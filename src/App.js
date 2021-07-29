@@ -1,24 +1,229 @@
-import logo from './logo.svg';
-import './App.css';
+import {
+  CssBaseline,
+  ThemeProvider,
+  createTheme,
+  Box,
+  makeStyles,
+} from "@material-ui/core";
+import Header from "./Components/Header";
+import Sidebar from "./Components/Sidebar";
+
+/**
+ * Theme generator
+ * */
+const themes = createTheme({
+  sidebarSmall: 50,
+  sidebarLarge: 200,
+  textOnPrimary: "#ffffff",
+});
+
+/**
+ * Styles generator
+ * */
+const useStyles = makeStyles((theme) => ({
+  rightSide: {
+    wordBreak: "break-word",
+  },
+  body: {
+    [theme.breakpoints.down("xs")]: {
+      paddingTop: 56,
+      paddingLeft: themes.sidebarSmall,
+    },
+  },
+}));
 
 function App() {
+  const classes = useStyles();
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <ThemeProvider theme={themes}>
+      <CssBaseline />
+      <Box display="flex">
+        <Box>
+          <Sidebar />
+        </Box>
+        <Box flexGrow={1}>
+          <Box className={classes.rightSide}>
+            <Header />
+            <div className={classes.body}>
+              ccc duvlorem
+              duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
+              duvlorem
+              duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
+              duvlorem
+              duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
+              duvlorem
+              duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
+              duvlorem
+              duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
+              duvlorem
+              duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
+              duvlorem duvloremduvloremdu ccc duvlorem
+              duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
+              duvlorem
+              duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
+              duvlorem
+              duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
+              duvlorem
+              duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
+              duvlorem
+              duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
+              duvlorem
+              duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
+              duvlorem duvloremduvloremdu ccc duvlorem
+              duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
+              duvlorem
+              duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
+              duvlorem
+              duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
+              duvlorem
+              duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
+              duvlorem
+              duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
+              duvlorem
+              duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
+              duvlorem duvloremduvloremdu ccc duvlorem
+              duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
+              duvlorem
+              duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
+              duvlorem
+              duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
+              duvlorem
+              duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
+              duvlorem
+              duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
+              duvlorem
+              duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
+              duvlorem duvloremduvloremdu ccc duvlorem
+              duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
+              duvlorem
+              duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
+              duvlorem
+              duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
+              duvlorem
+              duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
+              duvlorem
+              duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
+              duvlorem
+              duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
+              duvlorem duvloremduvloremdu ccc duvlorem
+              duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
+              duvlorem
+              duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
+              duvlorem
+              duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
+              duvlorem
+              duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
+              duvlorem
+              duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
+              duvlorem
+              duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
+              duvlorem duvloremduvloremdu ccc duvlorem
+              duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
+              duvlorem
+              duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
+              duvlorem
+              duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
+              duvlorem
+              duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
+              duvlorem
+              duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
+              duvlorem
+              duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
+              duvlorem duvloremduvloremdu ccc duvlorem
+              duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
+              duvlorem
+              duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
+              duvlorem
+              duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
+              duvlorem
+              duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
+              duvlorem
+              duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
+              duvlorem
+              duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
+              duvlorem
+              duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremccc
+              duvlorem
+              duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
+              duvlorem
+              duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
+              duvlorem
+              duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
+              duvlorem
+              duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
+              duvloremccc duvlorem
+              duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
+              duvlorem
+              duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
+              duvlorem
+              duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
+              duvlorem
+              duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
+              duvlorem
+              duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
+              duvlorem
+              duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
+              duvlorem
+              duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremccc
+              duvlorem
+              duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
+              duvlorem
+              duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
+              duvlorem
+              duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
+              duvlorem
+              duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
+              duvloremccc duvlorem
+              duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
+              duvlorem
+              duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
+              duvlorem
+              duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
+              duvlorem
+              duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
+              duvlorem
+              duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
+              duvlorem
+              duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
+              duvlorem
+              duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremccc
+              duvlorem
+              duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
+              duvlorem
+              duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
+              duvlorem
+              duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
+              duvlorem
+              duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
+              duvloremccc duvlorem
+              duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
+              duvlorem
+              duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
+              duvlorem
+              duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
+              duvlorem
+              duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
+              duvlorem
+              duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
+              duvlorem
+              duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
+              duvlorem
+              duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremccc
+              duvlorem
+              duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
+              duvlorem
+              duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
+              duvlorem
+              duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
+              duvlorem
+              duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
+              duvlorem
+            </div>
+          </Box>
+        </Box>
+      </Box>
+    </ThemeProvider>
   );
 }
 
