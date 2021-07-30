@@ -44,6 +44,20 @@ const useStyles = makeStyles((theme) => {
       flexDirection: "column",
       zIndex: 1,
       boxShadow: theme.shadows[1],
+      transition: "width 0.2s linear",
+      // Scrollbar Container
+      "&::-webkit-scrollbar": { width: 10 },
+      // Scrollbar track
+      "&::-webkit-scrollbar-track": { background: theme.palette.primary.light },
+      // Scrollbar mover
+      "&::-webkit-scrollbar-thumb": {
+        border: `2px solid ${theme.palette.primary.light}`,
+        background: theme.palette.primary.main,
+        borderRadius: 10,
+      },
+      "&::-webkit-scrollbar-thumb:hover": {
+        background: theme.palette.primary.dark,
+      },
     },
 
     // Icon side bar, on minimize btn
@@ -147,7 +161,7 @@ const Menu = ({ data: { title, icon, subNav } }) => {
       <Divider />
       <ListItem
         button
-        className={open && "menuOpen"}
+        className={open ? "menuOpen" : ""}
         onClick={() => setopen(!open)}
       >
         <ListItemIcon>
