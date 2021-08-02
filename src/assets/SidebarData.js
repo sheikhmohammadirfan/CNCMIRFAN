@@ -2,7 +2,6 @@ export const SidebarData = [
   {
     title: "About Us",
     path: "/about-us",
-    icon: "star",
     subNav: [
       {
         title: "Our Aim",
@@ -19,7 +18,6 @@ export const SidebarData = [
   {
     title: "Services",
     path: "/services",
-    icon: "star",
     subNav: [
       {
         title: "Service 1",
@@ -48,7 +46,6 @@ export const SidebarData = [
   {
     title: "Events",
     path: "/events",
-    icon: "star",
     subNav: [
       {
         title: "Event 1",

@@ -16,7 +16,7 @@ const useStyles = makeStyles((theme) => ({
   root: {
     minHeight: "min-content",
     color: theme.textOnPrimary,
-    background: theme.palette.primary.light,
+    background: theme.palette.primary.main,
     padding: theme.spacing(1),
     display: "flex",
     alignItems: "center",

@@ -8,7 +8,9 @@ import {
   ListItemIcon,
   ListItemText,
   makeStyles,
+  Tooltip,
   Typography,
+  useMediaQuery,
 } from "@material-ui/core";
 import AcUnitIcon from "@material-ui/icons/AcUnit";
 import React from "react";
@@ -28,6 +30,8 @@ const useStyles = makeStyles((theme) => {
       [theme.breakpoints.down("xs")]: {
         width: theme.sidebarSmall,
         position: "fixed",
+        // Hide scroll bar on reduce width
+        "&::-webkit-scrollbar": { display: "none" },
       },
       height: "100vh",
       background: theme.palette.primary.light,
@@ -35,6 +39,7 @@ const useStyles = makeStyles((theme) => {
       // Set Icon color
       "& .MuiIcon-root, & .MuiListItemIcon-root": {
         color: theme.textOnPrimary,
+        minWidth: 3 * iconPadding,
       },
       overflowY: "auto",
       overflowX: "hidden",
@@ -63,7 +68,13 @@ const useStyles = makeStyles((theme) => {
     // Icon side bar, on minimize btn
     closeSidebar: {
       width: theme.sidebarSmall,
-      [theme.breakpoints.down("xs")]: { width: theme.sidebarLarge },
+      // Hide scroll bar on reduce width
+      "&::-webkit-scrollbar": { display: "none" },
+      [theme.breakpoints.down("xs")]: {
+        width: theme.sidebarLarge,
+        // Display scroll bar again on complete width
+        "&::-webkit-scrollbar": { display: "block" },
+      },
     },
 
     // Sidebar btn to navigate
@@ -126,30 +137,32 @@ const useStyles = makeStyles((theme) => {
 /**
  * Submenu Component
  * */
-const SubMenu = ({ data: { title, icon, subNav } }) => {
+const SubMenu = ({ sidebarStatus, data: { title, icon } }) => {
   // Get styles
   const classes = useStyles();
 
   return (
-    <div className={classes.link}>
-      <ListItem button>
-        <ListItemIcon>
-          <Icon>{icon}</Icon>
-        </ListItemIcon>
-        <ListItemText>
-          <Typography noWrap variant="subtitle1">
-            {title}
-          </Typography>
-        </ListItemText>
-      </ListItem>
-    </div>
+    <Tooltip title={!sidebarStatus ? title : ""} arrow placement="right">
+      <div className={classes.link}>
+        <ListItem button>
+          <ListItemIcon>
+            <Icon>{icon}</Icon>
+          </ListItemIcon>
+          <ListItemText>
+            <Typography noWrap variant="subtitle1">
+              {title}
+            </Typography>
+          </ListItemText>
+        </ListItem>
+      </div>
+    </Tooltip>
   );
 };
 
 /**
  * Menu Component
  * */
-const Menu = ({ data: { title, icon, subNav } }) => {
+const Menu = ({ sidebarStatus, data: { title, icon, subNav } }) => {
   // Get styles
   const classes = useStyles();
 
@@ -158,26 +171,36 @@ const Menu = ({ data: { title, icon, subNav } }) => {
 
   return (
     <div className={classes.link}>
-      <Divider />
-      <ListItem
-        button
-        className={open ? "menuOpen" : ""}
-        onClick={() => setopen(!open)}
-      >
-        <ListItemIcon>
-          <Icon>{icon}</Icon>
-        </ListItemIcon>
-        <ListItemText>
-          <Typography noWrap variant="subtitle1">
-            {title}
-          </Typography>
-        </ListItemText>
-        {subNav && <Icon>{open ? "expand_less" : "expand_more"}</Icon>}
-      </ListItem>
+      {(sidebarStatus || !subNav) && (
+        <>
+          <Divider />
+          <Tooltip title={!sidebarStatus ? title : ""} placement="right">
+            <ListItem
+              button
+              className={open ? "menuOpen" : ""}
+              onClick={() => subNav && setopen(!open)}
+            >
+              {icon && (
+                <ListItemIcon>
+                  <Icon>{icon}</Icon>
+                </ListItemIcon>
+              )}
+              <ListItemText>
+                <Typography noWrap variant="subtitle1">
+                  {title}
+                </Typography>
+              </ListItemText>
+              {subNav && <Icon>{open ? "expand_less" : "expand_more"}</Icon>}
+            </ListItem>
+          </Tooltip>
+        </>
+      )}
       {open && (
         <div className="subMenu">
           {subNav &&
-            subNav.map((data, index) => <SubMenu data={data} key={index} />)}
+            subNav.map((data, index) => (
+              <SubMenu sidebarStatus={sidebarStatus} data={data} key={index} />
+            ))}
         </div>
       )}
     </div>
@@ -192,7 +215,10 @@ function Sidebar() {
   const classes = useStyles();
 
   // React states to open & close sub menu
-  const [open, setopen] = useState(false);
+  const [open, setopen] = useState(true);
+
+  // React state to change on theme breakpoint
+  const xs = useMediaQuery((theme) => theme.breakpoints.down("xs"));
 
   return (
     <Box className={`${classes.sidebar} ${!open && classes.closeSidebar}`}>
@@ -208,7 +234,11 @@ function Sidebar() {
       </ListItem>
       <List style={{ padding: 0 }}>
         {SidebarData.map((data, index) => (
-          <Menu data={data} key={index} />
+          <Menu
+            sidebarStatus={(open && !xs) || (!open && xs)}
+            data={data}
+            key={index}
+          />
         ))}
       </List>
       <Divider />
@@ -216,7 +246,9 @@ function Sidebar() {
         className={`${classes.sidebarBtn} ${classes.toggleSidebar}`}
         onClick={() => setopen(!open)}
       >
-        <Icon>{open ? "arrow_forward" : "arrow_back"}</Icon>
+        <Icon>
+          {(open && !xs) || (!open && xs) ? "arrow_back" : "arrow_forward"}
+        </Icon>
       </Button>
     </Box>
   );
