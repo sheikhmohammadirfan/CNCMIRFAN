@@ -26,7 +26,7 @@ const useStyles = makeStyles((theme) => ({
   headerContainer: {
     textAlign: "center",
     // Make title, subtitle bold
-    "& > h1, h4": { fontWeight: "bold", color: theme.palette.success.dark },
+    "& > h1, h4": { fontWeight: "bold", color: "darkblue" },
   },
 
   // Form Container
@@ -64,6 +64,7 @@ const useStyles = makeStyles((theme) => ({
     "&::before, &::after": {
       content: '""',
       whiteSpace: "pre",
+      margin: "auto 0",
       flex: "1 1",
       borderBottom: "1px solid #999",
     },
@@ -81,8 +82,19 @@ const useStyles = makeStyles((theme) => ({
       padding: theme.spacing(1),
       cursor: "pointer",
       transition: "color 0.2s linear",
-      "&:hover": { color: theme.palette.success.dark },
-      "& .MuiSvgIcon-root": { fontSize: "3rem" },
+      "& .MuiSvgIcon-root": { fontSize: "3.5rem" },
+    },
+    "& #facebook:hover, & #facebook:focus" : {
+      color: "#001E6C",
+    },
+    "& #github:hover, & #github:focus" : {
+      color: "#333",
+    },
+    "& #linkedin:hover, & #linkedin:focus" : {
+      color: "#035397",
+    },
+    "& #google:hover, & #google:focus" : {
+      color: "#BB8760",
     },
   },
 
@@ -150,16 +162,16 @@ function Auth() {
 
             <ul className={classes.socialContainer}>
               <li>
-                <FacebookIcon />
+                <FacebookIcon id="facebook"/>
               </li>
               <li>
-                <GitHubIcon />
+                <GitHubIcon id="github"/>
               </li>
               <li>
-                <LinkedInIcon />
+                <LinkedInIcon id="linkedin"/>
               </li>
               <li>
-                <GTranslateIcon />
+                <GTranslateIcon id="google"/>
               </li>
             </ul>
           </Box>

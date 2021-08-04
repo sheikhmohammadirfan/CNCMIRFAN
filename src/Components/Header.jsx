@@ -7,6 +7,7 @@ import {
 } from "@material-ui/core";
 import NotificationsIcon from "@material-ui/icons/Notifications";
 import React from "react";
+import Breadcrumbs from "./Breadcrumbs";
 
 /**
  * Styles generator
@@ -31,6 +32,7 @@ const useStyles = makeStyles((theme) => ({
 
   // Style for Avatar images
   avatar: {
+    cursor: "pointer",
     width: theme.spacing(5),
     height: theme.spacing(5),
     marginLeft: theme.spacing(2),
@@ -52,11 +54,12 @@ function Header() {
   });
 
   return (
+    <>
     <Box className={classes.root} boxShadow={headerScrollTrigger ? 3 : 0}>
       <Typography variant="h6">Header</Typography>
       <Box flexGrow={1}></Box>
       <Box display="flex" alignItems="center">
-        <NotificationsIcon />
+        <NotificationsIcon style={{cursor: "pointer"}} />
         <Avatar
           className={classes.avatar}
           alt="A"
@@ -64,6 +67,8 @@ function Header() {
         />
       </Box>
     </Box>
+    <Breadcrumbs/>
+    </>
   );
 }
 
