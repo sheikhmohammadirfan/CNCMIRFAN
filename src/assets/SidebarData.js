@@ -1,86 +1,141 @@
 export const SidebarData = [
   {
-    title: "About Us",
+    icon: "star",
+    title: "Document Compliance",
     path: "/about-us",
-    subNav: [
-      {
-        title: "Our Aim",
-        path: "/about-us/aim",
-        icon: "star",
-      },
-      {
-        title: "Our Vision",
-        path: "/about-us/vision",
-        icon: "star",
-      },
-    ],
   },
   {
-    title: "Services",
+    icon: "star",
+    title: "Verify Complaince",
     path: "/services",
+  },
+  {
+    title: "Complaince Framework",
+    path: "/contact",
+    icon: "star",
     subNav: [
       {
-        title: "Service 1",
+        title: "FEDRAMP / FISMA",
         path: "/services/services1",
         icon: "star",
-        cName: "sub-nav",
       },
       {
-        title: "Service 2",
+        title: "HIPAA",
         path: "/services/services2",
         icon: "star",
-        cName: "sub-nav",
       },
       {
-        title: "Service 3",
+        title: "PCI DSS",
         path: "/services/services3",
         icon: "star",
       },
+      {
+        title: "ISO 27001",
+        path: "/services/services3",
+        icon: "star",
+        subNav: [
+          {
+            title: "Compliance",
+            path: "/events",
+            icon: "star",
+          },
+          {
+            title: "MY TASKS",
+            path: "/events",
+            icon: "star",
+          },
+          {
+            title: "MY TASKS",
+            path: "/events",
+            icon: "star",
+          },
+          {
+            title: "MY TASKS",
+            path: "/events",
+            icon: "star",
+          },
+        ],
+      },
     ],
   },
   {
-    title: "Contact",
-    path: "/contact",
+    title: "Settings",
+    path: "",
+    icon: "settings",
+    subNav: [
+      {
+        title: "Compliance",
+        path: "/events",
+        icon: "star",
+        subNav: [
+          {
+            title: "Compliance",
+            path: "/events",
+            icon: "star",
+          },
+          {
+            title: "MY TASKS",
+            path: "/events",
+            icon: "star",
+          },
+          {
+            title: "MY TASKS",
+            path: "/events",
+            icon: "star",
+          },
+          {
+            title: "MY TASKS",
+            path: "/events",
+            icon: "star",
+          },
+        ],
+      },
+      {
+        title: "MY TASKS",
+        path: "/events",
+        icon: "star",
+      },
+      {
+        title: "MY TASKS",
+        path: "/events",
+        icon: "star",
+        subNav: [
+          {
+            title: "Compliance",
+            path: "/events",
+            icon: "star",
+          },
+          {
+            title: "MY TASKS",
+            path: "/events",
+            icon: "star",
+          },
+          {
+            title: "MY TASKS",
+            path: "/events",
+            icon: "star",
+          },
+          {
+            title: "MY TASKS",
+            path: "/events",
+            icon: "star",
+          },
+        ]
+      },
+      {
+        title: "MY TASKS",
+        path: "/events",
+        icon: "star",
+      },
+    ],
+  },
+  {
+    title: "MY TASKS",
+    path: "/events",
     icon: "star",
   },
   {
-    title: "Events",
-    path: "/events",
-    subNav: [
-      {
-        title: "Event 1",
-        path: "/events/events1",
-        icon: "star",
-      },
-      {
-        title: "Event 2",
-        path: "/events/events2",
-        icon: "star",
-      },
-      {
-        title: "Event 3",
-        path: "/events/events3",
-        icon: "star",
-      },
-      {
-        title: "Event 4",
-        path: "/events/events4",
-        icon: "star",
-      },
-      {
-        title: "Event 4",
-        path: "/events/events4",
-        icon: "star",
-      },
-      {
-        title: "Event 5",
-        path: "/events/events5",
-        icon: "star",
-      },
-    ],
-  },
-  {
-    title: "Support",
+    title: "Manage Artifacts",
     path: "/support",
     icon: "star",
   },

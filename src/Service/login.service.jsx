@@ -7,8 +7,9 @@ class AppService {
     return axios
       .post("/auth/login", { email, password })
       .then((res) => {
+        console.log(res);
         // Save JWT token
-        localStorage.setItem("accessToken", res.data.accessToken);
+        localStorage.setItem("accessToken", res.data.accesToken);
         // Show toast
         toast("Welcome", {
           toastId: "login-toast",

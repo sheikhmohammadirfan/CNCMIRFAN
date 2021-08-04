@@ -19,7 +19,7 @@ import ProtectedRoutes from "./Components/ProtectedRoutes";
  * */
 let themes = createTheme({
   sidebarSmall: 50,
-  sidebarLarge: 200,
+  sidebarLarge: 250,
   textOnPrimary: "#ffffff",
 });
 themes = responsiveFontSizes(themes);

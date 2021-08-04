@@ -11,6 +11,8 @@ import {
   Tooltip,
   Typography,
   useMediaQuery,
+  withStyles,
+  ClickAwayListener,
 } from "@material-ui/core";
 import AcUnitIcon from "@material-ui/icons/AcUnit";
 import React from "react";
@@ -37,7 +39,7 @@ const useStyles = makeStyles((theme) => {
       background: theme.palette.primary.light,
       color: theme.textOnPrimary,
       // Set Icon color
-      "& .MuiIcon-root, & .MuiListItemIcon-root": {
+      "& .MuiButton-root .MuiIcon-root, & .MuiListItemIcon-root": {
         color: theme.textOnPrimary,
         minWidth: 3 * iconPadding,
       },
@@ -80,31 +82,17 @@ const useStyles = makeStyles((theme) => {
     // Sidebar btn to navigate
     link: {
       // Decrease left & right padding so that, it look center on minimize
-      "& > .MuiListItem-root": {
+      "& .MuiListItem-root": {
         paddingLeft: iconPadding,
         paddingRight: iconPadding,
       },
       // Hover effect on list btn
-      "& > .MuiListItem-root:hover": {
+      "& .MuiListItem-root:hover": {
         backgroundColor: "rgba(255, 255, 255, 0.2)",
       },
-
-      // Sub menu backgroud style
-      "& .subMenu, & .menuOpen": {
-        backgroundColor: "rgba(255, 255, 255, 0.1)",
-      },
-      // Add margin bottom to submenu if it is not empty
-      "& .subMenu:not(:empty)": { paddingBottom: theme.spacing(1) },
-      // Decrease vertical space in sub menu btn
-      "& .subMenu": {
-        "& .MuiListItem-root": {
-          paddingTop: 0,
-          paddingBottom: 0,
-          "& .MuiListItemText-root": {
-            marginTop: theme.spacing(1 / 4),
-            marginBottom: theme.spacing(1 / 4),
-          },
-        },
+      // Reduce height of list btn
+      "& .MuiListItemText-root": {
+        margin: 0,
       },
     },
 
@@ -127,7 +115,7 @@ const useStyles = makeStyles((theme) => {
     },
 
     // Stick toggle btn to bottom & make it grow to available height
-    toggleSidebar: {
+    togglerBtn: {
       bottom: 0,
       flexGrow: 1,
     },
@@ -135,75 +123,83 @@ const useStyles = makeStyles((theme) => {
 });
 
 /**
- * Submenu Component
+ * Customize Tooltip to make sidebar popup
  * */
-const SubMenu = ({ sidebarStatus, data: { title, icon } }) => {
-  // Get styles
-  const classes = useStyles();
-
-  return (
-    <Tooltip title={!sidebarStatus ? title : ""} arrow placement="right">
-      <div className={classes.link}>
-        <ListItem button>
-          <ListItemIcon>
-            <Icon>{icon}</Icon>
-          </ListItemIcon>
-          <ListItemText>
-            <Typography noWrap variant="subtitle1">
-              {title}
-            </Typography>
-          </ListItemText>
-        </ListItem>
-      </div>
-    </Tooltip>
-  );
-};
+const PopupTooltip = withStyles((theme) => {
+  const iconPadding = (theme.sidebarSmall - 24) / 2;
+  return {
+    tooltip: {
+      marginLeft: 5,
+      marginRight: 5,
+      padding: 0,
+      background: theme.palette.primary.light,
+      boxShadow: theme.shadows[4],
+      // Set Icon color
+      "& .MuiListItemIcon-root": {
+        minWidth: 3 * iconPadding,
+        color: theme.textOnPrimary,
+      },
+      // Decrease left & right padding so that, it look center on minimize
+      "& .MuiListItem-root": {
+        paddingLeft: iconPadding,
+        paddingRight: iconPadding,
+      },
+      // Hover effect on list btn
+      "& .MuiListItem-root:hover": {
+        backgroundColor: "rgba(255, 255, 255, 0.2)",
+      },
+      // Reduce height of list btn
+      "& .MuiListItemText-root": { margin: 0 },
+      // Make tooltip text small
+      "& .MuiTypography-body2": { padding: theme.spacing(1 / 2) },
+    },
+  };
+})(Tooltip);
 
 /**
  * Menu Component
  * */
-const Menu = ({ sidebarStatus, data: { title, icon, subNav } }) => {
+const Menu = ({ sidebarStatus = true, data: { title, icon, subNav } }) => {
   // Get styles
   const classes = useStyles();
 
-  // React states to open & close sub menu
-  const [open, setopen] = useState(false);
+  const [showTooltip, toggleTooltip] = useState(false);
 
   return (
-    <div className={classes.link}>
-      {(sidebarStatus || !subNav) && (
-        <>
-          <Divider />
-          <Tooltip title={!sidebarStatus ? title : ""} placement="right">
-            <ListItem
-              button
-              className={open ? "menuOpen" : ""}
-              onClick={() => subNav && setopen(!open)}
-            >
-              {icon && (
-                <ListItemIcon>
-                  <Icon>{icon}</Icon>
-                </ListItemIcon>
-              )}
-              <ListItemText>
-                <Typography noWrap variant="subtitle1">
-                  {title}
-                </Typography>
-              </ListItemText>
-              {subNav && <Icon>{open ? "expand_less" : "expand_more"}</Icon>}
-            </ListItem>
-          </Tooltip>
-        </>
-      )}
-      {open && (
-        <div className="subMenu">
-          {subNav &&
-            subNav.map((data, index) => (
-              <SubMenu sidebarStatus={sidebarStatus} data={data} key={index} />
+    <PopupTooltip
+      title={
+        subNav ? (
+          <List className={classes.link}>
+            {subNav.map((val, index) => (
+              <Menu data={val} key={index} />
             ))}
-        </div>
-      )}
-    </div>
+          </List>
+        ) : !sidebarStatus ? (
+          <Typography noWrap variant="body2">
+            {title}
+          </Typography>
+        ) : (
+          ""
+        )
+      }
+      placement="right"
+      interactive
+      onClose={() => toggleTooltip(false)}
+      onOpen={() => toggleTooltip(true)}
+      open={showTooltip}
+    >
+      <ListItem button>
+        <ListItemIcon>
+          <Icon>{icon}</Icon>
+        </ListItemIcon>
+        <ListItemText>
+          <Typography noWrap variant="subtitle1">
+            {title}
+          </Typography>
+        </ListItemText>
+        {subNav && <Icon>arrow_right</Icon>}
+      </ListItem>
+    </PopupTooltip>
   );
 };
 
@@ -234,16 +230,15 @@ function Sidebar() {
       </ListItem>
       <List style={{ padding: 0 }}>
         {SidebarData.map((data, index) => (
-          <Menu
-            sidebarStatus={(open && !xs) || (!open && xs)}
-            data={data}
-            key={index}
-          />
+          <div className={classes.link} key={index}>
+            <Divider />
+            <Menu sidebarStatus={(open && !xs) || (!open && xs)} data={data} />
+          </div>
         ))}
       </List>
       <Divider />
       <Button
-        className={`${classes.sidebarBtn} ${classes.toggleSidebar}`}
+        className={`${classes.sidebarBtn} ${classes.togglerBtn}`}
         onClick={() => setopen(!open)}
       >
         <Icon>
