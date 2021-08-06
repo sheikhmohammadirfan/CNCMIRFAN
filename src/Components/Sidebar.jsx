@@ -1,6 +1,5 @@
 import {
   Box,
-  Button,
   Divider,
   Icon,
   List,
@@ -13,6 +12,9 @@ import {
   useMediaQuery,
   withStyles,
   ClickAwayListener,
+  Avatar,
+  Button,
+  IconButton,
 } from "@material-ui/core";
 import AcUnitIcon from "@material-ui/icons/AcUnit";
 import React from "react";
@@ -32,26 +34,37 @@ const useStyles = makeStyles((theme) => {
       [theme.breakpoints.down("xs")]: {
         width: theme.sidebarSmall,
         position: "fixed",
-        // Hide scroll bar on reduce width
-        "&::-webkit-scrollbar": { display: "none" },
       },
       height: "100vh",
       background: theme.palette.primary.light,
       color: theme.textOnPrimary,
-      // Set Icon color
-      "& .MuiButton-root .MuiIcon-root, & .MuiListItemIcon-root": {
-        color: theme.textOnPrimary,
-        minWidth: 3 * iconPadding,
-      },
-      overflowY: "auto",
-      overflowX: "hidden",
       position: "sticky",
       top: 0,
+      zIndex: 1,
       display: "flex",
       flexDirection: "column",
-      zIndex: 1,
       boxShadow: theme.shadows[1],
       transition: "width 0.2s linear",
+    },
+
+    // Icon side bar, on minimize btn
+    closeSidebar: {
+      width: theme.sidebarSmall,
+      [theme.breakpoints.down("xs")]: {
+        width: theme.sidebarLarge,
+      },
+    },
+
+    // Nav list container
+    navContainer: {
+      padding: 0,
+      overflowY: "auto",
+      overflowX: "hidden",
+      flexGrow: 1,
+      // Hide scroll bar on reduce width
+      [theme.breakpoints.down("xs")]: {
+        "&::-webkit-scrollbar": { display: "none" },
+      },
       // Scrollbar Container
       "&::-webkit-scrollbar": { width: 10 },
       // Scrollbar track
@@ -67,13 +80,11 @@ const useStyles = makeStyles((theme) => {
       },
     },
 
-    // Icon side bar, on minimize btn
-    closeSidebar: {
-      width: theme.sidebarSmall,
+    // Nav container on small width
+    navClose: {
       // Hide scroll bar on reduce width
       "&::-webkit-scrollbar": { display: "none" },
       [theme.breakpoints.down("xs")]: {
-        width: theme.sidebarLarge,
         // Display scroll bar again on complete width
         "&::-webkit-scrollbar": { display: "block" },
       },
@@ -81,6 +92,11 @@ const useStyles = makeStyles((theme) => {
 
     // Sidebar btn to navigate
     link: {
+      // Set Icon color
+      "& .MuiListItemIcon-root": {
+        color: theme.textOnPrimary,
+        minWidth: 3 * iconPadding,
+      },
       // Decrease left & right padding so that, it look center on minimize
       "& .MuiListItem-root": {
         paddingLeft: iconPadding,
@@ -96,28 +112,31 @@ const useStyles = makeStyles((theme) => {
       },
     },
 
-    // Logo & toggle btns in sidebar
-    sidebarBtn: {
-      width: "100%",
-      minWidth: "max-content",
-      minHeight: theme.sidebarSmall,
-      position: "sticky",
-      padding: 0,
-      zIndex: 10,
-      backgroundColor: theme.palette.primary.light,
-      "&:hover": { backgroundColor: theme.palette.primary.light },
-    },
-
-    // Stick logo btn to top
+    // Style for logobtn in sidebar
     logoBtn: {
-      top: 0,
       padding: `${theme.spacing(1)}px ${iconPadding}px`,
+      minHeight: 50,
+      "& .MuiListItemIcon-root": { color: theme.textOnPrimary },
     },
 
-    // Stick toggle btn to bottom & make it grow to available height
-    togglerBtn: {
-      bottom: 0,
-      flexGrow: 1,
+    // style for Account profile btn
+    accBtn: {
+      justifyContent: "center",
+      "& .MuiListItemIcon-root": { minWidth: "max-content" },
+    },
+
+    toggleBtn: {
+      maxWidth: "max-content",
+      minWidth: "max-content",
+      backgroundColor: "white",
+      transition: "all 0.4s linear",
+      "&:hover": { backgroundColor: "white" },
+      position: "absolute",
+      right: -9,
+      top: 5,
+      "& .MuiIcon-root": {
+        fontSize: 12,
+      },
     },
   };
 });
@@ -166,40 +185,43 @@ const Menu = ({ sidebarStatus = true, data: { title, icon, subNav } }) => {
   const [showTooltip, toggleTooltip] = useState(false);
 
   return (
-    <PopupTooltip
-      title={
-        subNav ? (
-          <List className={classes.link}>
-            {subNav.map((val, index) => (
-              <Menu data={val} key={index} />
-            ))}
-          </List>
-        ) : !sidebarStatus ? (
-          <Typography noWrap variant="body2">
-            {title}
-          </Typography>
-        ) : (
-          ""
-        )
-      }
-      placement="right"
-      interactive
-      onClose={() => toggleTooltip(false)}
-      onOpen={() => toggleTooltip(true)}
-      open={showTooltip}
-    >
-      <ListItem button>
-        <ListItemIcon>
-          <Icon>{icon}</Icon>
-        </ListItemIcon>
-        <ListItemText>
-          <Typography noWrap variant="subtitle1">
-            {title}
-          </Typography>
-        </ListItemText>
-        {subNav && <Icon>arrow_right</Icon>}
-      </ListItem>
-    </PopupTooltip>
+    <ClickAwayListener onClickAway={() => toggleTooltip(false)}>
+      <PopupTooltip
+        title={
+          subNav ? (
+            <List className={classes.link}>
+              {subNav.map((val, index) => (
+                <Menu data={val} key={index} />
+              ))}
+            </List>
+          ) : !sidebarStatus ? (
+            <Typography noWrap variant="body2">
+              {title}
+            </Typography>
+          ) : (
+            ""
+          )
+        }
+        placement="right"
+        interactive
+        onClose={() => toggleTooltip(false)}
+        onOpen={() => toggleTooltip(true)}
+        open={showTooltip}
+        leaveTouchDelay={60000}
+      >
+        <ListItem button onClick={() => toggleTooltip(true)}>
+          <ListItemIcon>
+            <Icon>{icon}</Icon>
+          </ListItemIcon>
+          <ListItemText>
+            <Typography noWrap variant="subtitle1">
+              {title}
+            </Typography>
+          </ListItemText>
+          {subNav && <Icon>arrow_right</Icon>}
+        </ListItem>
+      </PopupTooltip>
+    </ClickAwayListener>
   );
 };
 
@@ -210,15 +232,19 @@ function Sidebar() {
   // Get Styles
   const classes = useStyles();
 
-  // React states to open & close sub menu
-  const [open, setopen] = useState(true);
+  // React states to isSidebarOpen & close sub menu
+  const [isSidebarOpen, toggleSidebar] = useState(true);
 
   // React state to change on theme breakpoint
   const xs = useMediaQuery((theme) => theme.breakpoints.down("xs"));
 
   return (
-    <Box className={`${classes.sidebar} ${!open && classes.closeSidebar}`}>
-      <ListItem button className={`${classes.sidebarBtn} ${classes.logoBtn}`}>
+    <Box
+      className={`${classes.sidebar} ${
+        !isSidebarOpen ? classes.closeSidebar : ""
+      }`}
+    >
+      <ListItem button className={classes.logoBtn}>
         <ListItemIcon>
           <AcUnitIcon />
         </ListItemIcon>
@@ -228,23 +254,50 @@ function Sidebar() {
           </Typography>
         </ListItemText>
       </ListItem>
-      <List style={{ padding: 0 }}>
+      <Divider />
+
+      <List
+        className={`${classes.navContainer} ${
+          !isSidebarOpen ? classes.navClose : ""
+        }`}
+      >
         {SidebarData.map((data, index) => (
           <div className={classes.link} key={index}>
-            <Divider />
-            <Menu sidebarStatus={(open && !xs) || (!open && xs)} data={data} />
+            {index > 0 && <Divider />}
+            <Menu
+              sidebarStatus={(isSidebarOpen && !xs) || (!isSidebarOpen && xs)}
+              data={data}
+            />
           </div>
         ))}
       </List>
+
       <Divider />
-      <Button
-        className={`${classes.sidebarBtn} ${classes.togglerBtn}`}
-        onClick={() => setopen(!open)}
+      <ListItem button className={classes.accBtn}>
+        <ListItemIcon>
+          <Avatar
+            alt="A"
+            src="https://images.unsplash.com/photo-1625428508242-07166dc06bba?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxfDB8MXxyYW5kb218MHx8fHx8fHx8MTYyNzQ4MzIxNA&ixlib=rb-1.2.1&q=80&w=1080"
+          />
+        </ListItemIcon>
+        <ListItemText>
+          <Typography noWrap variant="h5" align="center">
+            Accounts
+          </Typography>
+        </ListItemText>
+      </ListItem>
+
+      <IconButton
+        size="small"
+        className={classes.toggleBtn}
+        onClick={() => toggleSidebar(!isSidebarOpen)}
       >
         <Icon>
-          {(open && !xs) || (!open && xs) ? "arrow_back" : "arrow_forward"}
+          {(isSidebarOpen && !xs) || (!isSidebarOpen && xs)
+            ? "arrow_back"
+            : "menu"}
         </Icon>
-      </Button>
+      </IconButton>
     </Box>
   );
 }
