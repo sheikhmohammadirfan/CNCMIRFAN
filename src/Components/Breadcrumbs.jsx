@@ -2,16 +2,37 @@ import React from "react";
 import {
   Breadcrumbs as MUIBreadcrumbs,
   Link,
-  Typography
+  Typography,
+  makeStyles
 } from "@material-ui/core";
 import { withRouter } from "react-router-dom";
 
+
+const useStyles = makeStyles({
+  typo: {
+    color: "#000"
+  },
+
+  link: { 
+    color: "#777",
+    "&:hover": {
+      cursor: "pointer",
+      textDecoration: "none",
+      color: "#333",
+    },
+  }
+});
+
 const Breadcrumbs = props => {
+
+  const classes = useStyles();
+
   // extracting the page relative paths
   const {
     history,
     location: { pathname }
   } = props;
+  
 
   //filtering to get rid of empty string
   const pathnames = pathname.split("/").filter(x => x);
@@ -20,9 +41,9 @@ const Breadcrumbs = props => {
     // but its herirarchical parent are a Link component
     <MUIBreadcrumbs aria-label="breadcrumb">
       {pathnames.length > 0 ? (
-        <Link color="inherit" onClick={() => history.push("/")}>Home</Link>
+        <Link className={classes.link} onClick={() => history.push("/")}>Home</Link>
       ) : (
-        <Typography> Home </Typography>
+        <Typography className={classes.typo}> Home </Typography>
       )}
       {/* figuring out the name and index from the pathname array
       and displaying it as breadcrumbs */}
@@ -30,7 +51,7 @@ const Breadcrumbs = props => {
         const routeTo = `/${pathnames.slice(0, index + 1).join("/")}`;
         const isLast = index === pathnames.length - 1;
         return isLast ? (
-          <Typography key={name}>{name}</Typography>
+          <Typography className={classes.typo} key={name}>{name}</Typography>
         ) : (
           <Link color="inherit" key={name} onClick={() => history.push(routeTo)}>
             {name}

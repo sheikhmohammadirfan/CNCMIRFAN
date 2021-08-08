@@ -1,6 +1,5 @@
 import {
   Box,
-  Divider,
   Icon,
   List,
   ListItem,
@@ -13,7 +12,6 @@ import {
   withStyles,
   ClickAwayListener,
   Avatar,
-  Button,
   IconButton,
 } from "@material-ui/core";
 import AcUnitIcon from "@material-ui/icons/AcUnit";
@@ -254,7 +252,6 @@ function Sidebar() {
           </Typography>
         </ListItemText>
       </ListItem>
-      <Divider />
 
       <List
         className={`${classes.navContainer} ${
@@ -263,7 +260,7 @@ function Sidebar() {
       >
         {SidebarData.map((data, index) => (
           <div className={classes.link} key={index}>
-            {index > 0 && <Divider />}
+            {index > 0}
             <Menu
               sidebarStatus={(isSidebarOpen && !xs) || (!isSidebarOpen && xs)}
               data={data}
@@ -272,7 +269,6 @@ function Sidebar() {
         ))}
       </List>
 
-      <Divider />
       <ListItem button className={classes.accBtn}>
         <ListItemIcon>
           <Avatar

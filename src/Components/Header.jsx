@@ -20,6 +20,7 @@ const useStyles = makeStyles((theme) => ({
     padding: theme.spacing(1),
     paddingLeft: theme.spacing(1.5),
     display: "flex",
+    justifyContent: "space-between",
     alignItems: "center",
     position: "sticky",
     top: 0,
@@ -48,7 +49,7 @@ function Header() {
     <>
       <Box className={classes.root} boxShadow={headerScrollTrigger ? 3 : 0}>
         <Breadcrumbs />
-        <Box flexGrow={1}></Box>
+        <Typography>Home</Typography>
         <Box display="flex" alignItems="center">
           <NotificationsIcon style={{ cursor: "pointer" }} />
         </Box>

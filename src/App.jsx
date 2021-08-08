@@ -13,6 +13,9 @@ import Sidebar from "./Components/Sidebar";
 import Auth from "./Pages/Auth";
 import "react-toastify/dist/ReactToastify.css";
 import ProtectedRoutes from "./Components/ProtectedRoutes";
+import { userData } from "./assets/dummyData";
+import Chart from "./Components/Chart";
+import { useLayoutEffect, useState } from 'react';
 
 /**
  * Theme generator
@@ -48,9 +51,22 @@ toast.configure({
   progress: undefined,
 });
 
+function useWindowSize() {
+  const [size, setSize] = useState([0, 0]);
+  useLayoutEffect(() => {
+    function updateSize() {
+      setSize([window.innerWidth]);
+    }
+    window.addEventListener('resize', updateSize);
+    updateSize();
+    return () => window.removeEventListener('resize', updateSize);
+  }, []);
+  return size;
+}
+
 function App() {
   const classes = useStyles();
-
+  const [width] = useWindowSize();
   return (
     <ThemeProvider theme={themes}>
       <CssBaseline />
@@ -68,180 +84,12 @@ function App() {
                 <Box className={classes.rightSide}>
                   <Header />
                   <div className={classes.body}>
-                    ccc duvlorem
-                    duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
-                    duvlorem
-                    duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
-                    duvlorem
-                    duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
-                    duvlorem
-                    duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
-                    duvlorem
-                    duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
-                    duvlorem
-                    duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
-                    duvlorem duvloremduvloremdu ccc duvlorem
-                    duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
-                    duvlorem
-                    duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
-                    duvlorem
-                    duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
-                    duvlorem
-                    duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
-                    duvlorem
-                    duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
-                    duvlorem
-                    duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
-                    duvlorem duvloremduvloremdu ccc duvlorem
-                    duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
-                    duvlorem
-                    duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
-                    duvlorem
-                    duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
-                    duvlorem
-                    duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
-                    duvlorem
-                    duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
-                    duvlorem
-                    duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
-                    duvlorem duvloremduvloremdu ccc duvlorem
-                    duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
-                    duvlorem
-                    duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
-                    duvlorem
-                    duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
-                    duvlorem
-                    duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
-                    duvlorem
-                    duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
-                    duvlorem
-                    duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
-                    duvlorem duvloremduvloremdu ccc duvlorem
-                    duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
-                    duvlorem
-                    duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
-                    duvlorem
-                    duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
-                    duvlorem
-                    duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
-                    duvlorem
-                    duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
-                    duvlorem
-                    duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
-                    duvlorem duvloremduvloremdu ccc duvlorem
-                    duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
-                    duvlorem
-                    duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
-                    duvlorem
-                    duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
-                    duvlorem
-                    duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
-                    duvlorem
-                    duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
-                    duvlorem
-                    duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
-                    duvlorem duvloremduvloremdu ccc duvlorem
-                    duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
-                    duvlorem
-                    duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
-                    duvlorem
-                    duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
-                    duvlorem
-                    duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
-                    duvlorem
-                    duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
-                    duvlorem
-                    duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
-                    duvlorem duvloremduvloremdu ccc duvlorem
-                    duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
-                    duvlorem
-                    duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
-                    duvlorem
-                    duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
-                    duvlorem
-                    duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
-                    duvlorem
-                    duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
-                    duvlorem
-                    duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
-                    duvlorem
-                    duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremccc
-                    duvlorem
-                    duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
-                    duvlorem
-                    duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
-                    duvlorem
-                    duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
-                    duvlorem
-                    duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
-                    duvloremccc duvlorem
-                    duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
-                    duvlorem
-                    duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
-                    duvlorem
-                    duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
-                    duvlorem
-                    duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
-                    duvlorem
-                    duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
-                    duvlorem
-                    duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
-                    duvlorem
-                    duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremccc
-                    duvlorem
-                    duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
-                    duvlorem
-                    duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
-                    duvlorem
-                    duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
-                    duvlorem
-                    duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
-                    duvloremccc duvlorem
-                    duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
-                    duvlorem
-                    duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
-                    duvlorem
-                    duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
-                    duvlorem
-                    duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
-                    duvlorem
-                    duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
-                    duvlorem
-                    duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
-                    duvlorem
-                    duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremccc
-                    duvlorem
-                    duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
-                    duvlorem
-                    duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
-                    duvlorem
-                    duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
-                    duvlorem
-                    duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
-                    duvloremccc duvlorem
-                    duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
-                    duvlorem
-                    duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
-                    duvlorem
-                    duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
-                    duvlorem
-                    duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
-                    duvlorem
-                    duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
-                    duvlorem
-                    duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
-                    duvlorem
-                    duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremccc
-                    duvlorem
-                    duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
-                    duvlorem
-                    duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
-                    duvlorem
-                    duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
-                    duvlorem
-                    duvloremduvloremduvloremduvloremduvloremduvloremduvloremduvloremduvlorem
-                    duvlorem
-                  </div>
+                   <Chart data={ width > 800 ?  userData: userData.slice(0,4)} 
+                    title="Analytics"
+                    grid
+                    dataKey="Active User"
+                   />
+                    </div>
                 </Box>
               </Box>
             </Box>
