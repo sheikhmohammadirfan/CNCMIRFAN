@@ -15,7 +15,8 @@ import "react-toastify/dist/ReactToastify.css";
 import ProtectedRoutes from "./Components/ProtectedRoutes";
 import { userData } from "./assets/dummyData";
 import Chart from "./Components/Chart";
-import { useLayoutEffect, useState } from 'react';
+import { useLayoutEffect, useState } from "react";
+import Verify from "./Pages/Verify";
 
 /**
  * Theme generator
@@ -57,9 +58,9 @@ function useWindowSize() {
     function updateSize() {
       setSize([window.innerWidth]);
     }
-    window.addEventListener('resize', updateSize);
+    window.addEventListener("resize", updateSize);
     updateSize();
-    return () => window.removeEventListener('resize', updateSize);
+    return () => window.removeEventListener("resize", updateSize);
   }, []);
   return size;
 }
@@ -81,16 +82,22 @@ function App() {
                 <Sidebar />
               </Box>
               <Box flexGrow={1}>
-                <Box className={classes.rightSide}>
-                  <Header />
-                  <div className={classes.body}>
-                   <Chart data={ width > 800 ?  userData: userData.slice(0,4)} 
-                    title="Analytics"
-                    grid
-                    dataKey="Active User"
-                   />
+                <Header />
+                <Route exact path="/">
+                  <Box className={classes.rightSide}>
+                    <div className={classes.body}>
+                      <Chart
+                        data={width > 800 ? userData : userData.slice(0, 4)}
+                        title="Analytics"
+                        grid
+                        dataKey="Active User"
+                      />
                     </div>
-                </Box>
+                  </Box>
+                </Route>
+                <Route exact path="/verify">
+                  <Verify />
+                </Route>
               </Box>
             </Box>
           </ProtectedRoutes>
