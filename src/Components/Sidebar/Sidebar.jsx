@@ -2,22 +2,20 @@ import {
   Box,
   Icon,
   List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
   makeStyles,
-  Tooltip,
   Typography,
   useMediaQuery,
-  withStyles,
-  ClickAwayListener,
-  Avatar,
   IconButton,
+  Divider,
 } from "@material-ui/core";
 import AcUnitIcon from "@material-ui/icons/AcUnit";
 import React from "react";
+import { useEffect } from "react";
 import { useState } from "react";
-import { SidebarData } from "../assets/SidebarData";
+import { SidebarData } from "../../assets/SidebarData";
+import MenuPopup from "./MenuPopup";
+import ProfileBtn from "./ProfileBtn";
+import SidebarItem from "./SidebarItem";
 
 /**
  * Styles generator
@@ -28,9 +26,9 @@ const useStyles = makeStyles((theme) => {
   return {
     // Sidebar root
     sidebar: {
+      flex: "1",
       width: theme.sidebarLarge,
       [theme.breakpoints.down("xs")]: {
-        width: theme.sidebarSmall,
         position: "fixed",
       },
       height: "100vh",
@@ -46,12 +44,7 @@ const useStyles = makeStyles((theme) => {
     },
 
     // Icon side bar, on minimize btn
-    closeSidebar: {
-      width: theme.sidebarSmall,
-      [theme.breakpoints.down("xs")]: {
-        width: theme.sidebarLarge,
-      },
-    },
+    closeSidebar: { width: theme.sidebarSmall },
 
     // Nav list container
     navContainer: {
@@ -117,12 +110,7 @@ const useStyles = makeStyles((theme) => {
       "& .MuiListItemIcon-root": { color: theme.textOnPrimary },
     },
 
-    // style for Account profile btn
-    accBtn: {
-      justifyContent: "center",
-      "& .MuiListItemIcon-root": { minWidth: "max-content" },
-    },
-
+    // Style for sidebar width toggler
     toggleBtn: {
       maxWidth: "max-content",
       minWidth: "max-content",
@@ -132,46 +120,10 @@ const useStyles = makeStyles((theme) => {
       position: "absolute",
       right: -9,
       top: 5,
-      "& .MuiIcon-root": {
-        fontSize: 12,
-      },
+      "& .MuiIcon-root": { fontSize: 12 },
     },
   };
 });
-
-/**
- * Customize Tooltip to make sidebar popup
- * */
-const PopupTooltip = withStyles((theme) => {
-  const iconPadding = (theme.sidebarSmall - 24) / 2;
-  return {
-    tooltip: {
-      marginLeft: 5,
-      marginRight: 5,
-      padding: 0,
-      background: theme.palette.primary.light,
-      boxShadow: theme.shadows[4],
-      // Set Icon color
-      "& .MuiListItemIcon-root": {
-        minWidth: 3 * iconPadding,
-        color: theme.textOnPrimary,
-      },
-      // Decrease left & right padding so that, it look center on minimize
-      "& .MuiListItem-root": {
-        paddingLeft: iconPadding,
-        paddingRight: iconPadding,
-      },
-      // Hover effect on list btn
-      "& .MuiListItem-root:hover": {
-        backgroundColor: "rgba(255, 255, 255, 0.2)",
-      },
-      // Reduce height of list btn
-      "& .MuiListItemText-root": { margin: 0 },
-      // Make tooltip text small
-      "& .MuiTypography-body2": { padding: theme.spacing(1 / 2) },
-    },
-  };
-})(Tooltip);
 
 /**
  * Menu Component
@@ -180,46 +132,35 @@ const Menu = ({ sidebarStatus = true, data: { title, icon, subNav } }) => {
   // Get styles
   const classes = useStyles();
 
-  const [showTooltip, toggleTooltip] = useState(false);
-
   return (
-    <ClickAwayListener onClickAway={() => toggleTooltip(false)}>
-      <PopupTooltip
-        title={
-          subNav ? (
-            <List className={classes.link}>
-              {subNav.map((val, index) => (
-                <Menu data={val} key={index} />
-              ))}
-            </List>
-          ) : !sidebarStatus ? (
-            <Typography noWrap variant="body2">
-              {title}
-            </Typography>
-          ) : (
-            ""
-          )
-        }
-        placement="right"
-        interactive
-        onClose={() => toggleTooltip(false)}
-        onOpen={() => toggleTooltip(true)}
-        open={showTooltip}
-        leaveTouchDelay={60000}
-      >
-        <ListItem button onClick={() => toggleTooltip(true)}>
-          <ListItemIcon>
-            <Icon>{icon}</Icon>
-          </ListItemIcon>
-          <ListItemText>
+    <MenuPopup
+      popup={
+        subNav ? (
+          <List className={classes.link}>
+            {subNav.map((val, index) => (
+              <Menu data={val} key={index} />
+            ))}
+          </List>
+        ) : !sidebarStatus ? (
+          <Typography noWrap variant="body2">
+            {title}
+          </Typography>
+        ) : (
+          ""
+        )
+      }
+      component={
+        <SidebarItem
+          text={
             <Typography noWrap variant="subtitle1">
               {title}
             </Typography>
-          </ListItemText>
-          {subNav && <Icon>arrow_right</Icon>}
-        </ListItem>
-      </PopupTooltip>
-    </ClickAwayListener>
+          }
+          icon={<Icon>{icon}</Icon>}
+          subMenu={subNav}
+        />
+      }
+    />
   );
 };
 
@@ -236,22 +177,25 @@ function Sidebar() {
   // React state to change on theme breakpoint
   const xs = useMediaQuery((theme) => theme.breakpoints.down("xs"));
 
+  // Change sidebar status on window width
+  useEffect(() => toggleSidebar(!xs), [xs]);
+
   return (
     <Box
       className={`${classes.sidebar} ${
         !isSidebarOpen ? classes.closeSidebar : ""
       }`}
     >
-      <ListItem button className={classes.logoBtn}>
-        <ListItemIcon>
-          <AcUnitIcon />
-        </ListItemIcon>
-        <ListItemText>
+      <SidebarItem
+        className={classes.logoBtn}
+        text={
           <Typography noWrap variant="h5">
             LOGO
           </Typography>
-        </ListItemText>
-      </ListItem>
+        }
+        icon={<AcUnitIcon />}
+      />
+      <Divider />
 
       <List
         className={`${classes.navContainer} ${
@@ -260,39 +204,20 @@ function Sidebar() {
       >
         {SidebarData.map((data, index) => (
           <div className={classes.link} key={index}>
-            {index > 0}
-            <Menu
-              sidebarStatus={(isSidebarOpen && !xs) || (!isSidebarOpen && xs)}
-              data={data}
-            />
+            <Menu sidebarStatus={isSidebarOpen} data={data} />
           </div>
         ))}
       </List>
 
-      <ListItem button className={classes.accBtn}>
-        <ListItemIcon>
-          <Avatar
-            alt="A"
-            src="https://images.unsplash.com/photo-1625428508242-07166dc06bba?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxfDB8MXxyYW5kb218MHx8fHx8fHx8MTYyNzQ4MzIxNA&ixlib=rb-1.2.1&q=80&w=1080"
-          />
-        </ListItemIcon>
-        <ListItemText>
-          <Typography noWrap variant="h5" align="center">
-            Accounts
-          </Typography>
-        </ListItemText>
-      </ListItem>
+      <Divider />
+      <ProfileBtn sidebarStatus={isSidebarOpen} />
 
       <IconButton
         size="small"
         className={classes.toggleBtn}
         onClick={() => toggleSidebar(!isSidebarOpen)}
       >
-        <Icon>
-          {(isSidebarOpen && !xs) || (!isSidebarOpen && xs)
-            ? "arrow_back"
-            : "menu"}
-        </Icon>
+        <Icon>{isSidebarOpen ? "arrow_back" : "menu"}</Icon>
       </IconButton>
     </Box>
   );

@@ -6,31 +6,40 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import { makeStyles, Typography } from "@material-ui/core";
 
-import { makeStyles } from "@material-ui/core";
+/**
+ * Style Generator
+ */
+const useStyle = makeStyles((theme) => ({
+  // Style for chart
+  chart: {
+    margin: "0 auto",
+    width: "80%",
+    marginTop: theme.spacing(2),
+    padding: theme.spacing(2),
+    boxShadow: theme.shadows[4],
+  },
+}));
 
-const useStyle = makeStyles({
-    chart: {
-        margin: "0 auto",
-        width: "80%",
-        marginTop: "1.2rem",
-        padding: "1.2rem",
-  boxShadow: "0px 0px 15px -10px rgba(0, 0, 0, 0.75)",
-    },
 
-    chartTitle: {
-        marginBottom: "1.2rem",
-    }
-});
-
+/** 
+ * Chart Component
+ */
 export default function Chart({ title, data, dataKey, grid }) {
-    const myClass = useStyle();
+  // GEt styles
+  const classes = useStyle();
+  
   return (
-    <div className={myClass.chart}>
-      <h3 className={myClass.chartTitle}>{title}</h3>
+    <div className={classes.chart}>
+      <Typography variant="h5">{title}</Typography>
       <ResponsiveContainer width="100%" aspect={4 / 1}>
         <LineChart data={data}>
-          <XAxis dataKey="name" stroke="#5550bd" interval={'preserveStartEnd'} />
+          <XAxis
+            dataKey="name"
+            stroke="#5550bd"
+            interval={"preserveStartEnd"}
+          />
           <Line type="monotone" dataKey={dataKey} stroke="#5550bd" />
           <Tooltip />
           {grid && <CartesianGrid stroke="#e0dfdf" strokeDasharray="5 5" />}

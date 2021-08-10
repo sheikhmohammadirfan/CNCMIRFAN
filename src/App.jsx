@@ -9,7 +9,7 @@ import {
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import { toast } from "react-toastify";
 import Header from "./Components/Header";
-import Sidebar from "./Components/Sidebar";
+import Sidebar from "./Components/Sidebar/Sidebar";
 import Auth from "./Pages/Auth";
 import "react-toastify/dist/ReactToastify.css";
 import ProtectedRoutes from "./Components/ProtectedRoutes";
@@ -83,21 +83,21 @@ function App() {
               </Box>
               <Box flexGrow={1}>
                 <Header />
-                <Route exact path="/">
-                  <Box className={classes.rightSide}>
-                    <div className={classes.body}>
+                <div className={classes.body}>
+                  <Route exact path="/">
+                    <Box className={classes.rightSide}>
                       <Chart
                         data={width > 800 ? userData : userData.slice(0, 4)}
                         title="Analytics"
                         grid
                         dataKey="Active User"
                       />
-                    </div>
-                  </Box>
-                </Route>
-                <Route exact path="/verify">
-                  <Verify />
-                </Route>
+                    </Box>
+                  </Route>
+                  <Route exact path="/verify">
+                    <Verify />
+                  </Route>
+                </div>
               </Box>
             </Box>
           </ProtectedRoutes>
