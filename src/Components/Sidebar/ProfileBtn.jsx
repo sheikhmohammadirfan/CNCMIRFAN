@@ -1,5 +1,7 @@
 import { Avatar, Icon, makeStyles, Typography } from "@material-ui/core";
 import React from "react";
+import { useHistory } from "react-router-dom";
+import { logout } from "../../Service/UserFactory";
 import MenuPopup from "./MenuPopup";
 import SidebarItem from "./SidebarItem";
 
@@ -18,6 +20,13 @@ const useStyles = makeStyles((theme) => ({
  */
 function ProfileBtn({ sidebarStatus }) {
   const classes = useStyles();
+
+  const history = useHistory();
+
+  // Method to Logout user from session
+  const logoutUser = () => {
+    logout().then((status) => status && history.push("/login"));
+  };
 
   return (
     <MenuPopup
@@ -39,6 +48,7 @@ function ProfileBtn({ sidebarStatus }) {
               </Typography>
             }
             icon={<Icon>logout</Icon>}
+            onClick={logoutUser}
           />
         </>
       }

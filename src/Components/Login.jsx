@@ -1,7 +1,7 @@
 import { Box, Button, CircularProgress } from "@material-ui/core";
 import React, { useState } from "react";
 import { useForm, TextControl } from "./Control";
-import LoginService from "../Service/login.service";
+import { login } from "../Service/UserFactory";
 import { useHistory } from "react-router-dom";
 
 // Default value for Login Form
@@ -50,7 +50,7 @@ function Login() {
     if (validateInput(user)) {
       setLoading(true); // Start loading
       // Call login Service
-      LoginService.login(user.email, user.password).then((status) => {
+      login(user).then((status) => {
         // If success
         if (status) history.push("/");
         else setLoading(false);

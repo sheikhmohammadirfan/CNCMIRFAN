@@ -1,8 +1,8 @@
 import { Box, Button, CircularProgress } from "@material-ui/core";
 import React, { useState } from "react";
 import { TextControl, useForm } from "./Control";
-import SignupService from "../Service/signup.service";
 import { useHistory } from "react-router-dom";
+import { signup } from "../Service/UserFactory";
 
 // Default value for siginup form
 const defaultValue = {
@@ -53,13 +53,11 @@ function Signup() {
     if (validateInput(user)) {
       setLoading(true); // Start loading
       // Call login Service
-      SignupService.signup(user.name, user.email, user.password).then(
-        (status) => {
-          // If success
-          if (status) history.push("/");
-          else setLoading(false);
-        }
-      );
+      signup(user).then((status) => {
+        // If success
+        if (status) history.push("/");
+        else setLoading(false);
+      });
     }
   };
 
