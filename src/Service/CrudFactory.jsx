@@ -16,14 +16,13 @@ const notification = (msg, type) =>
 
 // Generate Request Template
 async function request(requestOptions) {
-  const { url, data, method, notify = true } = requestOptions;
+  const { url, data, method, notify = true, ...rest } = requestOptions;
 
   // Append base url
   let fullurl = baseUrl + url;
 
   // Set basic header
   let headers = { Accept: "*/*", Authorization: `Bearer ${getToken()}` };
-
   // Get query params
   if (method === "GET") {
     let queryString = new URLSearchParams(data);
@@ -39,7 +38,8 @@ async function request(requestOptions) {
 
   try {
     // Make request
-    const response = await axios({ method, url: fullurl, data });
+    console.log({ method, url: fullurl, data , headers, ...rest});
+    const response = await axios({ method, url: fullurl, data , headers, ...rest});
     console.log(response);
     // Setup Success response
     res.status = true;

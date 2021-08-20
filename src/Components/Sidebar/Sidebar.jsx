@@ -36,7 +36,7 @@ const useStyles = makeStyles((theme) => {
       color: theme.textOnPrimary,
       position: "sticky",
       top: 0,
-      zIndex: 1,
+      zIndex: 100,
       display: "flex",
       flexDirection: "column",
       boxShadow: theme.shadows[1],

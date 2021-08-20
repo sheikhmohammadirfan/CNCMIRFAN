@@ -1,12 +1,14 @@
 import React from "react";
-import { withStyles } from "@material-ui/core/styles";
 import { Button } from "@material-ui/core";
 import { DataGrid } from "@material-ui/data-grid";
 import { DeleteOutline } from "@material-ui/icons";
 import UploadService from "../Service/upload.service";
+import { useState, useEffect } from "react";
+import { makeStyles } from "@material-ui/core";
+import { ErrorBoundary } from "./ErrorBoundary";
 
 // styles for the verify section
-const styles = (theme) => ({
+const useStyles = makeStyles((theme) => ({
   // styling input field
   customInp: {
     border: "none",
@@ -71,9 +73,10 @@ const styles = (theme) => ({
   },
 
   userListDelete: {
-    cursor: "pointer",
-    transition: "color 0.3s",
-    "&:hover" : {
+    backgroundColor: "#eee",
+    transition: "color 0.2s, backgroundColor: 0.2s",
+    "&:hover, &:focus" : {
+      backgroundColor: "#fff",
       color: "red",
     },
   },
@@ -84,105 +87,77 @@ const styles = (theme) => ({
     margin: "0 auto 1.5rem"
   },
 
-});
+
+  wrongFile: {
+    color: "red",
+  },
+}));
 
 // upload class for handling upload services
-class UploadPreview extends React.Component {
+function UploadPreview() {
   // initializing our fields
-  constructor(props) {
-    super(props);
-    this.selectFile = this.selectFile.bind(this);
-    this.upload = this.upload.bind(this);
+  const [selectedFiles, setSelectedFiles] = useState(undefined);
+  const [selectedFileName, setSelectedFileName] = useState("");
+  const [progress, setProgress] = useState(0);
+  const [message, setMessage] = useState("");
+  const [fileInfos, setFileInfos] = useState([]);
+  
 
-    this.state = {
-      selectedFiles: undefined,
-      currentFile: undefined,
-      progress: 0,
-      message: "",
-      timerID: null,  
-
-      fileInfos: [],
-    };
-  }
+  const classes = useStyles();
 
   // reset message after 5 second
-  resetMessage() {
-    this.timerId = setTimeout(() => {
-      this.setState({progress: 0, message: "" });
-       this.timerId = null;
+  const resetMessage = () => {
+    setTimeout(() => {
+      setProgress(0);
+      setMessage("");
+      setSelectedFileName("");
+      setSelectedFiles(undefined);
     }, 5000);
   }
 
   // checking if our component mounted
-  componentDidMount() {
+  useEffect(() => {
     UploadService.getFiles().then((response) => {
-      this.setState({
-        fileInfos: response.data,
-      });
+      setFileInfos(response.data);
     });
-  }
+  }, []);
+
 
   // selecting the file from the user
-  selectFile(event) {
-    this.setState({
-      selectedFiles: event.target.files,
-    });
-  }
+  const selectFile = (event) => {
+    setSelectedFiles(event.target.files[0]);
+    setSelectedFileName(event.target.files[0].name);
+
+    if(!event.target.files[0].name.match(/\.(docx|doc|pdf|jpg|jpeg)$/)){
+      setSelectedFileName("Please select a valid file");
+      setSelectedFiles(undefined);
+    }
+  };
 
   //upload function to handle file upload
+  const upload = () => {
 
-  upload() {
-    //select the current file and set progress to 0
-    let currentFile = this.state.selectedFiles[0];
-
-    this.setState({
-      progress: 0,
-      currentFile: currentFile,
-    });
-    
+    setProgress(0);
     // passing the selected file to the api and handling response
-    UploadService.upload(currentFile, (event) => {
-      this.setState({
-        progress: Math.round((100 * event.loaded) / event.total),
-      });
-    })
+    UploadService.upload(selectedFiles, (event) => setProgress(
+      Math.round((100 * event.loaded) / event.total),
+    ))
       .then((response) => {
-        this.setState({
-          message: response.data.msg,
-        });
-        this.resetMessage();
+        setMessage(response.data.message);
+        resetMessage();
         return UploadService.getFiles();
       })
-      .then((files) => {
-        this.setState({
-          fileInfos: files.data,
-        });
-        console.log(this.state.fileInfos);
-      })
-      .catch(() => {
-        this.setState({
-          progress: 0,
-          message: "Could not upload the file!",
-          currentFile: undefined,
-        });
+      .then((files) => 
+        setFileInfos(files.data)
+      )
+      .catch((e) => {
+        setProgress(0);
+        setMessage("Could not upload the file!");
       });
       // if the file was not selected
-    this.setState({
-      selectedFiles: undefined,
-    });
-  }
+  };
 
-  render() {
-    const { classes } = this.props;
-    const {
-      selectedFiles,
-      currentFile,
-      progress,
-      message,
-      fileInfos,
-    } = this.state;
-
-    const columns = [
+  const columns = [
       { field: 'id', headerName: 'ID', width: 100 },
       {
         field: 'filename',
@@ -206,11 +181,8 @@ class UploadPreview extends React.Component {
         sortable: false,
         renderCell: (params) => {
           return (
-            <>
-              <DeleteOutline
-                className={classes.userListDelete}
-              />
-            </>
+            <Button variant="outlined" className={classes.userListDelete}><DeleteOutline
+          /></Button>
           );
         },
       }
@@ -218,6 +190,7 @@ class UploadPreview extends React.Component {
 
     return (
       <div>
+        <ErrorBoundary>
         <div className={classes.inpContainer}> 
           <label className={classes.customInp} htmlFor="upload">
             Choose file
@@ -226,12 +199,18 @@ class UploadPreview extends React.Component {
           multiple
             id="upload"
             type="file"
-            onChange={this.selectFile}
+            accept=" application/msword, application/pdf, image/*,.doc, .docx"
+            onChange={selectFile}
             hidden
             />
-          <Button className={classes.success} disabled={!selectedFiles} variant="contained" onClick={this.upload}>Upload</Button>
+          <Button className={classes.success} disabled={!selectedFiles} variant="contained" onClick={upload}>Upload</Button>
         </div>
-        {currentFile && progress!==0 && (
+
+        <p className={selectedFiles!== undefined ? classes.rightFile : classes.wrongFile}>
+          {selectedFileName}
+        </p>
+
+        {selectedFiles && progress!==0 && (
           <div className={classes.progress}>
             <div
               className={classes.progressBar}
@@ -246,22 +225,32 @@ class UploadPreview extends React.Component {
           {message}
         </div>
         <div className={classes.fileList}>
+
         <DataGrid
             rows={fileInfos && fileInfos.map((file, index) => 
           (
-            {id: `${index + 1}`, filename: file.file_name, lastModified: file.file.split("/")[5] }
+            {id: index + 1, filename: file.file_name, lastModified: file.file.split("/")[5] }
           ))
         }
         autoHeight
         onCellEditCommit = {e => console.log(e)}
+        onCellClick =  {e => UploadService.deleteFile(fileInfos[e.row.id - 1].id).then(
+          (res) => {
+            setFileInfos(fileInfos.filter((_, index) => 
+            index !== e.row.id - 1
+          ));
+        }
+        )}
         columns = {columns}
         disableSelectionOnClick
         pageSize={8}
-          checkboxSelection
+        loading = {fileInfos === []}
+        checkboxSelection
         />
         </div>
+      </ErrorBoundary>
       </div>
     );
   }
-}
-export default withStyles(styles, { withTheme: true })(UploadPreview);
+
+export default UploadPreview;

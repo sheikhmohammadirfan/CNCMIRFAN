@@ -154,7 +154,7 @@ function Auth() {
           </Box>
 
           <Box className={classes.formBody}>
-            {loginState ? <Login /> : <Signup />}
+            {loginState ? <Login title="LOGIN" /> : <Signup title="SIGN UP" />}
 
             <Typography variant="h5" className={classes.seperatorText}>
               or connect with

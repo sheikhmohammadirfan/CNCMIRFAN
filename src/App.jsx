@@ -13,10 +13,8 @@ import Sidebar from "./Components/Sidebar/Sidebar";
 import Auth from "./Pages/Auth";
 import "react-toastify/dist/ReactToastify.css";
 import ProtectedRoutes from "./Components/ProtectedRoutes";
-import { userData } from "./assets/dummyData";
-import Chart from "./Components/Chart";
-import { useLayoutEffect, useState } from "react";
 import Verify from "./Pages/Verify";
+import Home from "./Components/Home";
 
 /**
  * Theme generator
@@ -32,9 +30,6 @@ themes = responsiveFontSizes(themes);
  * Styles generator
  * */
 const useStyles = makeStyles((theme) => ({
-  rightSide: {
-    wordBreak: "break-word",
-  },
   body: {
     [theme.breakpoints.down("xs")]: {
       paddingLeft: themes.sidebarSmall,
@@ -52,22 +47,10 @@ toast.configure({
   progress: undefined,
 });
 
-function useWindowSize() {
-  const [size, setSize] = useState([0, 0]);
-  useLayoutEffect(() => {
-    function updateSize() {
-      setSize([window.innerWidth]);
-    }
-    window.addEventListener("resize", updateSize);
-    updateSize();
-    return () => window.removeEventListener("resize", updateSize);
-  }, []);
-  return size;
-}
 
 function App() {
   const classes = useStyles();
-  const [width] = useWindowSize();
+  
   return (
     <ThemeProvider theme={themes}>
       <CssBaseline />
@@ -85,17 +68,10 @@ function App() {
                 <Header />
                 <div className={classes.body}>
                   <Route exact path="/">
-                    <Box className={classes.rightSide}>
-                      <Chart
-                        data={width > 800 ? userData : userData.slice(0, 4)}
-                        title="Analytics"
-                        grid
-                        dataKey="Active User"
-                      />
-                    </Box>
+                    <Home title="HOME"/>
                   </Route>
                   <Route exact path="/verify">
-                    <Verify />
+                    <Verify title="VERIFY"/>
                   </Route>
                 </div>
               </Box>

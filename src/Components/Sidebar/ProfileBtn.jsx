@@ -23,11 +23,6 @@ function ProfileBtn({ sidebarStatus }) {
 
   const history = useHistory();
 
-  // Method to Logout user from session
-  const logoutUser = () => {
-    logout().then((status) => status && history.push("/login"));
-  };
-
   return (
     <MenuPopup
       placement="right-end"
@@ -48,7 +43,7 @@ function ProfileBtn({ sidebarStatus }) {
               </Typography>
             }
             icon={<Icon>logout</Icon>}
-            onClick={logoutUser}
+            onClick={() => {logout(); history.push("/login")}}
           />
         </>
       }

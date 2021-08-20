@@ -1,4 +1,6 @@
-import { get, post } from "./CrudFactory";
+import axios from "axios";
+import {toast, Flip} from "react-toastify";
+import ErrMsg from "./ErrMsg";
 
 /**
  * ------> MANAGE USER
@@ -41,31 +43,52 @@ function deleteToken() {
 }
 
 // Login user
-async function login({ email, password }, options) {
-  const { data, status } = await post(
-    "/user/login",
-    { email, password },
-    options
-  );
-  if (status) {
-    setToken(data.token);
-    setUser(data.user);
-  }
-  return status;
+function login({ email, password }) {
+  return axios.post("https://internassign.herokuapp.com/api/user/login", {email, password}).then(res => {
+    setToken(res.data.access);
+    setUser(res.data.user);
+      toast("Login Successfull.", {
+        toastId: "api-toast",
+        transition: Flip,
+        type: "error",
+      });
+      return true;
+  }).catch(e => {
+      const msg = e.response?.data?.error || "An error occured.";
+      toast(Array.isArray(msg) ? <ErrMsg data={msg} /> : msg, {
+        toastId: "api-toast",
+        transition: Flip,
+        type: "error",
+      });
+      return false;
+  });
 }
 
 // Signup user
-async function signup({ name, email, password }, options) {
-  const { status } = await post("/user", { name, email, password }, options);
-  return status;
+function signup({ name, email, password }) {
+  return axios.post("https://internassign.herokuapp.com/api/user", {name, email, password}).then(res => {
+      toast("Signup Successfull.", {
+        toastId: "api-toast",
+        transition: Flip,
+        type: "error",
+      });
+      return true;
+  }).catch(e => {
+      console.log(e.response.data);
+      const msg =  "An error occured.";
+      toast(Array.isArray(msg) ? <ErrMsg data={msg} /> : msg, {
+        toastId: "api-toast",
+        transition: Flip,   
+        type: "error",
+      });
+      return false;
+  });
 }
 
-// Loginout user
-async function logout(options) {
-  const { status } = await get(`/user/logout/${getUser().id}`, options);
+// Logout user
+function logout() {
   deleteToken();
   deleteUser();
-  return status;
 }
 
 export {

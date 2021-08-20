@@ -1,23 +1,23 @@
-import axios from "./app.service";
-
+import {post, get} from "./CrudFactory";
 class Appservice {
-    upload(file, onUploadProgress) {
+    async upload(file, onUploadProgress) {
         let formData = new FormData();
 
         formData.append("file",file);
-
-        return axios.post(
-            "/file/addfile/64/izg0pi075c/", formData, {
-                headers: {
-                    "Content-Type": "multipart/form-data",
-                },
-                onUploadProgress,
+        return await post(
+            "/file/addfile", formData, {
+                onUploadProgress
             }
         );
     }
 
-    getFiles() {
-        return axios.get("/file");
+    async deleteFile(id) {
+        return await post(
+            "/file/deletefile/"+id 
+        );
+    }
+    async getFiles() {
+        return await get("/file");
     }
 }
 

@@ -14,6 +14,7 @@ import Breadcrumbs from "./Breadcrumbs";
 const useStyles = makeStyles((theme) => ({
   // style for header roots
   root: {
+    zIndex: 99,
     minHeight: "min-content",
     background: "#ddd",
     padding: theme.spacing(1),
@@ -48,7 +49,7 @@ function Header() {
     <>
       <Box className={classes.root} boxShadow={headerScrollTrigger ? 3 : 0}>
         <Breadcrumbs />
-        <Typography>Home</Typography>
+        <Typography>{}</Typography>
         <Box display="flex" alignItems="center">
           <NotificationsIcon style={{ cursor: "pointer" }} />
         </Box>

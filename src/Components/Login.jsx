@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { useForm, TextControl } from "./Control";
 import { login } from "../Service/UserFactory";
 import { useHistory } from "react-router-dom";
+import DocumentTitle from "./DocumentTitle";
 
 // Default value for Login Form
 const defaultValue = {
@@ -13,7 +14,10 @@ const defaultValue = {
 /**
  * Login Component
  * */
-function Login() {
+function Login(props) {
+
+  DocumentTitle(`CNCM | ${props.title}`);
+
   // Method to validate input
   const validateInput = (errObj) => {
     // Create temp error obj

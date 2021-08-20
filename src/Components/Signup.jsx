@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { TextControl, useForm } from "./Control";
 import { useHistory } from "react-router-dom";
 import { signup } from "../Service/UserFactory";
+import DocumentTitle from "./DocumentTitle";
 
 // Default value for siginup form
 const defaultValue = {
@@ -14,7 +15,8 @@ const defaultValue = {
 /**
  * Signup Component
  * */
-function Signup() {
+function Signup(props) {
+  DocumentTitle(`CNCM | ${props.title}`);
   // Method to validate input
   const validateInput = (errObj) => {
     // Create temp error obj
