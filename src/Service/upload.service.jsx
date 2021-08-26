@@ -1,24 +1,20 @@
-import {post, get} from "./CrudFactory";
-class Appservice {
-    async upload(file, onUploadProgress) {
-        let formData = new FormData();
+import { post, get } from "./CrudFactory";
 
-        formData.append("file",file);
-        return await post(
-            "/file/addfile", formData, {
-                onUploadProgress
-            }
-        );
-    }
-
-    async deleteFile(id) {
-        return await post(
-            "/file/deletefile/"+id 
-        );
-    }
-    async getFiles() {
-        return await get("/file");
-    }
+async function uploadFiles(files) {
+  const formData = new FormData();
+  for (let i = 0; i < files.length; i++) formData.append("file", files[i]);
+  return await post("/file/addfile", formData);
 }
 
-export default new Appservice();
+async function deleteFiles(files) {
+  for (let i = 0; i < files.length; i++) {
+    const { status } = await post("/file/deletefile/" + files[i].id);
+    if (!status) return false;
+  }
+  return true;
+}
+async function getFiles() {
+  return await get("/file");
+}
+
+export { uploadFiles, deleteFiles, getFiles };

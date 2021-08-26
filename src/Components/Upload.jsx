@@ -1,256 +1,258 @@
-import React from "react";
-import { Button } from "@material-ui/core";
-import { DataGrid } from "@material-ui/data-grid";
-import { DeleteOutline } from "@material-ui/icons";
-import UploadService from "../Service/upload.service";
-import { useState, useEffect } from "react";
-import { makeStyles } from "@material-ui/core";
-import { ErrorBoundary } from "./ErrorBoundary";
+import React, { useState, useEffect } from "react";
+import {
+  Box,
+  Button,
+  Icon,
+  IconButton,
+  makeStyles,
+  Fade,
+  TextField,
+  Typography,
+  LinearProgress,
+} from "@material-ui/core";
+import { toast } from "react-toastify";
+import unknownLogo from "../assets/img/unknown-file-format.png";
+import pdfLogo from "../assets/img/pdf-file-format.png";
+import docLogo from "../assets/img/doc-file-format.png";
+import txtLogo from "../assets/img/txt-file-format.png";
+import { uploadFiles } from "../Service/upload.service";
 
-// styles for the verify section
+// Function to handle Notification toast
+function notification(msg, type) {
+  toast(msg, { type, toastId: "upload-toast", position: "top-center" });
+}
+
+// Function to return, File type as integer
+function getFileType(name) {
+  const ext = /(?:\.([^.]+))?$/.exec(name)[0]?.toLowerCase();
+  return ext === ".pdf"
+    ? 0
+    : ext === ".docx" || ext === ".doc"
+    ? 1
+    : ext === ".txt"
+    ? 2
+    : 3;
+}
+
+// Generate styles
 const useStyles = makeStyles((theme) => ({
-  // styling input field
-  customInp: {
-    border: "none",
-    padding: ".5rem .8rem",
-    backgroundColor: "darkblue",
-    color: "#fff",
-    cursor: "pointer",
-    borderRadius: "4px",
+  overlay: {
+    position: "fixed",
+    top: 0,
+    left: 0,
+    width: "100vw",
+    height: "100vh",
+    background: "rgba(0, 0, 0, 0.5)",
+    zIndex: 20,
+    paddingTop: theme.spacing(10),
   },
-
-  // general class
-  centerAlign: {
-    textAlign: "center",
-    margin: "1rem",
+  container: {
+    background: theme.palette.background.paper,
+    borderRadius: theme.shape.borderRadius,
+    boxShadow: theme.shadows[4],
+    border: `1px solid ${theme.palette.grey[300]}`,
+    width: "90%",
+    maxWidth: 400,
   },
-
-  // file upload progress container
-  progress: {
-    borderRadius: "8px",
-    margin: "0 auto",
-    width: "80%",
-    height: "1rem",
-    backgroundColor: "lightgrey",
-    boxShadow: "box-shadow: 1px 1px 2px 1px #b9b9b9 inset;",
-    overflow: "hidden",
-  },
-
-  // file upload progress bar
-  progressBar: {
-    height: "inherit",
-    backgroundColor: theme.palette.success.dark,
-    color: theme.palette.common.white,
-    boxShadow: "1px 1px 5px 2px #989882",
-  },
-
-  // alert message
-  success: {
-    cursor: "pointer",
-    marginLeft: "3rem",
-    backgroundColor: theme.palette.success.main,
-    color: "#fff",
-    "&:hover": {
-      backgroundColor: theme.palette.success.dark,
-    }
-  },
-  
-  inpContainer: {
-    display: "flex",
-    justifyContent: "center",
-    padding: "1.5rem",
-  },
-
-  alert: {
-    width: "60%",
-    borderRadius: "4px",
-    height: "auto",
-    margin: "1rem auto",
-    fontSize: "1.3rem",
-    color: "#004085",
-    backgroundColor: "#cce5ff",
-    borderColor: "#b8daff",
-  },
-
-  userListDelete: {
-    backgroundColor: "#eee",
-    transition: "color 0.2s, backgroundColor: 0.2s",
-    "&:hover, &:focus" : {
-      backgroundColor: "#fff",
-      color: "red",
-    },
-  },
-
-  fileList: {
-    // height: "35rem",
-    width: "55vw",
-    margin: "0 auto 1.5rem"
-  },
-
-
-  wrongFile: {
-    color: "red",
+  container_title: {
+    fontWeight: "bold",
   },
 }));
 
-// upload class for handling upload services
-function UploadPreview() {
-  // initializing our fields
-  const [selectedFiles, setSelectedFiles] = useState(undefined);
-  const [selectedFileName, setSelectedFileName] = useState("");
-  const [progress, setProgress] = useState(0);
-  const [message, setMessage] = useState("");
-  const [fileInfos, setFileInfos] = useState([]);
-  
+// Close Warning dialog
+const WarningDialog = ({ cnt, set }) => {
+  return (
+    <Box>
+      Are you sure ? <strong>{cnt} files are yet to upload.</strong>
+      <Box marginTop={0.5}>
+        <Button
+          size="small"
+          variant="contained"
+          color="primary"
+          onClick={() => {
+            toast.dismiss("upload-toast");
+            set([]);
+          }}
+        >
+          Yes
+        </Button>
+        <Button
+          size="small"
+          variant="contained"
+          style={{ marginLeft: 8 }}
+          onClick={() => toast.dismiss("upload-toast")}
+        >
+          No
+        </Button>
+      </Box>
+    </Box>
+  );
+};
 
+// Row file that is uploaded
+const FileRow = ({ name, update, setter }) => {
+  return (
+    <Box display="flex" alignItems="center">
+      <img
+        src={[pdfLogo, docLogo, txtLogo, unknownLogo][getFileType(name)]}
+        alt={["PDF", "DOC", "TXT", "UNKNOWN"][getFileType(name)]}
+      />
+      <Box paddingX={1} width={1}>
+        <TextField value={name} onChange={update} fullWidth />
+      </Box>
+      <IconButton size="small" onClick={setter}>
+        <Icon>close</Icon>
+      </IconButton>
+    </Box>
+  );
+};
+
+// Main Compoent
+function Upload({ id, files, setFiles, updateFileList }) {
   const classes = useStyles();
 
-  // reset message after 5 second
-  const resetMessage = () => {
-    setTimeout(() => {
-      setProgress(0);
-      setMessage("");
-      setSelectedFileName("");
-      setSelectedFiles(undefined);
-    }, 5000);
-  }
+  // React state to set loading status btn
+  const [uploadStarted, setUploadStatus] = useState(false);
+  const toggleUploading = () => setUploadStatus((val) => !val);
 
-  // checking if our component mounted
+  // React state to set valid files status to activate/deactivate upload btn
+  const [validFiles, setValidFiles] = useState(true);
   useEffect(() => {
-    UploadService.getFiles().then((response) => {
-      setFileInfos(response.data);
+    let i = 0;
+    while (i < files.length && getFileType(files[i].name) !== 3) i++;
+    setValidFiles(i === files.length);
+  }, [files]);
+
+  // Upload files method
+  const updateFiles = (e) => {
+    // Get uploaded file obj
+    const fileList = e.target.files;
+    // Add new files
+    setFiles([
+      ...files,
+      ...Object.keys(fileList).map((index) => fileList[index]),
+    ]);
+    e.target.value = "";
+  };
+
+  // Upddate name
+  const updateName = (index, val) => {
+    const fileList = [...files];
+    const file = fileList[index];
+    // Replace file object with new name
+    fileList[index] = new File([file], val, {
+      type: file.type,
+      lastModified: file.lastModified,
     });
-  }, []);
+    setFiles(fileList);
+  };
 
+  // Remove selected files
+  const removeFiles = (delIndex) => {
+    const fileList = [...files];
+    setFiles(fileList.filter((_, index) => index !== delIndex));
+  };
 
-  // selecting the file from the user
-  const selectFile = (event) => {
-    setSelectedFiles(event.target.files[0]);
-    setSelectedFileName(event.target.files[0].name);
+  // Show warning toast
+  const showWarning = () => {
+    toast(<WarningDialog cnt={files.length} set={setFiles} />, {
+      type: "error",
+      toastId: "upload-toast",
+      autoClose: false,
+      closeOnClick: false,
+      position: "top-center",
+    });
+  };
 
-    if(!event.target.files[0].name.match(/\.(docx|doc|pdf|jpg|jpeg)$/)){
-      setSelectedFileName("Please select a valid file");
-      setSelectedFiles(undefined);
+  // Upload files
+  const pushFiles = async () => {
+    toggleUploading();
+    const { status } = await uploadFiles(files);
+    toggleUploading();
+    if (status) {
+      updateFileList();
+      setFiles([]);
     }
   };
 
-  //upload function to handle file upload
-  const upload = () => {
+  return (
+    <>
+      <input
+        multiple
+        id={id}
+        type="file"
+        accept=".pdf, .txt, .doc, .docx"
+        onChange={updateFiles}
+        hidden
+      />
+      <Fade in={files.length > 0} mountOnEnter unmountOnExit>
+        <Box
+          className={classes.overlay}
+          display="flex"
+          justifyContent="center"
+          alignItems="start"
+        >
+          <Box className={classes.container}>
+            <Box display="flex" justifyContent="space-between" padding={1}>
+              <Typography variant="h6" className={classes.container_title}>
+                Upload
+              </Typography>
+              <IconButton
+                size="small"
+                color="secondary"
+                variant="contained"
+                onClick={showWarning}
+              >
+                <Icon>cancel</Icon>
+              </IconButton>
+            </Box>
 
-    setProgress(0);
-    // passing the selected file to the api and handling response
-    UploadService.upload(selectedFiles, (event) => setProgress(
-      Math.round((100 * event.loaded) / event.total),
-    ))
-      .then((response) => {
-        setMessage(response.data.message);
-        resetMessage();
-        return UploadService.getFiles();
-      })
-      .then((files) => 
-        setFileInfos(files.data)
-      )
-      .catch((e) => {
-        setProgress(0);
-        setMessage("Could not upload the file!");
-      });
-      // if the file was not selected
-  };
+            {uploadStarted ? (
+              <LinearProgress />
+            ) : (
+              <hr style={{ border: "2px solid #444", margin: 0 }} />
+            )}
 
-  const columns = [
-      { field: 'id', headerName: 'ID', width: 100 },
-      {
-        field: 'filename',
-        headerName: 'File Name',
-        description: 'Double tap on your filename to edit them',
-        width: 180,
-        editable: true,
-      },
-      {
-        field: 'lastModified',
-        headerName: 'Last Modified',
-        headerAlign: 'start',
-        type: 'number',
-        align: 'left',
-        width: 180,
-      },
-      {
-        field: "action",
-        headerName: "Action",
-        width: 150,
-        sortable: false,
-        renderCell: (params) => {
-          return (
-            <Button variant="outlined" className={classes.userListDelete}><DeleteOutline
-          /></Button>
-          );
-        },
-      }
-    ];
+            <Box padding={1}>
+              {files.map((file, index) => (
+                <FileRow
+                  key={index}
+                  name={file.name}
+                  update={(e) => updateName(index, e.target.value)}
+                  setter={() => removeFiles(index)}
+                />
+              ))}
+            </Box>
+            <Box display="flex" justifyContent="flex-end" alignItems="center">
+              <Button
+                htmlFor={id}
+                component="label"
+                color="primary"
+                variant="contained"
+                size="small"
+                startIcon={<Icon>add</Icon>}
+                style={{ margin: 4 }}
+                disabled={uploadStarted || files.length === 10}
+              >
+                Add More
+              </Button>
+              <Button
+                color="secondary"
+                variant="contained"
+                size="small"
+                startIcon={<Icon>upload</Icon>}
+                style={{ margin: 4 }}
+                disabled={uploadStarted || !validFiles}
+                onClick={pushFiles}
+              >
+                Upload
+              </Button>
+            </Box>
+          </Box>
+        </Box>
+      </Fade>
+    </>
+  );
+}
 
-    return (
-      <div>
-        <ErrorBoundary>
-        <div className={classes.inpContainer}> 
-          <label className={classes.customInp} htmlFor="upload">
-            Choose file
-          </label>
-          <input
-          multiple
-            id="upload"
-            type="file"
-            accept=" application/msword, application/pdf, image/*,.doc, .docx"
-            onChange={selectFile}
-            hidden
-            />
-          <Button className={classes.success} disabled={!selectedFiles} variant="contained" onClick={upload}>Upload</Button>
-        </div>
-
-        <p className={selectedFiles!== undefined ? classes.rightFile : classes.wrongFile}>
-          {selectedFileName}
-        </p>
-
-        {selectedFiles && progress!==0 && (
-          <div className={classes.progress}>
-            <div
-              className={classes.progressBar}
-              style={{ width: progress + "%" }}
-            >
-              {progress}%
-            </div>
-          </div>
-        )}
-
-        <div className={classes.alert}> 
-          {message}
-        </div>
-        <div className={classes.fileList}>
-
-        <DataGrid
-            rows={fileInfos && fileInfos.map((file, index) => 
-          (
-            {id: index + 1, filename: file.file_name, lastModified: file.file.split("/")[5] }
-          ))
-        }
-        autoHeight
-        onCellEditCommit = {e => console.log(e)}
-        onCellClick =  {e => UploadService.deleteFile(fileInfos[e.row.id - 1].id).then(
-          (res) => {
-            setFileInfos(fileInfos.filter((_, index) => 
-            index !== e.row.id - 1
-          ));
-        }
-        )}
-        columns = {columns}
-        disableSelectionOnClick
-        pageSize={8}
-        loading = {fileInfos === []}
-        checkboxSelection
-        />
-        </div>
-      </ErrorBoundary>
-      </div>
-    );
-  }
-
-export default UploadPreview;
+export default Upload;
