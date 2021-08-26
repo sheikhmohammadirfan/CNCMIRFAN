@@ -11,11 +11,8 @@ import {
   LinearProgress,
 } from "@material-ui/core";
 import { toast } from "react-toastify";
-import unknownLogo from "../assets/img/unknown-file-format.png";
-import pdfLogo from "../assets/img/pdf-file-format.png";
-import docLogo from "../assets/img/doc-file-format.png";
-import txtLogo from "../assets/img/txt-file-format.png";
-import { uploadFiles } from "../Service/upload.service";
+import unknownLogo from "../../assets/img/unknown-file-format.png";
+import otherLogo from "../../assets/img/other-file-format.png";
 
 // Function to handle Notification toast
 function notification(msg, type) {
@@ -23,15 +20,8 @@ function notification(msg, type) {
 }
 
 // Function to return, File type as integer
-function getFileType(name) {
-  const ext = /(?:\.([^.]+))?$/.exec(name)[0]?.toLowerCase();
-  return ext === ".pdf"
-    ? 0
-    : ext === ".docx" || ext === ".doc"
-    ? 1
-    : ext === ".txt"
-    ? 2
-    : 3;
+function getExt(name) {
+  return /(?:\.([^.]+))?$/.exec(name)[0]?.toLowerCase();
 }
 
 // Generate styles
@@ -90,13 +80,10 @@ const WarningDialog = ({ cnt, set }) => {
 };
 
 // Row file that is uploaded
-const FileRow = ({ name, update, setter }) => {
+const FileRow = ({ name, update, setter, icon }) => {
   return (
     <Box display="flex" alignItems="center">
-      <img
-        src={[pdfLogo, docLogo, txtLogo, unknownLogo][getFileType(name)]}
-        alt={["PDF", "DOC", "TXT", "UNKNOWN"][getFileType(name)]}
-      />
+      <img src={icon ? icon : unknownLogo} alt="File" />
       <Box paddingX={1} width={1}>
         <TextField value={name} onChange={update} fullWidth />
       </Box>
@@ -108,8 +95,18 @@ const FileRow = ({ name, update, setter }) => {
 };
 
 // Main Compoent
-function Upload({ id, files, setFiles, updateFileList }) {
+function Upload({
+  id,
+  uploadService,
+  updateFileLst,
+  validFilesLst = {},
+  maxFile = 1000,
+}) {
   const classes = useStyles();
+
+  const extLst = Object.keys(validFilesLst);
+
+  const [files, setFiles] = useState([]);
 
   // React state to set loading status btn
   const [uploadStarted, setUploadStatus] = useState(false);
@@ -118,20 +115,25 @@ function Upload({ id, files, setFiles, updateFileList }) {
   // React state to set valid files status to activate/deactivate upload btn
   const [validFiles, setValidFiles] = useState(true);
   useEffect(() => {
-    let i = 0;
-    while (i < files.length && getFileType(files[i].name) !== 3) i++;
-    setValidFiles(i === files.length);
+    if (extLst.length > 0) {
+      let i = 0;
+      while (i < files.length && extLst.includes(getExt(files[i].name))) i++;
+      setValidFiles(i === files.length);
+    }
   }, [files]);
 
   // Upload files method
   const updateFiles = (e) => {
     // Get uploaded file obj
     const fileList = e.target.files;
+    if (Object.keys(fileList).length + files.length > maxFile)
+      notification("Upload Limit exceeded.", "error");
     // Add new files
-    setFiles([
-      ...files,
-      ...Object.keys(fileList).map((index) => fileList[index]),
-    ]);
+    else
+      setFiles([
+        ...files,
+        ...Object.keys(fileList).map((index) => fileList[index]),
+      ]);
     e.target.value = "";
   };
 
@@ -167,10 +169,10 @@ function Upload({ id, files, setFiles, updateFileList }) {
   // Upload files
   const pushFiles = async () => {
     toggleUploading();
-    const { status } = await uploadFiles(files);
+    const { status } = await uploadService(files);
     toggleUploading();
     if (status) {
-      updateFileList();
+      updateFileLst?.(files);
       setFiles([]);
     }
   };
@@ -181,7 +183,7 @@ function Upload({ id, files, setFiles, updateFileList }) {
         multiple
         id={id}
         type="file"
-        accept=".pdf, .txt, .doc, .docx"
+        accept={extLst.join(", ")}
         onChange={updateFiles}
         hidden
       />
@@ -213,13 +215,18 @@ function Upload({ id, files, setFiles, updateFileList }) {
               <hr style={{ border: "2px solid #444", margin: 0 }} />
             )}
 
-            <Box padding={1}>
+            <Box padding={1} overflow="auto" maxHeight={300}>
               {files.map((file, index) => (
                 <FileRow
                   key={index}
                   name={file.name}
                   update={(e) => updateName(index, e.target.value)}
                   setter={() => removeFiles(index)}
+                  icon={
+                    extLst.length > 0
+                      ? validFilesLst[getExt(file.name)]
+                      : otherLogo
+                  }
                 />
               ))}
             </Box>
@@ -232,7 +239,7 @@ function Upload({ id, files, setFiles, updateFileList }) {
                 size="small"
                 startIcon={<Icon>add</Icon>}
                 style={{ margin: 4 }}
-                disabled={uploadStarted || files.length === 10}
+                disabled={uploadStarted || files.length === maxFile}
               >
                 Add More
               </Button>
