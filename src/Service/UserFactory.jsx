@@ -1,10 +1,6 @@
-import axios from "axios";
-import {toast, Flip} from "react-toastify";
+import { axios } from "./CrudFactory";
+import { toast } from "react-toastify";
 import ErrMsg from "./ErrMsg";
-
-/**
- * ------> MANAGE USER
- */
 
 // Get User from storage
 function getUser() {
@@ -23,10 +19,6 @@ function deleteUser() {
   localStorage.removeItem("user");
 }
 
-/**
- * ------> MANAGE TOKEN
- */
-
 // Get User from storage
 function getToken() {
   return localStorage.getItem("accessToken");
@@ -43,52 +35,58 @@ function deleteToken() {
 }
 
 // Login user
-function login({ email, password }) {
-  return axios.post("https://internassign.herokuapp.com/api/user/login", {email, password}).then(res => {
+async function login({ email, password }) {
+  try {
+    const res = await axios.post("/user/login", {
+      email,
+      password,
+    });
     setToken(res.data.access);
     setUser(res.data.user);
-      toast("Login Successfull.", {
-        toastId: "api-toast",
-        transition: Flip,
-        type: "error",
-      });
-      return true;
-  }).catch(e => {
-      const msg = e.response?.data?.error || "An error occured.";
-      toast(Array.isArray(msg) ? <ErrMsg data={msg} /> : msg, {
-        toastId: "api-toast",
-        transition: Flip,
-        type: "error",
-      });
-      return false;
-  });
+    toast("Login Successfull.", {
+      toastId: "api-toast",
+      type: "error",
+    });
+    return true;
+  } catch (e) {
+    const msg = e.response?.data?.error || "An error occured.";
+    toast(Array.isArray(msg) ? <ErrMsg data={msg} /> : msg, {
+      toastId: "api-toast",
+      type: "error",
+    });
+    return false;
+  }
 }
 
 // Signup user
-function signup({ name, email, password }) {
-  return axios.post("https://internassign.herokuapp.com/api/user", {name, email, password}).then(res => {
-      toast("Signup Successfull.", {
-        toastId: "api-toast",
-        transition: Flip,
-        type: "error",
-      });
-      return true;
-  }).catch(e => {
-      console.log(e.response.data);
-      const msg =  "An error occured.";
-      toast(Array.isArray(msg) ? <ErrMsg data={msg} /> : msg, {
-        toastId: "api-toast",
-        transition: Flip,   
-        type: "error",
-      });
-      return false;
-  });
+async function signup({ name, email, password }) {
+  try {
+    await axios.post("https://internassign.herokuapp.com/api/user", {
+      name,
+      email,
+      password,
+    });
+    toast("Signup Successfull.", {
+      toastId: "api-toast",
+      type: "error",
+    });
+    return true;
+  } catch (e) {
+    console.log(e.response.data);
+    const msg = "An error occured.";
+    toast(Array.isArray(msg) ? <ErrMsg data={msg} /> : msg, {
+      toastId: "api-toast",
+      type: "error",
+    });
+    return false;
+  }
 }
 
 // Logout user
 function logout() {
   deleteToken();
   deleteUser();
+  window.location.href = "/login";
 }
 
 export {

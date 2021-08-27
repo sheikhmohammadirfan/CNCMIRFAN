@@ -13,6 +13,7 @@ import {
 import React from "react";
 import { useState } from "react";
 
+/** CSS classe generator */
 const useStyles = makeStyles((theme) => ({
   root: {
     margin: `${theme.spacing(1)}px 0`,
@@ -21,6 +22,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+/** Main DataTable Component */
 function DataTable({
   selectedRows = [],
   setSelectedRows,
@@ -43,8 +45,8 @@ function DataTable({
 
   // Toggle select All btn
   const toggleAllRows = (checked) =>
-    setSelectedRows(
-      checked ? [...rows.slice(currIn, currIn + rowsPerPage)] : []
+    setSelectedRows(row =>
+      checked ? [...row.slice(currIn, currIn + rowsPerPage)] : []
     );
 
   // Method to check if some files are selected
@@ -82,7 +84,7 @@ function DataTable({
                   color="primary"
                   indeterminate={isSomeChecked()}
                   checked={isAllChecked()}
-                  onClick={toggleAllRows}
+                  onClick={(e) => toggleAllRows(e.target.checked)}
                 />
               </TableCell>
             )}

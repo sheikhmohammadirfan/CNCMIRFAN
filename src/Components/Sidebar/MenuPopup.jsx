@@ -1,9 +1,7 @@
 import React, { useState } from "react";
 import { ClickAwayListener, Tooltip, withStyles } from "@material-ui/core";
 
-/**
- * Style Generator
- */
+/** Applying same backgroud style as of sidebar */
 const customStyles = (theme) => {
   const iconPadding = (theme.sidebarSmall - 24) / 2;
   return {
@@ -13,7 +11,7 @@ const customStyles = (theme) => {
       padding: 0,
       background: theme.palette.primary.light,
       boxShadow: theme.shadows[4],
-      // Set Icon color
+      // Set Icon color & width
       "& .MuiListItemIcon-root": {
         minWidth: 3 * iconPadding,
         color: theme.textOnPrimary,
@@ -35,13 +33,12 @@ const customStyles = (theme) => {
   };
 };
 
-/**
- * Apply styles to Tooltip
- */
+/** Apply custom styles to Mui Tooltip */
 const CustomTooltip = withStyles(customStyles)(Tooltip);
 
 /**
- * Custom Tooltip
+ * Generate component with Custom Tooltip attached,
+ * having onTouch and Click away listener
  */
 const MenuPopup = ({ popup, component, ...rest }) => {
   // Tooltip toggler, React hook

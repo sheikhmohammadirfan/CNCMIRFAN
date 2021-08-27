@@ -1,13 +1,13 @@
 import React from "react";
 import {
   Breadcrumbs as MUIBreadcrumbs,
-  Link,
   makeStyles,
+  Typography,
 } from "@material-ui/core";
-import { withRouter } from "react-router-dom";
+import { Link, withRouter } from "react-router-dom";
 
 /**
- * Generate Style
+ * CSS class generator
  * */
 const useStyles = makeStyles({
   // Color for current page link
@@ -16,40 +16,46 @@ const useStyles = makeStyles({
   // Update styles for link
   link: {
     color: "#777",
-    "&:hover": { cursor: "pointer", textDecoration: "none", color: "#333" },
+    textDecoration: "none",
+    "&:hover": { cursor: "pointer", color: "#333" },
   },
 });
+
+/** Compoent to return Link / typography based on data */
+const Text = ({ link, children, path }) => {
+  // Get styles
+  const classes = useStyles();
+
+  return link ? (
+    <Link className={classes.link} to={path}>
+      {children}
+    </Link>
+  ) : (
+    <Typography className={classes.typo}>{children}</Typography>
+  );
+};
 
 /**
  * Breadcrumbs Component
  */
 const Breadcrumbs = ({ history, location: { pathname } }) => {
-  // Get styles
-  const classes = useStyles();
-
   //filtering to get rid of empty string
   const pathnames = pathname.split("/").filter((x) => x);
 
   return (
     <MUIBreadcrumbs aria-label="breadcrumb">
-      <Link
-        className={pathnames.length > 0 ? classes.link : classes.typo}
-        onClick={() => pathnames.length > 0 && history.push("/")}
-      >
+      <Text link={pathnames.length > 0} path={"/"}>
         Home
-      </Link>
+      </Text>
 
-      {pathnames.map((name, index) => (
-        <Link
-          key={name}
-          className={index < pathnames.length - 1 ? classes.link : classes.typo}
-          onClick={() =>
-            index < pathnames.length - 1 &&
-            history.push(`/${pathnames.slice(0, index + 1).join("/")}`)
-          }
+      {pathnames.map((text, index) => (
+        <Text
+          key={index}
+          link={index < pathnames.length - 1}
+          path={`/${pathnames.slice(0, index + 1).join("/")}`}
         >
-          {name}
-        </Link>
+          {text}
+        </Text>
       ))}
     </MUIBreadcrumbs>
   );

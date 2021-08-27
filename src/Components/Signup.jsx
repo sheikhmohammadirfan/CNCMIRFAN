@@ -15,8 +15,8 @@ const defaultValue = {
 /**
  * Signup Component
  * */
-function Signup(props) {
-  DocumentTitle(`CNCM | ${props.title}`);
+function Signup({ title }) {
+  DocumentTitle(title);
   // Method to validate input
   const validateInput = (errObj) => {
     // Create temp error obj

@@ -1,13 +1,14 @@
+/** Sidebar data to map */
 export const SidebarData = [
   {
-    icon: "star",
+    icon: "description",
     title: "Document Compliance",
     path: "/about-us",
   },
   {
-    icon: "star",
+    icon: "verified",
     title: "Verify Complaince",
-    path: "/services",
+    path: "/verify",
   },
   {
     title: "Complaince Framework",
@@ -120,7 +121,7 @@ export const SidebarData = [
             path: "/events",
             icon: "star",
           },
-        ]
+        ],
       },
       {
         title: "MY TASKS",
@@ -132,11 +133,11 @@ export const SidebarData = [
   {
     title: "MY TASKS",
     path: "/events",
-    icon: "star",
+    icon: "task",
   },
   {
     title: "Manage Artifacts",
     path: "/support",
-    icon: "star",
+    icon: "manage_accounts",
   },
 ];

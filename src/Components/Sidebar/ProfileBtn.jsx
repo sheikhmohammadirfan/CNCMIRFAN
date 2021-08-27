@@ -1,13 +1,10 @@
 import { Avatar, Icon, makeStyles, Typography } from "@material-ui/core";
 import React from "react";
-import { useHistory } from "react-router-dom";
 import { logout } from "../../Service/UserFactory";
 import MenuPopup from "./MenuPopup";
 import SidebarItem from "./SidebarItem";
 
-/**
- * Style Generator
- */
+/** CSS Class Generator */
 const useStyles = makeStyles((theme) => ({
   root: {
     justifyContent: "center",
@@ -16,12 +13,11 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 /**
- * Profile Component
+ * Generate profile btn with Icon and username
+ * and on popup show user Setting & logout btn
  */
 function ProfileBtn({ sidebarStatus }) {
   const classes = useStyles();
-
-  const history = useHistory();
 
   return (
     <MenuPopup
@@ -43,7 +39,7 @@ function ProfileBtn({ sidebarStatus }) {
               </Typography>
             }
             icon={<Icon>logout</Icon>}
-            onClick={() => {logout(); history.push("/login")}}
+            onClick={() => logout()}
           />
         </>
       }

@@ -7,18 +7,16 @@ import {
   responsiveFontSizes,
 } from "@material-ui/core";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
-import { toast } from "react-toastify";
+import { Flip, toast } from "react-toastify";
 import Header from "./Components/Header";
 import Sidebar from "./Components/Sidebar/Sidebar";
 import Auth from "./Pages/Auth";
 import "react-toastify/dist/ReactToastify.css";
 import ProtectedRoutes from "./Components/ProtectedRoutes";
 import Verify from "./Pages/Verify";
-import Home from "./Components/Home";
+import Home from "./Pages/Home";
 
-/**
- * Theme generator
- * */
+/** Theme generator */
 let themes = createTheme({
   sidebarSmall: 50,
   sidebarLarge: 250,
@@ -26,9 +24,7 @@ let themes = createTheme({
 });
 themes = responsiveFontSizes(themes);
 
-/**
- * Styles generator
- * */
+/** CSS class generator */
 const useStyles = makeStyles((theme) => ({
   body: {
     [theme.breakpoints.down("xs")]: {
@@ -37,20 +33,22 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+/** Configure Toast */
 toast.configure({
   position: "top-right",
-  autoClose: 2000,
+  autoClose: 3000,
   hideProgressBar: false,
   closeOnClick: true,
   pauseOnHover: true,
   draggable: true,
   progress: undefined,
+  transition: Flip,
 });
 
-
+/** Root Component */
 function App() {
   const classes = useStyles();
-  
+
   return (
     <ThemeProvider theme={themes}>
       <CssBaseline />
@@ -68,10 +66,10 @@ function App() {
                 <Header />
                 <div className={classes.body}>
                   <Route exact path="/">
-                    <Home title="HOME"/>
+                    <Home title="HOME" />
                   </Route>
                   <Route exact path="/verify">
-                    <Verify title="VERIFY"/>
+                    <Verify title="VERIFY" />
                   </Route>
                 </div>
               </Box>

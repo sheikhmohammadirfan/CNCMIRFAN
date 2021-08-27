@@ -6,24 +6,19 @@ import {
   Fade,
   Icon,
   IconButton,
-  makeStyles,
 } from "@material-ui/core";
 import DocumentTitle from "../Components/DocumentTitle";
 import Upload from "../Components/Utils/Upload";
 import DataTable from "../Components/Utils/DataTable";
-import { deleteFiles, getFiles, uploadFiles } from "../Service/upload.service";
+import { deleteFiles, getFiles, uploadFiles } from "../Service/Verify.service";
 import pdfLogo from "../assets/img/pdf-file-format.png";
 import docLogo from "../assets/img/doc-file-format.png";
 import txtLogo from "../assets/img/txt-file-format.png";
 import { toast } from "react-toastify";
 
-const useStyles = makeStyles((theme) => ({
-  container: {
-    textAlign: "center",
-    padding: theme.spacing(1),
-  },
-}));
-
+/**
+ * Warning Toast message
+ */
 const WarningToast = ({ deleteMethod }) => {
   return (
     <Box>
@@ -53,61 +48,107 @@ const WarningToast = ({ deleteMethod }) => {
   );
 };
 
+// Method to show warning before deleting files
+function showWarning(mtd) {
+  toast(<WarningToast deleteMethod={mtd} />, {
+    toastId: "delete-toast",
+    position: "top-center",
+    autoClose: false,
+    closeOnClick: false,
+    type: "error",
+  });
+}
+
+// Object of valid files
+const validFiles = {
+  ".pdf": pdfLogo,
+  ".doc": docLogo,
+  ".docx": docLogo,
+  ".txt": txtLogo,
+};
+
+// Content for header of table
+const header = {
+  data: [
+    { text: "ID" },
+    { text: "FileName" },
+    { text: "Last Activity", props: { align: "right" } },
+  ],
+};
+
+// row data
+const row = (lst) =>
+  lst.map((file, index) => [
+    { text: index + 1 },
+    { text: file.file_name },
+    { text: file.file.split("/")[5], props: { align: "right" } },
+  ]);
+
+/** Verify page compoent */
 export default function Verify(props) {
   DocumentTitle(props.title);
-  const classes = useStyles();
 
+  // React state, to save list of ifles
   const [fileList, setFileList] = useState([]);
-  const updateFiles = async () => {
+
+  // Fetch files from server
+  const fetchFiles = async () => {
     const { data, status } = await getFiles();
     status && setFileList(data);
   };
 
-  const validFiles = {
-    ".pdf": pdfLogo,
-    ".doc": docLogo,
-    ".docx": docLogo,
-    ".txt": txtLogo,
-  };
+  // Fetch all files when component is mounted
+  useEffect((files) => fetchFiles().then((val) => setLoading(false)), []);
 
+  // React state, to indicate loading status
   const [loading, setLoading] = useState(true);
+
+  // React state, to save selected rows
   const [selectedRows, setSelectedRows] = useState([]);
 
-  useEffect((files) => {
-    updateFiles().then((val) => setLoading(false));
-  }, []);
-
+  // Method to delete list of selected files
   const deleteSelectedFiles = async () => {
-    if (selectedRows.length > 0) {
-      setLoading(true);
-      const status = await deleteFiles(
-        selectedRows.map((row) => fileList[row[0].text - 1])
-      );
-      if (status) {
-        setSelectedRows([]);
-        await updateFiles();
-        setLoading(false);
-      }
+    setLoading(true);
+    // Delete files
+    const status = await deleteFiles(
+      selectedRows.map((row) => fileList[row[0].text - 1])
+    );
+    if (status) {
+      // If success then update files
+      setSelectedRows([]);
+      await fetchFiles();
+      setLoading(false);
     }
   };
 
-  const showWarning = () => {
-    toast(<WarningToast deleteMethod={deleteSelectedFiles} />, {
-      toastId: "delete-toast",
-      position: "top-center",
-      autoClose: false,
-      closeOnClick: false,
-      type: "error",
-    });
-  };
+  // Component for footer of table
+  const FooterComponent = () => (
+    <Box display="flex" alignItems="center">
+      <IconButton
+        onClick={() =>
+          selectedRows.length > 0 && showWarning(deleteSelectedFiles)
+        }
+      >
+        <Icon>delete</Icon>
+      </IconButton>
+      <Button color="primary" variant="contained">
+        Verify
+      </Button>
+      <Fade in={loading} mountOnEnter unmountOnExit>
+        <Box paddingX={1}>
+          <CircularProgress size={32} />
+        </Box>
+      </Fade>
+    </Box>
+  );
 
   return (
-    <div className={classes.container}>
+    <Box padding={1} textAlign="center">
       <Upload
         id="uploadFiles"
         uploadService={uploadFiles}
-        updateFileLst={updateFiles}
-        validFilesLst={validFiles}
+        updateFileLst={fetchFiles}
+        validFiles={validFiles}
         maxFile={10}
       />
       <Button
@@ -126,37 +167,11 @@ export default function Verify(props) {
           setSelectedRows={setSelectedRows}
           pagging={10}
           showIndex={true}
-          header={{
-            row: {},
-            cols: {},
-            data: [
-              { text: "ID" },
-              { text: "FileName" },
-              { text: "Last Activity", props: { align: "right" } },
-            ],
-          }}
-          rows={fileList.map((file, index) => [
-            { text: index + 1 },
-            { text: file.file_name },
-            { text: file.file.split("/")[5], props: { align: "right" } },
-          ])}
-          footerComponent={
-            <Box display="flex" alignItems="center">
-              <IconButton onClick={showWarning}>
-                <Icon>delete</Icon>
-              </IconButton>
-              <Button color="primary" variant="contained">
-                Verify
-              </Button>
-              <Fade in={loading} mountOnEnter unmountOnExit>
-                <Box paddingX={1}>
-                  <CircularProgress size={32} />
-                </Box>
-              </Fade>
-            </Box>
-          }
+          header={header}
+          rows={row(fileList)}
+          footerComponent={<FooterComponent />}
         />
       </Box>
-    </div>
+    </Box>
   );
 }

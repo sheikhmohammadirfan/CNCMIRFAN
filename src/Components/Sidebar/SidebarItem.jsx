@@ -1,6 +1,7 @@
 import { Icon, ListItem, ListItemIcon, ListItemText } from "@material-ui/core";
 import React from "react";
 
+/** Generate Sidebar Item */
 function SidebarItem({ text, icon, subMenu, ...rest }) {
   return (
     <ListItem button {...rest}>

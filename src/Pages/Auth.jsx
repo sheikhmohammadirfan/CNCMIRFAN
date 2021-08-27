@@ -9,9 +9,7 @@ import { useState } from "react";
 import Login from "../Components/Login";
 import Signup from "../Components/Signup";
 
-/**
- *  Style generator
- * */
+/** CSS class generator  */
 const useStyles = makeStyles((theme) => ({
   // Page container style
   container: {
@@ -84,16 +82,16 @@ const useStyles = makeStyles((theme) => ({
       transition: "color 0.2s linear",
       "& .MuiSvgIcon-root": { fontSize: "3.5rem" },
     },
-    "& #facebook:hover, & #facebook:focus" : {
+    "& #facebook:hover, & #facebook:focus": {
       color: "#001E6C",
     },
-    "& #github:hover, & #github:focus" : {
+    "& #github:hover, & #github:focus": {
       color: "#333",
     },
-    "& #linkedin:hover, & #linkedin:focus" : {
+    "& #linkedin:hover, & #linkedin:focus": {
       color: "#035397",
     },
-    "& #google:hover, & #google:focus" : {
+    "& #google:hover, & #google:focus": {
       color: "#BB8760",
     },
   },
@@ -162,16 +160,16 @@ function Auth() {
 
             <ul className={classes.socialContainer}>
               <li>
-                <FacebookIcon id="facebook"/>
+                <FacebookIcon id="facebook" />
               </li>
               <li>
-                <GitHubIcon id="github"/>
+                <GitHubIcon id="github" />
               </li>
               <li>
-                <LinkedInIcon id="linkedin"/>
+                <LinkedInIcon id="linkedin" />
               </li>
               <li>
-                <GTranslateIcon id="google"/>
+                <GTranslateIcon id="google" />
               </li>
             </ul>
           </Box>

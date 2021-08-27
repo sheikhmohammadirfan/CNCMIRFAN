@@ -9,7 +9,7 @@ import {
 import { makeStyles, Typography } from "@material-ui/core";
 
 /**
- * Style Generator
+ * CSS class generator
  */
 const useStyle = makeStyles((theme) => ({
   // Style for chart
@@ -22,14 +22,13 @@ const useStyle = makeStyles((theme) => ({
   },
 }));
 
-
-/** 
+/**
  * Chart Component
  */
 export default function Chart({ title, data, dataKey, grid }) {
   // GEt styles
   const classes = useStyle();
-  
+
   return (
     <div className={classes.chart}>
       <Typography variant="h5">{title}</Typography>

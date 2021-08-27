@@ -1,16 +1,17 @@
-import axios from "axios";
-import { Flip, toast } from "react-toastify";
+import instance from "axios";
+import { toast } from "react-toastify";
 import ErrMsg from "./ErrMsg";
-import { getToken } from "./UserFactory";
+import { getToken, logout } from "./UserFactory";
 
-// Base API URL
-const baseUrl = "https://internassign.herokuapp.com/api";
+// Setup axios object
+const axios = instance.create({
+  baseURL: "https://internassign.herokuapp.com/api",
+});
 
 // Generate toast template
 const notification = (msg, type) =>
   toast(Array.isArray(msg) ? <ErrMsg data={msg} /> : msg, {
     toastId: "api-toast",
-    transition: Flip,
     type,
   });
 
@@ -19,7 +20,7 @@ async function request(requestOptions) {
   const { url, data, method, notify = true, ...rest } = requestOptions;
 
   // Append base url
-  let fullurl = baseUrl + url;
+  let fullurl = url;
 
   // Set basic header
   let headers = { Accept: "*/*", Authorization: `Bearer ${getToken()}` };
@@ -38,23 +39,29 @@ async function request(requestOptions) {
 
   try {
     // Make request
-    console.log({ method, url: fullurl, data , headers, ...rest});
-    const response = await axios({ method, url: fullurl, data , headers, ...rest});
-    console.log(response);
+    const response = await axios({
+      method,
+      url: fullurl,
+      data,
+      headers,
+      ...rest,
+    });
     // Setup Success response
     res.status = true;
-    // res.message = response.data.message;
-    // delete response.data.message;
+    res.message = response.data.message;
+    delete response.data.message;
     res.data = response.data;
-    // // Notify user
-    // if (method !== "GET" && notify) notification(res.message, "success");
+    // Notify user
+    if (method !== "GET" && notify) notification(res.message, "success");
   } catch (e) {
-    console.log(e.response);
+    // If unauthorize then logout user
+    if (e?.response?.status === 401) logout();
+
     // Setup Error response
     res.status = false;
-    // res.message = e?.response?.data?.error || "An error occured.";
-    // // Notify user
-    // notification(res.message, "error");
+    res.message = e?.response?.data?.error || "An error occured.";
+    // Notify user
+    notification(res.message, "error");
   }
   return res;
 }
@@ -79,4 +86,4 @@ async function deletes(url, data, requestOptions) {
   return request({ method: "DELETE", url, data, ...requestOptions });
 }
 
-export { get, post, put, patch, deletes };
+export { axios, get, post, put, patch, deletes };

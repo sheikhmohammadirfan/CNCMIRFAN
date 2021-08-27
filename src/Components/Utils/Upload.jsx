@@ -24,7 +24,7 @@ function getExt(name) {
   return /(?:\.([^.]+))?$/.exec(name)[0]?.toLowerCase();
 }
 
-// Generate styles
+// CSS class generator
 const useStyles = makeStyles((theme) => ({
   overlay: {
     position: "fixed",
@@ -44,9 +44,8 @@ const useStyles = makeStyles((theme) => ({
     width: "90%",
     maxWidth: 400,
   },
-  container_title: {
-    fontWeight: "bold",
-  },
+  container_title: { fontWeight: "bold" },
+  divider: { border: "2px solid #444", margin: 0 },
 }));
 
 // Close Warning dialog
@@ -99,21 +98,20 @@ function Upload({
   id,
   uploadService,
   updateFileLst,
-  validFilesLst = {},
+  validFiles = {},
   maxFile = 1000,
 }) {
+  // Get styles
   const classes = useStyles();
 
-  const extLst = Object.keys(validFilesLst);
+  // Get list of extension list
+  const extLst = Object.keys(validFiles);
 
+  // React hook, to save selected files
   const [files, setFiles] = useState([]);
 
-  // React state to set loading status btn
-  const [uploadStarted, setUploadStatus] = useState(false);
-  const toggleUploading = () => setUploadStatus((val) => !val);
-
   // React state to set valid files status to activate/deactivate upload btn
-  const [validFiles, setValidFiles] = useState(true);
+  const [isAllValid, setValidFiles] = useState(true);
   useEffect(() => {
     if (extLst.length > 0) {
       let i = 0;
@@ -121,6 +119,10 @@ function Upload({
       setValidFiles(i === files.length);
     }
   }, [files]);
+
+  // React state to set loading status btn
+  const [uploadStarted, setUploadStatus] = useState(false);
+  const toggleUploading = () => setUploadStatus((val) => !val);
 
   // Upload files method
   const updateFiles = (e) => {
@@ -130,8 +132,8 @@ function Upload({
       notification("Upload Limit exceeded.", "error");
     // Add new files
     else
-      setFiles([
-        ...files,
+      setFiles(file => [
+        ...file,
         ...Object.keys(fileList).map((index) => fileList[index]),
       ]);
     e.target.value = "";
@@ -212,7 +214,7 @@ function Upload({
             {uploadStarted ? (
               <LinearProgress />
             ) : (
-              <hr style={{ border: "2px solid #444", margin: 0 }} />
+              <hr className={classes.divider} />
             )}
 
             <Box padding={1} overflow="auto" maxHeight={300}>
@@ -224,7 +226,7 @@ function Upload({
                   setter={() => removeFiles(index)}
                   icon={
                     extLst.length > 0
-                      ? validFilesLst[getExt(file.name)]
+                      ? validFiles[getExt(file.name)]
                       : otherLogo
                   }
                 />
@@ -249,7 +251,7 @@ function Upload({
                 size="small"
                 startIcon={<Icon>upload</Icon>}
                 style={{ margin: 4 }}
-                disabled={uploadStarted || !validFiles}
+                disabled={uploadStarted || !isAllValid}
                 onClick={pushFiles}
               >
                 Upload

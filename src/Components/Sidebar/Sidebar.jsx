@@ -12,31 +12,26 @@ import AcUnitIcon from "@material-ui/icons/AcUnit";
 import React from "react";
 import { useEffect } from "react";
 import { useState } from "react";
-import { SidebarData } from "../../assets/SidebarData";
+import { Link } from "react-router-dom";
+import { SidebarData } from "../../assets/data/SidebarData";
 import MenuPopup from "./MenuPopup";
 import ProfileBtn from "./ProfileBtn";
 import SidebarItem from "./SidebarItem";
 
-/**
- * Styles generator
- * */
+/** CSS Class Generator */
 const useStyles = makeStyles((theme) => {
   const iconPadding = (theme.sidebarSmall - 24) / 2;
-
   return {
     // Sidebar root
     sidebar: {
-      flex: "1",
       width: theme.sidebarLarge,
-      [theme.breakpoints.down("xs")]: {
-        position: "fixed",
-      },
+      [theme.breakpoints.down("xs")]: { position: "fixed" },
       height: "100vh",
       background: theme.palette.primary.light,
       color: theme.textOnPrimary,
       position: "sticky",
       top: 0,
-      zIndex: 100,
+      zIndex: 10,
       display: "flex",
       flexDirection: "column",
       boxShadow: theme.shadows[1],
@@ -126,9 +121,13 @@ const useStyles = makeStyles((theme) => {
 });
 
 /**
- * Menu Component
- * */
-const Menu = ({ sidebarStatus = true, data: { title, icon, subNav } }) => {
+ * Menu to display sidebar navigation item
+ * with tooltip popup if it have sub menu
+ */
+const Menu = ({
+  sidebarStatus = true,
+  data: { title, icon, subNav, path },
+}) => {
   // Get styles
   const classes = useStyles();
 
@@ -151,6 +150,8 @@ const Menu = ({ sidebarStatus = true, data: { title, icon, subNav } }) => {
       }
       component={
         <SidebarItem
+          component={Link}
+          to={path}
           text={
             <Typography noWrap variant="subtitle1">
               {title}
@@ -165,7 +166,7 @@ const Menu = ({ sidebarStatus = true, data: { title, icon, subNav } }) => {
 };
 
 /**
- * Main Sidebar Component
+ * Sidebar Component to show logo btn, profile btn and Navigation
  * */
 function Sidebar() {
   // Get Styles

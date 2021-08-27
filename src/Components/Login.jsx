@@ -14,9 +14,8 @@ const defaultValue = {
 /**
  * Login Component
  * */
-function Login(props) {
-
-  DocumentTitle(`CNCM | ${props.title}`);
+function Login({ title }) {
+  DocumentTitle(title);
 
   // Method to validate input
   const validateInput = (errObj) => {
