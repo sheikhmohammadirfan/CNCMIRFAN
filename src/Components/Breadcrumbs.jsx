@@ -43,7 +43,7 @@ const Breadcrumbs = ({ history, location: { pathname } }) => {
   const pathnames = pathname.split("/").filter((x) => x);
 
   return (
-    <MUIBreadcrumbs aria-label="breadcrumb">
+    <MUIBreadcrumbs aria-label="breadcrumb" separator=">">
       <Text link={pathnames.length > 0} path={"/"}>
         Home
       </Text>

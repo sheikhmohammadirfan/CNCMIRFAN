@@ -1,4 +1,4 @@
-import { Box, Button, CircularProgress } from "@material-ui/core";
+import { Box, Button, CircularProgress, makeStyles } from "@material-ui/core";
 import React, { useState } from "react";
 import { useForm, TextControl } from "./Control";
 import { login } from "../Service/UserFactory";
@@ -11,6 +11,37 @@ const defaultValue = {
   password: "",
 };
 
+const useStyles = makeStyles((theme) => ({
+  forgotRow : {
+    height: "3.5rem",
+    fontSize: "1rem",
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: ".8rem",
+    
+    "& label" : {
+      cursor: "pointer",
+      marginRight: "auto",
+    },
+    "& input": {
+      cursor: "pointer",
+      marginRight: "5px",
+    },
+
+    "& a": {
+      textDecoration: "none",
+      color: "darkblue",
+      borderBottom: "1px solid transparent",
+      transition: "textDecoration 0.3s",
+    },
+
+    "& a:hover": {
+      textDecoration: "underline",
+    }
+
+  },
+}));
 /**
  * Login Component
  * */
@@ -66,6 +97,7 @@ function Login({ title }) {
 
   // History react hook, to navigate
   const history = useHistory();
+  const classes = useStyles();
 
   return (
     <Box display="flex" flexDirection="column">
@@ -86,10 +118,17 @@ function Login({ title }) {
         error={error.password}
       />
 
+      <Box className={classes.forgotRow}>
+        <input type="checkbox" name="checkBox" id="check" />
+        <label htmlFor="check">Remeber me</label>
+        <a href="#">Forgot password ?</a>
+      </Box>
+
       <Button
         variant="contained"
         color="secondary"
         style={{
+          marginTop: ".2rem",
           marginBottom: 16,
           width: "max-content",
           marginLeft: "auto",

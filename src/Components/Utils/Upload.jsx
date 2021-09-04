@@ -52,7 +52,7 @@ const useStyles = makeStyles((theme) => ({
 const WarningDialog = ({ cnt, set }) => {
   return (
     <Box>
-      Are you sure ? <strong>{cnt} files are yet to upload.</strong>
+      Are you sure ? <strong>{cnt === 1 ? cnt + " file is": cnt + " files are"} yet to upload.</strong>
       <Box marginTop={0.5}>
         <Button
           size="small"

@@ -31,7 +31,7 @@ const useStyles = makeStyles((theme) => ({
   formContainer: {
     margin: `${theme.spacing(3)}px 0`,
     backgroundColor: "#fff",
-    boxShadow: "0px 6px 13px -1px rgba(0, 0, 0, 0.75)",
+    boxShadow: "0 6px 16px 0 rgb(0 0 0 / 20%)",
     borderRadius: theme.shape.borderRadius,
   },
 
@@ -154,24 +154,6 @@ function Auth() {
           <Box className={classes.formBody}>
             {loginState ? <Login title="LOGIN" /> : <Signup title="SIGN UP" />}
 
-            <Typography variant="h5" className={classes.seperatorText}>
-              or connect with
-            </Typography>
-
-            <ul className={classes.socialContainer}>
-              <li>
-                <FacebookIcon id="facebook" />
-              </li>
-              <li>
-                <GitHubIcon id="github" />
-              </li>
-              <li>
-                <LinkedInIcon id="linkedin" />
-              </li>
-              <li>
-                <GTranslateIcon id="google" />
-              </li>
-            </ul>
           </Box>
         </main>
 
