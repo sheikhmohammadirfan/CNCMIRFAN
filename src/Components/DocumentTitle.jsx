@@ -8,9 +8,14 @@ function DocumentTitle(title, prevailOnUnmount = false) {
   useEffect(() => (document.title = `CNCM | ${title}`), [title]);
 
   // In case the component is unmounted the title is same
-  useEffect(() => {
-    return !prevailOnUnmount && (document.title = defaultTitle.current);
-  }, []);
+  useEffect(
+    () => () => {
+      if (!prevailOnUnmount) {
+        document.title = defaultTitle.current;
+      }
+    },
+    [prevailOnUnmount]
+  );
 }
 
 export default DocumentTitle;

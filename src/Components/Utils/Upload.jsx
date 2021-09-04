@@ -52,7 +52,10 @@ const useStyles = makeStyles((theme) => ({
 const WarningDialog = ({ cnt, set }) => {
   return (
     <Box>
-      Are you sure ? <strong>{cnt === 1 ? cnt + " file is": cnt + " files are"} yet to upload.</strong>
+      Are you sure ?
+      <strong>
+        {cnt === 1 ? ` ${cnt} file is` : ` ${cnt} files are`} yet to upload.
+      </strong>
       <Box marginTop={0.5}>
         <Button
           size="small"
@@ -118,7 +121,7 @@ function Upload({
       while (i < files.length && extLst.includes(getExt(files[i].name))) i++;
       setValidFiles(i === files.length);
     }
-  }, [files]);
+  }, [files, extLst]);
 
   // React state to set loading status btn
   const [uploadStarted, setUploadStatus] = useState(false);
@@ -132,7 +135,7 @@ function Upload({
       notification("Upload Limit exceeded.", "error");
     // Add new files
     else
-      setFiles(file => [
+      setFiles((file) => [
         ...file,
         ...Object.keys(fileList).map((index) => fileList[index]),
       ]);

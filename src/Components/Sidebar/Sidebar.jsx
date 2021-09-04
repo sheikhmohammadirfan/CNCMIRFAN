@@ -8,7 +8,6 @@ import {
   IconButton,
   Divider,
 } from "@material-ui/core";
-import AcUnitIcon from "@material-ui/icons/AcUnit";
 import React from "react";
 import { useEffect } from "react";
 import { useState } from "react";
@@ -194,7 +193,7 @@ function Sidebar() {
             LOGO
           </Typography>
         }
-        icon={<AcUnitIcon />}
+        // icon={<AcUnitIcon />}
       />
       <Divider />
 

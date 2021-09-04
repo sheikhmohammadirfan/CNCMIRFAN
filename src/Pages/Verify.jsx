@@ -10,7 +10,12 @@ import {
 import DocumentTitle from "../Components/DocumentTitle";
 import Upload from "../Components/Utils/Upload";
 import DataTable from "../Components/Utils/DataTable";
-import { deleteFiles, getFiles, uploadFiles } from "../Service/Verify.service";
+import {
+  deleteFiles,
+  getFiles,
+  uploadFiles,
+  verifyFile,
+} from "../Service/Verify.service";
 import pdfLogo from "../assets/img/pdf-file-format.png";
 import docLogo from "../assets/img/doc-file-format.png";
 import txtLogo from "../assets/img/txt-file-format.png";
@@ -121,6 +126,18 @@ export default function Verify(props) {
     }
   };
 
+  // Method ot selected verify file
+  const verifySelectedFile = async () => {
+    if (selectedRows.length > 0) {
+      setLoading(true);
+      const { data, status } = await verifyFile(
+        fileList[selectedRows[0][0].text - 1].id
+      );
+      setLoading(false);
+      console.log(data, status);
+    }
+  };
+
   // Component for footer of table
   const FooterComponent = () => (
     <Box display="flex" alignItems="center">
@@ -131,7 +148,7 @@ export default function Verify(props) {
       >
         <Icon>delete</Icon>
       </IconButton>
-      <Button color="primary" variant="contained">
+      <Button color="primary" variant="contained" onClick={verifySelectedFile}>
         Verify
       </Button>
       <Fade in={loading} mountOnEnter unmountOnExit>

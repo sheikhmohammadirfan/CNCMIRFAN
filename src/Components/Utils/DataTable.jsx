@@ -44,10 +44,11 @@ function DataTable({
     );
 
   // Toggle select All btn
-  const toggleAllRows = (checked) =>
-    setSelectedRows(row =>
-      checked ? [...row.slice(currIn, currIn + rowsPerPage)] : []
+  const toggleAllRows = (checked) => {
+    setSelectedRows(
+      checked ? [...rows.slice(currIn, currIn + rowsPerPage)] : []
     );
+  };
 
   // Method to check if some files are selected
   const isSomeChecked = () =>

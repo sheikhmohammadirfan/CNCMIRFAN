@@ -121,7 +121,7 @@ function Login({ title }) {
       <Box className={classes.forgotRow}>
         <input type="checkbox" name="checkBox" id="check" />
         <label htmlFor="check">Remeber me</label>
-        <a href="#">Forgot password ?</a>
+        <a href="/">Forgot password ?</a>
       </Box>
 
       <Button

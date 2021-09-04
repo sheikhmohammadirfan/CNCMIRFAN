@@ -3,10 +3,12 @@ import { toast } from "react-toastify";
 import ErrMsg from "./ErrMsg";
 import { getToken, logout } from "./UserFactory";
 
+// Base url
+// const baseURL = "http://127.0.0.1:8000";
+const baseURL = "https://internassign.herokuapp.com";
+
 // Setup axios object
-const axios = instance.create({
-  baseURL: "https://internassign.herokuapp.com/api",
-});
+const axios = instance.create({ baseURL: baseURL + "/api" });
 
 // Generate toast template
 const notification = (msg, type) =>
@@ -86,4 +88,4 @@ async function deletes(url, data, requestOptions) {
   return request({ method: "DELETE", url, data, ...requestOptions });
 }
 
-export { axios, get, post, put, patch, deletes };
+export { baseURL, axios, get, post, put, patch, deletes };

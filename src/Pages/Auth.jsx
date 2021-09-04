@@ -1,10 +1,6 @@
 import React from "react";
 import { useHistory } from "react-router-dom";
 import { makeStyles, Typography, Box } from "@material-ui/core";
-import FacebookIcon from "@material-ui/icons/Facebook";
-import GitHubIcon from "@material-ui/icons/GitHub";
-import LinkedInIcon from "@material-ui/icons/LinkedIn";
-import GTranslateIcon from "@material-ui/icons/GTranslate";
 import { useState } from "react";
 import Login from "../Components/Login";
 import Signup from "../Components/Signup";
@@ -70,32 +66,6 @@ const useStyles = makeStyles((theme) => ({
     "&::after": { marginLeft: theme.spacing(1) },
   },
 
-  // Social Icon container
-  socialContainer: {
-    display: "flex",
-    justifyContent: "space-between",
-    listStyleType: "none",
-    padding: 0,
-    "& li": {
-      padding: theme.spacing(1),
-      cursor: "pointer",
-      transition: "color 0.2s linear",
-      "& .MuiSvgIcon-root": { fontSize: "3.5rem" },
-    },
-    "& #facebook:hover, & #facebook:focus": {
-      color: "#001E6C",
-    },
-    "& #github:hover, & #github:focus": {
-      color: "#333",
-    },
-    "& #linkedin:hover, & #linkedin:focus": {
-      color: "#035397",
-    },
-    "& #google:hover, & #google:focus": {
-      color: "#BB8760",
-    },
-  },
-
   // Rules & Regulation style
   signupAgreement: {
     color: theme.palette.grey[700],
@@ -153,7 +123,6 @@ function Auth() {
 
           <Box className={classes.formBody}>
             {loginState ? <Login title="LOGIN" /> : <Signup title="SIGN UP" />}
-
           </Box>
         </main>
 
