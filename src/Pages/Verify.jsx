@@ -19,50 +19,7 @@ import {
 import pdfLogo from "../assets/img/pdf-file-format.png";
 import docLogo from "../assets/img/doc-file-format.png";
 import txtLogo from "../assets/img/txt-file-format.png";
-import { toast } from "react-toastify";
-
-/**
- * Warning Toast message
- */
-const WarningToast = ({ deleteMethod }) => {
-  return (
-    <Box>
-      Are you sure to delete selected files?
-      <Box marginTop={0.5}>
-        <Button
-          size="small"
-          variant="contained"
-          color="primary"
-          onClick={() => {
-            deleteMethod();
-            toast.dismiss("delete-toast");
-          }}
-        >
-          Yes
-        </Button>
-        <Button
-          size="small"
-          variant="contained"
-          style={{ marginLeft: 8 }}
-          onClick={() => toast.dismiss("delete-toast")}
-        >
-          No
-        </Button>
-      </Box>
-    </Box>
-  );
-};
-
-// Method to show warning before deleting files
-function showWarning(mtd) {
-  toast(<WarningToast deleteMethod={mtd} />, {
-    toastId: "delete-toast",
-    position: "top-center",
-    autoClose: false,
-    closeOnClick: false,
-    type: "error",
-  });
-}
+import DialogBox from "../Components/Utils/DialogBox";
 
 // Object of valid files
 const validFiles = {
@@ -93,7 +50,12 @@ const row = (lst) =>
 export default function Verify(props) {
   DocumentTitle(props.title);
 
-  // React state, to save list of ifles
+  // React state, to show/hide warning dialog
+  const [dialog, setDialog] = useState(true);
+  const showDailog = () => setDialog(true);
+  const hideDailog = () => setDialog(false);
+
+  // React state, to save list of files
   const [fileList, setFileList] = useState([]);
 
   // Fetch files from server
@@ -138,14 +100,31 @@ export default function Verify(props) {
     }
   };
 
+  // Compoent to show warning dialog
+  const WarningDailog = () => (
+    <DialogBox
+      open={dialog}
+      close={hideDailog}
+      title="Delete Files"
+      content={`Are you sure to delete ${selectedRows.length} selected files ?`}
+      actions={[
+        <Button
+          onClick={() => {
+            deleteSelectedFiles();
+            hideDailog();
+          }}
+        >
+          Yes
+        </Button>,
+        <Button onClick={hideDailog}>No</Button>,
+      ]}
+    />
+  );
+
   // Component for footer of table
   const FooterComponent = () => (
     <Box display="flex" alignItems="center">
-      <IconButton
-        onClick={() =>
-          selectedRows.length > 0 && showWarning(deleteSelectedFiles)
-        }
-      >
+      <IconButton onClick={() => selectedRows.length > 0 && showDailog()}>
         <Icon>delete</Icon>
       </IconButton>
       <Button color="primary" variant="contained" onClick={verifySelectedFile}>
@@ -161,6 +140,7 @@ export default function Verify(props) {
 
   return (
     <Box padding={1} textAlign="center">
+      <WarningDailog />
       <Upload
         id="uploadFiles"
         uploadService={uploadFiles}

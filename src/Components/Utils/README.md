@@ -11,7 +11,6 @@
 - ###### Limit no. of files can be uploaded at once.
 - ###### Rename, deselect individual file.
 - ###### Show specific icon to a file format.
-- ###### Get warning on closing dialog without uploading.
 - ###### Put file format restriction.
 
 **<span style="color: blue;">PROPS :</span>**
@@ -21,7 +20,7 @@
 **validFiles <span style="color: brown;">: { ext : imgObj } </span>** Object of valid files
 **maxFile <span style="color: brown;">: Number </span>** max count of file to be uploaded
 
-**<span style="color: green;">RETURN :</span>** Upload overlay component
+**<span style="color: green;">RETURN :</span>** Upload dialog
 
 **<span style="color: red;">NOTE :</span>**
 
@@ -68,3 +67,21 @@
 ```
 
 - **checkbox** is true then, **selectedRows** & **setSelectedRows** should also be passed.
+
+---
+
+### [DialogBox](./DialogBox.jsx)
+
+###### Genralize dialog box, to show popup
+
+**<span style="color: blue;">PROPS :</span>**
+**<span style="color: blue;">open</span> <span style="color: brown;">: Boolean </span>** React state value
+**<span style="color: blue;">close</span> <span style="color: brown;">: Method </span>** Method to set open state value to false to close dailog when user click out side of dialog
+**title <span style="color: brown;">: String | HTML | Component </span>** Show content as title.
+**titleProp <span style="color: brown;">: Object </span>** props passed to the title container.
+**content <span style="color: brown;">: String | HTML | Component </span>** Show content as content.
+**contentProp <span style="color: brown;">: Object </span>** props passed to the content container.
+**actions <span style="color: brown;">: Button[] </span>** Shows a grid of buttons.
+**actionsProp <span style="color: brown;">: Object </span>** Props passed to grid container.
+
+**<span style="color: green;">RETURN :</span>** Dialog Component

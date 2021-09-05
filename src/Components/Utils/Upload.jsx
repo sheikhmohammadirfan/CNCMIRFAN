@@ -5,10 +5,12 @@ import {
   Icon,
   IconButton,
   makeStyles,
-  Fade,
   TextField,
   Typography,
   LinearProgress,
+  Dialog,
+  DialogTitle,
+  Divider,
 } from "@material-ui/core";
 import { toast } from "react-toastify";
 import unknownLogo from "../../assets/img/unknown-file-format.png";
@@ -26,60 +28,12 @@ function getExt(name) {
 
 // CSS class generator
 const useStyles = makeStyles((theme) => ({
-  overlay: {
-    position: "fixed",
-    top: 0,
-    left: 0,
-    width: "100vw",
-    height: "100vh",
-    background: "rgba(0, 0, 0, 0.5)",
-    zIndex: 20,
-    paddingTop: theme.spacing(10),
+  titleContainer: {
+    padding: theme.spacing(1),
+    display: "flex",
+    justifyContent: "space-between",
   },
-  container: {
-    background: theme.palette.background.paper,
-    borderRadius: theme.shape.borderRadius,
-    boxShadow: theme.shadows[4],
-    border: `1px solid ${theme.palette.grey[300]}`,
-    width: "90%",
-    maxWidth: 400,
-  },
-  container_title: { fontWeight: "bold" },
-  divider: { border: "2px solid #444", margin: 0 },
 }));
-
-// Close Warning dialog
-const WarningDialog = ({ cnt, set }) => {
-  return (
-    <Box>
-      Are you sure ?
-      <strong>
-        {cnt === 1 ? ` ${cnt} file is` : ` ${cnt} files are`} yet to upload.
-      </strong>
-      <Box marginTop={0.5}>
-        <Button
-          size="small"
-          variant="contained"
-          color="primary"
-          onClick={() => {
-            toast.dismiss("upload-toast");
-            set([]);
-          }}
-        >
-          Yes
-        </Button>
-        <Button
-          size="small"
-          variant="contained"
-          style={{ marginLeft: 8 }}
-          onClick={() => toast.dismiss("upload-toast")}
-        >
-          No
-        </Button>
-      </Box>
-    </Box>
-  );
-};
 
 // Row file that is uploaded
 const FileRow = ({ name, update, setter, icon }) => {
@@ -160,17 +114,6 @@ function Upload({
     setFiles(fileList.filter((_, index) => index !== delIndex));
   };
 
-  // Show warning toast
-  const showWarning = () => {
-    toast(<WarningDialog cnt={files.length} set={setFiles} />, {
-      type: "error",
-      toastId: "upload-toast",
-      autoClose: false,
-      closeOnClick: false,
-      position: "top-center",
-    });
-  };
-
   // Upload files
   const pushFiles = async () => {
     toggleUploading();
@@ -180,6 +123,12 @@ function Upload({
       updateFileLst?.(files);
       setFiles([]);
     }
+  };
+
+  // Cloe upload dialog
+  const closeUpload = () => {
+    document.getElementById(id).value = "";
+    setFiles([]);
   };
 
   return (
@@ -192,77 +141,66 @@ function Upload({
         onChange={updateFiles}
         hidden
       />
-      <Fade in={files.length > 0} mountOnEnter unmountOnExit>
-        <Box
-          className={classes.overlay}
-          display="flex"
-          justifyContent="center"
-          alignItems="start"
-        >
-          <Box className={classes.container}>
-            <Box display="flex" justifyContent="space-between" padding={1}>
-              <Typography variant="h6" className={classes.container_title}>
-                Upload
-              </Typography>
-              <IconButton
-                size="small"
-                color="secondary"
-                variant="contained"
-                onClick={showWarning}
-              >
-                <Icon>cancel</Icon>
-              </IconButton>
-            </Box>
+      <Dialog
+        open={files.length > 0}
+        onClose={() => !uploadStarted && closeUpload()}
+        aria-labelledby="upload-dialog"
+      >
+        <DialogTitle className={classes.titleContainer} disableTypography>
+          <Typography display="inline" variant="h6">
+            Upload files
+          </Typography>
+          <IconButton
+            size="small"
+            color="secondary"
+            variant="contained"
+            disabled={uploadStarted}
+            onClick={() => !uploadStarted && closeUpload()}
+          >
+            <Icon>cancel</Icon>
+          </IconButton>
+        </DialogTitle>
 
-            {uploadStarted ? (
-              <LinearProgress />
-            ) : (
-              <hr className={classes.divider} />
-            )}
+        {uploadStarted ? <LinearProgress /> : <Divider />}
 
-            <Box padding={1} overflow="auto" maxHeight={300}>
-              {files.map((file, index) => (
-                <FileRow
-                  key={index}
-                  name={file.name}
-                  update={(e) => updateName(index, e.target.value)}
-                  setter={() => removeFiles(index)}
-                  icon={
-                    extLst.length > 0
-                      ? validFiles[getExt(file.name)]
-                      : otherLogo
-                  }
-                />
-              ))}
-            </Box>
-            <Box display="flex" justifyContent="flex-end" alignItems="center">
-              <Button
-                htmlFor={id}
-                component="label"
-                color="primary"
-                variant="contained"
-                size="small"
-                startIcon={<Icon>add</Icon>}
-                style={{ margin: 4 }}
-                disabled={uploadStarted || files.length === maxFile}
-              >
-                Add More
-              </Button>
-              <Button
-                color="secondary"
-                variant="contained"
-                size="small"
-                startIcon={<Icon>upload</Icon>}
-                style={{ margin: 4 }}
-                disabled={uploadStarted || !isAllValid}
-                onClick={pushFiles}
-              >
-                Upload
-              </Button>
-            </Box>
-          </Box>
+        <Box padding={1} overflow="auto" maxHeight={300}>
+          {files.map((file, index) => (
+            <FileRow
+              key={index}
+              name={file.name}
+              update={(e) => updateName(index, e.target.value)}
+              setter={() => removeFiles(index)}
+              icon={extLst.length ? validFiles[getExt(file.name)] : otherLogo}
+            />
+          ))}
         </Box>
-      </Fade>
+
+        <Box display="flex" justifyContent="flex-end" alignItems="center">
+          <Button
+            htmlFor={id}
+            component="label"
+            color="primary"
+            variant="contained"
+            size="small"
+            startIcon={<Icon>add</Icon>}
+            style={{ margin: 4 }}
+            disabled={uploadStarted || files.length === maxFile}
+          >
+            Add More
+          </Button>
+          <Button
+            color="secondary"
+            variant="contained"
+            size="small"
+            startIcon={<Icon>upload</Icon>}
+            style={{ margin: 4 }}
+            disabled={uploadStarted || !isAllValid}
+            onClick={pushFiles}
+          >
+            Upload
+          </Button>
+        </Box>
+      </Dialog>
     </>
   );
 }

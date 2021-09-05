@@ -23,7 +23,7 @@ async function getFiles() {
 
 // Method to verify files
 async function verifyFile(id, control = [], subcontrol = []) {
-  return await get(`aws/verify/${id}`, { control, subcontrol });
+  return await get(`aws/verify/${id}/`, { control, subcontrol });
 }
 
 export { uploadFiles, deleteFiles, getFiles, verifyFile };
