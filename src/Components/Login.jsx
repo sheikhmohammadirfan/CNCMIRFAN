@@ -18,7 +18,7 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: ".8rem",
+    marginBottom: "1rem",
     
     "& label" : {
       cursor: "pointer",
@@ -129,9 +129,15 @@ function Login({ title }) {
         color="secondary"
         style={{
           marginTop: ".2rem",
-          marginBottom: 16,
-          width: "max-content",
+          borderRadius: "1rem",
+          marginBottom: "1.7rem",
+          fontSize: "1.15rem",
+          fontWeight: "bold",
+          letterSpacing: "1px",
+          width: "100%",
+          padding: "0.8rem 1.35rem",
           marginLeft: "auto",
+          background: "linear-gradient(to right , darkblue, blue)",
         }}
         endIcon={startLoading && <CircularProgress color="inherit" size={20} />}
         onClick={submit}

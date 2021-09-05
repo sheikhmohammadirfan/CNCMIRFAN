@@ -98,9 +98,16 @@ function Signup({ title }) {
         variant="contained"
         color="secondary"
         style={{
-          marginBottom: 16,
-          width: "max-content",
+          marginTop: ".2rem",
+          borderRadius: "1rem",
+          marginBottom: "1.7rem",
+          fontSize: "1.15rem",
+          fontWeight: "bold",
+          letterSpacing: "1px",
+          width: "100%",
+          padding: "0.8rem 1.35rem",
           marginLeft: "auto",
+          background: "linear-gradient(to right , darkblue, blue)",
         }}
         endIcon={startLoading && <CircularProgress color="inherit" size={20} />}
         onClick={handleOnSubmit}

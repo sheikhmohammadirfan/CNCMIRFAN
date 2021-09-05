@@ -28,8 +28,32 @@ const useStyles = makeStyles((theme) => ({
     margin: `${theme.spacing(3)}px 0`,
     backgroundColor: "#fff",
     boxShadow: "0 6px 16px 0 rgb(0 0 0 / 20%)",
-    borderRadius: theme.shape.borderRadius,
+    borderRadius: "1rem",
   },
+
+  tabHeadingContainer: {
+    width: "100%",
+    padding: "1rem 1.8rem",
+    display: "flex",
+  },
+
+  // "@keyframes slide": {
+  //   "0%": {
+  //     // transform: "scaleX(1)"
+  //     // width: "50%",
+  //     transform: "translateX(0)",
+  //   },
+  //   "50%": {
+  //     // transform: "scaleX(1.05)"
+  //     // width: "60%",
+  //     transform: "translateX(110%)"
+  //   },
+  //   "100%": {
+  //     // transform: "scaleX(1)"
+  //     // width: "50%",
+  //     transform: "translateX(100%)"
+  //   },
+  // },
 
   // Heading TAB style
   tabHeadings: {
@@ -40,31 +64,47 @@ const useStyles = makeStyles((theme) => ({
     fontWeight: "bold",
     textTransform: "uppercase",
     letterSpacing: 2,
-    marginBottom: theme.spacing(2),
-    transition: "box-shadow 0.3s ease-in-out",
-    "&:first-child": { boxShadow: "inset -6px 0 15px 0 rgba(0, 0, 0, 0.1)" },
-    "&:last-child": { boxShadow: "inset 6px 0 15px 0 rgba(0, 0, 0, 0.1)" },
-    "&.active": { boxShadow: "none" },
+    color: "#333",
+    zIndex: "2",
+    transition: "all .5s",
+    // "&:first-child": { background: "none"  },
+    // "&:last-child": { background: "none" },
+    "&.active": {color: "#fff"},
+  },
+
+  tabBackground: {
+    height: "100%",
+    width: "50%",
+    position:"absolute",
+    borderRadius: "1rem",
+    zIndex: 1,
+    background: "linear-gradient(to right , darkblue, blue)",
+    transition: "transform .3s",
+    "&.active": {
+      transform: "translateX(100%)",
+    },
   },
 
   // Add horizontal spacing in body
-  formBody: { padding: `0 ${theme.spacing(4)}px` },
-
-  // Horizontal seperator from FORM to connection
-  seperatorText: {
-    display: "flex",
-    justifyContent: "center",
-    // Add border bottom, as seperator
-    "&::before, &::after": {
-      content: '""',
-      whiteSpace: "pre",
-      margin: "auto 0",
-      flex: "1 1",
-      borderBottom: "1px solid #999",
-    },
-    "&::before": { marginRight: theme.spacing(1) },
-    "&::after": { marginLeft: theme.spacing(1) },
+  formBody: { 
+    padding: `0 ${theme.spacing(4)}px`,
   },
+
+  // // Horizontal seperator from FORM to connection
+  // seperatorText: {
+  //   display: "flex",
+  //   justifyContent: "center",
+  //   // Add border bottom, as seperator
+  //   "&::before, &::after": {
+  //     content: '""',
+  //     whiteSpace: "pre",
+  //     margin: "auto 0",
+  //     flex: "1 1",
+  //     borderBottom: "1px solid #999",
+  //   },
+  //   "&::before": { marginRight: theme.spacing(1) },
+  //   "&::after": { marginLeft: theme.spacing(1) },
+  // },
 
   // Rules & Regulation style
   signupAgreement: {
@@ -98,10 +138,12 @@ function Auth() {
         </header>
 
         <main className={classes.formContainer}>
-          <Box display="flex">
+          <Box padding="1rem 1.8rem 0.8rem">
+            <Box display="flex" position="relative" marginBottom={2}>
+              <Box className={`${classes.tabBackground} ${loginState ? "active" :  ""}`}></Box>
             <Typography
               variant="h5"
-              className={`${classes.tabHeadings} ${!loginState && "active"}`}
+              className={`${classes.tabHeadings} ${!loginState ? "active" : ""}`}
               onClick={() => {
                 history.push("/signup");
                 setPageState(false);
@@ -111,7 +153,7 @@ function Auth() {
             </Typography>
             <Typography
               variant="h5"
-              className={`${classes.tabHeadings} ${loginState && "active"}`}
+              className={`${classes.tabHeadings} ${loginState ? "active" : ""}`}
               onClick={() => {
                 history.push("/login");
                 setPageState(true);
@@ -119,6 +161,7 @@ function Auth() {
             >
               Login
             </Typography>
+            </Box>
           </Box>
 
           <Box className={classes.formBody}>
