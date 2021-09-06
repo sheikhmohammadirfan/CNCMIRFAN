@@ -1,4 +1,10 @@
-import { Box, Button, CircularProgress } from "@material-ui/core";
+import {
+  Box,
+  Button,
+  CircularProgress,
+  makeStyles,
+  Slide,
+} from "@material-ui/core";
 import React, { useState } from "react";
 import { TextControl, useForm } from "./Control";
 import { useHistory } from "react-router-dom";
@@ -12,10 +18,21 @@ const defaultValue = {
   password: "",
 };
 
-/**
- * Signup Component
- * */
-function Signup({ title }) {
+const useStyles = makeStyles((theme) => ({
+  // Style to apply on login btn
+  submitBtn: {
+    borderRadius: 3 * theme.shape.borderRadius,
+    width: "100%",
+    fontSize: theme.spacing(2.5),
+    fontWeight: "bold",
+    background: `linear-gradient(to right , ${theme.palette.primary.dark}, ${theme.palette.primary.light})`,
+    color: theme.textOnPrimary,
+    marginBottom: theme.spacing(1),
+  },
+}));
+
+// Signup Component
+function Signup({ title, show }) {
   DocumentTitle(title);
   // Method to validate input
   const validateInput = (errObj) => {
@@ -50,11 +67,11 @@ function Signup({ title }) {
   } = useForm(defaultValue, true, validateInput);
 
   // handle on Submit
-  const handleOnSubmit = (e) => {
-    // Check if all input valid
-    if (validateInput(user)) {
+  const submit = (e) => {
+    // Check if all input valid and form is not loading
+    if (!isLoading && validateInput(user)) {
       setLoading(true); // Start loading
-      // Call login Service
+      // Call signup Service
       signup(user).then((status) => {
         // If success
         if (status) history.push("/");
@@ -64,57 +81,49 @@ function Signup({ title }) {
   };
 
   // React state for loading status of submit btn
-  const [startLoading, setLoading] = useState(false);
+  const [isLoading, setLoading] = useState(false);
 
   // History react hook, to navigate
   const history = useHistory();
+  // Get style
+  const classes = useStyles();
 
   return (
-    <Box display="flex" flexDirection="column">
-      <TextControl
-        name="name"
-        style={{ marginBottom: 16 }}
-        value={user.name}
-        onChange={handleInputChange}
-        error={error.name}
-      />
-      <TextControl
-        type="email"
-        name="email"
-        style={{ marginBottom: 16 }}
-        value={user.email}
-        onChange={handleInputChange}
-        error={error.email}
-      />
-      <TextControl
-        type="password"
-        name="password"
-        style={{ marginBottom: 16 }}
-        value={user.password}
-        onChange={handleInputChange}
-        error={error.password}
-      />
-      <Button
-        variant="contained"
-        color="secondary"
-        style={{
-          marginTop: ".2rem",
-          borderRadius: "1rem",
-          marginBottom: "1.7rem",
-          fontSize: "1.15rem",
-          fontWeight: "bold",
-          letterSpacing: "1px",
-          width: "100%",
-          padding: "0.8rem 1.35rem",
-          marginLeft: "auto",
-          background: "linear-gradient(to right , darkblue, blue)",
-        }}
-        endIcon={startLoading && <CircularProgress color="inherit" size={20} />}
-        onClick={handleOnSubmit}
-      >
-        Create
-      </Button>
-    </Box>
+    <Slide direction="right" in={show} mountOnEnter unmountOnExit>
+      <Box display={show ? "flex" : "none"} flexDirection="column">
+        <TextControl
+          name="name"
+          value={user.name}
+          onChange={handleInputChange}
+          error={error.name}
+          size="small"
+        />
+        <TextControl
+          type="email"
+          name="email"
+          value={user.email}
+          onChange={handleInputChange}
+          error={error.email}
+          size="small"
+        />
+        <TextControl
+          type="password"
+          name="password"
+          value={user.password}
+          onChange={handleInputChange}
+          error={error.password}
+          size="small"
+        />
+
+        <Button className={classes.submitBtn} onClick={submit}>
+          {isLoading ? (
+            <CircularProgress color="inherit" size={35} />
+          ) : (
+            "Create"
+          )}
+        </Button>
+      </Box>
+    </Slide>
   );
 }
 

@@ -1,51 +1,54 @@
-import { Box, Button, CircularProgress, makeStyles } from "@material-ui/core";
+import {
+  Box,
+  Button,
+  CircularProgress,
+  makeStyles,
+  Slide,
+  Typography,
+} from "@material-ui/core";
 import React, { useState } from "react";
-import { useForm, TextControl } from "./Control";
+import {
+  useForm,
+  TextControl,
+  PasswordControl,
+  CheckboxControl,
+} from "./Control";
 import { login } from "../Service/UserFactory";
-import { useHistory } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import DocumentTitle from "./DocumentTitle";
 
 // Default value for Login Form
 const defaultValue = {
   email: "",
   password: "",
+  remember: false,
 };
 
+// CSS class generator
 const useStyles = makeStyles((theme) => ({
-  forgotRow : {
-    height: "3.5rem",
-    fontSize: "1rem",
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: "1rem",
-    
-    "& label" : {
-      cursor: "pointer",
-      marginRight: "auto",
+  // Forgot password styles
+  forgotPassword: {
+    textDecoration: "none",
+    "& .MuiTypography-root": {
+      color: theme.palette.primary.main,
+      letterSpacing: 1,
+      fontWeight: "bold",
+      paddingRight: theme.spacing(1),
     },
-    "& input": {
-      cursor: "pointer",
-      marginRight: "5px",
-    },
-
-    "& a": {
-      textDecoration: "none",
-      color: "darkblue",
-      borderBottom: "1px solid transparent",
-      transition: "textDecoration 0.3s",
-    },
-
-    "& a:hover": {
-      textDecoration: "underline",
-    }
-
+  },
+  // Style to apply on login btn
+  submitBtn: {
+    borderRadius: 3 * theme.shape.borderRadius,
+    width: "100%",
+    fontSize: theme.spacing(2.5),
+    fontWeight: "bold",
+    background: `linear-gradient(to right , ${theme.palette.primary.dark}, ${theme.palette.primary.light})`,
+    color: theme.textOnPrimary,
   },
 }));
-/**
- * Login Component
- * */
-function Login({ title }) {
+
+// Login Component
+function Login({ title, show }) {
   DocumentTitle(title);
 
   // Method to validate input
@@ -80,8 +83,8 @@ function Login({ title }) {
 
   // handle on Submit
   const submit = (e) => {
-    // Check if all input valid
-    if (validateInput(user)) {
+    // Check if all input valid and form is not loading
+    if (!isLoading && validateInput(user)) {
       setLoading(true); // Start loading
       // Call login Service
       login(user).then((status) => {
@@ -93,58 +96,50 @@ function Login({ title }) {
   };
 
   // React state for loading status of submit btn
-  const [startLoading, setLoading] = useState(false);
+  const [isLoading, setLoading] = useState(false);
 
   // History react hook, to navigate
   const history = useHistory();
   const classes = useStyles();
 
   return (
-    <Box display="flex" flexDirection="column">
-      <TextControl
-        type="email"
-        name="email"
-        style={{ marginBottom: 16 }}
-        value={user.email}
-        onChange={handleInputChange}
-        error={error.email}
-      />
-      <TextControl
-        type="password"
-        name="password"
-        style={{ marginBottom: 16 }}
-        value={user.password}
-        onChange={handleInputChange}
-        error={error.password}
-      />
+    <Slide direction="left" in={show} mountOnEnter unmountOnExit>
+      <Box display={show ? "flex" : "none"} flexDirection="column">
+        <TextControl
+          type="email"
+          name="email"
+          value={user.email}
+          onChange={handleInputChange}
+          error={error.email}
+          size="small"
+        />
+        <PasswordControl
+          name="password"
+          value={user.password}
+          onChange={handleInputChange}
+          error={error.password}
+          size="small"
+        />
 
-      <Box className={classes.forgotRow}>
-        <input type="checkbox" name="checkBox" id="check" />
-        <label htmlFor="check">Remeber me</label>
-        <a href="/">Forgot password ?</a>
+        <Box textAlign="right" marginBottom={2}>
+          <Link to="/" className={classes.forgotPassword}>
+            <Typography variant="body2">Forgot password?</Typography>
+          </Link>
+        </Box>
+
+        <Button className={classes.submitBtn} onClick={submit}>
+          {isLoading ? <CircularProgress color="inherit" size={35} /> : "Login"}
+        </Button>
+
+        <CheckboxControl
+          color="primary"
+          name="remember"
+          label={<Typography variant="body2">Stayed Logged in</Typography>}
+          value={user.remember}
+          onChange={handleInputChange}
+        />
       </Box>
-
-      <Button
-        variant="contained"
-        color="secondary"
-        style={{
-          marginTop: ".2rem",
-          borderRadius: "1rem",
-          marginBottom: "1.7rem",
-          fontSize: "1.15rem",
-          fontWeight: "bold",
-          letterSpacing: "1px",
-          width: "100%",
-          padding: "0.8rem 1.35rem",
-          marginLeft: "auto",
-          background: "linear-gradient(to right , darkblue, blue)",
-        }}
-        endIcon={startLoading && <CircularProgress color="inherit" size={20} />}
-        onClick={submit}
-      >
-        Login
-      </Button>
-    </Box>
+    </Slide>
   );
 }
 

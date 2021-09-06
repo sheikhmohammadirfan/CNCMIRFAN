@@ -1,28 +1,87 @@
-import { TextField, withStyles } from "@material-ui/core";
+import {
+  Icon,
+  IconButton,
+  Checkbox,
+  InputAdornment,
+  FormControlLabel,
+  TextField,
+  withStyles,
+} from "@material-ui/core";
 import React, { useState } from "react";
 
-// Apply styles for text fields
-const styles = {
+// Get New text field with some default values
+const TextControl = withStyles({
   root: {
-    "& label": {
-      textTransform: "capitalize",
+    // Capitalize label text
+    "& label": { textTransform: "capitalize" },
+    // Disable cursor on error text
+    "& .MuiFormHelperText-root": {
+      caretColor: "transparent",
+      cursor: "default",
     },
   },
-};
+})(({ name, variant, label, value, error, onChange, ...others }) => (
+  <TextField
+    variant={variant || "filled"}
+    name={name || "text"}
+    value={value}
+    onChange={onChange}
+    label={label || name}
+    error={error !== "" && error !== undefined}
+    helperText={error ? error : " "}
+    {...others}
+  />
+));
 
-// Get New text field with some default values
-const TextControl = withStyles(styles)(
-  ({ name, variant, label, value, error, onChange, ...others }) => (
-    <TextField
-      variant={variant || "filled"}
-      name={name || "text"}
+// Get Paassword field with show/hide password btn
+const PasswordControl = ({ value, ...others }) => {
+  const [visible, setVisible] = useState(false);
+
+  return (
+    <TextControl
+      type={visible ? "text" : "password"}
       value={value}
-      onChange={onChange}
-      label={label || name}
-      {...(error && { error: true, helperText: error })}
+      InputProps={{
+        endAdornment: (
+          <InputAdornment position="end">
+            <IconButton
+              size="small"
+              style={{
+                visibility: value ? "visible" : "hidden",
+                opacity: value ? "1" : "0",
+                transition: "all .1s linear",
+              }}
+              onClick={() => setVisible((v) => !v)}
+            >
+              <Icon>{visible ? "visibility_off" : "visibility"}</Icon>
+            </IconButton>
+          </InputAdornment>
+        ),
+      }}
       {...others}
     />
-  )
+  );
+};
+
+// Get checkbox, with label
+const CustomCheckbox = withStyles((theme) => ({
+  root: { margin: 0 },
+}))(FormControlLabel);
+const CheckboxControl = ({
+  color,
+  name,
+  label,
+  value,
+  onChange,
+  ...others
+}) => (
+  <CustomCheckbox
+    control={<Checkbox color={color || "default"} name={name} />}
+    checked={value}
+    onChange={(e) => onChange({ target: { name, value: e.target.checked } })}
+    label={label || name}
+    {...others}
+  />
 );
 
 // Use form function
@@ -36,9 +95,13 @@ function useForm(defaultValue, validateOnChange, validateInput) {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     // Update input
-    setValue((val) => ({ ...val, [name]: value }));
+    setValue((val) => ({
+      ...val,
+      // clean the input
+      [name]: typeof value === "string" ? value.trim() : value,
+    }));
     // Validate input
-    if (validateOnChange) validateInput({ [name]: value.trim() });
+    if (validateOnChange) validateInput({ [name]: value });
   };
 
   // Reset form
@@ -50,4 +113,4 @@ function useForm(defaultValue, validateOnChange, validateInput) {
   return { value, setValue, error, setError, handleInputChange, resetForm };
 }
 
-export { TextControl, useForm };
+export { TextControl, PasswordControl, CheckboxControl, useForm };

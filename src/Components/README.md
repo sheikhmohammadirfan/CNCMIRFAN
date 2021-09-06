@@ -22,7 +22,7 @@
 
 ###### Contain methods & generalize form component
 
-<strong>TextControl</strong> Generalize text input field
+<strong>TextControl</strong> Generalize text input field with empty space at bottom to show helper text.
 
 <span style="color: blue;">PROPS :</span>
 <span style="color: blue;">name</span> <span style="color: brown;">: String</span> Name for the input field should be unique
@@ -30,11 +30,35 @@
 <span style="color: blue;">onChange</span> <span style="color: brown;">: Method(e)</span>
 variant <span style="color: brown;">: outlined | filled | standard </span>
 label <span style="color: brown;">: String</span>
-error <span styl  e="color: brown;">: String</span>
-
-\* other props to apply on TextField
+error <span styl  e="color: brown;">: String</span> \* other props to apply on TextField
 
 <span style="color: green;">RETURN :</span> TextFiled
+
+<strong>PasswordControl</strong> Password filled based on TextControl, for passwords with show/hide password btn
+
+<span style="color: blue;">PROPS :</span>
+<span style="color: blue;">name</span> <span style="color: brown;">: String</span> Name for the input field should be unique
+<span style="color: blue;">value</span> <span style="color: brown;">: String</span>
+<span style="color: blue;">onChange</span> <span style="color: brown;">: Method(e)</span>
+variant <span style="color: brown;">: outlined | filled | standard </span>
+label <span style="color: brown;">: String</span>
+error <span style="color: brown;">: String</span> \* other props to apply on TextField
+
+<span style="color: green;">RETURN :</span> TextFiled
+
+<span style="color: red;">NOTE :</span>
+Do not set type
+
+<strong>CheckboxControl</strong> Manage checkbox
+
+<span style="color: blue;">PROPS :</span>
+<span style="color: blue;">name</span> <span style="color: brown;">: String</span> Name for the checkbox field should be unique
+<span style="color: blue;">value</span> <span style="color: brown;">: String</span>
+<span style="color: blue;">onChange</span> <span style="color: brown;">: Method(e)</span>
+color <span style="color: brown;">: primary | secondary | default </span>
+label <span style="color: brown;">: String</span> \* other props to apply on TextField
+
+<span style="color: green;">RETURN :</span> label
 
 <strong>useForm</strong> Method to manage given form filleds
 
@@ -86,7 +110,8 @@ error <span styl  e="color: brown;">: String</span>
 ###### To handle login functionality
 
 **<span style="color: blue;">PROPS :</span>**
-**<span style="color: blue;">title</span> <span style="color: brown;">: String</span>**
+**<span style="color: blue;">title</span> <span style="color: brown;">: String</span>** Title of the page
+**<span style="color: blue;">show</span> <span style="color: brown;">: boolean</span>** Boolean value to control visiblity of component
 
 **<span style="color: green;">RETURN :</span>** Login Component
 
@@ -105,6 +130,7 @@ error <span styl  e="color: brown;">: String</span>
 ###### To handle Signup functionality
 
 **<span style="color: blue;">PROPS :</span>**
-**<span style="color: blue;">title</span> <span style="color: brown;">: String</span>**
+**<span style="color: blue;">title</span> <span style="color: brown;">: String</span>** Title of the page
+**<span style="color: blue;">show</span> <span style="color: brown;">: boolean</span>** Boolean value to control visiblity of component
 
 **<span style="color: green;">RETURN :</span>** Signup Component
