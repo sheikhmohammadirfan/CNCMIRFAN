@@ -3,7 +3,6 @@ import {
   Button,
   CircularProgress,
   makeStyles,
-  Slide,
 } from "@material-ui/core";
 import React, { useState } from "react";
 import { TextControl, useForm } from "./Control";
@@ -89,41 +88,35 @@ function Signup({ title, show }) {
   const classes = useStyles();
 
   return (
-    <Slide direction="right" in={show} mountOnEnter unmountOnExit>
-      <Box display={show ? "flex" : "none"} flexDirection="column">
-        <TextControl
-          name="name"
-          value={user.name}
-          onChange={handleInputChange}
-          error={error.name}
-          size="small"
-        />
-        <TextControl
-          type="email"
-          name="email"
-          value={user.email}
-          onChange={handleInputChange}
-          error={error.email}
-          size="small"
-        />
-        <TextControl
-          type="password"
-          name="password"
-          value={user.password}
-          onChange={handleInputChange}
-          error={error.password}
-          size="small"
-        />
+    <Box display="flex" flexDirection="column" width={1} paddingX={1}>
+      <TextControl
+        name="name"
+        value={user.name}
+        onChange={handleInputChange}
+        error={error.name}
+        size="small"
+      />
+      <TextControl
+        type="email"
+        name="email"
+        value={user.email}
+        onChange={handleInputChange}
+        error={error.email}
+        size="small"
+      />
+      <TextControl
+        type="password"
+        name="password"
+        value={user.password}
+        onChange={handleInputChange}
+        error={error.password}
+        size="small"
+      />
 
-        <Button className={classes.submitBtn} onClick={submit}>
-          {isLoading ? (
-            <CircularProgress color="inherit" size={35} />
-          ) : (
-            "Create"
-          )}
-        </Button>
-      </Box>
-    </Slide>
+      <Button className={classes.submitBtn} onClick={submit}>
+        {isLoading ? <CircularProgress color="inherit" size={35} /> : "Create"}
+      </Button>
+    </Box>
   );
 }
 

@@ -72,8 +72,11 @@ async function signup({ name, email, password }) {
     });
     return true;
   } catch (e) {
-    console.log(e.response.data);
-    const msg = "An error occured.";
+    var msg = e.response.data || "An error occured.";
+    msg =
+      typeof msg !== "string"
+        ? Object.keys(msg).map((key) => msg[key][0])
+        : msg;
     toast(Array.isArray(msg) ? <ErrMsg data={msg} /> : msg, {
       toastId: "api-toast",
       type: "error",

@@ -3,7 +3,6 @@ import {
   Button,
   CircularProgress,
   makeStyles,
-  Slide,
   Typography,
 } from "@material-ui/core";
 import React, { useState } from "react";
@@ -103,43 +102,41 @@ function Login({ title, show }) {
   const classes = useStyles();
 
   return (
-    <Slide direction="left" in={show} mountOnEnter unmountOnExit>
-      <Box display={show ? "flex" : "none"} flexDirection="column">
-        <TextControl
-          type="email"
-          name="email"
-          value={user.email}
-          onChange={handleInputChange}
-          error={error.email}
-          size="small"
-        />
-        <PasswordControl
-          name="password"
-          value={user.password}
-          onChange={handleInputChange}
-          error={error.password}
-          size="small"
-        />
+    <Box display="flex" flexDirection="column" width={1} paddingX={1}>
+      <TextControl
+        type="email"
+        name="email"
+        value={user.email}
+        onChange={handleInputChange}
+        error={error.email}
+        size="small"
+      />
+      <PasswordControl
+        name="password"
+        value={user.password}
+        onChange={handleInputChange}
+        error={error.password}
+        size="small"
+      />
 
-        <Box textAlign="right" marginBottom={2}>
-          <Link to="/" className={classes.forgotPassword}>
-            <Typography variant="body2">Forgot password?</Typography>
-          </Link>
-        </Box>
-
-        <Button className={classes.submitBtn} onClick={submit}>
-          {isLoading ? <CircularProgress color="inherit" size={35} /> : "Login"}
-        </Button>
-
-        <CheckboxControl
-          color="primary"
-          name="remember"
-          label={<Typography variant="body2">Stayed Logged in</Typography>}
-          value={user.remember}
-          onChange={handleInputChange}
-        />
+      <Box textAlign="right" marginBottom={2}>
+        <Link to="/" className={classes.forgotPassword}>
+          <Typography variant="body2">Forgot password?</Typography>
+        </Link>
       </Box>
-    </Slide>
+
+      <Button className={classes.submitBtn} onClick={submit}>
+        {isLoading ? <CircularProgress color="inherit" size={35} /> : "Login"}
+      </Button>
+
+      <CheckboxControl
+        color="primary"
+        name="remember"
+        label={<Typography variant="body2">Stayed Logged in</Typography>}
+        value={user.remember}
+        onChange={handleInputChange}
+      />
+    </Box>
   );
 }
 

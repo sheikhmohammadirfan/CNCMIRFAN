@@ -1,27 +1,47 @@
 import React from "react";
 import { useHistory } from "react-router-dom";
-import { makeStyles, Typography, Box } from "@material-ui/core";
+import { makeStyles, Typography, Box, Grid } from "@material-ui/core";
 import { useState } from "react";
 import Login from "../Components/Login";
 import Signup from "../Components/Signup";
 
 // CSS class generator
 const useStyles = makeStyles((theme) => ({
-  // Form Container
-  formContainer: {
-    width: 350,
+  // Root grid container of page
+  root: {
+    background: `linear-gradient(to right , ${theme.palette.primary.dark}, ${theme.palette.primary.light})`,
+    borderRadius: 2 * theme.shape.borderRadius,
     maxWidth: "90%",
-    paddingLeft: theme.spacing(4),
-    paddingRight: theme.spacing(4),
-    paddingBottom: theme.spacing(1),
-    backgroundColor: theme.palette.background.paper,
-    boxShadow: theme.shadows[23],
-    borderRadius: 4 * theme.shape.borderRadius,
-    overflow: "hidden",
+    [theme.breakpoints.up("md")]: {
+      maxWidth: "80%",
+      padding: theme.spacing(1),
+    },
+    [theme.breakpoints.up("lg")]: {
+      maxWidth: "70%",
+      padding: theme.spacing(2),
+    },
   },
 
-  // headingContainer
-  headingContainer: {
+  // Form Container
+  formContainer: {
+    width: "100%",
+    maxWidth: 350,
+    marginLeft: "auto",
+    padding: `0 ${theme.spacing(2.5)}px`,
+    paddingBottom: theme.spacing(1),
+    borderRadius: 4 * theme.shape.borderRadius,
+    backgroundColor: theme.palette.background.paper,
+    boxShadow: theme.shadows[23],
+    [theme.breakpoints.down("md")]: { padding: `0 ${theme.spacing(2)}px` },
+    [theme.breakpoints.down("sm")]: { padding: `0 ${theme.spacing(1.5)}px` },
+    [theme.breakpoints.down("xs")]: {
+      marginRight: "auto",
+      padding: `0 ${theme.spacing(1)}px`,
+    },
+  },
+
+  // formHeading to contains tab toggler
+  formHeading: {
     display: "flex",
     position: "relative",
     borderRadius: 4 * theme.shape.borderRadius,
@@ -30,7 +50,7 @@ const useStyles = makeStyles((theme) => ({
   },
 
   // Heading TAB style
-  tabHeadings: {
+  headings: {
     width: "50%",
     padding: `${theme.spacing(1)}px 0`,
     textAlign: "center",
@@ -40,10 +60,11 @@ const useStyles = makeStyles((theme) => ({
     letterSpacing: 2,
     zIndex: "2",
     transition: "all .5s  cubic-bezier(.63,-0.58,.63,1.58)",
-    "&.active": { color: theme.textOnPrimary },
+    "&.login": { color: theme.textOnPrimary },
   },
 
-  tabBackground: {
+  // Background style for active tab heading
+  tabBackgnd: {
     height: "100%",
     width: "50%",
     position: "absolute",
@@ -51,7 +72,16 @@ const useStyles = makeStyles((theme) => ({
     zIndex: 1,
     background: `linear-gradient(to right , ${theme.palette.primary.dark}, ${theme.palette.primary.light})`,
     transition: "transform .5s cubic-bezier(.63,-0.58,.63,1.58)",
-    "&.active": { transform: "translateX(100%)" },
+    "&.login": { transform: "translateX(100%)" },
+  },
+
+  // Form fields container
+  formBody: {
+    display: "flex",
+    width: "200%",
+    transform: "translateX(-50%)",
+    transition: "transform .5s cubic-bezier(.63,-0.58,.63,1.58)",
+    "&.login": { transform: "translateX(0%)" },
   },
 }));
 
@@ -67,6 +97,16 @@ function Auth() {
   const [loginIn, setPageState] = useState(
     history.location.pathname === "/login"
   );
+  // Method to login user
+  const loginUser = () => {
+    history.push("/login");
+    setPageState(true);
+  };
+  // MEthod to signuo user
+  const signupUser = () => {
+    history.push("/signup");
+    setPageState(false);
+  };
 
   return (
     <Box
@@ -75,38 +115,60 @@ function Auth() {
       alignItems="center"
       height="100vh"
     >
-      <main className={classes.formContainer}>
-        <Box paddingY={3}>
-          <Box className={classes.headingContainer}>
-            <Box
-              className={`${classes.tabBackground} ${loginIn ? "active" : ""}`}
-            ></Box>
-            <Typography
-              variant="subtitle1"
-              className={`${classes.tabHeadings} ${!loginIn ? "active" : ""}`}
-              onClick={() => {
-                history.push("/signup");
-                setPageState(false);
-              }}
-            >
-              Sign Up
+      <Grid
+        container
+        spacing={2}
+        className={`${classes.root} ${!loginIn ? "login" : ""}`}
+      >
+        <Grid item xs={12} sm={5} md={7}>
+          <Box textAlign="center">
+            <Typography variant="h1" color="secondary">
+              CNCM
             </Typography>
-            <Typography
-              variant="subtitle1"
-              className={`${classes.tabHeadings} ${loginIn ? "active" : ""}`}
-              onClick={() => {
-                history.push("/login");
-                setPageState(true);
-              }}
-            >
-              Login
+            <Typography variant="h4" color="secondary">
+              Welcome
+            </Typography>
+            <Typography variant="h6" color="secondary">
+              We are happy to have you.
             </Typography>
           </Box>
-        </Box>
+        </Grid>
 
-        <Login title="LOGIN" show={loginIn} />
-        <Signup title="SIGN UP" show={!loginIn} />
-      </main>
+        <Grid item xs={12} sm={7} md={5}>
+          <main
+            className={`${classes.formContainer} ${!loginIn ? "login" : ""}`}
+          >
+            <Box paddingTop={2} paddingBottom={3}>
+              <Box className={classes.formHeading}>
+                <Box
+                  className={`${classes.tabBackgnd} ${loginIn ? "login" : ""}`}
+                ></Box>
+                <Typography
+                  variant="subtitle1"
+                  className={`${classes.headings} ${!loginIn ? "login" : ""}`}
+                  onClick={signupUser}
+                >
+                  Sign Up
+                </Typography>
+                <Typography
+                  variant="subtitle1"
+                  className={`${classes.headings} ${loginIn ? "login" : ""}`}
+                  onClick={loginUser}
+                >
+                  Login
+                </Typography>
+              </Box>
+            </Box>
+
+            <Box overflow="hidden">
+              <Box className={`${classes.formBody} ${!loginIn ? "login" : ""}`}>
+                <Signup title="SIGN UP" show={!loginIn} />
+                <Login title="LOGIN" show={loginIn} />
+              </Box>
+            </Box>
+          </main>
+        </Grid>
+      </Grid>
     </Box>
   );
 }
