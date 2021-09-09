@@ -41,7 +41,7 @@ const useStyles = makeStyles((theme) => ({
     width: "100%",
     fontSize: theme.spacing(2.5),
     fontWeight: "bold",
-    background: `linear-gradient(to right , ${theme.palette.primary.dark}, ${theme.palette.primary.light})`,
+    background: `linear-gradient(to right , ${theme.palette.secondary.dark}, ${theme.palette.secondary.light})`,
     color: theme.textOnPrimary,
   },
 }));

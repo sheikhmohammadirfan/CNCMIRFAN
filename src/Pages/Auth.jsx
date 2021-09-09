@@ -4,12 +4,18 @@ import { makeStyles, Typography, Box, Grid } from "@material-ui/core";
 import { useState } from "react";
 import Login from "../Components/Login";
 import Signup from "../Components/Signup";
+import DocumentTitle from "../Components/DocumentTitle";
+import svgBackground from "../assets/img/colored_patterns.svg"
+
+// primary back color: #00A19D 
+// secondary back color: #FFF8E5 
+
 
 // CSS class generator
 const useStyles = makeStyles((theme) => ({
   // Root grid container of page
   root: {
-    background: `linear-gradient(to right , ${theme.palette.primary.dark}, ${theme.palette.primary.light})`,
+    background: `linear-gradient(to right bottom , ${theme.palette.primary.light}, ${theme.palette.primary.dark})`,
     borderRadius: 2 * theme.shape.borderRadius,
     maxWidth: "90%",
     [theme.breakpoints.up("md")]: {
@@ -20,6 +26,11 @@ const useStyles = makeStyles((theme) => ({
       maxWidth: "70%",
       padding: theme.spacing(2),
     },
+    padding: "1rem",
+  },
+
+  body: {
+
   },
 
   // Form Container
@@ -70,7 +81,7 @@ const useStyles = makeStyles((theme) => ({
     position: "absolute",
     borderRadius: 4 * theme.shape.borderRadius,
     zIndex: 1,
-    background: `linear-gradient(to right , ${theme.palette.primary.dark}, ${theme.palette.primary.light})`,
+    background: `linear-gradient(to right, ${theme.palette.secondary.dark}, ${theme.palette.secondary.light})`,
     transition: "transform .5s cubic-bezier(.63,-0.58,.63,1.58)",
     "&.login": { transform: "translateX(100%)" },
   },
@@ -86,7 +97,8 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 // Main Component
-function Auth() {
+function Auth({title}) {
+  DocumentTitle(title);
   // Get Styles
   const classes = useStyles();
 
@@ -114,6 +126,11 @@ function Auth() {
       justifyContent="center"
       alignItems="center"
       height="100vh"
+      style ={{
+        backgroundImage: `url(${svgBackground}), linear-gradient(to right bottom, #D5EEBB, #7FC8A9) `,
+        backgroundSize: "cover",
+        backgroundRepeat: "no-repeat",
+      }}
     >
       <Grid
         container
@@ -121,7 +138,7 @@ function Auth() {
         className={`${classes.root} ${!loginIn ? "login" : ""}`}
       >
         <Grid item xs={12} sm={5} md={7}>
-          <Box textAlign="center">
+          <Box textAlign="center" margin="auto">
             <Typography variant="h1" color="secondary">
               CNCM
             </Typography>

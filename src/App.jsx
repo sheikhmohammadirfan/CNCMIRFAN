@@ -21,6 +21,18 @@ let themes = createTheme({
   sidebarSmall: 50,
   sidebarLarge: 250,
   textOnPrimary: "#ffffff",
+  palette: {
+    primary: {
+      main: "#00A19D",
+      dark: "#00A19D",
+      light: "#FFF8E5",
+    },
+    secondary: {
+      main: "#22577A",
+      dark: "#22577A",
+      light: "#38A3A5",
+    }
+  }
 });
 themes = responsiveFontSizes(themes);
 
@@ -54,8 +66,12 @@ function App() {
       <CssBaseline />
       <Router>
         <Switch>
-          <Route path="/login" component={Auth} exact />
-          <Route path="/signup" component={Auth} exact />
+          <Route path="/login" exact >
+            <Auth title="LOGIN" />
+          </Route>
+          <Route path="/signup" exact >
+            <Auth title="SIGNUP" />
+            </Route>
 
           <ProtectedRoutes>
             <Box display="flex">

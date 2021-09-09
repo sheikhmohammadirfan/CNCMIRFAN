@@ -9,7 +9,7 @@ const customStyles = (theme) => {
       marginLeft: 5,
       marginRight: 5,
       padding: 0,
-      background: theme.palette.primary.light,
+      background: theme.palette.primary.dark,
       boxShadow: theme.shadows[4],
       // Set Icon color & width
       "& .MuiListItemIcon-root": {

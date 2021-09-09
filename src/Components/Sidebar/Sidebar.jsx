@@ -26,7 +26,7 @@ const useStyles = makeStyles((theme) => {
       width: theme.sidebarLarge,
       [theme.breakpoints.down("xs")]: { position: "fixed" },
       height: "100vh",
-      background: theme.palette.primary.light,
+      background: theme.palette.primary.dark,
       color: theme.textOnPrimary,
       position: "sticky",
       top: 0,
