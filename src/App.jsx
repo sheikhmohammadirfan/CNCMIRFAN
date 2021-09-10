@@ -31,8 +31,8 @@ let themes = createTheme({
       main: "#22577A",
       dark: "#22577A",
       light: "#38A3A5",
-    }
-  }
+    },
+  },
 });
 themes = responsiveFontSizes(themes);
 
@@ -66,12 +66,15 @@ function App() {
       <CssBaseline />
       <Router>
         <Switch>
-          <Route path="/login" exact >
+          <Route path="/login" exact>
             <Auth title="LOGIN" />
           </Route>
-          <Route path="/signup" exact >
+          <Route path="/signup" exact>
             <Auth title="SIGNUP" />
-            </Route>
+          </Route>
+          <Route path="/forgotpassword" exact>
+            <Auth title="FORGOT PASSWORD" />
+          </Route>
 
           <ProtectedRoutes>
             <Box display="flex">

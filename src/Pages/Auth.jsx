@@ -1,15 +1,15 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useHistory } from "react-router-dom";
 import { makeStyles, Typography, Box, Grid } from "@material-ui/core";
 import { useState } from "react";
 import Login from "../Components/Login";
 import Signup from "../Components/Signup";
 import DocumentTitle from "../Components/DocumentTitle";
-import svgBackground from "../assets/img/colored_patterns.svg"
+import svgBackground from "../assets/img/colored_patterns.svg";
+import ForgotPassword from "../Components/ForgotPassword";
 
-// primary back color: #00A19D 
-// secondary back color: #FFF8E5 
-
+// primary back color: #00A19D
+// secondary back color: #FFF8E5
 
 // CSS class generator
 const useStyles = makeStyles((theme) => ({
@@ -18,20 +18,12 @@ const useStyles = makeStyles((theme) => ({
     background: `linear-gradient(to right bottom , ${theme.palette.primary.light}, ${theme.palette.primary.dark})`,
     borderRadius: 2 * theme.shape.borderRadius,
     maxWidth: "90%",
-    [theme.breakpoints.up("md")]: {
-      maxWidth: "80%",
-      padding: theme.spacing(1),
-    },
-    [theme.breakpoints.up("lg")]: {
-      maxWidth: "70%",
-      padding: theme.spacing(2),
-    },
-    padding: "1rem",
+    padding: theme.spacing(1.5),
+    [theme.breakpoints.up("md")]: { maxWidth: "80%" },
+    [theme.breakpoints.up("lg")]: { maxWidth: "70%" },
   },
 
-  body: {
-
-  },
+  body: {},
 
   // Form Container
   formContainer: {
@@ -49,6 +41,8 @@ const useStyles = makeStyles((theme) => ({
       marginRight: "auto",
       padding: `0 ${theme.spacing(1)}px`,
     },
+    overflow: "hidden",
+    position: "relative",
   },
 
   // formHeading to contains tab toggler
@@ -71,7 +65,7 @@ const useStyles = makeStyles((theme) => ({
     letterSpacing: 2,
     zIndex: "2",
     transition: "all .5s  cubic-bezier(.63,-0.58,.63,1.58)",
-    "&.login": { color: theme.textOnPrimary },
+    "&.active": { color: theme.textOnPrimary },
   },
 
   // Background style for active tab heading
@@ -97,7 +91,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 // Main Component
-function Auth({title}) {
+function Auth({ title }) {
   DocumentTitle(title);
   // Get Styles
   const classes = useStyles();
@@ -107,18 +101,25 @@ function Auth({title}) {
 
   // React state hook, to save login or sigin up state
   const [loginIn, setPageState] = useState(
-    history.location.pathname === "/login"
+    history.location.pathname === "/signup"
+      ? 0
+      : history.location.pathname === "/login"
+      ? 1
+      : 2
   );
+
   // Method to login user
-  const loginUser = () => {
-    history.push("/login");
-    setPageState(true);
-  };
-  // MEthod to signuo user
-  const signupUser = () => {
-    history.push("/signup");
-    setPageState(false);
-  };
+  const loginUser = () => history.push("/login");
+  // Method to signup user
+  const signupUser = () => history.push("/signup");
+  // Method to goto home page
+  const homePage = () => history.push("/");
+
+  useEffect(() => {
+    if (history.location.pathname === "/signup") setPageState(0);
+    else if (history.location.pathname === "/login") setPageState(1);
+    else setPageState(2);
+  }, [history.location.pathname]);
 
   return (
     <Box
@@ -126,17 +127,13 @@ function Auth({title}) {
       justifyContent="center"
       alignItems="center"
       height="100vh"
-      style ={{
+      style={{
         backgroundImage: `url(${svgBackground}), linear-gradient(to right bottom, #D5EEBB, #7FC8A9) `,
         backgroundSize: "cover",
         backgroundRepeat: "no-repeat",
       }}
     >
-      <Grid
-        container
-        spacing={2}
-        className={`${classes.root} ${!loginIn ? "login" : ""}`}
-      >
+      <Grid container spacing={2} className={classes.root}>
         <Grid item xs={12} sm={5} md={7}>
           <Box textAlign="center" margin="auto">
             <Typography variant="h1" color="secondary">
@@ -152,9 +149,7 @@ function Auth({title}) {
         </Grid>
 
         <Grid item xs={12} sm={7} md={5}>
-          <main
-            className={`${classes.formContainer} ${!loginIn ? "login" : ""}`}
-          >
+          <main className={classes.formContainer}>
             <Box paddingTop={2} paddingBottom={3}>
               <Box className={classes.formHeading}>
                 <Box
@@ -162,14 +157,14 @@ function Auth({title}) {
                 ></Box>
                 <Typography
                   variant="subtitle1"
-                  className={`${classes.headings} ${!loginIn ? "login" : ""}`}
+                  className={`${classes.headings} ${!loginIn ? "active" : ""}`}
                   onClick={signupUser}
                 >
                   Sign Up
                 </Typography>
                 <Typography
                   variant="subtitle1"
-                  className={`${classes.headings} ${loginIn ? "login" : ""}`}
+                  className={`${classes.headings} ${loginIn ? "active" : ""}`}
                   onClick={loginUser}
                 >
                   Login
@@ -178,11 +173,16 @@ function Auth({title}) {
             </Box>
 
             <Box overflow="hidden">
-              <Box className={`${classes.formBody} ${!loginIn ? "login" : ""}`}>
-                <Signup title="SIGN UP" show={!loginIn} />
-                <Login title="LOGIN" show={loginIn} />
+              <Box className={`${classes.formBody} ${loginIn ? "" : "login"}`}>
+                <Signup title="SIGN UP" loginPage={loginUser} />
+                <Login title="LOGIN" homePage={homePage} />
               </Box>
             </Box>
+            <ForgotPassword
+              title="FORGOT PASSWORD"
+              show={loginIn === 2}
+              login={loginUser}
+            />
           </main>
         </Grid>
       </Grid>
