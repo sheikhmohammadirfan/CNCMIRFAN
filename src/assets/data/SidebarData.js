@@ -13,7 +13,7 @@ export const SidebarData = [
   {
     title: "Complaince Framework",
     path: "/contact",
-    icon: "star",
+    icon: "crop_free",
     subNav: [
       {
         title: "FEDRAMP / FISMA",

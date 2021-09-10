@@ -105,32 +105,8 @@ label <span style="color: brown;">: String</span> \* other props to apply on Tex
 
 ---
 
-### [Login](./Login.jsx)
-
-###### To handle login functionality
-
-**<span style="color: blue;">PROPS :</span>**
-**<span style="color: blue;">title</span> <span style="color: brown;">: String</span>** Title of the page
-**<span style="color: blue;">show</span> <span style="color: brown;">: boolean</span>** Boolean value to control visiblity of component
-
-**<span style="color: green;">RETURN :</span>** Login Component
-
----
-
 ### [ProtectedRoutes](./ProtectedRoutes.jsx)
 
 ###### To authorize user from accessing control urls using local storage
 
 **<span style="color: green;">RETURN :</span>** Route component
-
----
-
-### [Signup](./Signup.jsx)
-
-###### To handle Signup functionality
-
-**<span style="color: blue;">PROPS :</span>**
-**<span style="color: blue;">title</span> <span style="color: brown;">: String</span>** Title of the page
-**<span style="color: blue;">show</span> <span style="color: brown;">: boolean</span>** Boolean value to control visiblity of component
-
-**<span style="color: green;">RETURN :</span>** Signup Component

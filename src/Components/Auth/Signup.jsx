@@ -1,40 +1,17 @@
-import {
-  Box,
-  Button,
-  CircularProgress,
-  makeStyles,
-  Typography,
-} from "@material-ui/core";
+import { Box, Button, CircularProgress, makeStyles } from "@material-ui/core";
 import React, { useState } from "react";
-import {
-  useForm,
-  TextControl,
-  PasswordControl,
-  CheckboxControl,
-} from "./Control";
-import { login } from "../Service/UserFactory";
-import { Link, useHistory } from "react-router-dom";
-import DocumentTitle from "./DocumentTitle";
+import { PasswordControl, TextControl, useForm } from "../Control";
+import { signup } from "../../Service/UserFactory";
+import DocumentTitle from "../DocumentTitle";
 
-// Default value for Login Form
+// Default value for siginup form
 const defaultValue = {
+  name: "",
   email: "",
   password: "",
-  remember: false,
 };
 
-// CSS class generator
 const useStyles = makeStyles((theme) => ({
-  // Forgot password styles
-  forgotPassword: {
-    textDecoration: "none",
-    "& .MuiTypography-root": {
-      color: theme.palette.primary.main,
-      letterSpacing: 1,
-      fontWeight: "bold",
-      paddingRight: theme.spacing(1),
-    },
-  },
   // Style to apply on login btn
   submitBtn: {
     borderRadius: 3 * theme.shape.borderRadius,
@@ -43,19 +20,21 @@ const useStyles = makeStyles((theme) => ({
     fontWeight: "bold",
     background: `linear-gradient(to right , ${theme.palette.secondary.dark}, ${theme.palette.secondary.light})`,
     color: theme.textOnPrimary,
+    marginBottom: theme.spacing(1),
   },
 }));
 
-// Login Component
-function Login({ title, show }) {
+// Signup Component
+function Signup({ title, loginPage }) {
   DocumentTitle(title);
-
   // Method to validate input
   const validateInput = (errObj) => {
     // Create temp error obj
     let tempObj = { ...error };
 
     // Check for error on input field
+    if ("name" in errObj)
+      tempObj.name = errObj.name ? "" : "This field is required.";
     if ("email" in errObj)
       tempObj.email =
         errObj.email && errObj.email.match(/$^|.+@.+..+/)
@@ -78,31 +57,40 @@ function Login({ title, show }) {
     error,
     setError,
     handleInputChange,
+    resetForm,
   } = useForm(defaultValue, true, validateInput);
 
   // handle on Submit
-  const submit = (e) => {
+  const submit = async () => {
     // Check if all input valid and form is not loading
     if (!isLoading && validateInput(user)) {
-      setLoading(true); // Start loading
-      // Call login Service
-      login(user).then((status) => {
-        // If success
-        if (status) history.push("/");
-        else setLoading(false);
-      });
+      setLoading(true);
+      // Call signup Service
+      const status = await signup(user);
+      setLoading(false);
+      // If success
+      if (status) {
+        resetForm();
+        loginPage();
+      }
     }
   };
 
   // React state for loading status of submit btn
   const [isLoading, setLoading] = useState(false);
 
-  // History react hook, to navigate
-  const history = useHistory();
+  // Get style
   const classes = useStyles();
 
   return (
     <Box display="flex" flexDirection="column" width={1} paddingX={1}>
+      <TextControl
+        name="name"
+        value={user.name}
+        onChange={handleInputChange}
+        error={error.name}
+        size="small"
+      />
       <TextControl
         type="email"
         name="email"
@@ -119,25 +107,11 @@ function Login({ title, show }) {
         size="small"
       />
 
-      <Box textAlign="right" marginBottom={2}>
-        <Link to="/" className={classes.forgotPassword}>
-          <Typography variant="body2">Forgot password?</Typography>
-        </Link>
-      </Box>
-
       <Button className={classes.submitBtn} onClick={submit}>
-        {isLoading ? <CircularProgress color="inherit" size={35} /> : "Login"}
+        {isLoading ? <CircularProgress color="inherit" size={35} /> : "Create"}
       </Button>
-
-      <CheckboxControl
-        color="primary"
-        name="remember"
-        label={<Typography variant="body2">Stayed Logged in</Typography>}
-        value={user.remember}
-        onChange={handleInputChange}
-      />
     </Box>
   );
 }
 
-export default Login;
+export default Signup;

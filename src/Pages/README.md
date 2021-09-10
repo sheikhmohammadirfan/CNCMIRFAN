@@ -4,7 +4,7 @@
 
 ### [Auth](./Auth.jsx)
 
-#### /login, /signup
+#### /login, /signup, /forgotpassword
 
 ###### Auth page is used to manage login and signup activity
 

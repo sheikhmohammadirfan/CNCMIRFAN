@@ -10,6 +10,7 @@ import {
 import DocumentTitle from "../Components/DocumentTitle";
 import Upload from "../Components/Utils/Upload";
 import DataTable from "../Components/Utils/DataTable";
+import DialogBox from "../Components/Utils/DialogBox";
 import {
   deleteFiles,
   getFiles,
@@ -19,7 +20,6 @@ import {
 import pdfLogo from "../assets/img/pdf-file-format.png";
 import docLogo from "../assets/img/doc-file-format.png";
 import txtLogo from "../assets/img/txt-file-format.png";
-import DialogBox from "../Components/Utils/DialogBox";
 
 // Object of valid files
 const validFiles = {
@@ -51,7 +51,7 @@ export default function Verify(props) {
   DocumentTitle(props.title);
 
   // React state, to show/hide warning dialog
-  const [dialog, setDialog] = useState(true);
+  const [dialog, setDialog] = useState(false);
   const showDailog = () => setDialog(true);
   const hideDailog = () => setDialog(false);
 
@@ -62,10 +62,11 @@ export default function Verify(props) {
   const fetchFiles = async () => {
     const { data, status } = await getFiles();
     status && setFileList(data);
+    setLoading(false);
   };
 
   // Fetch all files when component is mounted
-  useEffect((files) => fetchFiles().then((val) => setLoading(false)), []);
+  useEffect(() => fetchFiles(), []);
 
   // React state, to indicate loading status
   const [loading, setLoading] = useState(true);
@@ -84,8 +85,8 @@ export default function Verify(props) {
       // If success then update files
       setSelectedRows([]);
       await fetchFiles();
-      setLoading(false);
     }
+    hideDailog();
   };
 
   // Method ot selected verify file
@@ -108,14 +109,7 @@ export default function Verify(props) {
       title="Delete Files"
       content={`Are you sure to delete ${selectedRows.length} selected files ?`}
       actions={[
-        <Button
-          onClick={() => {
-            deleteSelectedFiles();
-            hideDailog();
-          }}
-        >
-          Yes
-        </Button>,
+        <Button onClick={deleteSelectedFiles}>Yes</Button>,
         <Button onClick={hideDailog}>No</Button>,
       ]}
     />
@@ -141,6 +135,7 @@ export default function Verify(props) {
   return (
     <Box padding={1} textAlign="center">
       <WarningDailog />
+
       <Upload
         id="uploadFiles"
         uploadService={uploadFiles}
@@ -157,6 +152,7 @@ export default function Verify(props) {
       >
         Choose file
       </Button>
+
       <Box width="90%" maxWidth={600} marginX="auto">
         <DataTable
           checkbox={true}

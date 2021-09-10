@@ -1,56 +1,63 @@
-import React, { useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useHistory } from "react-router-dom";
-import { makeStyles, Typography, Box, Grid } from "@material-ui/core";
-import { useState } from "react";
-import Login from "../Components/Login";
-import Signup from "../Components/Signup";
+import { makeStyles, Typography, Box, Grid, Hidden } from "@material-ui/core";
+import Login from "../Components/Auth/Login";
+import Signup from "../Components/Auth/Signup";
+import ForgotPassword from "../Components/Auth/ForgotPassword";
 import DocumentTitle from "../Components/DocumentTitle";
-import svgBackground from "../assets/img/colored_patterns.svg";
-import ForgotPassword from "../Components/ForgotPassword";
-
-// primary back color: #00A19D
-// secondary back color: #FFF8E5
+import svgBackground from "../assets/img/login_background.svg";
+import logo from "../assets/img/company_logo_large.webp";
 
 // CSS class generator
 const useStyles = makeStyles((theme) => ({
+  // Style for backgroud page
+  page: {
+    height: "100vh",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    background: "rgb(64, 86, 181, 0.1)",
+    backgroundImage: `url(${svgBackground}), linear-gradient(to right bottom, #D5EEBB, #7FC8A9)`,
+    backgroundSize: "cover",
+    backgroundRepeat: "no-repeat",
+  },
+
   // Root grid container of page
   root: {
+    maxWidth: "90%",
     background: `linear-gradient(to right bottom , ${theme.palette.primary.light}, ${theme.palette.primary.dark})`,
     borderRadius: 2 * theme.shape.borderRadius,
-    maxWidth: "90%",
     padding: theme.spacing(1.5),
     [theme.breakpoints.up("md")]: { maxWidth: "80%" },
     [theme.breakpoints.up("lg")]: { maxWidth: "70%" },
   },
 
-  body: {},
-
   // Form Container
   formContainer: {
+    position: "relative",
+    overflow: "hidden",
     width: "100%",
     maxWidth: 350,
-    marginLeft: "auto",
+    marginLeft: "auto", // Push form on right on large screen
     padding: `0 ${theme.spacing(2.5)}px`,
     paddingBottom: theme.spacing(1),
     borderRadius: 4 * theme.shape.borderRadius,
     backgroundColor: theme.palette.background.paper,
-    boxShadow: theme.shadows[23],
     [theme.breakpoints.down("md")]: { padding: `0 ${theme.spacing(2)}px` },
     [theme.breakpoints.down("sm")]: { padding: `0 ${theme.spacing(1.5)}px` },
+    // Center align form in small devices
     [theme.breakpoints.down("xs")]: {
       marginRight: "auto",
       padding: `0 ${theme.spacing(1)}px`,
     },
-    overflow: "hidden",
-    position: "relative",
   },
 
   // formHeading to contains tab toggler
   formHeading: {
     display: "flex",
     position: "relative",
-    borderRadius: 4 * theme.shape.borderRadius,
     overflow: "hidden",
+    borderRadius: 4 * theme.shape.borderRadius,
     border: `1px solid ${theme.palette.grey[400]}`,
   },
 
@@ -59,11 +66,11 @@ const useStyles = makeStyles((theme) => ({
     width: "50%",
     padding: `${theme.spacing(1)}px 0`,
     textAlign: "center",
-    cursor: "pointer",
     fontWeight: "bold",
     textTransform: "uppercase",
     letterSpacing: 2,
-    zIndex: "2",
+    cursor: "pointer",
+    zIndex: 2,
     transition: "all .5s  cubic-bezier(.63,-0.58,.63,1.58)",
     "&.active": { color: theme.textOnPrimary },
   },
@@ -115,6 +122,7 @@ function Auth({ title }) {
   // Method to goto home page
   const homePage = () => history.push("/");
 
+  // React hook to update  state on path change
   useEffect(() => {
     if (history.location.pathname === "/signup") setPageState(0);
     else if (history.location.pathname === "/login") setPageState(1);
@@ -122,29 +130,22 @@ function Auth({ title }) {
   }, [history.location.pathname]);
 
   return (
-    <Box
-      display="flex"
-      justifyContent="center"
-      alignItems="center"
-      height="100vh"
-      style={{
-        backgroundImage: `url(${svgBackground}), linear-gradient(to right bottom, #D5EEBB, #7FC8A9) `,
-        backgroundSize: "cover",
-        backgroundRepeat: "no-repeat",
-      }}
-    >
+    <Box className={classes.page}>
       <Grid container spacing={2} className={classes.root}>
         <Grid item xs={12} sm={5} md={7}>
-          <Box textAlign="center" margin="auto">
-            <Typography variant="h1" color="secondary">
-              CNCM
-            </Typography>
-            <Typography variant="h4" color="secondary">
-              Welcome
-            </Typography>
-            <Typography variant="h6" color="secondary">
-              We are happy to have you.
-            </Typography>
+          <Box textAlign="center" style={{ color: "white" }}>
+            <img src={logo} alt="logo" width="100%" />
+            <Hidden xsDown>
+              <Typography variant="h1" color="inherit">
+                CNCM
+              </Typography>
+              <Typography variant="h4" color="inherit">
+                Welcome
+              </Typography>
+              <Typography variant="h6" color="inherit">
+                We are happy to have you.
+              </Typography>
+            </Hidden>
           </Box>
         </Grid>
 
@@ -178,6 +179,7 @@ function Auth({ title }) {
                 <Login title="LOGIN" homePage={homePage} />
               </Box>
             </Box>
+
             <ForgotPassword
               title="FORGOT PASSWORD"
               show={loginIn === 2}
