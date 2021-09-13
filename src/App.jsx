@@ -64,38 +64,40 @@ function App() {
   return (
     <ThemeProvider theme={themes}>
       <CssBaseline />
-      <Router>
-        <Switch>
-          <Route path="/login" exact>
-            <Auth title="LOGIN" />
-          </Route>
-          <Route path="/signup" exact>
-            <Auth title="SIGNUP" />
-          </Route>
-          <Route path="/forgotpassword" exact>
-            <Auth title="FORGOT PASSWORD" />
-          </Route>
+      <Box minHeight="100vh" minWidth="100vw">
+        <Router>
+          <Switch>
+            <Route path="/login" exact>
+              <Auth title="LOGIN" />
+            </Route>
+            <Route path="/signup" exact>
+              <Auth title="SIGNUP" />
+            </Route>
+            <Route path="/forgotpassword" exact>
+              <Auth title="FORGOT PASSWORD" />
+            </Route>
 
-          <ProtectedRoutes>
-            <Box display="flex">
-              <Box>
-                <Sidebar />
+            <ProtectedRoutes>
+              <Box display="flex">
+                <Box>
+                  <Sidebar />
+                </Box>
+                <Box flexGrow={1}>
+                  <Header />
+                  <div className={classes.body}>
+                    <Route exact path="/">
+                      <Home title="HOME" />
+                    </Route>
+                    <Route exact path="/verify">
+                      <Verify title="VERIFY" />
+                    </Route>
+                  </div>
+                </Box>
               </Box>
-              <Box flexGrow={1}>
-                <Header />
-                <div className={classes.body}>
-                  <Route exact path="/">
-                    <Home title="HOME" />
-                  </Route>
-                  <Route exact path="/verify">
-                    <Verify title="VERIFY" />
-                  </Route>
-                </div>
-              </Box>
-            </Box>
-          </ProtectedRoutes>
-        </Switch>
-      </Router>
+            </ProtectedRoutes>
+          </Switch>
+        </Router>
+      </Box>
     </ThemeProvider>
   );
 }

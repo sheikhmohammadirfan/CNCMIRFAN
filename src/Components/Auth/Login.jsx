@@ -87,7 +87,7 @@ function Login({ title, homePage }) {
     if (!isLoading && validateInput(user)) {
       setLoading(true);
       // Call login Service
-      const status = login(user);
+      const status = await login(user);
       setLoading(false);
       // If success
       if (status) homePage();
@@ -131,7 +131,7 @@ function Login({ title, homePage }) {
       <CheckboxControl
         color="primary"
         name="remember"
-        label={<Typography variant="body2">Stayed Logged in</Typography>}
+        label={<Typography variant="body2">Stay Logged in</Typography>}
         value={user.remember}
         onChange={handleInputChange}
       />

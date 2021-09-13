@@ -3,7 +3,9 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  Divider,
   Grid,
+  LinearProgress,
 } from "@material-ui/core";
 import React from "react";
 
@@ -11,6 +13,7 @@ import React from "react";
 function DialogBox({
   open,
   close,
+  loading,
   title,
   titleProp,
   content,
@@ -21,6 +24,8 @@ function DialogBox({
   return (
     <Dialog open={open} onClose={close}>
       {title && <DialogTitle {...titleProp}>{title}</DialogTitle>}
+      {loading === true && <LinearProgress />}
+      {loading === false && <Divider />}
       {content && <DialogContent {...contentProp}>{content}</DialogContent>}
       {actions && (
         <DialogActions disableSpacing>

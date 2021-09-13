@@ -23,6 +23,8 @@
 ###### Generalize component, act as item of Sidebar and its submenu
 
 **<span style="color: blue;">PROPS :</span>**
+**sidebarOpen <span style="color: brown;">: Boolean </span>** Boolean value to save sidebar status
+**xs <span style="color: brown;">: Boolean </span>** Boolean value to save window width
 **text <span style="color: brown;">: String | HTML | Component </span>** text to show
 **icon <span style="color: brown;">: String | HTML | Component </span>** icon to show
 **subMenu <span style="color: brown;">: { text, icon, subMenu }[ ] </span>** Object of Submenu details
@@ -35,24 +37,12 @@ subMenu should be an array of Object `{text,icon,subMenu}[]`
 
 ---
 
-### [MenuPopup](./MenuPopup.jsx)
-
-###### Help to warp passed component into customized tooltip to show their sub-menu / text
-
-**<span style="color: blue;">PROPS :</span>**
-**<span style="color: blue;">popup </span> <span style="color: brown;">: String | HTML | Component </span>** Component to show in tooltip popoup.
-**<span style="color: blue;">component </span> <span style="color: brown;">: String | HTML | Component </span>** Component on which tooltip triggers.
-**\*** props to be applied on Tooltip.
-
-**<span style="color: green;">RETURN :</span>** component with tooltip trigger
-
----
-
 ### [ProfileBtn](./ProfileBtn.jsx)
 
 ###### Genrate profile btn as with user image and name and on popup show user settings and logout btn
 
 **<span style="color: blue;">PROPS :</span>**
 **<span style="color: blue;">sidebarStatus </span> <span style="color: brown;">: Boolean </span>** required to toggle visibility of arrow icon which signify sub menu.
+**<span style="color: blue;">xs </span> <span style="color: brown;">: Boolean </span>** Boolean value to save window width.
 
 **<span style="color: green;">RETURN :</span>** profile btn as Sidebar item

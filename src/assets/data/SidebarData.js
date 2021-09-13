@@ -1,58 +1,71 @@
+import { Link } from "react-router-dom";
+
 /** Sidebar data to map */
 export const SidebarData = [
   {
     icon: "description",
     title: "Document Compliance",
-    path: "/about-us",
+    component: Link,
+    to: "/about-us",
   },
   {
     icon: "verified",
     title: "Verify Complaince",
-    path: "/verify",
+    component: Link,
+    to: "/verify",
   },
   {
     title: "Complaince Framework",
-    path: "/contact",
+    component: Link,
+    to: "/contact",
     icon: "crop_free",
-    subNav: [
+    subMenu: [
       {
         title: "FEDRAMP / FISMA",
-        path: "/services/services1",
+        component: Link,
+        to: "/services/services1",
         icon: "star",
       },
       {
         title: "HIPAA",
-        path: "/services/services2",
+        component: Link,
+        to: "/services/services2",
         icon: "star",
       },
       {
         title: "PCI DSS",
-        path: "/services/services3",
+        component: Link,
+        to: "/services/services3",
         icon: "star",
       },
       {
         title: "ISO 27001",
-        path: "/services/services3",
+        component: Link,
+        to: "/services/services3",
         icon: "star",
-        subNav: [
+        subMenu: [
           {
             title: "Compliance",
-            path: "/events",
+            component: Link,
+            to: "/events",
             icon: "star",
           },
           {
             title: "MY TASKS",
-            path: "/events",
+            component: Link,
+            to: "/events",
             icon: "star",
           },
           {
             title: "MY TASKS",
-            path: "/events",
+            component: Link,
+            to: "/events",
             icon: "star",
           },
           {
             title: "MY TASKS",
-            path: "/events",
+            component: Link,
+            to: "/events",
             icon: "star",
           },
         ],
@@ -61,83 +74,98 @@ export const SidebarData = [
   },
   {
     title: "Settings",
-    path: "",
+    component: Link,
+    to: "",
     icon: "settings",
-    subNav: [
+    subMenu: [
       {
         title: "Compliance",
-        path: "/events",
+        component: Link,
+        to: "/events",
         icon: "star",
-        subNav: [
+        subMenu: [
           {
             title: "Compliance",
-            path: "/events",
+            component: Link,
+            to: "/events",
             icon: "star",
           },
           {
             title: "MY TASKS",
-            path: "/events",
+            component: Link,
+            to: "/events",
             icon: "star",
           },
           {
             title: "MY TASKS",
-            path: "/events",
+            component: Link,
+            to: "/events",
             icon: "star",
           },
           {
             title: "MY TASKS",
-            path: "/events",
+            component: Link,
+            to: "/events",
             icon: "star",
           },
         ],
       },
       {
         title: "MY TASKS",
-        path: "/events",
+        component: Link,
+        to: "/events",
         icon: "star",
       },
       {
         title: "MY TASKS",
-        path: "/events",
+        component: Link,
+        to: "/events",
         icon: "star",
-        subNav: [
+        subMenu: [
           {
             title: "Compliance",
-            path: "/events",
+            component: Link,
+            to: "/events",
             icon: "star",
           },
           {
             title: "MY TASKS",
-            path: "/events",
+            component: Link,
+            to: "/events",
             icon: "star",
           },
           {
             title: "MY TASKS",
-            path: "/events",
+            component: Link,
+            to: "/events",
             icon: "star",
           },
           {
             title: "MY TASKS",
-            path: "/events",
+            component: Link,
+            to: "/events",
             icon: "star",
           },
         ],
       },
       {
         title: "MY TASKS",
-        path: "/events",
+        component: Link,
+        to: "/events",
         icon: "star",
       },
     ],
   },
   {
     title: "MY TASKS",
-    path: "/events",
+    component: Link,
+    to: "/events",
     icon: "task",
   },
   {
     title: "Manage Artifacts",
-    path: "/support",
+    component: Link,
+    to: "/support",
     icon: "manage_accounts",
   },
 ];

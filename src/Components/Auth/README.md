@@ -31,3 +31,11 @@
 **<span style="color: blue;">loginPage</span> <span style="color: brown;">: boolean</span>** Method to change url to login page after signup
 
 **<span style="color: green;">RETURN :</span>** Signup Component
+
+---
+
+### [SingleSignon](./SingleSignon.jsx)
+
+###### To show and handle SSO functionality
+
+**<span style="color: green;">RETURN :</span>** SSO component

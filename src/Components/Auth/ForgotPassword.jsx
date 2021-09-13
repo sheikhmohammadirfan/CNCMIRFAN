@@ -16,17 +16,15 @@ const useStyles = makeStyles((theme) => ({
     background: theme.palette.background.paper,
     position: "absolute",
     right: 0,
-    bottom: 2 * theme.spacing(7),
+    bottom: 0,
     zIndex: 3,
     width: "100%",
     height: 0,
-    padding: 0,
     display: "flex",
     flexDirection: "column",
     overflow: "hidden",
     transition: "all 0.3s linear",
     "&.active": {
-      bottom: 0,
       width: "100%",
       height: "100%",
       padding: `${theme.spacing(1)}px ${theme.spacing(2)}px`,
@@ -40,7 +38,6 @@ const useStyles = makeStyles((theme) => ({
     textTransform: "uppercase",
     letterSpacing: 2,
     paddingRight: theme.spacing(1),
-    borderBottom: `2px dashed ${theme.palette.secondary.dark}`,
   },
 
   // Style for password submit btn
@@ -65,7 +62,7 @@ function ForgotPassword({ show, login }) {
           <Icon>cancel</Icon>
         </IconButton>
       </Box>
-      
+
       <Box height={1} display="flex" flexDirection="column">
         <Box padding={1} flexGrow={1}>
           <TextControl fullWidth name="Email id to Recover" />

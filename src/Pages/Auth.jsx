@@ -7,12 +7,15 @@ import ForgotPassword from "../Components/Auth/ForgotPassword";
 import DocumentTitle from "../Components/DocumentTitle";
 import svgBackground from "../assets/img/login_background.svg";
 import logo from "../assets/img/company_logo_large.webp";
+import SingleSignon from "../Components/Auth/SingleSignon";
 
 // CSS class generator
 const useStyles = makeStyles((theme) => ({
   // Style for backgroud page
   page: {
-    height: "100vh",
+    minHeight: "100vh",
+    height: "min-content",
+    padding: theme.spacing(1),
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
@@ -179,6 +182,8 @@ function Auth({ title }) {
                 <Login title="LOGIN" homePage={homePage} />
               </Box>
             </Box>
+
+            <SingleSignon />
 
             <ForgotPassword
               title="FORGOT PASSWORD"

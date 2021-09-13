@@ -3,9 +3,11 @@ import {
   Box,
   Button,
   CircularProgress,
+  Divider,
   Fade,
   Icon,
   IconButton,
+  LinearProgress,
 } from "@material-ui/core";
 import DocumentTitle from "../Components/DocumentTitle";
 import Upload from "../Components/Utils/Upload";
@@ -76,17 +78,17 @@ export default function Verify(props) {
 
   // Method to delete list of selected files
   const deleteSelectedFiles = async () => {
-    setLoading(true);
     // Delete files
     const status = await deleteFiles(
       selectedRows.map((row) => fileList[row[0].text - 1])
     );
+    hideDailog();
+    setLoading(true);
     if (status) {
       // If success then update files
       setSelectedRows([]);
       await fetchFiles();
     }
-    hideDailog();
   };
 
   // Method ot selected verify file
@@ -102,18 +104,29 @@ export default function Verify(props) {
   };
 
   // Compoent to show warning dialog
-  const WarningDailog = () => (
-    <DialogBox
-      open={dialog}
-      close={hideDailog}
-      title="Delete Files"
-      content={`Are you sure to delete ${selectedRows.length} selected files ?`}
-      actions={[
-        <Button onClick={deleteSelectedFiles}>Yes</Button>,
-        <Button onClick={hideDailog}>No</Button>,
-      ]}
-    />
-  );
+  const WarningDailog = () => {
+    const [deleteLoader, setDeleteLoader] = useState(false);
+    return (
+      <DialogBox
+        open={dialog}
+        close={() => !deleteLoader && hideDailog()}
+        title="Delete Files"
+        loading={deleteLoader}
+        content={`Are you sure to delete ${selectedRows.length} selected files ?`}
+        actions={[
+          <Button
+            onClick={() => deleteSelectedFiles() && setDeleteLoader(true)}
+            disabled={deleteLoader}
+          >
+            Yes
+          </Button>,
+          <Button onClick={hideDailog} disabled={deleteLoader}>
+            No
+          </Button>,
+        ]}
+      />
+    );
+  };
 
   // Component for footer of table
   const FooterComponent = () => (
