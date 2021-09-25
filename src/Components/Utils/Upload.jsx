@@ -13,8 +13,8 @@ import {
   Divider,
 } from "@material-ui/core";
 import { toast } from "react-toastify";
-import unknownLogo from "../../assets/img/unknown-file-format.png";
-import otherLogo from "../../assets/img/other-file-format.png";
+import unknownLogo from "../../assets/img/unknown.svg";
+import otherLogo from "../../assets/img/other.svg";
 
 // Function to handle Notification toast
 function notification(msg, type) {

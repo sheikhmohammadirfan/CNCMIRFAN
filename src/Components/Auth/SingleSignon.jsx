@@ -7,11 +7,11 @@ import {
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/styles";
 import React from "react";
-import aws from "../../assets/img/sso/aws.png";
-import cloud from "../../assets/img/sso/cloud.png";
-import github from "../../assets/img/sso/github.png";
-import google from "../../assets/img/sso/google.png";
-import heroku from "../../assets/img/sso/heroku.png";
+import aws from "../../assets/img/sso/aws.svg";
+import cloud from "../../assets/img/sso/gcp.svg";
+import github from "../../assets/img/sso/github.svg";
+import google from "../../assets/img/sso/google.svg";
+import heroku from "../../assets/img/sso/heroku.svg";
 
 /** CSS class generator */
 const useStyles = makeStyles((theme) => ({

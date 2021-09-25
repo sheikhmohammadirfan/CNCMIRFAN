@@ -19,9 +19,9 @@ import {
   uploadFiles,
   verifyFile,
 } from "../Service/Verify.service";
-import pdfLogo from "../assets/img/pdf-file-format.png";
-import docLogo from "../assets/img/doc-file-format.png";
-import txtLogo from "../assets/img/txt-file-format.png";
+import pdfLogo from "../assets/img/pdf.svg";
+import docLogo from "../assets/img/doc.svg";
+import txtLogo from "../assets/img/txt.svg";
 
 // Object of valid files
 const validFiles = {
