@@ -20,18 +20,29 @@ const TextControl = withStyles({
       cursor: "default",
     },
   },
-})(({ name, variant, label, value, error, onChange, ...others }) => (
-  <TextField
-    variant={variant || "filled"}
-    name={name || "text"}
-    value={value}
-    onChange={onChange}
-    label={label || name}
-    error={error !== "" && error !== undefined}
-    helperText={error ? error : " "}
-    {...others}
-  />
-));
+})(
+  ({
+    name,
+    variant,
+    label,
+    value,
+    error,
+    removeGutter = false,
+    onChange,
+    ...others
+  }) => (
+    <TextField
+      variant={variant || "filled"}
+      name={name || "text"}
+      value={value}
+      onChange={onChange}
+      label={label || name}
+      error={error !== "" && error !== undefined}
+      helperText={error ? error : removeGutter ? "" : " "}
+      {...others}
+    />
+  )
+);
 
 // Get Paassword field with show/hide password btn
 const PasswordControl = ({ value, ...others }) => {

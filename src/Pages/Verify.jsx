@@ -42,11 +42,13 @@ const header = {
 
 // row data
 const row = (lst) =>
-  lst.map((file, index) => [
-    { text: index + 1 },
-    { text: file.file_name },
-    { text: file.file.split("/")[5], props: { align: "right" } },
-  ]);
+  lst.map((file, index) => ({
+    data: [
+      { text: index + 1 },
+      { text: file.file_name },
+      { text: file.file.split("/")[5], props: { align: "right" } },
+    ],
+  }));
 
 /** Verify page compoent */
 export default function Verify(props) {

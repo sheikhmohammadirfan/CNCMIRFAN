@@ -7,11 +7,13 @@ import {
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/styles";
 import React from "react";
+import { useHistory } from "react-router";
 import aws from "../../assets/img/sso/aws.svg";
 import cloud from "../../assets/img/sso/gcp.svg";
 import github from "../../assets/img/sso/github.svg";
 import google from "../../assets/img/sso/google.svg";
 import heroku from "../../assets/img/sso/heroku.svg";
+import { gapi_signin } from "../../Service/GAPI";
 
 /** CSS class generator */
 const useStyles = makeStyles((theme) => ({
@@ -25,15 +27,24 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 /** Flex row with Single Signon options */
-function SingleSignon() {
+function SingleSignon({ google: googleSet }) {
   // Organize data
   const sso = [
-    ["aws", aws],
-    ["GCP", cloud],
-    ["Github", github],
-    ["Google", google],
-    ["Heroku", heroku],
+    ["aws", aws, null],
+    ["GCP", cloud, null],
+    ["Github", github, null],
+    [
+      "Google",
+      google,
+      async () => {
+        const status = await gapi_signin();
+        if (status) history.push("/");
+      },
+    ],
+    ["Heroku", heroku, null],
   ];
+
+  const history = useHistory();
 
   // Get styles
   const classes = useStyles();
@@ -45,7 +56,7 @@ function SingleSignon() {
       justifyContent="space-between"
       marginBottom={1}
     >
-      {sso.map(([title, src], index) => (
+      {sso.map(([title, src, onclick], index) => (
         <Tooltip
           key={index}
           title={<Typography variant="caption">{title}</Typography>}
@@ -53,7 +64,7 @@ function SingleSignon() {
           arrow
           classes={{ tooltip: classes.tooltip, arrow: classes.arrow }}
         >
-          <IconButton style={{ padding: 4 }}>
+          <IconButton style={{ padding: 4 }} onClick={onclick}>
             <Avatar src={src} alt={title} />
           </IconButton>
         </Tooltip>

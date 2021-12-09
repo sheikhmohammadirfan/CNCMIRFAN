@@ -1,0 +1,50 @@
+export const poam_header = [
+  "POAM ID",
+  "Controls",
+  "Weakness Name",
+  "Weakness Description",
+  "Weakness Detector Source",
+  "Weakness Source Identifier",
+  "Asset Identifier",
+  "Point of Contact",
+  "Resources Required",
+  "Overall Remediation Plan",
+  "Original Detection Date",
+  "Scheduled Completion Date",
+  "Planned Milestones",
+];
+
+export const poam_rows = [
+  [
+    "V-1",
+    "AC-11",
+    "Open port on Example Firewall",
+    "Unprovisioned port left open on example firewall",
+    "Nessus",
+    "12345",
+    "172.246.15.3 (80/TCP) http://vuln.gov/queries 172.246.16.17 (80/tcp)",
+    "John Doe -  Example CSP",
+    "",
+    "Implement a technical solution to the problem",
+    "5/5/2014",
+    "8/3/2014",
+    "(1) 2014/05/23: Milestone Description.\n(2) 2014-06-12: Milestone Description",
+  ],
+  [
+    "V-2",
+    "AC-01",
+    "Example Firewall",
+    "open on example firewall",
+    "Xddd Nessus",
+    "4234234212345",
+    "172.246.15.3 (80/TCP) http://vuln.gov/queries 172.246.16.17 (80/tcp)",
+    "Doe -  Example CSP",
+    "",
+    "Implement a technical solution to the problem",
+    "5/5/2014",
+    "81/33/2014",
+    "one Description.\n(2) 2014-06-12: Milestone Description",
+  ],
+];
+
+export const secondaryColumns = new Set([3, 4, 5, 7, 11, 12]);

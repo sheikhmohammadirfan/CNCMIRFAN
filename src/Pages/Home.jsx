@@ -3,6 +3,7 @@ import { userData } from "../assets/data/dummyData";
 import Chart from "../Components/Chart";
 import { useLayoutEffect, useState } from "react";
 import DocumentTitle from "../Components/DocumentTitle";
+import Drive from "../Components/Drive";
 
 // Add event listener on window width
 function useWindowSize() {
@@ -33,6 +34,7 @@ export default function Home(props) {
         grid
         dataKey="Active User"
       />
+      <Drive />
     </div>
   );
 }

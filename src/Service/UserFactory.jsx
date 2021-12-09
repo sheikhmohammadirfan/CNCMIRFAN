@@ -61,7 +61,7 @@ async function login({ email, password }) {
 // Signup user
 async function signup({ name, email, password }) {
   try {
-    await axios.post("https://internassign.herokuapp.com/api/user", {
+    await axios.post("/user", {
       name,
       email,
       password,

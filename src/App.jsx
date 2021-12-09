@@ -15,6 +15,7 @@ import "react-toastify/dist/ReactToastify.css";
 import ProtectedRoutes from "./Components/ProtectedRoutes";
 import Verify from "./Pages/Verify";
 import Home from "./Pages/Home";
+import Poam from "./Pages/Poam";
 
 /** Theme generator */
 let themes = createTheme({
@@ -90,6 +91,9 @@ function App() {
                     </Route>
                     <Route exact path="/verify">
                       <Verify title="VERIFY" />
+                    </Route>
+                    <Route exact path="/support">
+                      <Poam title="POAM Table" />
                     </Route>
                   </div>
                 </Box>

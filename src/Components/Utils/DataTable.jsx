@@ -17,8 +17,19 @@ import { useState } from "react";
 const useStyles = makeStyles((theme) => ({
   root: {
     margin: `${theme.spacing(1)}px 0`,
-    border: `2px solid ${theme.palette.grey[300]}`,
+    border: `2px solid ${theme.palette.grey[400]}`,
     borderRadius: theme.shape.borderRadius,
+    "&, &  td, & th": {
+      borderColor: theme.palette.grey[400],
+    },
+  },
+  headerStyle: {
+    background: theme.palette.grey[200],
+  },
+  border: {
+    "& tr > td:not(:first-child), & tr > th:not(:first-child)": {
+      borderLeft: `${theme.spacing(1 / 8)}px solid ${theme.palette.grey[400]}`,
+    },
   },
 }));
 
@@ -32,6 +43,8 @@ function DataTable({
   header = { data: [] },
   rows = [],
   footerComponent,
+  verticalBorder = false,
+  ...rest
 }) {
   const classes = useStyles();
 
@@ -40,7 +53,7 @@ function DataTable({
     setSelectedRows((row) =>
       checked
         ? [...row, rows[index]]
-        : row.filter((r) => r[0].text - 1 !== index)
+        : row.filter((r) => r.data[0].text - 1 !== index)
     );
 
   // Toggle select All btn
@@ -75,9 +88,12 @@ function DataTable({
     currIn + rowsPerPage > rows.length ? rows.length - currIn : rowsPerPage;
 
   return (
-    <TableContainer className={classes.root}>
+    <TableContainer
+      className={`${classes.root} ${verticalBorder && classes.border}`}
+      {...rest}
+    >
       <Table>
-        <TableHead>
+        <TableHead className={classes.headerStyle}>
           <TableRow {...header.row}>
             {checkbox && (
               <TableCell padding="checkbox">
@@ -98,25 +114,27 @@ function DataTable({
         </TableHead>
         <TableBody>
           {rows.slice(currIn, currIn + rowsPerPage).map((dataRow, rowIndex) => (
-            <TableRow key={rowIndex}>
+            <TableRow key={rowIndex} {...dataRow.props}>
               {checkbox && (
                 <TableCell padding="checkbox">
                   <Checkbox
                     color="primary"
                     checked={selectedRows
-                      .map((row) => row[0].text)
-                      .includes(dataRow[0].text)}
+                      .map((row) => row.data[0].text)
+                      .includes(dataRow.data[0].text)}
                     onChange={(e) =>
-                      toggleRow(dataRow[0].text - 1, e.target.checked)
+                      toggleRow(dataRow.data[0].text - 1, e.target.checked)
                     }
                   />
                 </TableCell>
               )}
-              {dataRow.slice(Number(!showIndex)).map((dataCol, colIndex) => (
-                <TableCell key={colIndex} {...dataCol.props}>
-                  {dataCol.text}
-                </TableCell>
-              ))}
+              {dataRow.data
+                .slice(Number(!showIndex))
+                .map((dataCol, colIndex) => (
+                  <TableCell key={colIndex} {...dataCol.props}>
+                    {dataCol.text}
+                  </TableCell>
+                ))}
             </TableRow>
           ))}
         </TableBody>

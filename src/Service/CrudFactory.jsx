@@ -25,7 +25,9 @@ async function request(requestOptions) {
   let fullurl = url;
 
   // Set basic header
-  let headers = { Accept: "*/*", Authorization: `Bearer ${getToken()}` };
+  let headers = { Accept: "*/*" };
+  if (getToken()) headers["Authorization"] = `Bearer ${getToken()}`;
+
   // Get query params
   if (method === "GET") {
     let queryString = new URLSearchParams(data);
@@ -41,6 +43,7 @@ async function request(requestOptions) {
 
   try {
     // Make request
+    console.log(method, fullurl, data, headers);
     const response = await axios({
       method,
       url: fullurl,

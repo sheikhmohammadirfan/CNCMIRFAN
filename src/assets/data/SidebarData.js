@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 export const SidebarData = [
   {
     icon: "description",
-    title: "Document Compliance",
+    title: "Compliance Documention",
     component: Link,
     to: "/about-us",
   },
@@ -15,10 +15,16 @@ export const SidebarData = [
     to: "/verify",
   },
   {
-    title: "Complaince Framework",
+    icon: "manage_accounts",
+    title: "Manage Artifacts",
+    component: Link,
+    to: "/support",
+  },
+  {
+    icon: "category",
+    title: "Complaince Mapping",
     component: Link,
     to: "/contact",
-    icon: "crop_free",
     subMenu: [
       {
         title: "FEDRAMP / FISMA",
@@ -73,10 +79,28 @@ export const SidebarData = [
     ],
   },
   {
+    icon: "task",
+    title: "My Audit Tasks",
+    component: Link,
+    to: "/events",
+  },
+  {
+    icon: "repeat",
+    title: "Continous Monitoring",
+    component: Link,
+    to: "/events",
+  },
+  {
+    icon: "merge_type",
+    title: "Integration",
+    component: Link,
+    to: "/events",
+  },
+  {
+    icon: "settings",
     title: "Settings",
     component: Link,
     to: "",
-    icon: "settings",
     subMenu: [
       {
         title: "Compliance",
@@ -155,17 +179,5 @@ export const SidebarData = [
         icon: "star",
       },
     ],
-  },
-  {
-    title: "MY TASKS",
-    component: Link,
-    to: "/events",
-    icon: "task",
-  },
-  {
-    title: "Manage Artifacts",
-    component: Link,
-    to: "/support",
-    icon: "manage_accounts",
   },
 ];
