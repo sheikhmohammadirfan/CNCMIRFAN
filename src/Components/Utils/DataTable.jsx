@@ -10,7 +10,7 @@ import {
   makeStyles,
   TablePagination,
 } from "@material-ui/core";
-import React from "react";
+import React, { useEffect } from "react";
 import { useState } from "react";
 
 /** CSS classe generator */
@@ -26,6 +26,12 @@ const useStyles = makeStyles((theme) => ({
   headerStyle: {
     background: theme.palette.grey[200],
   },
+  stickTop: {
+    position: "sticky",
+    top: 0,
+    zIndex: 1,
+    boxShadow: theme.shadows[1],
+  },
   border: {
     "& tr > td:not(:first-child), & tr > th:not(:first-child)": {
       borderLeft: `${theme.spacing(1 / 8)}px solid ${theme.palette.grey[400]}`,
@@ -39,29 +45,51 @@ function DataTable({
   setSelectedRows,
   pagging = 0,
   checkbox = false,
-  showIndex = false,
-  header = { data: [] },
-  rows = [],
+  serialNo = true,
+  header = { data: [], props: {}, style: {}, cellStyle: {} },
+  rowList = [],
   footerComponent,
   verticalBorder = false,
+  stickHeader = true,
   ...rest
 }) {
   const classes = useStyles();
 
+  // Page index and current Starting index
+  const [page, setPage] = useState(0);
+  const [startIndex, setStart] = useState(0);
+  const updatePage = (_, index) => {
+    setPage(index);
+    setStart(index * rowsPerPage);
+    setSelectedRows([]);
+  };
+
+  // Method to add row
+  const addRow = (index) => [...selectedRows, index];
+
+  // Method to remove row
+  const removeRow = (index) => selectedRows.filter((i) => i != index);
+
+  // Method to splice row from start till length
+  const sliceRowLength = (start, length) =>
+    rowList.slice(start, start + length);
+
+  // Method to check if row in list
+  const containRow = (index) => selectedRows.some((i) => i == index);
+
   // Toggle check & uncheck status of row
   const toggleRow = (index, checked) =>
-    setSelectedRows((row) =>
-      checked
-        ? [...row, rows[index]]
-        : row.filter((r) => r.data[0].text - 1 !== index)
-    );
+    setSelectedRows(() => (checked ? addRow(index) : removeRow(index)));
 
   // Toggle select All btn
-  const toggleAllRows = (checked) => {
-    setSelectedRows(
-      checked ? [...rows.slice(currIn, currIn + rowsPerPage)] : []
+  const toggleAllRows = (checked) =>
+    setSelectedRows(() =>
+      checked
+        ? Array.from(
+            Array(sliceRowLength(startIndex, rowsPerPage).length).keys()
+          )
+        : []
     );
-  };
 
   // Method to check if some files are selected
   const isSomeChecked = () =>
@@ -71,70 +99,81 @@ function DataTable({
   const isAllChecked = () =>
     selectedRows.length > 0 && selectedRows.length === getCurrMax();
 
-  // Store row per page
-  const rowsPerPage = pagging ? pagging : rows.length;
-
-  // Page index and current Starting index
-  const [page, setPage] = useState(0);
-  const [currIn, setCurr] = useState(0);
-  const updatePage = (_, index) => {
-    setPage(index);
-    setCurr(index * rowsPerPage);
-    setSelectedRows([]);
-  };
-
   // Method get max row count of current page
   const getCurrMax = () =>
-    currIn + rowsPerPage > rows.length ? rows.length - currIn : rowsPerPage;
+    startIndex + rowsPerPage > rowList.length
+      ? rowList.length - startIndex
+      : rowsPerPage;
+
+  // Store row per page
+  const rowsPerPage = pagging ? pagging : rowList.length;
 
   return (
     <TableContainer
-      className={`${classes.root} ${verticalBorder && classes.border}`}
+      className={`${classes.root} ${
+        verticalBorder && classes.border
+      } custom-sidebar`}
       {...rest}
     >
       <Table>
-        <TableHead className={classes.headerStyle}>
-          <TableRow {...header.row}>
+        <TableHead
+          className={`${classes.headerStyle} ${
+            stickHeader ? classes.stickTop : ""
+          }`}
+          style={header.style}
+          {...header.props}
+        >
+          <TableRow>
             {checkbox && (
               <TableCell padding="checkbox">
                 <Checkbox
                   color="primary"
                   indeterminate={isSomeChecked()}
                   checked={isAllChecked()}
-                  onClick={(e) => toggleAllRows(e.target.checked)}
+                  onClick={(e) => {
+                    toggleAllRows(e.target.checked);
+                    e.stopPropagation();
+                  }}
+                  {...header.cellStyle}
                 />
               </TableCell>
             )}
-            {header.data.slice(Number(!showIndex)).map((val, index) => (
-              <TableCell key={index} {...header.cols} {...val.props}>
-                {val.text}
+            {serialNo && <TableCell {...header.cellStyle}>Sr. No.</TableCell>}
+            {header.data.map(({ text = "", props = {}, style = {} }, index) => (
+              <TableCell
+                key={index}
+                {...props}
+                style={style}
+                {...header.cellStyle}
+              >
+                {text}
               </TableCell>
             ))}
           </TableRow>
         </TableHead>
         <TableBody>
-          {rows.slice(currIn, currIn + rowsPerPage).map((dataRow, rowIndex) => (
-            <TableRow key={rowIndex} {...dataRow.props}>
+          {sliceRowLength(startIndex, rowsPerPage).map((currRow, rowIndex) => (
+            <TableRow key={rowIndex} {...currRow.props} style={currRow.style}>
               {checkbox && (
                 <TableCell padding="checkbox">
                   <Checkbox
                     color="primary"
-                    checked={selectedRows
-                      .map((row) => row.data[0].text)
-                      .includes(dataRow.data[0].text)}
+                    checked={containRow(rowIndex)}
                     onChange={(e) =>
-                      toggleRow(dataRow.data[0].text - 1, e.target.checked)
+                      toggleRow(startIndex + rowIndex, e.target.checked)
                     }
+                    onClick={(e) => e.stopPropagation()}
                   />
                 </TableCell>
               )}
-              {dataRow.data
-                .slice(Number(!showIndex))
-                .map((dataCol, colIndex) => (
-                  <TableCell key={colIndex} {...dataCol.props}>
-                    {dataCol.text}
+              {serialNo && <TableCell>{rowIndex + 1}</TableCell>}
+              {currRow.data.map(
+                ({ text = "", props = {}, style = {} }, colIndex) => (
+                  <TableCell key={colIndex} {...props} style={style}>
+                    {text}
                   </TableCell>
-                ))}
+                )
+              )}
             </TableRow>
           ))}
         </TableBody>
@@ -151,7 +190,7 @@ function DataTable({
                 rowsPerPage={rowsPerPage}
                 page={page}
                 onPageChange={updatePage}
-                count={rows.length}
+                count={rowList.length}
                 component={Box}
               />
             )}

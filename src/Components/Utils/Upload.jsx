@@ -3,18 +3,15 @@ import {
   Box,
   Button,
   Icon,
-  IconButton,
   makeStyles,
   TextField,
   Typography,
-  LinearProgress,
-  Dialog,
-  DialogTitle,
-  Divider,
 } from "@material-ui/core";
 import { toast } from "react-toastify";
 import unknownLogo from "../../assets/img/unknown.svg";
 import otherLogo from "../../assets/img/other.svg";
+import CloseButton from "../Utils/CloseButton";
+import DialogBox from "./DialogBox";
 
 // Function to handle Notification toast
 function notification(msg, type) {
@@ -43,9 +40,7 @@ const FileRow = ({ name, update, setter, icon }) => {
       <Box paddingX={1} width={1}>
         <TextField value={name} onChange={update} fullWidth />
       </Box>
-      <IconButton size="small" onClick={setter}>
-        <Icon>close</Icon>
-      </IconButton>
+      <CloseButton type="text" size="small" click={setter} />
     </Box>
   );
 };
@@ -141,41 +136,41 @@ function Upload({
         onChange={updateFiles}
         hidden
       />
-      <Dialog
+
+      <DialogBox
         open={files.length > 0}
         onClose={() => !uploadStarted && closeUpload()}
         aria-labelledby="upload-dialog"
-      >
-        <DialogTitle className={classes.titleContainer} disableTypography>
-          <Typography display="inline" variant="h6">
-            Upload files
-          </Typography>
-          <IconButton
-            size="small"
-            color="secondary"
-            variant="contained"
-            disabled={uploadStarted}
-            onClick={() => !uploadStarted && closeUpload()}
-          >
-            <Icon>cancel</Icon>
-          </IconButton>
-        </DialogTitle>
-
-        {uploadStarted ? <LinearProgress /> : <Divider />}
-
-        <Box padding={1} overflow="auto" maxHeight={300}>
-          {files.map((file, index) => (
-            <FileRow
-              key={index}
-              name={file.name}
-              update={(e) => updateName(index, e.target.value)}
-              setter={() => removeFiles(index)}
-              icon={extLst.length ? validFiles[getExt(file.name)] : otherLogo}
+        loading={uploadStarted}
+        bottomSeperator={true}
+        title={
+          <>
+            <Typography display="inline" variant="h6">
+              Upload files
+            </Typography>
+            <CloseButton
+              click={() => !uploadStarted && closeUpload()}
+              size="small"
+              color="secondary"
+              variant="contained"
+              disabled={uploadStarted}
             />
-          ))}
-        </Box>
-
-        <Box display="flex" justifyContent="flex-end" alignItems="center">
+          </>
+        }
+        titleProp={{
+          className: classes.titleContainer,
+          disableTypography: true,
+        }}
+        content={files.map((file, index) => (
+          <FileRow
+            key={index}
+            name={file.name}
+            update={(e) => updateName(index, e.target.value)}
+            setter={() => removeFiles(index)}
+            icon={extLst.length ? validFiles[getExt(file.name)] : otherLogo}
+          />
+        ))}
+        actions={[
           <Button
             htmlFor={id}
             component="label"
@@ -183,24 +178,22 @@ function Upload({
             variant="contained"
             size="small"
             startIcon={<Icon>add</Icon>}
-            style={{ margin: 4 }}
             disabled={uploadStarted || files.length === maxFile}
           >
             Add More
-          </Button>
+          </Button>,
           <Button
             color="secondary"
             variant="contained"
             size="small"
             startIcon={<Icon>upload</Icon>}
-            style={{ margin: 4 }}
             disabled={uploadStarted || !isAllValid}
             onClick={pushFiles}
           >
             Upload
-          </Button>
-        </Box>
-      </Dialog>
+          </Button>,
+        ]}
+      />
     </>
   );
 }

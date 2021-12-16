@@ -1,6 +1,4 @@
-import { axios } from "./CrudFactory";
-import { toast } from "react-toastify";
-import ErrMsg from "./ErrMsg";
+import { post } from "./CrudFactory";
 
 // Get User from storage
 function getUser() {
@@ -10,8 +8,8 @@ function getUser() {
 }
 
 // Set User to Storage
-function setUser(obj) {
-  localStorage.setItem("user", JSON.stringify(obj));
+function setUser(userObj) {
+  localStorage.setItem("user", JSON.stringify(userObj));
 }
 
 // Delete User from Storage
@@ -35,54 +33,22 @@ function deleteToken() {
 }
 
 // Login user
-async function login({ email, password }) {
-  try {
-    const res = await axios.post("/user/login", {
-      email,
-      password,
-    });
-    setToken(res.data.access);
-    setUser(res.data.user);
-    toast("Login Successfull.", {
-      toastId: "api-toast",
-      type: "error",
-    });
-    return true;
-  } catch (e) {
-    const msg = e.response?.data?.error || "An error occured.";
-    toast(Array.isArray(msg) ? <ErrMsg data={msg} /> : msg, {
-      toastId: "api-toast",
-      type: "error",
-    });
-    return false;
+async function login(details) {
+  const { data, status } = await post("/user/login", details);
+
+  // if success then set token
+  if (status) {
+    setToken(data.access);
+    setUser(data.user);
   }
+
+  return status;
 }
 
 // Signup user
-async function signup({ name, email, password }) {
-  try {
-    await axios.post("/user", {
-      name,
-      email,
-      password,
-    });
-    toast("Signup Successfull.", {
-      toastId: "api-toast",
-      type: "error",
-    });
-    return true;
-  } catch (e) {
-    var msg = e.response.data || "An error occured.";
-    msg =
-      typeof msg !== "string"
-        ? Object.keys(msg).map((key) => msg[key][0])
-        : msg;
-    toast(Array.isArray(msg) ? <ErrMsg data={msg} /> : msg, {
-      toastId: "api-toast",
-      type: "error",
-    });
-    return false;
-  }
+async function signup(details) {
+  const { status } = await post("/user", details);
+  return status;
 }
 
 // Logout user

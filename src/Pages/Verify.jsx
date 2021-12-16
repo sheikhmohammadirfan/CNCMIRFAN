@@ -3,11 +3,9 @@ import {
   Box,
   Button,
   CircularProgress,
-  Divider,
   Fade,
   Icon,
   IconButton,
-  LinearProgress,
 } from "@material-ui/core";
 import DocumentTitle from "../Components/DocumentTitle";
 import Upload from "../Components/Utils/Upload";
@@ -31,24 +29,57 @@ const validFiles = {
   ".txt": txtLogo,
 };
 
-// Content for header of table
-const header = {
-  data: [
-    { text: "ID" },
-    { text: "FileName" },
-    { text: "Last Activity", props: { align: "right" } },
-  ],
+// Compoent to show warning dialog
+const WarningDailog = ({ openState, closeDialog, rows, deleteFiles }) => {
+  const [isLoading, setLoader] = useState(false);
+  const startLoading = () => setLoader(true);
+  const stopLoading = () => setLoader(false);
+  const close = () => {
+    stopLoading();
+    closeDialog();
+  };
+
+  return (
+    <DialogBox
+      open={openState}
+      close={() => !isLoading && close()}
+      title="Delete Files"
+      loading={isLoading}
+      content={`Are you sure to delete ${rows.length} selected files ?`}
+      actions={[
+        <Button
+          onClick={() => {
+            startLoading();
+            deleteFiles(stopLoading);
+          }}
+          disabled={isLoading}
+        >
+          Yes
+        </Button>,
+        <Button onClick={close} disabled={isLoading}>
+          No
+        </Button>,
+      ]}
+    />
+  );
 };
 
-// row data
-const row = (lst) =>
-  lst.map((file, index) => ({
-    data: [
-      { text: index + 1 },
-      { text: file.file_name },
-      { text: file.file.split("/")[5], props: { align: "right" } },
-    ],
-  }));
+// Component for footer of table
+const FooterComponent = ({ isLoading, showDailog, verifyMethod }) => (
+  <Box display="flex" alignItems="center">
+    <IconButton onClick={showDailog}>
+      <Icon>delete</Icon>
+    </IconButton>
+    <Button color="primary" variant="contained" onClick={verifyMethod}>
+      Verify
+    </Button>
+    <Fade in={isLoading} mountOnEnter unmountOnExit>
+      <Box paddingX={1}>
+        <CircularProgress size={32} />
+      </Box>
+    </Fade>
+  </Box>
+);
 
 /** Verify page compoent */
 export default function Verify(props) {
@@ -62,9 +93,17 @@ export default function Verify(props) {
   // React state, to save list of files
   const [fileList, setFileList] = useState([]);
 
+  // React state, to indicate loading status
+  const [loading, setLoading] = useState(true);
+
+  // React state, to save selected rows
+  const [selectedRows, setSelectedRows] = useState([]);
+
   // Fetch files from server
   const fetchFiles = async () => {
+    setLoading(true);
     const { data, status } = await getFiles();
+    console.log(data);
     status && setFileList(data);
     setLoading(false);
   };
@@ -72,20 +111,14 @@ export default function Verify(props) {
   // Fetch all files when component is mounted
   useEffect(() => fetchFiles(), []);
 
-  // React state, to indicate loading status
-  const [loading, setLoading] = useState(true);
-
-  // React state, to save selected rows
-  const [selectedRows, setSelectedRows] = useState([]);
-
   // Method to delete list of selected files
-  const deleteSelectedFiles = async () => {
+  const deleteSelectedFiles = async (stopLoading) => {
     // Delete files
     const status = await deleteFiles(
-      selectedRows.map((row) => fileList[row[0].text - 1])
+      selectedRows.map((index) => fileList[index])
     );
+    stopLoading();
     hideDailog();
-    setLoading(true);
     if (status) {
       // If success then update files
       setSelectedRows([]);
@@ -97,59 +130,40 @@ export default function Verify(props) {
   const verifySelectedFile = async () => {
     if (selectedRows.length > 0) {
       setLoading(true);
-      const { data, status } = await verifyFile(
-        fileList[selectedRows[0][0].text - 1].id
-      );
+      await verifyFile(fileList[selectedRows[0]].id);
       setLoading(false);
-      console.log(data, status);
     }
   };
 
-  // Compoent to show warning dialog
-  const WarningDailog = () => {
-    const [deleteLoader, setDeleteLoader] = useState(false);
-    return (
-      <DialogBox
-        open={dialog}
-        close={() => !deleteLoader && hideDailog()}
-        title="Delete Files"
-        loading={deleteLoader}
-        content={`Are you sure to delete ${selectedRows.length} selected files ?`}
-        actions={[
-          <Button
-            onClick={() => deleteSelectedFiles() && setDeleteLoader(true)}
-            disabled={deleteLoader}
-          >
-            Yes
-          </Button>,
-          <Button onClick={hideDailog} disabled={deleteLoader}>
-            No
-          </Button>,
-        ]}
-      />
-    );
+  const getId = (lst) => lst.data[0].text - 1;
+
+  // Content for header of table
+  const header = {
+    data: [
+      { text: "ID" },
+      { text: "FileName" },
+      { text: "Last Activity", props: { align: "right" } },
+    ],
   };
 
-  // Component for footer of table
-  const FooterComponent = () => (
-    <Box display="flex" alignItems="center">
-      <IconButton onClick={() => selectedRows.length > 0 && showDailog()}>
-        <Icon>delete</Icon>
-      </IconButton>
-      <Button color="primary" variant="contained" onClick={verifySelectedFile}>
-        Verify
-      </Button>
-      <Fade in={loading} mountOnEnter unmountOnExit>
-        <Box paddingX={1}>
-          <CircularProgress size={32} />
-        </Box>
-      </Fade>
-    </Box>
-  );
+  // row data
+  const rows = () =>
+    fileList.map((file, index) => ({
+      data: [
+        { text: index + 1 },
+        { text: file.file_name },
+        { text: file.file.split("/")[5], props: { align: "right" } },
+      ],
+    }));
 
   return (
     <Box padding={1} textAlign="center">
-      <WarningDailog />
+      <WarningDailog
+        openState={dialog}
+        closeDialog={hideDailog}
+        rows={selectedRows}
+        deleteFiles={deleteSelectedFiles}
+      />
 
       <Upload
         id="uploadFiles"
@@ -174,10 +188,17 @@ export default function Verify(props) {
           selectedRows={selectedRows}
           setSelectedRows={setSelectedRows}
           pagging={10}
-          showIndex={true}
+          stickHeader={false}
+          serialNo={false}
           header={header}
-          rows={row(fileList)}
-          footerComponent={<FooterComponent />}
+          rowList={rows()}
+          footerComponent={
+            <FooterComponent
+              isLoading={loading}
+              showDailog={() => selectedRows.length > 0 && showDailog()}
+              verifyMethod={verifySelectedFile}
+            />
+          }
         />
       </Box>
     </Box>

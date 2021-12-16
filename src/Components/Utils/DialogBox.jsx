@@ -13,30 +13,44 @@ import React from "react";
 function DialogBox({
   open,
   close,
-  loading,
+  loading = false,
   title,
   titleProp,
   content,
   contentProp,
   actions,
   actionProp,
+  bottomSeperator = false,
+  ...rest
 }) {
   return (
-    <Dialog open={open} onClose={close}>
-      {title && <DialogTitle {...titleProp}>{title}</DialogTitle>}
-      {loading === true && <LinearProgress />}
-      {loading === false && <Divider />}
+    <Dialog open={open} onClose={close} scroll="paper" {...rest}>
+      <DialogTitle {...titleProp}>{title}</DialogTitle>
+      <DialogContent
+        style={{ overflow: "hidden", padding: `${loading ? 4 : 0}px 0` }}
+      >
+        {loading && <LinearProgress />}
+        {!loading && <Divider />}
+      </DialogContent>
       {content && <DialogContent {...contentProp}>{content}</DialogContent>}
       {actions && (
-        <DialogActions disableSpacing>
-          <Grid container justifyContent="flex-end" {...actionProp}>
-            {actions.map((element, index) => (
-              <Grid item key={index}>
-                {element}
-              </Grid>
-            ))}
-          </Grid>
-        </DialogActions>
+        <>
+          {bottomSeperator && <Divider />}
+          <DialogActions disableSpacing>
+            <Grid
+              container
+              spacing={1}
+              justifyContent="flex-end"
+              {...actionProp}
+            >
+              {actions.map((element, index) => (
+                <Grid item key={index}>
+                  {element}
+                </Grid>
+              ))}
+            </Grid>
+          </DialogActions>
+        </>
       )}
     </Dialog>
   );

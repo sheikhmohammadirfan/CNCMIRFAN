@@ -2,30 +2,79 @@ import {
   GAPI_API_KEY,
   GAPI_CLIENT_ID,
   GAPI_DISCOVERY_DOCS,
-  GAPI_INIT_STATUS,
   GAPI_SCOPES,
-} from "./GAPI_CREDS";
+} from "../GAPI_CREDS";
 import { post } from "./CrudFactory";
 import { setToken, setUser } from "./UserFactory";
 import { toast } from "react-toastify";
+import { STATUS } from "../assets/data/status";
 
-export let GAPI_SETUP_STATUS = GAPI_INIT_STATUS.INCOMPLETE;
+// Gapi status variables
+export let GAPI_SETUP_STATUS = STATUS.INCOMPLETE;
 export let GAPI_SIGNIN_STATUS = false;
 
+// Gapi global variables
 const gapi = window?.gapi;
 let GAPI_AUTH = null;
 export let GAPI_TOKEN = null;
 export let GAPI_USER = null;
 
+/* Method to load gapi client modules, & trigger callback */
 export function initGapi() {
-  gapi.load("client:auth2", init);
-  gapi.load("picker", initPicker);
+  // Load Oauth2 module
+  gapi.load("client:auth2", init_auth_callback);
+
+  // Load Drive Picker module
+  gapi.load("picker", init_picker_callback);
+}
+
+/*********************
+ * Oauth Section
+ */
+
+/* Oauth module Callback */
+function init_auth_callback() {
+  // Pass Application credentials
+  gapi.client
+    .init({
+      apiKey: GAPI_API_KEY,
+      clientId: GAPI_CLIENT_ID,
+      discoveryDocs: GAPI_DISCOVERY_DOCS,
+      scope: GAPI_SCOPES,
+    })
+    .then(auth_success_callback, auth_failure_callback);
+}
+
+/* Gapi object setup success callback */
+function auth_success_callback() {
+  window.gapi = null;
+
+  GAPI_SETUP_STATUS = STATUS.SUCCESS;
+
+  GAPI_AUTH = gapi.auth2.getAuthInstance();
+  GAPI_AUTH.isSignedIn.listen(updateSigninStatus);
+
+  updateSigninStatus(GAPI_AUTH.isSignedIn.get());
+}
+
+/* Gapi object setup failure callback */
+function auth_failure_callback(error) {
+  // Remove gapi obj from window
+  window.gapi = null;
+
+  GAPI_SETUP_STATUS = STATUS.FAILURE;
+  console.error(error);
 }
 
 export async function gapi_signin() {
   try {
+    // Show signin prompt
     const res = await GAPI_AUTH.signIn();
+
+    // Extract token
     const token = res.getAuthResponse().id_token;
+
+    // Put token in database, and wait to login response
     const { data, status } = await post("/user/provider/google/", {
       auth_token: token,
     });
@@ -44,31 +93,6 @@ export async function gapi_signin() {
 
 export function gapi_signout() {
   GAPI_AUTH.signOut();
-}
-
-function init() {
-  gapi.client
-    .init({
-      apiKey: GAPI_API_KEY,
-      clientId: GAPI_CLIENT_ID,
-      discoveryDocs: GAPI_DISCOVERY_DOCS,
-      scope: GAPI_SCOPES,
-    })
-    .then(onInitSuccessHandler, onInitFaliureHandler);
-}
-
-function onInitSuccessHandler() {
-  // window.gapi = null;
-  GAPI_SETUP_STATUS = GAPI_INIT_STATUS.SUCCESS;
-  GAPI_AUTH = gapi.auth2.getAuthInstance();
-  GAPI_AUTH.isSignedIn.listen(updateSigninStatus);
-  updateSigninStatus(GAPI_AUTH.isSignedIn.get());
-}
-
-function onInitFaliureHandler(error) {
-  // window.gapi = null;
-  GAPI_SETUP_STATUS = GAPI_INIT_STATUS.FAILURE;
-  console.error(error);
 }
 
 function updateSigninStatus(signin) {
@@ -105,7 +129,7 @@ let picker_loaded = false;
 let GAPI_PICKER = null;
 let PICKER = null;
 
-function initPicker() {
+function init_picker_callback() {
   picker_loaded = true;
   PICKER = window.google?.picker;
   createPicker();
@@ -113,17 +137,19 @@ function initPicker() {
 
 export function createPicker() {
   if (picker_loaded && GAPI_TOKEN) {
-    const docsView = new PICKER.ViewGroup(
+    const viewGroup = new PICKER.ViewGroup(
       new PICKER.DocsView(PICKER.ViewId.SPREADSHEETS).setLabel("PPT & DOC")
     )
       .addView(PICKER.ViewId.DOCUMENTS)
       .addView(PICKER.ViewId.PRESENTATIONS);
+
+    const view = new PICKER.DocsView(PICKER.ViewId.SPREADSHEETS).setLabel(
+      "Excel"
+    );
+
     GAPI_PICKER = new PICKER.PickerBuilder()
-      .addViewGroup(docsView)
-      .addView(
-        new PICKER.DocsView(PICKER.ViewId.SPREADSHEETS).setLabel("Excel")
-      )
-      // .addView(new PICKER.DocsUploadView())
+      .addViewGroup(viewGroup)
+      .addView(view)
       .setOAuthToken(GAPI_TOKEN.access_token)
       .setDeveloperKey(GAPI_API_KEY)
       .setCallback(pickerCallback)

@@ -1,13 +1,12 @@
 import {
   Box,
   Button,
-  Icon,
-  IconButton,
   makeStyles,
   Typography,
 } from "@material-ui/core";
 import React from "react";
 import { TextControl } from "../Control";
+import CloseButton from "../Utils/CloseButton";
 
 // Generate CSS classes
 const useStyles = makeStyles((theme) => ({
@@ -58,9 +57,7 @@ function ForgotPassword({ show, login }) {
     <Box className={`${classes.root} ${show ? "active" : ""}`}>
       <Box display="flex" alignItems="center" justifyContent="space-between">
         <Typography className={classes.title}>Forgot Password</Typography>
-        <IconButton onClick={login}>
-          <Icon>cancel</Icon>
-        </IconButton>
+        <CloseButton click={login} />
       </Box>
 
       <Box height={1} display="flex" flexDirection="column">

@@ -1,8 +1,4 @@
-import {
-  Box,
-  makeStyles,
-  useScrollTrigger,
-} from "@material-ui/core";
+import { Box, makeStyles, useScrollTrigger } from "@material-ui/core";
 import NotificationsIcon from "@material-ui/icons/Notifications";
 import React from "react";
 import Breadcrumbs from "./Breadcrumbs";
@@ -23,6 +19,7 @@ const useStyles = makeStyles((theme) => ({
     alignItems: "center",
     position: "sticky",
     top: 0,
+    transition: "box-shadow 0.1s linear",
     [theme.breakpoints.down("xs")]: {
       width: `calc(100% - ${theme.sidebarSmall}px)`,
       left: theme.sidebarSmall,
@@ -33,7 +30,7 @@ const useStyles = makeStyles((theme) => ({
 /**
  * Header component
  * */
-function Header() {
+function Header({ scrollTarget }) {
   // Get styles
   const classes = useStyles();
 
@@ -41,6 +38,7 @@ function Header() {
   const headerScrollTrigger = useScrollTrigger({
     disableHysteresis: true,
     threshold: 50,
+    target: scrollTarget,
   });
 
   return (

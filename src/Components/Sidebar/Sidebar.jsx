@@ -43,32 +43,6 @@ const useStyles = makeStyles((theme) => {
       overflowY: "auto",
       overflowX: "hidden",
       flexGrow: 1,
-      // Hide scroll bar on reduce width
-      [theme.breakpoints.down("xs")]: {
-        "&::-webkit-scrollbar": { display: "none" },
-      },
-      // Scrollbar Container
-      "&::-webkit-scrollbar": { width: 10 },
-      // Scrollbar track
-      "&::-webkit-scrollbar-track": { background: theme.palette.primary.light },
-      // Scrollbar mover
-      "&::-webkit-scrollbar-thumb": {
-        border: `2px solid ${theme.palette.primary.light}`,
-        background: theme.palette.primary.main,
-        borderRadius: 10,
-      },
-      "&::-webkit-scrollbar-thumb:hover": {
-        background: theme.palette.primary.dark,
-      },
-      // Style for nav container on small width
-      "&.close": {
-        // Hide scroll bar on reduce width
-        "&::-webkit-scrollbar": { display: "none" },
-        [theme.breakpoints.down("xs")]: {
-          // Display scroll bar again on complete width
-          "&::-webkit-scrollbar": { display: "block" },
-        },
-      },
     },
 
     // Style for logobtn in sidebar
@@ -95,12 +69,9 @@ const useStyles = makeStyles((theme) => {
 /**
  * Sidebar Component to show logo btn, profile btn and Navigation
  * */
-function Sidebar() {
+function Sidebar({ isOpen, toggleSidebar }) {
   // Get Styles
   const classes = useStyles();
-
-  // React states to isOpen & close sub menu
-  const [isOpen, toggleSidebar] = useState(true);
 
   // React state to change on theme breakpoint
   const xs = useMediaQuery((theme) => theme.breakpoints.down("xs"));
@@ -122,7 +93,9 @@ function Sidebar() {
       <Divider />
 
       <List
-        className={`${classes.navContainer} ${isOpen ^ xs ? "" : "close"}`}
+        className={`${classes.navContainer} custom-sidebar ${
+          isOpen ^ xs ? "close-sidebar" : ""
+        }`}
         disablePadding
       >
         {SidebarData.map(({ title, icon, subMenu, ...rest }, index) => (

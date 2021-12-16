@@ -1,0 +1,25 @@
+.custom-sidebar::-webkit-scrollbar {
+  width: 10px;
+}
+
+.custom-sidebar::-webkit-scrollbar-track {
+  background: #d6d5cf;
+}
+
+.custom-sidebar::-webkit-scrollbar-thumb {
+  border: 2px solid #fff8e5;
+  background: #00a19d;
+  border-radius: 10px;
+}
+
+.custom-sidebar::-webkit-scrollbar-thumb:hover {
+  background: #00a19d;
+}
+
+.custom-sidebar.close-sidebar::-webkit-scrollbar {
+  display: none;
+}
+
+.fullscreen-enabled {
+  background: #fff;
+}

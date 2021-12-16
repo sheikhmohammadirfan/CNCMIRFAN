@@ -5,6 +5,7 @@ import {
   Box,
   makeStyles,
   responsiveFontSizes,
+  Grid,
 } from "@material-ui/core";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import { Flip, toast } from "react-toastify";
@@ -16,11 +17,15 @@ import ProtectedRoutes from "./Components/ProtectedRoutes";
 import Verify from "./Pages/Verify";
 import Home from "./Pages/Home";
 import Poam from "./Pages/Poam";
+import { useState } from "react";
+
+const sidebarSmall = 50;
+const sidebarLarge = 250;
 
 /** Theme generator */
-let themes = createTheme({
-  sidebarSmall: 50,
-  sidebarLarge: 250,
+let theme = createTheme({
+  sidebarSmall,
+  sidebarLarge,
   textOnPrimary: "#ffffff",
   palette: {
     primary: {
@@ -35,13 +40,20 @@ let themes = createTheme({
     },
   },
 });
-themes = responsiveFontSizes(themes);
+theme = responsiveFontSizes(theme);
 
 /** CSS class generator */
 const useStyles = makeStyles((theme) => ({
   body: {
+    flexGrow: 1,
+    width: `calc(100% - ${sidebarSmall}px)`,
+    "&.open": {
+      width: `calc(100% - ${sidebarLarge}px)`,
+    },
+  },
+  wrapper: {
     [theme.breakpoints.down("xs")]: {
-      paddingLeft: themes.sidebarSmall,
+      paddingLeft: sidebarSmall,
     },
   },
 }));
@@ -62,10 +74,17 @@ toast.configure({
 function App() {
   const classes = useStyles();
 
+  // State to get target node, to upate scroll event on header
+  const [scrollTarget, setScrollTarget] = useState();
+  const updateTarget = (target) => target && setScrollTarget(target);
+
+  // State to save scrollbar status
+  const [isSidebarOpen, setSidebar] = useState(false);
+
   return (
-    <ThemeProvider theme={themes}>
+    <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Box minHeight="100vh" minWidth="100vw">
+      <Box height="100vh" width="100vw" overflow="auto" ref={updateTarget}>
         <Router>
           <Switch>
             <Route path="/login" exact>
@@ -81,11 +100,14 @@ function App() {
             <ProtectedRoutes>
               <Box display="flex">
                 <Box>
-                  <Sidebar />
+                  <Sidebar isOpen={isSidebarOpen} toggleSidebar={setSidebar} />
                 </Box>
-                <Box flexGrow={1}>
-                  <Header />
-                  <div className={classes.body}>
+                <Box
+                  flexGrow={1}
+                  className={`${classes.body} ${isSidebarOpen ? "open" : ""}`}
+                >
+                  <Header scrollTarget={scrollTarget} />
+                  <div className={classes.wrapper}>
                     <Route exact path="/">
                       <Home title="HOME" />
                     </Route>

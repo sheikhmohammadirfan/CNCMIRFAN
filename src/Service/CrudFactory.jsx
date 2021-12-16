@@ -43,7 +43,6 @@ async function request(requestOptions) {
 
   try {
     // Make request
-    console.log(method, fullurl, data, headers);
     const response = await axios({
       method,
       url: fullurl,
@@ -60,7 +59,10 @@ async function request(requestOptions) {
     if (method !== "GET" && notify) notification(res.message, "success");
   } catch (e) {
     // If unauthorize then logout user
-    if (e?.response?.status === 401) logout();
+    if (e?.response?.status === 401) {
+      logout();
+      notification("Session expired!", "error");
+    }
 
     // Setup Error response
     res.status = false;
