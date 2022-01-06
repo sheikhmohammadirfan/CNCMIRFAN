@@ -9,7 +9,7 @@ import {
 } from "@material-ui/core";
 import DocumentTitle from "../Components/DocumentTitle";
 import Upload from "../Components/Utils/Upload";
-import DataTable from "../Components/Utils/DataTable";
+import DataTable from "../Components/Utils/DataTable/DataTable";
 import DialogBox from "../Components/Utils/DialogBox";
 import {
   deleteFiles,
@@ -103,7 +103,6 @@ export default function Verify(props) {
   const fetchFiles = async () => {
     setLoading(true);
     const { data, status } = await getFiles();
-    console.log(data);
     status && setFileList(data);
     setLoading(false);
   };
@@ -135,26 +134,25 @@ export default function Verify(props) {
     }
   };
 
-  const getId = (lst) => lst.data[0].text - 1;
-
   // Content for header of table
   const header = {
     data: [
       { text: "ID" },
       { text: "FileName" },
-      { text: "Last Activity", props: { align: "right" } },
+      { text: "Last Activity", params: { align: "right" } },
     ],
   };
 
   // row data
-  const rows = () =>
-    fileList.map((file, index) => ({
+  const rows = () => ({
+    rowData: fileList.map((file, index) => ({
       data: [
         { text: index + 1 },
         { text: file.file_name },
-        { text: file.file.split("/")[5], props: { align: "right" } },
+        { text: file.file.split("/")[5], params: { align: "right" } },
       ],
-    }));
+    })),
+  });
 
   return (
     <Box padding={1} textAlign="center">
@@ -182,13 +180,12 @@ export default function Verify(props) {
         Choose file
       </Button>
 
-      <Box width="90%" maxWidth={600} marginX="auto">
+      <Box width="90%" maxWidth={600} marginY={1} marginX="auto">
         <DataTable
           checkbox={true}
           selectedRows={selectedRows}
           setSelectedRows={setSelectedRows}
-          pagging={10}
-          stickHeader={false}
+          pageSize={10}
           serialNo={false}
           header={header}
           rowList={rows()}

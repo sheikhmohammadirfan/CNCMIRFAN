@@ -1,7 +1,6 @@
 import { Box, Button, CircularProgress, Typography } from "@material-ui/core";
 import React, { useEffect, useState } from "react";
 import {
-  createPicker,
   gapi_signin,
   GAPI_SIGNIN_STATUS,
   gapi_signout,

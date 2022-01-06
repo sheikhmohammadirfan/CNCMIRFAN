@@ -1,9 +1,8 @@
 import { Box, Button, CircularProgress, makeStyles } from "@material-ui/core";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { PasswordControl, TextControl, useForm } from "../Control";
 import { signup } from "../../Service/UserFactory";
 import DocumentTitle from "../DocumentTitle";
-import { GAPI_SIGNIN_STATUS, GAPI_USER } from "../../Service/GAPI";
 
 // Default value for siginup form
 let defaultValue = {
@@ -56,7 +55,6 @@ function Signup({ title, loginPage }) {
   // useForm
   const {
     value: user,
-    setValue: setUser,
     error,
     setError,
     handleInputChange,

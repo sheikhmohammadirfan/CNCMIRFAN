@@ -36,7 +36,7 @@ const TextControl = withStyles({
     label,
     value,
     error = "",
-    removeGutter = false,
+    gutter = true,
     onChange,
     ...others
   }) => (
@@ -47,7 +47,7 @@ const TextControl = withStyles({
       onChange={onChange}
       label={label || name}
       error={error !== ""}
-      helperText={error ? error : removeGutter ? "" : " "}
+      helperText={error ? error : gutter ? " " : ""}
       {...others}
     />
   )
@@ -92,7 +92,7 @@ const CheckboxControl = ({
   name,
   label,
   value,
-  onChange,
+  onChange = () => {},
   ...others
 }) => (
   <CustomCheckbox
@@ -107,7 +107,7 @@ const CheckboxControl = ({
 // Get dropdown input
 const DropdownControl = ({
   name = "dropdown",
-  variant = "default",
+  variant = "standard",
   label,
   value,
   error,
@@ -225,12 +225,12 @@ const SliderControl = ({
   ...other
 }) => {
   const mapLabelToValue = (l) => {
-    const v = markers.find((mark) => mark.label == l);
+    const v = markers.find((mark) => mark.label === l);
     return v ? v.value : 0;
   };
 
   const mapValueToLabel = (v) => {
-    const l = markers.find((mark) => mark.value == v);
+    const l = markers.find((mark) => mark.value === v);
     return l ? l.label : "";
   };
 
@@ -277,7 +277,7 @@ function useForm(defaultValue, validateOnChange, validateInput) {
   // Reset form
   const resetForm = () => {
     setValue(defaultValue);
-    setError();
+    setError({});
   };
 
   return { value, setValue, error, setError, handleInputChange, resetForm };

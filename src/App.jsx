@@ -5,7 +5,6 @@ import {
   Box,
   makeStyles,
   responsiveFontSizes,
-  Grid,
 } from "@material-ui/core";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import { Flip, toast } from "react-toastify";
@@ -52,6 +51,8 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   wrapper: {
+    minHeight: "calc(100vh - 40px)",
+    overflow: "auto",
     [theme.breakpoints.down("xs")]: {
       paddingLeft: sidebarSmall,
     },
@@ -115,7 +116,7 @@ function App() {
                       <Verify title="VERIFY" />
                     </Route>
                     <Route exact path="/support">
-                      <Poam title="POAM Table" />
+                      <Poam title="POAM" />
                     </Route>
                   </div>
                 </Box>

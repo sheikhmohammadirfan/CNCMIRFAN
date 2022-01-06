@@ -1,286 +1,367 @@
 import {
   Box,
   Button,
-  ButtonGroup,
-  Checkbox,
   ClickAwayListener,
+  Grid,
   Icon,
-  IconButton,
   makeStyles,
-  Slide,
-  Tooltip,
   Typography,
 } from "@material-ui/core";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { FullScreen, useFullScreenHandle } from "react-full-screen";
+import { useHistory, useLocation } from "react-router-dom";
 import {
+  columns_width,
+  hidden_columns,
   poam_header,
-  poam_rows,
-  secondaryColumns,
+  secondary_columns,
 } from "../assets/data/PoamData";
+import { TextControl } from "../Components/Control";
 import DocumentTitle from "../Components/DocumentTitle";
-import FormDialog from "../Components/FormDialog";
-import DataTable from "../Components/Utils/DataTable";
+import FormDialog from "../Components/Poam/FormDialog";
+import JustificationDialog from "../Components/Poam/JustificationDialog";
+import PoamHeader from "../Components/Poam/PoamHeader";
+import SecondaryTable from "../Components/Poam/SecondaryTable";
+import UploadPoam from "../Components/Poam/UploadPoam";
+import DataTable from "../Components/Utils/DataTable/DataTable";
+import DialogBox from "../Components/Utils/DialogBox";
+import SkeletonBox from "../Components/Utils/SkeletonBox";
+import {
+  addRow,
+  getData,
+  getLastIndex,
+  getRowData,
+  moveToClose,
+  moveToOpen,
+  updatePoam,
+  updateRow,
+} from "../Service/Poam.service";
 
+// Generate css style
 const useStyle = makeStyles((theme) => ({
-  selection_checkbox: {
-    position: "absolute",
-    top: 0,
-    left: 0,
+  // Style to indicate selected row
+  selected_row: { "& td": { background: "#d4e9e9 !important" } },
+
+  //Header cell style
+  headerCell: { fontWeight: "bold" },
+
+  // Style to make all cell height of 3 line
+  tableCell: {
+    whiteSpace: "pre-line",
+    display: "-webkit-box",
+    WebkitBoxOrient: "vertical",
+    WebkitLineClamp: "3",
+    overflow: "hidden",
   },
-  selected_row: {
-    background: "rgba(56,163,165,0.2)",
-  },
-  secondaryTable_root: {
-    width: "300px",
-    position: "absolute",
-    bottom: 0,
-    left: theme.spacing(3 / 4),
-    zIndex: 5000,
-    padding: 0,
+
+  // Style for table container
+  gridContainer: {
+    "& > div": { maxHeight: "80vh" },
+    "&.zoomed > div": { maxHeight: "85vh" },
   },
 }));
 
-const SecondaryTable = ({ currentRow, closeTable }) => {
+/** POAM PAGE COMPONENT */
+function Poam({ title }) {
   const classes = useStyle();
 
-  return (
-    <Slide in={currentRow != -1} direction="right" mountOnEnter unmountOnExit>
-      <Box className={classes.secondaryTable_root}>
-        <Box>
-          <DataTable
-            style={{ background: "white" }}
-            showIndex={true}
-            verticalBorder={true}
-            rows={[
-              {
-                data: [
-                  {
-                    text: (
-                      <Box
-                        display="flex"
-                        alignItems="center"
-                        justifyContent="space-between"
-                      >
-                        <Typography variant="button">
-                          Secondary Table
-                        </Typography>
-                        <IconButton size="small" onClick={closeTable}>
-                          <Icon>cancel</Icon>
-                        </IconButton>
-                      </Box>
-                    ),
-                    props: {
-                      style: { paddingTop: "6px", paddingBottom: "6px" },
-                      colSpan: 2,
-                    },
-                  },
-                ],
-              },
-              ...[...secondaryColumns].map((index) => ({
-                data: [
-                  {
-                    text: (
-                      <Typography
-                        noWrap={true}
-                        variant="caption"
-                        component="div"
-                      >
-                        {poam_header[index]}
-                      </Typography>
-                    ),
-                    props: {
-                      style: {
-                        maxWidth: "180px",
-                        paddingTop: "6px",
-                        paddingBottom: "6px",
-                        background: "rgba(234, 234, 234, 0.3)",
-                      },
-                    },
-                  },
-                  {
-                    text: (
-                      <Typography
-                        noWrap={true}
-                        variant="caption"
-                        component="div"
-                      >
-                        {poam_rows[currentRow == -1 ? 0 : currentRow][index]}
-                      </Typography>
-                    ),
-                    props: {
-                      style: {
-                        maxWidth: "110px",
-                        paddingTop: "6px",
-                        paddingBottom: "6px",
-                      },
-                    },
-                  },
-                ],
-              })),
-            ]}
-          />
-        </Box>
-      </Box>
-    </Slide>
+  // Fullscreen handler to zoom in and zoom out
+  const fullScreenHandler = useFullScreenHandle();
+  const zoomIn = fullScreenHandler.enter;
+  const zoomOut = fullScreenHandler.exit;
+  const isZoomed = () => fullScreenHandler.active;
+
+  // React hook, to change routes
+  const history = useHistory();
+
+  // React hook, to update state of query params
+  const location = useLocation();
+
+  // React state to maintain loading status
+  const [isDataLoading, setIsDataLoading] = useState(false);
+  const startLoading = () => setIsDataLoading(true);
+  const stopLoading = () => setIsDataLoading(false);
+
+  // React state to store Query params obj
+  const [queryParams, setQueryParams] = useState({});
+  // Get sheet status
+  const isOpenPoam = (params = queryParams) => params.sheet !== "close";
+
+  const [justifyOpen, setJustifyOpen] = useState(false);
+  const openJustify = () => setJustifyOpen(true);
+  const closeJustify = () => setJustifyOpen(false);
+
+  // hook to store selected rows
+  const [selectedRow, setSelectedRow] = useState([]);
+
+  // hook to store index of current clicked row
+  const [currentRow, setcurrentRow] = useState(-1);
+
+  // hook to store index of data to be shown in secondary tabel
+  const [secondaryOpen, setSecondaryOpen] = useState(-1);
+
+  // Change status of poam
+  const onPoamChange = (status = isOpenPoam) =>
+    history.push(`/support?sheet=${status ? "open" : "close"}`);
+  const showOpenPoam = () => onPoamChange(true);
+  const showClosePoam = () => onPoamChange(false);
+
+  // State to managing dailog visibility
+  const [formOpen, setFormOpen] = useState(false);
+  const editRowData = () => {
+    setcurrentRow(selectedRow[0]);
+    setFormOpen(true);
+  };
+  const addNewRow = () => {
+    setcurrentRow(-1);
+    setFormOpen(true);
+  };
+  const closeFormDialog = () => setFormOpen(false);
+
+  // State to save table data
+  const [poamData, setPoamData] = useState();
+
+  // List for all types of columns
+  const [allColumns, setAllColumns] = useState(poam_header);
+  const [hiddenColumns, sethiddenColumns] = useState(hidden_columns);
+  const [secondaryColumns, setSecondaryColumns] = useState(secondary_columns);
+  const [visibleColumns, setVisibleColumns] = useState();
+
+  // Update visible cols on secondary column change
+  useEffect(
+    () =>
+      setVisibleColumns(
+        allColumns.filter((colName) => !secondaryColumns.includes(colName))
+      ),
+    [allColumns, secondaryColumns]
   );
-};
 
-function Poam({ title }) {
-  DocumentTitle(title);
+  // Method to move columns to secondary table
+  const moveToSecondary = (colName) =>
+    setSecondaryColumns((prevCol) => [...prevCol, colName]);
+  // Method to remove columns from secondary table
+  const moveToPrimary = (colName) =>
+    setSecondaryColumns((prevCol) => prevCol.filter((c) => c !== colName));
 
-  const [alignment, setAlignment] = useState("left");
-  const handleAlignment = (e, newAlignment) => {
-    setAlignment(newAlignment);
+  // Fetch data
+  const fetchData = async (params = {}) => {
+    startLoading();
+    const { data, status } = await getData(isOpenPoam(params));
+    if (status) setPoamData(data);
+    stopLoading();
   };
 
-  const [selectedRow, setSelectedRow] = useState([]);
-  const handleSelection = (e, index) => {
-    if (e.target.checked) {
-      setSelectedRow((row) => [...row, index]);
-    } else {
-      setSelectedRow((row) => row.filter((i) => i != index));
+  // Reset Current_Row, Selected_Row & update Query_Params state on route change
+  useEffect(() => {
+    // Set current params
+    const urlSearchParams = new URLSearchParams(location.search);
+    const params = Object.fromEntries(urlSearchParams.entries());
+    setQueryParams(params);
+
+    // Reset table
+    setcurrentRow(-1);
+    setSelectedRow([]);
+
+    fetchData(params);
+  }, [location]);
+
+  // Metho to get row index from lis index
+  const getRowIndex = (lstIndex) =>
+    lstIndex === -1 ? -1 : Object.keys(poamData["POAM ID"])[lstIndex];
+
+  // Header cell component
+  const HeaderCell = ({ text }) => (
+    <Typography noWrap variant="body1" className={classes.headerCell}>
+      {text}
+    </Typography>
+  );
+
+  // Row cell component
+  const RowCell = ({ text }) => (
+    <Typography variant="body2" noWrap className={classes.tableCell}>
+      {text}
+    </Typography>
+  );
+
+  // Method to map header data to table header
+  const mapDataToHeader = () => ({
+    data: visibleColumns.map((txt, index) => ({
+      text: <HeaderCell text={txt} />,
+      css: index === 0 ? { left: 50, zIndex: 2 } : {},
+    })),
+    cellStyle: {
+      fontWeight: "bold",
+      paddingTop: "4px",
+      paddingBottom: "4px",
+    },
+  });
+
+  // Convert data to row cell
+  const mapDataToRow = (lstIndex) =>
+    visibleColumns.map((headerName, index) => ({
+      text: <RowCell text={poamData[headerName][getRowIndex(lstIndex)]} />,
+      css:
+        index === 0
+          ? {
+              left: 50,
+              position: "sticky",
+              zIndex: 1,
+              background: "#fafafa",
+            }
+          : {},
+    }));
+
+  // Combine rows
+  const rows = () => ({
+    rowData: Object.keys(poamData["POAM ID"]).map((_, index) => ({
+      data: mapDataToRow(index),
+      props: {
+        className:
+          selectedRow.some((i) => i === index) || secondaryOpen === index
+            ? classes.selected_row
+            : "",
+        onClick: () => setSecondaryOpen(index),
+      },
+    })),
+    rowStyle: { cursor: "pointer" },
+    cellStyle: {
+      paddingTop: "6px",
+      paddingBottom: "4px",
+      verticalAlign: "top",
+      position: "relative",
+    },
+  });
+
+  // Method to create new row
+  const createNewRow = async (newData) => {
+    let newIndex = getLastIndex(poamData) + 1;
+    const { data, status } = await addRow(newIndex, newData);
+
+    if (status)
+      setPoamData((prevData) =>
+        updatePoam(prevData, data, allColumns, newIndex)
+      );
+  };
+
+  // Method to edit existing row
+  const updateRowData = async (newData) => {
+    const rowIndex = getRowIndex(currentRow);
+    const { data, status } = await updateRow(rowIndex, newData);
+
+    if (status)
+      setPoamData((prevData) =>
+        updatePoam(prevData, data, allColumns, rowIndex)
+      );
+  };
+
+  // Method to move row to & from OPEN & CLOSE
+  const moveRow = async (justification) => {
+    // Get data
+    const rowIndex = getRowIndex(selectedRow[0]);
+    const rowData = getRowData(rowIndex, allColumns, poamData);
+
+    // Add justification
+    rowData.justification = justification;
+
+    // Make api call
+    const { data, status } = await (isOpenPoam()
+      ? moveToClose(rowIndex, rowData)
+      : moveToOpen(rowIndex, rowData));
+
+    // reset data
+    if (status) {
+      setPoamData(data);
+      setSelectedRow([]);
     }
   };
 
-  const [currentRow, setcurrentRow] = useState(-1);
-
-  const [formOpen, setFormOpen] = useState(true);
-  const closeFormDialog = () => setFormOpen(false);
-
-  const classes = useStyle();
+  DocumentTitle(!isOpenPoam() ? "CLOSE " + title : "OPEN " + title);
 
   return (
-    <Box padding={1} textAlign="center">
-      <Box width="90%" maxWidth={900} marginX="auto">
-        <Box
-          display="flex"
-          justifyContent="space-between"
-          paddingTop={1}
-          paddingBottom={1}
-        >
-          <Typography variant="h4" style={{ fontWeight: "bold" }}>
-            File name
-          </Typography>
-          <ButtonGroup
-            color="default"
-            size="small"
-            aria-label="outlined primary button group"
+    <FullScreen handle={fullScreenHandler}>
+      <Box padding={isZoomed() ? 3 : 1}>
+        <PoamHeader
+          selectedRow={selectedRow}
+          zoom={{ isZoomed, zoomIn, zoomOut }}
+          data={poamData}
+          cols={{ allColumns, secondaryColumns, hiddenColumns }}
+          manageCol={{ moveToPrimary, moveToSecondary }}
+          manageRow={{ editRowData, addNewRow, openJustify }}
+          manageSheet={{ isOpenPoam, showOpenPoam, showClosePoam }}
+        />
+
+        {isDataLoading ? (
+          <SkeletonBox text="Loading.." height="60vh" width="100%" />
+        ) : poamData ? (
+          <Grid
+            container
+            spacing={1}
+            className={`${classes.gridContainer} ${isZoomed() ? "zoomed" : ""}`}
           >
-            <Tooltip arrow title="Move to Close POAM">
-              <Button>
-                <Icon>edit_note</Icon>
-              </Button>
-            </Tooltip>
-            <Tooltip arrow title="Delete row">
-              <Button disabled={selectedRow.length !== 1}>
-                <Icon>delete_forever</Icon>
-              </Button>
-            </Tooltip>
-            <Tooltip arrow title="Edit row">
-              <Button disabled={selectedRow.length !== 1}>
-                <Icon>edit</Icon>
-              </Button>
-            </Tooltip>
-            <Button
-              startIcon={<Icon>add</Icon>}
-              variant="contained"
-              disableElevation
-              style={{
-                background: "black",
-                color: "white",
-                fontWeight: "bold",
-              }}
-              onClick={() => setFormOpen(true)}
-            >
-              Create New
-            </Button>
-          </ButtonGroup>
-        </Box>
-        <ClickAwayListener onClickAway={() => setcurrentRow(-1)}>
-          <Box>
-            <DataTable
-              showIndex={true}
-              verticalBorder={true}
-              header={{
-                data: [
-                  {
-                    text: (
-                      <Typography
-                        noWrap={true}
-                        style={{ fontWeight: "bold" }}
-                        variant="body1"
-                      >
-                        Sr. no.
-                      </Typography>
-                    ),
-                  },
-                  ...poam_header
-                    .filter((val, index) => !secondaryColumns.has(index))
-                    .map((txt) => ({
-                      text: (
-                        <Typography
-                          noWrap={true}
-                          style={{ fontWeight: "bold" }}
-                          variant="body1"
-                        >
-                          {txt}
-                        </Typography>
-                      ),
-                    })),
-                ],
-              }}
-              rows={poam_rows.map((rowData, row_index) => ({
-                data: [
-                  {
-                    text: (
-                      <>
-                        <Typography variant="body2" align="center">
-                          {row_index}
-                        </Typography>
-                        <Checkbox
-                          className={classes.selection_checkbox}
-                          size="small"
-                          onChange={(e) => handleSelection(e, row_index)}
-                          onClick={(e) => e.stopPropagation()}
-                        />
-                      </>
-                    ),
-                    props: {
-                      style: {
-                        paddingTop: "6px",
-                        paddingBottom: "4px",
-                        position: "relative",
-                      },
-                    },
-                  },
-                  ...rowData
-                    .filter((val, index) => !secondaryColumns.has(index))
-                    .map((cellData) => ({
-                      text: <Typography variant="body2">{cellData}</Typography>,
-                      props: {
-                        style: { paddingTop: "6px", paddingBottom: "4px" },
-                      },
-                    })),
-                ],
-                props: {
-                  className:
-                    selectedRow.includes(row_index) || currentRow == row_index
-                      ? classes.selected_row
-                      : "",
-                  style: { cursor: "pointer" },
-                  onClick: () => setcurrentRow(row_index),
-                },
-              }))}
-            />
-          </Box>
-        </ClickAwayListener>
+            <Grid item xs={secondaryOpen !== -1 ? 9 : 12}>
+              <DataTable
+                verticalBorder={true}
+                header={mapDataToHeader()}
+                rowList={rows()}
+                checkbox={true}
+                serialNo={false}
+                reiszeTable={true}
+                selectedRows={selectedRow}
+                setSelectedRows={setSelectedRow}
+                headerWrapper={(text) => <HeaderCell text={text} />}
+                rowWrapper={(text) => <RowCell text={text} />}
+                style={{ borderRadius: 0 }}
+                minCellWidth={visibleColumns.map(
+                  (name) => columns_width[allColumns.indexOf(name)]
+                )}
+              />
+            </Grid>
+
+            {secondaryOpen !== -1 && (
+              <Grid item xs={3}>
+                <SecondaryTable
+                  data={poamData}
+                  currentRow={getRowIndex(secondaryOpen)}
+                  columnsList={secondaryColumns.filter(
+                    (name) => !hiddenColumns.includes(name)
+                  )}
+                  closeTable={() => setSecondaryOpen(-1)}
+                  maxHeight={isZoomed() ? "80vh" : "70vh"}
+                />
+              </Grid>
+            )}
+          </Grid>
+        ) : (
+          <UploadPoam fetchData={fetchData} />
+        )}
       </Box>
-      <SecondaryTable
-        currentRow={currentRow}
-        closeTable={() => setcurrentRow(-1)}
-      />
-      <FormDialog open={formOpen} onClose={closeFormDialog} data={""} />
-    </Box>
+
+      {formOpen && (
+        <FormDialog
+          rows={poamData}
+          rowIndex={getRowIndex(currentRow)}
+          open={formOpen}
+          onClose={closeFormDialog}
+          onSubmit={async (val) => {
+            // Do edit or new operation
+            if (currentRow !== -1) await updateRowData(val);
+            else await createNewRow(val);
+            // Reset status
+            setcurrentRow(-1);
+            setSelectedRow([]);
+            setFormOpen(false);
+          }}
+        />
+      )}
+
+      {justifyOpen && (
+        <JustificationDialog
+          isOpen={justifyOpen}
+          onClose={closeJustify}
+          onSubmit={moveRow}
+        />
+      )}
+    </FullScreen>
   );
 }
 
