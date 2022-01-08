@@ -12,8 +12,10 @@ import {
 } from "@material-ui/core";
 import React, { useState } from "react";
 import ManageColumns from "./ManageColumns";
+import DataTable from "../Utils/DataTable/DataTable";
 import DownloadPoam from "./DownloadPoam";
 import { TextControl } from "../Control";
+import jira from "../../assets/img/jira-brands.svg";
 
 const clx = (...params) => params.filter((val) => val).join(" ");
 
@@ -38,7 +40,7 @@ const useStyle = makeStyles((theme) => ({
   // Apply style on search container
   searchContainer: {
     justifyContent: "flex-end",
-    "& > *": { width: 40 },
+    "& > *": { width: 40, height: "max-content" },
   },
 
   // Search input style
@@ -86,17 +88,45 @@ function PoamHeader({
     <>
       {data && (
         <>
-          <Box display="flex">
-            <Typography
-              noWrap
-              variant="body1"
-              style={{ flexGrow: 1, marginRight: "12px" }}
-            >
-              <strong>Poam file</strong>
-              &nbsp;&nbsp; &nbsp;&nbsp;<strong>CSP Name</strong>
-              <br />
-              File name &nbsp;&nbsp;&nbsp; ACME INC.
-            </Typography>
+          <Box
+            display="flex"
+            alignItems="center"
+            justifyContent="space-between"
+          >
+            <DataTable
+              style={{
+                border: "none",
+                marginRight: "10rem",
+                width: "fit-content",
+              }}
+              serialNo={false}
+              rowList={{
+                rowData: [
+                  {
+                    data: [
+                      { text: "File Name", css: { fontWeight: "bold" } },
+                      { text: "CSP Name", css: { fontWeight: "bold" } },
+                      { text: "System Name", css: { fontWeight: "bold" } },
+                      { text: "Agency Name", css: { fontWeight: "bold" } },
+                    ],
+                  },
+                  {
+                    data: [
+                      { text: "POAM_FILE_001.xlsx" },
+                      { text: "ACME INC." },
+                      { text: "HEALTH DEPARTMENT" },
+                      { text: "HEALTH DEPARTMENT" },
+                    ],
+                  },
+                ],
+                cellStyle: {
+                  border: "none",
+                  borderRight: "16px solid transparent",
+                  padding: 2,
+                  textAlign: "center",
+                },
+              }}
+            />
 
             <ButtonGroup
               disableElevation
@@ -107,8 +137,8 @@ function PoamHeader({
               className={classes.searchContainer}
             >
               <Tooltip arrow title="Manage issues">
-                <Button>
-                  <Icon>confirmation_number</Icon>
+                <Button style={{ padding: "5px 15px" }}>
+                  <img src={jira} style={{ height: "24px" }} />
                 </Button>
               </Tooltip>
 
@@ -120,7 +150,17 @@ function PoamHeader({
                   disabled={selectedRow.length !== 1}
                   onClick={openJustify}
                 >
-                  <Icon>{isOpenPoam() ? "lock" : "lock_open"}</Icon>
+                  {isOpenPoam() ? (
+                    <img
+                      src="https://img.icons8.com/ios-filled/24/000000/move-right.png"
+                      style={{ opacity: selectedRow.length !== 1 ? 0.4 : 1 }}
+                    />
+                  ) : (
+                    <img
+                      src="https://img.icons8.com/ios-filled/24/000000/move-left.png"
+                      style={{ opacity: selectedRow.length !== 1 ? 0.4 : 1 }}
+                    />
+                  )}
                 </Button>
               </Tooltip>
 
@@ -158,6 +198,7 @@ function PoamHeader({
               </Tooltip>
             </ButtonGroup>
           </Box>
+
           <Box
             display="flex"
             alignItems="flex-end"
@@ -216,6 +257,7 @@ function PoamHeader({
               )}
             </Box>
           </Box>
+
           <DownloadPoam
             data={data}
             isOpenPoam={isOpenPoam()}

@@ -56,8 +56,8 @@ const useStyle = makeStyles((theme) => ({
 
   // Style for table container
   gridContainer: {
-    "& > div": { maxHeight: "80vh" },
-    "&.zoomed > div": { maxHeight: "85vh" },
+    "& > div": { maxHeight: "75vh" },
+    "&.zoomed > div": { maxHeight: "83vh" },
   },
 }));
 
