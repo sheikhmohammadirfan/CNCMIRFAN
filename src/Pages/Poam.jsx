@@ -18,7 +18,7 @@ import {
   secondaryColumns,
 } from "../assets/data/PoamData";
 import DocumentTitle from "../Components/DocumentTitle";
-import FormDialog from "../Components/FormDialog";
+// import FormDialog from "../Components/FormDialog";
 import DataTable from "../Components/Utils/DataTable";
 
 const useStyle = makeStyles((theme) => ({
@@ -279,7 +279,7 @@ function Poam({ title }) {
         currentRow={currentRow}
         closeTable={() => setcurrentRow(-1)}
       />
-      <FormDialog open={formOpen} onClose={closeFormDialog} data={""} />
+      {/* <FormDialog open={formOpen} onClose={closeFormDialog} data={""} /> */}
     </Box>
   );
 }

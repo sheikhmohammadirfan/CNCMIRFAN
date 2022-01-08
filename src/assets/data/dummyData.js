@@ -1,3 +1,8 @@
+import slack from "../img/integration/slack-2.svg";
+import aws from "../img/integration/aws-2.svg";
+import googleCloud from "../img/integration/google-cloud-3.svg";
+import github from "../img/integration/github-icon-1.svg";
+
 /** Dummy userData for charts */
 export const userData = [
   { name: "Jan", "Active User": 4000 },
@@ -12,4 +17,23 @@ export const userData = [
   { name: "Oct", "Active User": 1000 },
   { name: "Nov", "Active User": 4000 },
   { name: "Dec", "Active User": 3000 },
+];
+
+export const integratedPlatforms = [
+  {
+    name: "Slack",
+    image: slack,
+  },
+  {
+    name: "AWS",
+    image: aws,
+  },
+  {
+    name: "Google Cloud",
+    image: googleCloud,
+  },
+  {
+    name: "GitHub",
+    image: github,
+  },
 ];

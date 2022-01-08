@@ -1,11 +1,19 @@
 import { Avatar, Typography } from "@material-ui/core";
 import React from "react";
 import { logout } from "../../Service/UserFactory";
+import { useHistory } from "react-router-dom";
 import SidebarItem from "./SidebarItem";
 
 /** Generate profile btn with Icon and username
     and on popup show user Setting & logout btn */
 function ProfileBtn({ sidebarStatus, xs }) {
+  const history = useHistory();
+
+  function navigate() {
+    history.push("/profile");
+    // window.location.href = "/profile";
+  }
+
   return (
     <SidebarItem
       text={
@@ -21,7 +29,11 @@ function ProfileBtn({ sidebarStatus, xs }) {
         />
       }
       subMenu={[
-        { title: "Settings", icon: "settings" },
+        {
+          title: "Settings",
+          icon: "settings",
+          onClick: navigate,
+        },
         { title: "Log out", icon: "logout", onClick: logout },
       ]}
       sidebarOpen={sidebarStatus}

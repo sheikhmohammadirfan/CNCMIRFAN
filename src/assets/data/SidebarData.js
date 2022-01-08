@@ -94,7 +94,7 @@ export const SidebarData = [
     icon: "merge_type",
     title: "Integration",
     component: Link,
-    to: "/events",
+    to: "/Integrated_Platforms",
   },
   {
     icon: "settings",

@@ -5,7 +5,6 @@ import {
   Box,
   makeStyles,
   responsiveFontSizes,
-  Grid,
 } from "@material-ui/core";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import { Flip, toast } from "react-toastify";
@@ -17,6 +16,10 @@ import ProtectedRoutes from "./Components/ProtectedRoutes";
 import Verify from "./Pages/Verify";
 import Home from "./Pages/Home";
 import Poam from "./Pages/Poam";
+import Email from "./Pages/Email";
+import Jira from "./Pages/Jira";
+import Profile from "./Pages/Profile";
+import Integrate from "./Pages/Integrate";
 import { useState } from "react";
 
 const sidebarSmall = 50;
@@ -116,6 +119,18 @@ function App() {
                     </Route>
                     <Route exact path="/support">
                       <Poam title="POAM Table" />
+                    </Route>
+                    <Route exact path="/email">
+                      <Email title="EMAIL" />
+                    </Route>
+                    <Route exact path="/issue">
+                      <Jira title="Jira" />
+                    </Route>
+                    <Route exact path="/profile">
+                      <Profile title="PROFILE" />
+                    </Route>
+                    <Route exact path="/Integrated_Platforms">
+                      <Integrate title="Integrated Platforms" />
                     </Route>
                   </div>
                 </Box>
