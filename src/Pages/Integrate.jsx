@@ -40,7 +40,7 @@ export default function Integrate({ title }) {
           <Grid item xs key={index} className={classes.item}>
             <img
               style={{
-                padding: "0.4rem 0.8rem",
+                padding: "0.6rem 1.15rem",
                 width: "100%",
                 height: "100%",
               }}

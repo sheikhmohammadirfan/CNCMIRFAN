@@ -55,6 +55,8 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   wrapper: {
+    minHeight: "calc(100vh - 40px)",
+    overflow: "auto",
     [theme.breakpoints.down("xs")]: {
       paddingLeft: sidebarSmall,
     },
@@ -118,7 +120,7 @@ function App() {
                       <Verify title="VERIFY" />
                     </Route>
                     <Route exact path="/support">
-                      <Poam title="POAM Table" />
+                      <Poam title="POAM" />
                     </Route>
                     <Route exact path="/email">
                       <Email title="EMAIL" />

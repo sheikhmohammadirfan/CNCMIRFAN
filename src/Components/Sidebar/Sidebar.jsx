@@ -8,7 +8,7 @@ import {
   IconButton,
   Divider,
 } from "@material-ui/core";
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { SidebarData } from "../../assets/data/SidebarData";
 import ProfileBtn from "./ProfileBtn";
 import SidebarItem from "./SidebarItem";
@@ -94,7 +94,7 @@ function Sidebar({ isOpen, toggleSidebar }) {
 
       <List
         className={`${classes.navContainer} custom-sidebar ${
-          isOpen ^ xs ? "close-sidebar" : ""
+          !isOpen ? "close-sidebar" : ""
         }`}
         disablePadding
       >

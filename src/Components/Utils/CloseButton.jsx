@@ -4,7 +4,7 @@ import React from "react";
 function CloseButton({ click, type = "contained", ...rest }) {
   return (
     <IconButton onClick={click} {...rest}>
-      <Icon>{type == "text" ? "close" : "cancel"}</Icon>
+      <Icon>{type === "text" ? "close" : "cancel"}</Icon>
     </IconButton>
   );
 }
