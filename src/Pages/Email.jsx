@@ -19,6 +19,9 @@ import { toast } from "react-toastify";
 import sendMail from "../Service/email.service";
 import useScrollBox from "../Components/ScrollBar/useScrollBar";
 import DocumentTitle from "../Components/DocumentTitle";
+import { useLocation } from "react-router-dom";
+import { useEffect } from "react";
+import CloseButton from "../Components/Utils/CloseButton";
 
 const Transition = forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -209,7 +212,6 @@ function Email({ title }) {
   })}`;
   const classes = useStyles();
 
-  const [open, setOpen] = useState(false);
   const [mailAcknowledgement, setMailAcknowledgement] = useState(false);
   const [loader, setLoader] = useState(false);
   const [subject, setSubject] = useState("");
@@ -240,9 +242,13 @@ function Email({ title }) {
     });
   };
 
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
+  const location = useLocation();
+  const [open, setOpen] = useState(false);
+  useEffect(() => {
+    const urlSearchParams = new URLSearchParams(location.search);
+    const params = Object.fromEntries(urlSearchParams.entries());
+    setOpen(params.email);
+  }, [location]);
 
   const handleClose = () => {
     resetFields();
@@ -318,19 +324,7 @@ function Email({ title }) {
   };
 
   return (
-    <div>
-      <Button
-        style={{
-          marginTop: "25%",
-          marginLeft: "45%",
-        }}
-        color="primary"
-        variant="outlined"
-        onClick={handleClickOpen}
-      >
-        Send Mail
-      </Button>
-
+    <>
       <Dialog
         open={mailAcknowledgement}
         TransitionComponent={Transition}
@@ -363,8 +357,17 @@ function Email({ title }) {
         </DialogActions>
       </Dialog>
 
-      <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
-        <DialogTitle>Email</DialogTitle>
+      <Dialog open={open} maxWidth="sm" fullWidth>
+        <DialogTitle>
+          <Box
+            display="flex"
+            justifyContent="space-between"
+            alignItems="center"
+          >
+            <span>Email</span>
+            <CloseButton click={handleClose} />
+          </Box>
+        </DialogTitle>
         <DialogContent>
           <DialogContentText>
             Write Mails To Clients Effectively.
@@ -514,7 +517,7 @@ function Email({ title }) {
           </Box>
         </DialogContent>
       </Dialog>
-    </div>
+    </>
   );
 }
 

@@ -21,20 +21,18 @@ const clx = (...params) => params.filter((val) => val).join(" ");
 
 // Style generator
 const useStyle = makeStyles((theme) => ({
-  // Style for create new row button
-  tabBtn: {
-    borderBottomLeftRadius: 0,
-    borderBottomRightRadius: 0,
-    borderColor: theme.palette.grey[400],
-    borderBottomWidth: 0,
-    "&.active": {
-      background: "black",
+  // Style for tab switching button
+  tabButton: {
+    background: "black",
+    padding: theme.spacing(0.25),
+    borderRadius: `${theme.spacing(1.5)}px ${theme.spacing(1.5)}px 0 0`,
+    paddingBottom: 0,
+    "& > .MuiButton-root": {
       color: "white",
-      fontWeight: "bold",
-      "&:disabled": { borderBottomWidth: 0 },
+      borderRadius: `${theme.spacing(1.5)}px ${theme.spacing(1.5)}px 0 0`,
+      borderBottom: "none",
+      "&:disabled": { color: "black", background: "white" },
     },
-    "&:nth-child(1)": { borderTopRightRadius: 0 },
-    "&:nth-child(2)": { borderTopLeftRadius: 0 },
   },
 
   // Apply style on search container
@@ -81,9 +79,6 @@ function PoamHeader({
   const openDownload = () => setIsDownloadOpen(true);
   const closeDownload = () => setIsDownloadOpen(false);
 
-  // Hook to save visibility of input field
-  const [isInputOpen, setInputOpen] = useState(false);
-
   return (
     <>
       {data && (
@@ -92,6 +87,7 @@ function PoamHeader({
             display="flex"
             alignItems="center"
             justifyContent="space-between"
+            marginY={0.5}
           >
             <DataTable
               style={{
@@ -205,25 +201,17 @@ function PoamHeader({
             justifyContent="space-between"
           >
             <Box>
-              <Button
-                variant="outlined"
-                className={clx(classes.tabBtn, isOpenPoam() && "active")}
-                disabled={isOpenPoam()}
-                onClick={showOpenPoam}
-              >
-                Open
-              </Button>
-              <Button
-                variant="outlined"
-                className={clx(classes.tabBtn, !isOpenPoam() && "active")}
-                disabled={!isOpenPoam()}
-                onClick={showClosePoam}
-              >
-                Close
-              </Button>
+              <ButtonGroup className={classes.tabButton}>
+                <Button disabled={isOpenPoam()} onClick={showOpenPoam}>
+                  Open
+                </Button>
+                <Button disabled={!isOpenPoam()} onClick={showClosePoam}>
+                  Close
+                </Button>
+              </ButtonGroup>
             </Box>
 
-            <Box paddingY={1}>
+            <Box marginY={1} paddingBottom={Number(!isOpenPoam())}>
               <TextControl
                 variant="outlined"
                 placeholder="Search here"

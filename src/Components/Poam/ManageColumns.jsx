@@ -53,7 +53,7 @@ function ManageColumns({
       open={isOpen}
       onOpen={stopTimeout}
       onClose={startTimeout}
-      classes={{ tooltip: `${classes.customTooltip} custom-sidebar` }}
+      classes={{ tooltip: classes.customTooltip }}
       interactive
       {...rest}
       title={

@@ -8,6 +8,8 @@ import {
   TableRow,
   TableCell,
   makeStyles,
+  Button,
+  Typography,
 } from "@material-ui/core";
 import React, { useCallback, useEffect, useRef } from "react";
 import { useState } from "react";
@@ -61,6 +63,12 @@ const useStyles = makeStyles((theme) => ({
     },
   },
 
+  headerCheckbox: {
+    lineHeight: 1,
+    textTransform: "none",
+    marginRight: theme.spacing(1),
+  },
+
   // Vertical border for table
   border: {
     "& tr > td:not(:last-child), & tr > th:not(:last-child)": {
@@ -68,6 +76,37 @@ const useStyles = makeStyles((theme) => ({
     },
   },
 }));
+
+const HeaderCheckbox = ({ isAllChecked, toggleAllRows, selectedCount }) => {
+  const classes = useStyles();
+  // <Checkbox
+  //           color="primary"
+  //           indeterminate={isSomeChecked()}
+  //           checked={isAllChecked()}
+  //           onClick={(e) => {
+  //             toggleAllRows(e.target.checked);
+  //             e.stopPropagation();
+  //           }}
+  //         />
+  return (
+    <Box textAlign="center" width="max-content" paddingX={1}>
+      <Button
+        size="small"
+        variant="outlined"
+        className={classes.headerCheckbox}
+        onClick={(e) => {
+          toggleAllRows(!isAllChecked);
+          e.stopPropagation();
+        }}
+      >
+        {!isAllChecked ? "Select All" : "Deselect All"}
+      </Button>
+      {selectedCount > 0 && (
+        <Typography variant="body2">{selectedCount} items selected</Typography>
+      )}
+    </Box>
+  );
+};
 
 /** Main DataTable Component */
 function DataTable({
@@ -81,6 +120,7 @@ function DataTable({
   verticalBorder = false,
   reiszeTable = false,
   header = { data: [], props: {}, style: {}, cellStyle: {} },
+  // data: { text = "", props = {}, css = {} },
   rowList: {
     rowData = [],
     rowProps = {},
@@ -88,11 +128,11 @@ function DataTable({
     cellProps = {},
     cellStyle = {},
   },
-  // rowData: { text = "", props = {}, style = {} }[],
+  // rowData: { text = "", props = {}, css = {} }[],
   headerWrapper = (val) => val,
   rowWrapper = (val) => val,
   minCellWidth = 200,
-  minCheckboxWidth = 50,
+  minCheckboxWidth = 120,
   className = "",
   ...rest
 }) {
@@ -120,14 +160,10 @@ function DataTable({
     if (checkbox)
       temp.unshift({
         text: (
-          <Checkbox
-            color="primary"
-            indeterminate={isSomeChecked()}
-            checked={isAllChecked()}
-            onClick={(e) => {
-              toggleAllRows(e.target.checked);
-              e.stopPropagation();
-            }}
+          <HeaderCheckbox
+            isAllChecked={isAllChecked()}
+            toggleAllRows={toggleAllRows}
+            selectedCount={selectedRows.length}
           />
         ),
       });
@@ -172,8 +208,6 @@ function DataTable({
       if (checkbox) temp[0] = `${minCheckboxWidth}px`;
     }
 
-    console.log(temp, temp.length);
-
     return temp.join(" ");
   };
 
@@ -189,11 +223,11 @@ function DataTable({
     <TableContainer
       className={`${classes.root} ${
         verticalBorder && classes.border
-      } ${className} custom-sidebar`}
+      } ${className}`}
       {...rest}
     >
       <Table
-        className={`${reiszeTable ? classes.table : ""} custom-sidebar`}
+        className={reiszeTable ? classes.table : ""}
         style={{ gridTemplateColumns: generateTemplate() }}
         ref={tableRef}
       >
@@ -207,13 +241,7 @@ function DataTable({
               <TableCell
                 key={index}
                 {...params}
-                style={{
-                  ...header.cellStyle,
-                  ...css,
-                  ...(index === 0
-                    ? { left: 0, position: "sticky", zIndex: 2 }
-                    : {}),
-                }}
+                style={{ ...header.cellStyle, ...css }}
                 padding={checkbox && index === 0 ? "checkbox" : "normal"}
               >
                 {text}
@@ -238,18 +266,7 @@ function DataTable({
                       key={colIndex}
                       {...cellProps}
                       {...params}
-                      style={{
-                        ...cellStyle,
-                        ...css,
-                        ...(colIndex === 0
-                          ? {
-                              left: 0,
-                              position: "sticky",
-                              zIndex: 1,
-                              background: "#fafafa",
-                            }
-                          : {}),
-                      }}
+                      style={{ ...cellStyle, ...css }}
                       padding={
                         checkbox && colIndex === 0 ? "checkbox" : "normal"
                       }

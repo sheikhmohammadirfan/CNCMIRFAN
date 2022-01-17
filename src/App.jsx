@@ -122,9 +122,6 @@ function App() {
                     <Route exact path="/support">
                       <Poam title="POAM" />
                     </Route>
-                    <Route exact path="/email">
-                      <Email title="EMAIL" />
-                    </Route>
                     <Route exact path="/issue">
                       <Jira title="Jira" />
                     </Route>
@@ -139,6 +136,7 @@ function App() {
               </Box>
             </ProtectedRoutes>
           </Switch>
+          <Email title="EMAIL" />
         </Router>
       </Box>
     </ThemeProvider>

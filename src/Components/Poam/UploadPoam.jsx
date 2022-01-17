@@ -32,8 +32,7 @@ const useStyle = makeStyles((theme) => ({
       fontWeight: "bold",
     },
     "& .wrapper": {
-      height: "50vh",
-      border: `${theme.spacing(1 / 2)}px dashed #0000004d`,
+      height: "80vh",
       borderRadius: theme.shape.borderRadius,
       display: "flex",
       flexDirection: "column",
@@ -105,6 +104,7 @@ function UploadPoam({ fetchData }) {
               multiple
               id="poam-file-upload"
               type="file"
+              value=""
               onChange={(e) => setPickedFile(e.target.files[0])}
               hidden
             />
@@ -120,6 +120,7 @@ function UploadPoam({ fetchData }) {
                   variant="outlined"
                   color="secondary"
                   style={{ maxWidth: "100%", marginBottom: "8px" }}
+                  onDelete={() => setPickedFile(null)}
                 />
                 <Button
                   variant="contained"

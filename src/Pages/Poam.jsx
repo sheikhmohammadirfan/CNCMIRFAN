@@ -39,11 +39,41 @@ import {
 
 // Generate css style
 const useStyle = makeStyles((theme) => ({
-  // Style to indicate selected row
-  selected_row: { "& td": { background: "#d4e9e9 !important" } },
-
   //Header cell style
   headerCell: { fontWeight: "bold" },
+
+  tableStyle: {
+    // Make row cell background white
+    "& tbody td": { background: "#fafafa !important" },
+
+    // Stick rows checkbox & left fo table
+    "& td:nth-child(1)": {
+      position: "sticky !important",
+      left: "0 !important",
+      zIndex: "1 !important",
+    },
+
+    // Stick header checkbox & left fo table
+    "& th:nth-child(1)": {
+      left: "0 !important",
+      zIndex: "2 !important",
+    },
+
+    // Change background color of selected row
+    "& tr.Mui-selected td": { background: "#d4e9e9 !important" },
+
+    // On open poam apply style on first 2 row
+    "&.o": {
+      "& table tbody tr:nth-child(1), & table tbody tr:nth-child(2)": {
+        "& td": {
+          pointerEvents: "none !important",
+          color: `${theme.palette.grey[600]} !important`,
+          "& .MuiCheckbox-root": { color: `#a2a2a2 !important` },
+          "& .MuiTypography-root": { fontWeight: "bold !important" },
+        },
+      },
+    },
+  },
 
   // Style to make all cell height of 3 line
   tableCell: {
@@ -187,7 +217,7 @@ function Poam({ title }) {
   const mapDataToHeader = () => ({
     data: visibleColumns.map((txt, index) => ({
       text: <HeaderCell text={txt} />,
-      css: index === 0 ? { left: 50, zIndex: 2 } : {},
+      css: index === 0 ? { left: 120, zIndex: 2 } : {},
     })),
     cellStyle: {
       fontWeight: "bold",
@@ -203,7 +233,7 @@ function Poam({ title }) {
       css:
         index === 0
           ? {
-              left: 50,
+              left: 120,
               position: "sticky",
               zIndex: 1,
               background: "#fafafa",
@@ -213,14 +243,11 @@ function Poam({ title }) {
 
   // Combine rows
   const rows = () => ({
-    rowData: Object.keys(poamData["POAM ID"]).map((_, index) => ({
-      data: mapDataToRow(index),
+    rowData: Object.keys(poamData["POAM ID"]).map((_, idx) => ({
+      data: mapDataToRow(idx),
       props: {
-        className:
-          selectedRow.some((i) => i === index) || secondaryOpen === index
-            ? classes.selected_row
-            : "",
-        onClick: () => setSecondaryOpen(index),
+        selected: selectedRow.some((i) => i === idx) || secondaryOpen === idx,
+        onClick: () => setSecondaryOpen(idx),
       },
     })),
     rowStyle: { cursor: "pointer" },
@@ -300,6 +327,7 @@ function Poam({ title }) {
           >
             <Grid item xs={secondaryOpen !== -1 ? 9 : 12}>
               <DataTable
+                className={`${classes.tableStyle} ${isOpenPoam() ? "o" : ""}`}
                 verticalBorder={true}
                 header={mapDataToHeader()}
                 rowList={rows()}
