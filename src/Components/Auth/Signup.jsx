@@ -1,15 +1,10 @@
 import { Box, Button, CircularProgress, makeStyles } from "@material-ui/core";
 import React, { useState } from "react";
-import { PasswordControl, TextControl, useForm } from "../Control";
+import { PasswordControl, TextControl, Form } from "../Control";
 import { signup } from "../../Service/UserFactory";
+import { useForm } from "react-hook-form";
 import DocumentTitle from "../DocumentTitle";
-
-// Default value for siginup form
-let defaultValue = {
-  name: "",
-  email: "",
-  password: "",
-};
+import { DisableAutoComplete } from "../Utils/Utils";
 
 const useStyles = makeStyles((theme) => ({
   // Style to apply on login btn
@@ -28,50 +23,32 @@ const useStyles = makeStyles((theme) => ({
 function Signup({ title, loginPage }) {
   DocumentTitle(title);
 
-  // Method to validate input
-  const validateInput = (errObj) => {
-    // Create temp error obj
-    let tempObj = { ...error };
-
-    // Check for error on input field
-    if ("name" in errObj)
-      tempObj.name = errObj.name ? "" : "This field is required.";
-    if ("email" in errObj)
-      tempObj.email =
-        errObj.email && errObj.email.match(/$^|.+@.+..+/)
-          ? ""
-          : "Enter a valid email.";
-    if ("password" in errObj)
-      tempObj.password = errObj.password ? "" : "This field is required.";
-
-    // Set error
-    setError({ ...tempObj });
-
-    // If submit btn pressed, then return value
-    if (errObj === user)
-      return Object.values(tempObj).every((inp) => inp === "");
+  // Apply validation on field
+  const validations = {
+    name: { required: "This field is required." },
+    email: {
+      pattern: {
+        value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+        message: "Invalid email address.",
+      },
+    },
+    password: { required: "This field is required." },
   };
 
-  // useForm
-  const {
-    value: user,
-    error,
-    setError,
-    handleInputChange,
-    resetForm,
-  } = useForm(defaultValue, true, validateInput);
+  // TODO: Reset is not working
+  const { handleSubmit, control, reset } = useForm();
 
   // handle on Submit
-  const submit = async () => {
+  const submit = async (data) => {
     // Check if all input valid and form is not loading
-    if (!isLoading && validateInput(user)) {
+    if (!isLoading) {
       setLoading(true);
       // Call signup Service
-      const status = await signup(user);
+      const status = await signup(data);
       setLoading(false);
       // If success
       if (status) {
-        resetForm();
+        reset();
         loginPage();
       }
     }
@@ -85,32 +62,41 @@ function Signup({ title, loginPage }) {
 
   return (
     <Box display="flex" flexDirection="column" width={1} paddingX={1}>
-      <TextControl
-        name="name"
-        value={user.name}
-        onChange={handleInputChange}
-        error={error.name}
-        size="small"
-      />
-      <TextControl
-        type="email"
-        name="email"
-        value={user.email}
-        onChange={handleInputChange}
-        error={error.email}
-        size="small"
-      />
-      <PasswordControl
-        name="password"
-        value={user.password}
-        onChange={handleInputChange}
-        error={error.password}
-        size="small"
-      />
+      <Form
+        control={control}
+        rules={validations}
+        onSubmit={handleSubmit(submit)}
+      >
+        <TextControl
+          name="name"
+          size="small"
+          fullWidth
+          variant="standard"
+          {...DisableAutoComplete}
+        />
+        <TextControl
+          type="email"
+          name="email"
+          size="small"
+          fullWidth
+          variant="standard"
+          {...DisableAutoComplete}
+        />
+        <PasswordControl
+          name="password"
+          size="small"
+          fullWidth
+          variant="standard"
+        />
 
-      <Button className={classes.submitBtn} onClick={submit}>
-        {isLoading ? <CircularProgress color="inherit" size={35} /> : "Create"}
-      </Button>
+        <Button className={classes.submitBtn} type="submit">
+          {isLoading ? (
+            <CircularProgress color="inherit" size={35} />
+          ) : (
+            "Create"
+          )}
+        </Button>
+      </Form>
     </Box>
   );
 }

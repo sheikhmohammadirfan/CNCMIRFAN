@@ -16,7 +16,6 @@ import {
   poam_header,
   secondary_columns,
 } from "../assets/data/PoamData";
-import { TextControl } from "../Components/Control";
 import DocumentTitle from "../Components/DocumentTitle";
 import FormDialog from "../Components/Poam/FormDialog";
 import JustificationDialog from "../Components/Poam/JustificationDialog";

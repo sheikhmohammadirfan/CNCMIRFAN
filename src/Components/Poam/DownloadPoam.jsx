@@ -129,6 +129,7 @@ function DownloadPoam({
   const exportAsXLSX = () => exportFile("POAM FILE", "xlsx");
   const exportAsCSV = () => exportFile("POAM FILE", "csv");
 
+  // Create component to show text & caption
   const OptionText = ({ text, caption }) => (
     <Box paddingY={1}>
       <Typography style={{ lineHeight: 1 }}>{text}</Typography>
@@ -138,6 +139,7 @@ function DownloadPoam({
     </Box>
   );
 
+  // Component to select columns
   const SelectColumns = () => (
     <Box>
       <OptionText
@@ -170,16 +172,18 @@ function DownloadPoam({
           {allColumns.map((name, index) => (
             <Grid item xs={12} sm={6} key={index}>
               <CheckboxControl
-                name={
+                name={name}
+                label={
                   <Typography noWrap variant="body1">
                     {name}
                   </Typography>
                 }
                 className={classes.checkboxInput}
                 checked={selectCols.includes(index)}
-                onChange={(e) =>
-                  e.target.value ? check(index) : uncheck(index)
-                }
+                onChange={(e) => {
+                  e.target.checked ? check(index) : uncheck(index);
+                  console.log(e.target.checked);
+                }}
               />
             </Grid>
           ))}
@@ -187,6 +191,38 @@ function DownloadPoam({
       )}
     </Box>
   );
+
+  // List of all options to download
+  const optionList = [
+    {
+      val: "All Columns",
+      text: (
+        <OptionText
+          text="All Columns"
+          caption="The file will include all columns i.e. FeDRMP specified and additional columns."
+        />
+      ),
+    },
+    {
+      val: "Default Columns",
+      text: (
+        <OptionText
+          text="Default Columns"
+          caption="The file will include only FeDRMP specified columns."
+        />
+      ),
+    },
+    {
+      val: "Hidden Columns",
+      text: (
+        <OptionText
+          text="Hidden Columns"
+          caption="The file will include only additional columns."
+        />
+      ),
+    },
+    { val: "Selected Columns", text: <SelectColumns /> },
+  ];
 
   return (
     <DialogBox
@@ -202,36 +238,7 @@ function DownloadPoam({
             className={classes.radioStyle}
             value={radioInput}
             onChange={(e) => setRadioInput(e.target.value)}
-            options={[
-              {
-                val: "All Columns",
-                text: (
-                  <OptionText
-                    text="All Columns"
-                    caption="The file will include all columns i.e. FeDRMP specified and additional columns."
-                  />
-                ),
-              },
-              {
-                val: "Default Columns",
-                text: (
-                  <OptionText
-                    text="Default Columns"
-                    caption="The file will include only FeDRMP specified columns."
-                  />
-                ),
-              },
-              {
-                val: "Hidden Columns",
-                text: (
-                  <OptionText
-                    text="Hidden Columns"
-                    caption="The file will include only additional columns."
-                  />
-                ),
-              },
-              { val: "Selected Columns", text: <SelectColumns /> },
-            ]}
+            options={optionList}
           />
         </Box>
       }
