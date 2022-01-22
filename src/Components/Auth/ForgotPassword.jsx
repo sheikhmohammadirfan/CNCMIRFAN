@@ -1,9 +1,4 @@
-import {
-  Box,
-  Button,
-  makeStyles,
-  Typography,
-} from "@material-ui/core";
+import { Box, Button, makeStyles, Typography } from "@material-ui/core";
 import React from "react";
 import { TextControl } from "../Control";
 import CloseButton from "../Utils/CloseButton";
@@ -62,7 +57,11 @@ function ForgotPassword({ show, login }) {
 
       <Box height={1} display="flex" flexDirection="column">
         <Box padding={1} flexGrow={1}>
-          <TextControl fullWidth name="Email id to Recover" />
+          <TextControl
+            fullWidth
+            name="Email id to Recover"
+            variant="standard"
+          />
         </Box>
         <Box padding={1} display="flex" justifyContent="flex-end">
           <Button variant="contained" className={classes.submitBtn}>

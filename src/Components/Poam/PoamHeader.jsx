@@ -12,33 +12,33 @@ import {
 } from "@material-ui/core";
 import React, { useState } from "react";
 import ManageColumns from "./ManageColumns";
+import DataTable from "../Utils/DataTable/DataTable";
 import DownloadPoam from "./DownloadPoam";
 import { TextControl } from "../Control";
+import jira from "../../assets/img/jira-brands.svg";
 
 const clx = (...params) => params.filter((val) => val).join(" ");
 
 // Style generator
 const useStyle = makeStyles((theme) => ({
-  // Style for create new row button
-  tabBtn: {
-    borderBottomLeftRadius: 0,
-    borderBottomRightRadius: 0,
-    borderColor: theme.palette.grey[400],
-    borderBottomWidth: 0,
-    "&.active": {
-      background: "black",
+  // Style for tab switching button
+  tabButton: {
+    background: "black",
+    padding: theme.spacing(0.25),
+    borderRadius: `${theme.spacing(1.5)}px ${theme.spacing(1.5)}px 0 0`,
+    paddingBottom: 0,
+    "& > .MuiButton-root": {
       color: "white",
-      fontWeight: "bold",
-      "&:disabled": { borderBottomWidth: 0 },
+      borderRadius: `${theme.spacing(1.5)}px ${theme.spacing(1.5)}px 0 0`,
+      borderBottom: "none",
+      "&:disabled": { color: "black", background: "white" },
     },
-    "&:nth-child(1)": { borderTopRightRadius: 0 },
-    "&:nth-child(2)": { borderTopLeftRadius: 0 },
   },
 
   // Apply style on search container
   searchContainer: {
     justifyContent: "flex-end",
-    "& > *": { width: 40 },
+    "& > *": { width: 40, height: "max-content" },
   },
 
   // Search input style
@@ -79,24 +79,50 @@ function PoamHeader({
   const openDownload = () => setIsDownloadOpen(true);
   const closeDownload = () => setIsDownloadOpen(false);
 
-  // Hook to save visibility of input field
-  const [isInputOpen, setInputOpen] = useState(false);
-
   return (
     <>
       {data && (
         <>
-          <Box display="flex">
-            <Typography
-              noWrap
-              variant="body1"
-              style={{ flexGrow: 1, marginRight: "12px" }}
-            >
-              <strong>Poam file</strong>
-              &nbsp;&nbsp; &nbsp;&nbsp;<strong>CSP Name</strong>
-              <br />
-              File name &nbsp;&nbsp;&nbsp; ACME INC.
-            </Typography>
+          <Box
+            display="flex"
+            alignItems="center"
+            justifyContent="space-between"
+            marginY={0.5}
+          >
+            <DataTable
+              style={{
+                border: "none",
+                marginRight: "10rem",
+                width: "fit-content",
+              }}
+              serialNo={false}
+              rowList={{
+                rowData: [
+                  {
+                    data: [
+                      { text: "File Name", css: { fontWeight: "bold" } },
+                      { text: "CSP Name", css: { fontWeight: "bold" } },
+                      { text: "System Name", css: { fontWeight: "bold" } },
+                      { text: "Agency Name", css: { fontWeight: "bold" } },
+                    ],
+                  },
+                  {
+                    data: [
+                      { text: "POAM_FILE_001.xlsx" },
+                      { text: "ACME INC." },
+                      { text: "HEALTH DEPARTMENT" },
+                      { text: "HEALTH DEPARTMENT" },
+                    ],
+                  },
+                ],
+                cellStyle: {
+                  border: "none",
+                  borderRight: "16px solid transparent",
+                  padding: 2,
+                  textAlign: "center",
+                },
+              }}
+            />
 
             <ButtonGroup
               disableElevation
@@ -107,8 +133,8 @@ function PoamHeader({
               className={classes.searchContainer}
             >
               <Tooltip arrow title="Manage issues">
-                <Button>
-                  <Icon>confirmation_number</Icon>
+                <Button style={{ padding: "5px 15px" }}>
+                  <img src={jira} style={{ height: "24px" }} />
                 </Button>
               </Tooltip>
 
@@ -120,7 +146,17 @@ function PoamHeader({
                   disabled={selectedRow.length !== 1}
                   onClick={openJustify}
                 >
-                  <Icon>{isOpenPoam() ? "lock" : "lock_open"}</Icon>
+                  {isOpenPoam() ? (
+                    <img
+                      src="https://img.icons8.com/ios-filled/24/000000/move-right.png"
+                      style={{ opacity: selectedRow.length !== 1 ? 0.4 : 1 }}
+                    />
+                  ) : (
+                    <img
+                      src="https://img.icons8.com/ios-filled/24/000000/move-left.png"
+                      style={{ opacity: selectedRow.length !== 1 ? 0.4 : 1 }}
+                    />
+                  )}
                 </Button>
               </Tooltip>
 
@@ -158,31 +194,24 @@ function PoamHeader({
               </Tooltip>
             </ButtonGroup>
           </Box>
+
           <Box
             display="flex"
             alignItems="flex-end"
             justifyContent="space-between"
           >
             <Box>
-              <Button
-                variant="outlined"
-                className={clx(classes.tabBtn, isOpenPoam() && "active")}
-                disabled={isOpenPoam()}
-                onClick={showOpenPoam}
-              >
-                Open
-              </Button>
-              <Button
-                variant="outlined"
-                className={clx(classes.tabBtn, !isOpenPoam() && "active")}
-                disabled={!isOpenPoam()}
-                onClick={showClosePoam}
-              >
-                Close
-              </Button>
+              <ButtonGroup className={classes.tabButton}>
+                <Button disabled={isOpenPoam()} onClick={showOpenPoam}>
+                  Open
+                </Button>
+                <Button disabled={!isOpenPoam()} onClick={showClosePoam}>
+                  Close
+                </Button>
+              </ButtonGroup>
             </Box>
 
-            <Box paddingY={1}>
+            <Box marginY={1} paddingBottom={Number(!isOpenPoam())}>
               <TextControl
                 variant="outlined"
                 placeholder="Search here"
@@ -216,6 +245,7 @@ function PoamHeader({
               )}
             </Box>
           </Box>
+
           <DownloadPoam
             data={data}
             isOpenPoam={isOpenPoam()}

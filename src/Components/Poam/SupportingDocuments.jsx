@@ -9,8 +9,9 @@ import {
   Icon,
   Tooltip,
 } from "@material-ui/core";
-import React, { useState } from "react";
-import { RadioControl, TextControl } from "../Control";
+import React, { useState, useEffect } from "react";
+import { Controller, useForm } from "react-hook-form";
+import { Form, RadioControl, TextControl } from "../Control";
 import CloseButton from "../Utils/CloseButton";
 import DialogBox from "../Utils/DialogBox";
 
@@ -59,45 +60,55 @@ const DocumentChip = ({ type, doc, onDelete }) => {
 const DocumentSelect = ({ open, onClose, onSelect, options }) => {
   const classes = useStyle();
 
-  // React state to save other input
-  const [otherInput, setOtherInput] = useState("");
-  const [otherError, setOtherError] = useState(false);
-  const handleOtherChange = (e) => {
-    const val = e.target.value;
-    setOtherInput(val);
-    setdocType("Other");
+  // Default values of the RHF
+  const defaultValues = {
+    "Document Name": "",
+    "Document Type": "Other",
+    "Other Name": "",
   };
 
-  // React state to get Document name
-  const [docName, setDocName] = useState("");
-  const [docError, setDocError] = useState(false);
-  const handleInputChange = (e) => {
-    const val = e.target.value;
-    setDocName(val);
+  // Validation for input fields
+  const validation = {
+    "Document Name": { required: "This field is required." },
+    "Document Type": { required: "This field is required." },
+    "Other Name": {
+      validate: {
+        requiredIfOther: (val) =>
+          !(getValues("Document Type") === "Other" && val === "") ||
+          "This field is required.",
+      },
+    },
   };
 
-  // Clear the input field
-  const clearInput = () => setDocName("");
+  // Get object
+  const { handleSubmit, control, reset, getValues, setValue, watch } = useForm({
+    defaultValues,
+  });
+
+  // Watch Other Name, to update radio if any value is filled
+  const watchOther = watch("Other Name");
+  useEffect(() => {
+    if (watchOther !== "" && getValues("Document Type") !== "Other")
+      setValue("Document Type", "Other");
+  }, [watchOther]);
 
   // Get filename from the picked file
   const getFileName = (e) => {
     const fileList = e.target.files;
-    if (fileList.length) setDocName(fileList[0].name);
+    if (fileList.length) setValue("Document Name", fileList[0].name);
   };
 
-  // React state to get Document type
-  const [docType, setdocType] = useState("");
-  const handleRadioChange = (e) => setdocType(e.target.value);
+  // Clear the input field
+  const clearInput = () => setValue("Document Name", "");
 
-  // On submit listener
-  const handleSubmit = (e) => {
-    setDocError(docName === "");
-    setOtherError(docType === "Other" && otherInput === "");
-
-    if (docName === "" || (docType === "Other" && otherInput === "")) return;
-
-    onSelect(docType === "Other" ? otherInput : docType, docName);
-  };
+  // Return name of selected documents
+  const submitDoc = (data) =>
+    onSelect(
+      data["Document Type"] === "Other"
+        ? data["Other Name"]
+        : data["Document Type"],
+      data["Document Name"]
+    );
 
   return (
     <DialogBox
@@ -123,74 +134,70 @@ const DocumentSelect = ({ open, onClose, onSelect, options }) => {
       }}
       content={
         <Box>
-          <input
-            id="supporting-doc"
-            type="file"
-            accept="*"
-            onChange={getFileName}
-            hidden
-          />
-          <Box display="flex" alignItems="center">
-            <Tooltip title="Select Document">
-              <Button
-                htmlFor="supporting-doc"
-                component="label"
-                startIcon={<Icon>file_upload</Icon>}
-                color="primary"
-                variant="contained"
-                className={classes.uploadButton}
-                size="large"
+          <Form control={control} rules={validation}>
+            <input
+              id="supporting-doc"
+              type="file"
+              accept="*"
+              onChange={getFileName}
+              hidden
+            />
+            <Box display="flex" alignItems="center">
+              <Tooltip title="Select Document">
+                <Button
+                  htmlFor="supporting-doc"
+                  component="label"
+                  startIcon={<Icon>file_upload</Icon>}
+                  color="primary"
+                  variant="contained"
+                  className={classes.uploadButton}
+                  size="large"
+                />
+              </Tooltip>
+              <TextControl
+                gutter={false}
+                size="small"
+                variant="standard"
+                name="Document Name"
+                fullWidth
               />
-            </Tooltip>
-            <TextControl
-              gutter={false}
-              size="small"
-              variant="standard"
-              label="Document Name"
-              value={docName}
-              onChange={handleInputChange}
-              error={docError ? "This field is required." : ""}
+              <Tooltip title="clear">
+                <Box>
+                  <CloseButton type="text" size="small" click={clearInput} />
+                </Box>
+              </Tooltip>
+            </Box>
+            <Box paddingY={1}>
+              <RadioControl
+                direction="row"
+                name="Document Type"
+                options={[
+                  ...options,
+                  {
+                    val: "Other",
+                    text: (
+                      <TextControl
+                        name="Other Name"
+                        label="Other"
+                        size="small"
+                        variant="standard"
+                        gutter={false}
+                      />
+                    ),
+                  },
+                ]}
+              />
+            </Box>
+            <Button
+              variant="contained"
+              color="primary"
               fullWidth
-            />
-            <Tooltip title="clear">
-              <Box>
-                <CloseButton type="text" size="small" click={clearInput} />
-              </Box>
-            </Tooltip>
-          </Box>
-          <Box paddingY={1}>
-            <RadioControl
-              direction="row"
-              options={[
-                ...options,
-                {
-                  val: "Other",
-                  text: (
-                    <TextControl
-                      label="Other"
-                      size="small"
-                      variant="standard"
-                      gutter={false}
-                      value={otherInput}
-                      onChange={handleOtherChange}
-                      error={otherError ? "This field is required." : ""}
-                    />
-                  ),
-                },
-              ]}
-              value={docType}
-              onChange={handleRadioChange}
-            />
-          </Box>
-          <Button
-            variant="contained"
-            color="primary"
-            fullWidth
-            startIcon={<Icon>add</Icon>}
-            onClick={handleSubmit}
-          >
-            Add Document
-          </Button>
+              startIcon={<Icon>add</Icon>}
+              onClick={handleSubmit(submitDoc)}
+            >
+              Add Document
+            </Button>
+          </Form>
         </Box>
       }
       contentProp={{ style: { paddingLeft: "12px", paddingRight: "12px" } }}
@@ -198,7 +205,7 @@ const DocumentSelect = ({ open, onClose, onSelect, options }) => {
   );
 };
 
-function SupportingDocuments({ value, onChange, options }) {
+function SupportingDocuments({ name, control, options }) {
   const classes = useStyle();
 
   const [openDialog, setOpenDialog] = useState(false);
@@ -264,7 +271,7 @@ function SupportingDocuments({ value, onChange, options }) {
       .join("\n");
 
   // Method to add Doc to given document string
-  const addDocToList = (type, doc) => {
+  const addDocToList = (value, type, doc) => {
     const temp = getDocsFromString(value);
 
     // Check if valid
@@ -281,7 +288,7 @@ function SupportingDocuments({ value, onChange, options }) {
   };
 
   // Method to remove doc from document string
-  const removeDoc = (type, index) => {
+  const removeDoc = (value, type, index) => {
     const temp = getDocsFromString(value);
     const typeIndex = getIndex(temp, type);
     temp[typeIndex].list = temp[typeIndex].list.filter((v, i) => i !== index);
@@ -291,40 +298,46 @@ function SupportingDocuments({ value, onChange, options }) {
   };
 
   return (
-    <List className={classes.documentList}>
-      {openDialog && (
-        <DocumentSelect
-          open={openDialog}
-          onClose={CloseDialog}
-          onSelect={(type, doc) => {
-            onChange(mapDocsToString(addDocToList(type, doc)));
-            CloseDialog();
-          }}
-          options={options}
-        />
-      )}
-      <ListItem>
-        <Box width={1} overflow="hidden">
-          {getDocsFromString(value).map(({ type, list }) =>
-            list.map((doc, index) => (
-              <DocumentChip
-                key={index}
-                type={type}
-                doc={doc}
-                onDelete={() =>
-                  onChange(mapDocsToString(removeDoc(type, index)))
-                }
-              />
-            ))
+    <Controller
+      name={name}
+      control={control}
+      render={({ field: { value, onChange } }) => (
+        <List className={classes.documentList}>
+          {openDialog && (
+            <DocumentSelect
+              open={openDialog}
+              onClose={CloseDialog}
+              onSelect={(type, doc) => {
+                onChange(mapDocsToString(addDocToList(value, type, doc)));
+                CloseDialog();
+              }}
+              options={options}
+            />
           )}
-        </Box>
-      </ListItem>
-      <ListItem>
-        <Button color="primary" variant="contained" onClick={OpenDialog}>
-          Add File
-        </Button>
-      </ListItem>
-    </List>
+          <ListItem>
+            <Box width={1} overflow="hidden">
+              {getDocsFromString(value).map(({ type, list }) =>
+                list.map((doc, index) => (
+                  <DocumentChip
+                    key={index}
+                    type={type}
+                    doc={doc}
+                    onDelete={() =>
+                      onChange(mapDocsToString(removeDoc(value, type, index)))
+                    }
+                  />
+                ))
+              )}
+            </Box>
+          </ListItem>
+          <ListItem>
+            <Button color="primary" variant="contained" onClick={OpenDialog}>
+              Add File
+            </Button>
+          </ListItem>
+        </List>
+      )}
+    />
   );
 }
 

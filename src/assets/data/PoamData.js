@@ -39,8 +39,8 @@ export const secondary_columns = [
 export const hidden_columns = ["justification"];
 
 export const columns_width = [
-  100, 100, 200, 200, 200, 200, 200, 200, 200, 200, 180, 180, 300, 400, 180,
-  150, 200, 200, 150, 150, 150, 150, 150, 400, 400, 300, 150, 300,
+  110, 100, 170, 210, 250, 250, 160, 160, 200, 230, 220, 250, 300, 400, 180,
+  200, 240, 300, 200, 200, 170, 150, 230, 400, 400, 300, 150, 300,
 ];
 
 export const capitalizeList = (lst) =>

@@ -9,7 +9,9 @@ import {
   Divider,
 } from "@material-ui/core";
 import React, { useEffect } from "react";
+import { Link } from "react-router-dom";
 import { SidebarData } from "../../assets/data/SidebarData";
+import { logout } from "../../Service/UserFactory";
 import ProfileBtn from "./ProfileBtn";
 import SidebarItem from "./SidebarItem";
 
@@ -93,9 +95,7 @@ function Sidebar({ isOpen, toggleSidebar }) {
       <Divider />
 
       <List
-        className={`${classes.navContainer} custom-sidebar ${
-          !isOpen ? "close-sidebar" : ""
-        }`}
+        className={`${classes.navContainer} ${!isOpen ? "close-sidebar" : ""}`}
         disablePadding
       >
         {SidebarData.map(({ title, icon, subMenu, ...rest }, index) => (
@@ -117,7 +117,29 @@ function Sidebar({ isOpen, toggleSidebar }) {
 
       <Divider />
 
-      <ProfileBtn sidebarStatus={isOpen} xs={xs} />
+      <SidebarItem
+        sidebarOpen={isOpen}
+        xs={xs}
+        text={
+          <Typography noWrap variant="subtitle1">
+            Settings
+          </Typography>
+        }
+        icon={<Icon>settings</Icon>}
+        component={Link}
+        to="/profile"
+      />
+      <SidebarItem
+        sidebarOpen={isOpen}
+        xs={xs}
+        text={
+          <Typography noWrap variant="subtitle1">
+            Log out
+          </Typography>
+        }
+        icon={<Icon>logout</Icon>}
+        onClick={logout}
+      />
 
       <IconButton
         size="small"

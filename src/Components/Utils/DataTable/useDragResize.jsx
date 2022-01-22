@@ -15,16 +15,11 @@ export const useDragResize = (
     }
 
     // Populate left & width value of list
-    for (let i = 0; i < colCount; i++) {
+    for (let i = 0; i < colCount; i++)
       widthList[i] = {
         left: i === 0 ? 0 : widthList[i - 1].left + widthList[i - 1].width,
         width: Number(widthList[i]),
       };
-      console.log(
-        i,
-        widthList.map((v) => v.width)
-      );
-    }
 
     return widthList;
   };

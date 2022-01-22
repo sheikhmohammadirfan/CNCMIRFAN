@@ -5,13 +5,15 @@ import { poam_header } from "../../assets/data/PoamData";
 import {
   DatepickerControl,
   DropdownControl,
+  Form,
   RadioControl,
   SliderControl,
   TextControl,
-  useForm,
 } from "../Control";
 import CustomAccordion from "../Utils/CustomAccordion";
 import SupportingDocuments from "./SupportingDocuments";
+import { useForm } from "react-hook-form";
+import { useEffect } from "react";
 
 // Style generator
 const useStyle = makeStyles((theme) => ({
@@ -56,17 +58,27 @@ function FormDialog({ open, onClose, rowIndex, onSubmit, rows }) {
     { value: 100, label: "High" },
   ];
 
-  const defaultValue = {};
+  const defaultValues = {};
 
   for (var name of poam_header)
-    defaultValue[name] = rowIndex === -1 ? "" : rows[name][rowIndex];
+    defaultValues[name] =
+      rowIndex === -1
+        ? name.toLowerCase().includes("date")
+          ? undefined
+          : ""
+        : rows[name][rowIndex];
 
-  const { value, handleInputChange } = useForm(defaultValue);
+  const { handleSubmit, control } = useForm({ defaultValues });
+
+  const submitForm = async (data) => {
+    setisLoading(true);
+    await onSubmit(data);
+    setisLoading(false);
+  };
 
   return (
     <DialogBox
       open={open}
-      onClose={onClose}
       title={
         <Typography style={{ fontWeight: "bold" }}>
           {rowIndex !== -1 ? "Edit Row" : "Create New Row"}
@@ -74,321 +86,250 @@ function FormDialog({ open, onClose, rowIndex, onSubmit, rows }) {
       }
       loading={isLoading}
       content={
-        <Grid container spacing={2}>
-          <Grid item xs={12} sm={6}>
-            <FormInput
-              name="POAM ID"
-              value={value["POAM ID"]}
-              disabled={true}
-            />
-          </Grid>
-
-          <Grid item xs={12} sm={6}>
-            <DropdownControl
-              name="Controls"
-              value={value["Controls"]}
-              onChange={handleInputChange}
-              variant="outlined"
-              fullWidth
-              options={controlsList}
-            />
-          </Grid>
-
-          <Grid item xs={12}>
-            <CustomAccordion
-              name="weakness"
-              summary={<TitleWrapper text="Weakness" />}
-              details={
-                <Grid container spacing={2}>
-                  <Grid item xs={12} sm={6}>
-                    <FormInput
-                      name="Weakness Name"
-                      value={value["Weakness Name"]}
-                      onChange={handleInputChange}
-                    />
-                  </Grid>
-
-                  <Grid item xs={12} sm={6}>
-                    <FormInput
-                      name="Weakness Description"
-                      value={value["Weakness Description"]}
-                      onChange={handleInputChange}
-                    />
-                  </Grid>
-
-                  <Grid item xs={12} sm={6}>
-                    <FormInput
-                      name="Weakness Detector Source"
-                      value={value["Weakness Detector Source"]}
-                      onChange={handleInputChange}
-                    />
-                  </Grid>
-
-                  <Grid item xs={12} sm={6}>
-                    <FormInput
-                      name="Weakness Source Identifier"
-                      value={value["Weakness Source Identifier"]}
-                      onChange={handleInputChange}
-                    />
-                  </Grid>
-                </Grid>
-              }
-            />
-          </Grid>
-
-          <Grid item xs={12}>
-            <FormInput
-              name="Asset Identifier"
-              value={value["Asset Identifier"]}
-              onChange={handleInputChange}
-            />
-          </Grid>
-
-          <Grid item xs={12}>
-            <FormInput
-              name="Point of Contact"
-              value={value["Point of Contact"]}
-              onChange={handleInputChange}
-            />
-          </Grid>
-
-          <Grid item xs={12}>
-            <FormInput
-              name="Resources Required"
-              value={value["Resources Required"]}
-              onChange={handleInputChange}
-            />
-          </Grid>
-
-          <Grid item xs={12}>
-            <FormInput
-              name="Overall Remediation Plan"
-              value={value["Overall Remediation Plan"]}
-              onChange={handleInputChange}
-            />
-          </Grid>
-
-          <Grid item xs={12}>
+        <Box>
+          <Form
+            id="create-poam-form"
+            control={control}
+            onSubmit={handleSubmit(submitForm)}
+          >
             <Grid container spacing={2}>
               <Grid item xs={12} sm={6}>
-                <DatepickerControl
-                  name="Original Detection Date"
-                  value={value["Original Detection Date"]}
-                  onChange={handleInputChange}
-                  variant="outlined"
-                  fullWidth
-                />
+                <FormInput name="POAM ID" />
               </Grid>
 
               <Grid item xs={12} sm={6}>
-                <DatepickerControl
-                  name="Scheduled Completion Date"
-                  value={value["Scheduled Completion Date"]}
-                  onChange={handleInputChange}
+                <DropdownControl
+                  name="Controls"
                   variant="outlined"
-                  fullWidth
+                  styleProps={{ fullWidth: true }}
+                  options={controlsList}
                 />
               </Grid>
-            </Grid>
-          </Grid>
 
-          <Grid item xs={12}>
-            <CustomAccordion
-              name="milestone"
-              summary={<TitleWrapper text="Milestone" />}
-              details={
+              <Grid item xs={12}>
+                <CustomAccordion
+                  name="weakness"
+                  summary={<TitleWrapper text="Weakness" />}
+                  details={
+                    <Grid container spacing={2}>
+                      <Grid item xs={12} sm={6}>
+                        <FormInput name="Weakness Name" />
+                      </Grid>
+
+                      <Grid item xs={12} sm={6}>
+                        <FormInput name="Weakness Description" />
+                      </Grid>
+
+                      <Grid item xs={12} sm={6}>
+                        <FormInput name="Weakness Detector Source" />
+                      </Grid>
+
+                      <Grid item xs={12} sm={6}>
+                        <FormInput name="Weakness Source Identifier" />
+                      </Grid>
+                    </Grid>
+                  }
+                />
+              </Grid>
+
+              <Grid item xs={12}>
+                <FormInput name="Asset Identifier" />
+              </Grid>
+
+              <Grid item xs={12}>
+                <FormInput name="Point of Contact" />
+              </Grid>
+
+              <Grid item xs={12}>
+                <FormInput name="Resources Required" />
+              </Grid>
+
+              <Grid item xs={12}>
+                <FormInput name="Overall Remediation Plan" />
+              </Grid>
+
+              <Grid item xs={12}>
                 <Grid container spacing={2}>
                   <Grid item xs={12} sm={6}>
-                    <FormInput
-                      name="Planned Milestones"
-                      value={value["Planned Milestones"]}
-                      onChange={handleInputChange}
-                    />
-                  </Grid>
-
-                  <Grid item xs={12} sm={6}>
-                    <FormInput
-                      name="Milestone Changes"
-                      value={value["Milestone Changes"]}
-                      onChange={handleInputChange}
-                    />
-                  </Grid>
-                </Grid>
-              }
-            />
-          </Grid>
-
-          <Grid item xs={12} sm={6}>
-            <DatepickerControl
-              name="Status Date"
-              value={value["Status Date"]}
-              onChange={handleInputChange}
-              variant="outlined"
-              fullWidth
-            />
-          </Grid>
-
-          <Grid item xs={12}>
-            <CustomAccordion
-              name="vendor"
-              summary={<TitleWrapper text="Vendor" />}
-              details={
-                <Grid container spacing={2}>
-                  <Grid item xs={12}>
-                    <RadioControl
-                      name="Vendor Dependency"
-                      value={value["Vendor Dependency"]}
-                      onChange={handleInputChange}
-                      fullWidth
-                      direction="row"
-                      options={["Yes", "No"]}
-                    />
-                  </Grid>
-
-                  <Grid item xs={12} sm={5}>
                     <DatepickerControl
-                      name="Last Vendor Check-in Date"
-                      value={value["Last Vendor Check-in Date"]}
-                      onChange={handleInputChange}
+                      name="Original Detection Date"
                       variant="outlined"
                       fullWidth
                     />
                   </Grid>
 
-                  <Grid item xs={12} sm={7}>
-                    <FormInput
-                      name="Vendor Dependent Product Name"
-                      value={value["Vendor Dependent Product Name"]}
-                      onChange={handleInputChange}
-                    />
-                  </Grid>
-                </Grid>
-              }
-            />
-          </Grid>
-
-          <Grid item xs={12}>
-            <CustomAccordion
-              name="risk"
-              summary={<TitleWrapper text="Risk" />}
-              details={
-                <Grid container spacing={2}>
-                  <Grid item xs={12}>
-                    <RadioControl
-                      name="Risk Adjustment"
-                      value={value["Risk Adjustment"]}
-                      onChange={handleInputChange}
-                      direction="row"
+                  <Grid item xs={12} sm={6}>
+                    <DatepickerControl
+                      name="Scheduled Completion Date"
+                      variant="outlined"
                       fullWidth
-                      options={["Yes", "No", "Pending"]}
                     />
                   </Grid>
-
-                  <Grid item xs={12} sm={6}>
-                    <Box paddingX={1.5}>
-                      <SliderControl
-                        name="Original Risk Rating"
-                        value={value["Original Risk Rating"]}
-                        onChange={handleInputChange}
-                        step={50}
-                        markers={sliderInput}
-                        fullWidth
-                      />
-                    </Box>
-                  </Grid>
-
-                  <Grid item xs={12} sm={6}>
-                    <Box paddingX={1.5}>
-                      <SliderControl
-                        name="Adjusted Risk Rating"
-                        value={value["Adjusted Risk Rating"]}
-                        onChange={handleInputChange}
-                        step={50}
-                        markers={sliderInput}
-                        fullWidth
-                      />
-                    </Box>
-                  </Grid>
                 </Grid>
-              }
-            />
-          </Grid>
+              </Grid>
 
-          <Grid item xs={12}>
-            <RadioControl
-              name="False Positive"
-              value={value["False Positive"]}
-              onChange={handleInputChange}
-              direction="row"
-              fullWidth
-              options={["Yes", "No"]}
-            />
-          </Grid>
+              <Grid item xs={12}>
+                <CustomAccordion
+                  name="milestone"
+                  summary={<TitleWrapper text="Milestone" />}
+                  details={
+                    <Grid container spacing={2}>
+                      <Grid item xs={12} sm={6}>
+                        <FormInput name="Planned Milestones" />
+                      </Grid>
 
-          <Grid item xs={12}>
-            <RadioControl
-              name="Operational Requirement"
-              value={value["Operational Requirement"]}
-              onChange={handleInputChange}
-              direction="row"
-              fullWidth
-              options={["Yes", "No", "Pending"]}
-            />
-          </Grid>
+                      <Grid item xs={12} sm={6}>
+                        <FormInput name="Milestone Changes" />
+                      </Grid>
+                    </Grid>
+                  }
+                />
+              </Grid>
 
-          <Grid item xs={12}>
-            <FormInput
-              name="Deviation Rationale"
-              value={value["Deviation Rationale"]}
-              onChange={handleInputChange}
-            />
-          </Grid>
+              <Grid item xs={12} sm={6}>
+                <DatepickerControl
+                  name="Status Date"
+                  variant="outlined"
+                  fullWidth
+                />
+              </Grid>
 
-          <Grid item xs={12}>
-            <Box width={1}>
-              <CustomAccordion
-                name="Supporting Documents"
-                summary={<TitleWrapper text="Supporting Documents" />}
-                details={
-                  <SupportingDocuments
-                    value={value["Supporting Documents"]}
-                    onChange={(value) =>
-                      handleInputChange({
-                        target: { name: "Supporting Documents", value },
-                      })
+              <Grid item xs={12}>
+                <CustomAccordion
+                  name="vendor"
+                  summary={<TitleWrapper text="Vendor" />}
+                  details={
+                    <Grid container spacing={2}>
+                      <Grid item xs={12}>
+                        <RadioControl
+                          name="Vendor Dependency"
+                          fullWidth
+                          direction="row"
+                          options={["Yes", "No"]}
+                        />
+                      </Grid>
+
+                      <Grid item xs={12} sm={5}>
+                        <DatepickerControl
+                          name="Last Vendor Check-in Date"
+                          variant="outlined"
+                          fullWidth
+                        />
+                      </Grid>
+
+                      <Grid item xs={12} sm={7}>
+                        <FormInput name="Vendor Dependent Product Name" />
+                      </Grid>
+                    </Grid>
+                  }
+                />
+              </Grid>
+
+              <Grid item xs={12}>
+                <CustomAccordion
+                  name="risk"
+                  summary={<TitleWrapper text="Risk" />}
+                  details={
+                    <Grid container spacing={2}>
+                      <Grid item xs={12}>
+                        <RadioControl
+                          name="Risk Adjustment"
+                          direction="row"
+                          fullWidth
+                          options={["Yes", "No", "Pending"]}
+                        />
+                      </Grid>
+
+                      <Grid item xs={12} sm={6}>
+                        <Box paddingX={1.5}>
+                          <SliderControl
+                            name="Original Risk Rating"
+                            step={50}
+                            markers={sliderInput}
+                            returnLabel
+                            fullWidth
+                          />
+                        </Box>
+                      </Grid>
+
+                      <Grid item xs={12} sm={6}>
+                        <Box paddingX={1.5}>
+                          <SliderControl
+                            name="Adjusted Risk Rating"
+                            step={50}
+                            markers={sliderInput}
+                            returnLabel
+                            fullWidth
+                          />
+                        </Box>
+                      </Grid>
+                    </Grid>
+                  }
+                />
+              </Grid>
+
+              <Grid item xs={12}>
+                <RadioControl
+                  name="False Positive"
+                  direction="row"
+                  fullWidth
+                  options={["Yes", "No"]}
+                />
+              </Grid>
+
+              <Grid item xs={12}>
+                <RadioControl
+                  name="Operational Requirement"
+                  direction="row"
+                  fullWidth
+                  options={["Yes", "No", "Pending"]}
+                />
+              </Grid>
+
+              <Grid item xs={12}>
+                <FormInput name="Deviation Rationale" />
+              </Grid>
+
+              <Grid item xs={12}>
+                <Box width={1}>
+                  <CustomAccordion
+                    name="Supporting Documents"
+                    summary={<TitleWrapper text="Supporting Documents" />}
+                    details={
+                      <SupportingDocuments
+                        name="Supporting Documents"
+                        control={control}
+                        options={[
+                          {
+                            text: "Remediation Evidence",
+                            val: "Remediation Evidence",
+                          },
+                          {
+                            text: "Deviation Request",
+                            val: "Deviation Request",
+                          },
+                        ]}
+                      />
                     }
-                    options={[
-                      {
-                        text: "Remediation Evidence",
-                        val: "Remediation Evidence",
-                      },
-                      { text: "Deviation Request", val: "Deviation Request" },
-                    ]}
                   />
-                }
-              />
-            </Box>
-          </Grid>
+                </Box>
+              </Grid>
 
-          <Grid item xs={12}>
-            <FormInput
-              name="Comments"
-              value={value["Comments"]}
-              onChange={handleInputChange}
-            />
-          </Grid>
+              <Grid item xs={12}>
+                <FormInput name="Comments" />
+              </Grid>
 
-          <Grid item xs={12}>
-            <RadioControl
-              name="Auto-Approve"
-              value={value["Auto-Approve"]}
-              onChange={handleInputChange}
-              direction="row"
-              fullWidth
-              options={["Yes", "No"]}
-            />
-          </Grid>
-        </Grid>
+              <Grid item xs={12}>
+                <RadioControl
+                  name="Auto-Approve"
+                  direction="row"
+                  fullWidth
+                  options={["Yes", "No"]}
+                />
+              </Grid>
+            </Grid>
+          </Form>
+        </Box>
       }
       contentProp={{ className: classes.form_root }}
       actions={[
@@ -404,10 +345,8 @@ function FormDialog({ open, onClose, rowIndex, onSubmit, rows }) {
           variant="contained"
           color="secondary"
           size="large"
-          onClick={() => {
-            setisLoading(true);
-            onSubmit(value);
-          }}
+          form="create-poam-form"
+          type="submit"
         >
           SUBMIT
         </Button>,

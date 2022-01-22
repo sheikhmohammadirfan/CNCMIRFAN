@@ -97,42 +97,14 @@ export const SidebarData = [
     to: "/Integrated_Platforms",
   },
   {
-    icon: "settings",
-    title: "Settings",
-    component: Link,
-    to: "",
+    title: "Utility",
+    icon: "more_horiz",
     subMenu: [
       {
-        title: "Compliance",
+        title: "Email",
         component: Link,
-        to: "/events",
-        icon: "star",
-        subMenu: [
-          {
-            title: "Compliance",
-            component: Link,
-            to: "/events",
-            icon: "star",
-          },
-          {
-            title: "MY TASKS",
-            component: Link,
-            to: "/events",
-            icon: "star",
-          },
-          {
-            title: "MY TASKS",
-            component: Link,
-            to: "/events",
-            icon: "star",
-          },
-          {
-            title: "MY TASKS",
-            component: Link,
-            to: "/events",
-            icon: "star",
-          },
-        ],
+        to: "?email=true",
+        icon: "email",
       },
       {
         title: "MY TASKS",
@@ -145,32 +117,6 @@ export const SidebarData = [
         component: Link,
         to: "/events",
         icon: "star",
-        subMenu: [
-          {
-            title: "Compliance",
-            component: Link,
-            to: "/events",
-            icon: "star",
-          },
-          {
-            title: "MY TASKS",
-            component: Link,
-            to: "/events",
-            icon: "star",
-          },
-          {
-            title: "MY TASKS",
-            component: Link,
-            to: "/events",
-            icon: "star",
-          },
-          {
-            title: "MY TASKS",
-            component: Link,
-            to: "/events",
-            icon: "star",
-          },
-        ],
       },
       {
         title: "MY TASKS",
