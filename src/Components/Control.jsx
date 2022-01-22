@@ -43,8 +43,19 @@ const Form = ({
 
 // Map child component into a controller if control props is passed
 const Field = ({ field, ...rest }) => {
-  // Get control context from form
-  const { control, rules, controlProps } = useContext(ControllerContext);
+  // Get control form props
+  const restControl = {
+    control: rest.control,
+    rules: rest.rules,
+    controlProps: rest.controlProps,
+  };
+
+  // Get control from form context
+  const formControl = useContext(ControllerContext);
+
+  const { control, rules, controlProps } = restControl.control
+    ? restControl
+    : formControl;
 
   return control ? (
     <Controller
@@ -296,43 +307,12 @@ const SliderControl = (props) => {
   );
 };
 
-// Use form function
-function useForm(defaultValue, validateOnChange, validateInput) {
-  // Set react hook, for values
-  const [value, setValue] = useState(defaultValue);
-  // Set react hook, for error
-  const [error, setError] = useState({});
-
-  // Handle input
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    console.log(name, value);
-    // Update input
-    setValue((val) => ({
-      ...val,
-      // clean the input
-      [name]: value,
-    }));
-    // Validate input
-    if (validateOnChange) validateInput({ [name]: value });
-  };
-
-  // Reset form
-  const resetForm = () => {
-    setValue(defaultValue);
-    setError({});
-  };
-
-  return { value, setValue, error, setError, handleInputChange, resetForm };
-}
-
 export {
   Form,
   TextControl,
   PasswordControl,
   CheckboxControl,
-  useForm,
-  SelectControl as DropdownControl,
+  SelectControl,
   DatepickerControl,
   RadioControl,
   SliderControl,

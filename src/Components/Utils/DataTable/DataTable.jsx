@@ -77,37 +77,6 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const HeaderCheckbox = ({ isAllChecked, toggleAllRows, selectedCount }) => {
-  const classes = useStyles();
-  // <Checkbox
-  //           color="primary"
-  //           indeterminate={isSomeChecked()}
-  //           checked={isAllChecked()}
-  //           onClick={(e) => {
-  //             toggleAllRows(e.target.checked);
-  //             e.stopPropagation();
-  //           }}
-  //         />
-  return (
-    <Box textAlign="center" width="max-content" paddingX={1}>
-      <Button
-        size="small"
-        variant="outlined"
-        className={classes.headerCheckbox}
-        onClick={(e) => {
-          toggleAllRows(!isAllChecked);
-          e.stopPropagation();
-        }}
-      >
-        {!isAllChecked ? "Select All" : "Deselect All"}
-      </Button>
-      {selectedCount > 0 && (
-        <Typography variant="body2">{selectedCount} items selected</Typography>
-      )}
-    </Box>
-  );
-};
-
 /** Main DataTable Component */
 function DataTable({
   selectedRows = [],
@@ -132,7 +101,7 @@ function DataTable({
   headerWrapper = (val) => val,
   rowWrapper = (val) => val,
   minCellWidth = 200,
-  minCheckboxWidth = 120,
+  minCheckboxWidth = 50,
   className = "",
   ...rest
 }) {
@@ -160,10 +129,14 @@ function DataTable({
     if (checkbox)
       temp.unshift({
         text: (
-          <HeaderCheckbox
-            isAllChecked={isAllChecked()}
-            toggleAllRows={toggleAllRows}
-            selectedCount={selectedRows.length}
+          <Checkbox
+            color="primary"
+            indeterminate={isSomeChecked()}
+            checked={isAllChecked()}
+            onClick={(e) => {
+              toggleAllRows(e.target.checked);
+              e.stopPropagation();
+            }}
           />
         ),
       });
