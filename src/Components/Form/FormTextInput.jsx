@@ -8,6 +8,8 @@ export default function FormTextInput({
   label,
   required,
   type,
+  defaultValue,
+  disabled,
 }) {
   return (
     <Controller
@@ -18,11 +20,13 @@ export default function FormTextInput({
         <TextField
           type={type || ""}
           required
+          disabled={disabled || false}
           style={{ margin: "0.8rem 0" }}
           helperText={invalid ? "This field is required" : ""}
           size="small"
           error={invalid}
           fullWidth
+          defaultValue={defaultValue || null}
           variant="outlined"
           onChange={onChange}
           value={value}

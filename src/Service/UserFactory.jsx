@@ -7,9 +7,21 @@ function getUser() {
   return null;
 }
 
+// Get integrated plarform status
+function getIntegratedPlatform() {
+  const items = localStorage.getItem("integration");
+  if (items) return JSON.parse(items);
+  return null;
+}
+
 // Set User to Storage
 function setUser(userObj) {
   localStorage.setItem("user", JSON.stringify(userObj));
+}
+
+// Set integrated plarform status
+function setIntegratedPlatform(obj) {
+  localStorage.setItem("integration", JSON.stringify(obj));
 }
 
 // Delete User from Storage
@@ -40,6 +52,7 @@ async function login(details) {
   if (status) {
     setToken(data.access);
     setUser(data.user);
+    setIntegratedPlatform(data.integration);
   }
 
   return status;
@@ -60,6 +73,7 @@ function logout() {
 
 export {
   getUser,
+  getIntegratedPlatform,
   setUser,
   deleteUser,
   getToken,

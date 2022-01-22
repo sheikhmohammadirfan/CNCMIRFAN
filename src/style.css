@@ -26,7 +26,7 @@
   background: #00a19d;
 }
 
-.custom-sidebar.close-sidebar::-webkit-scrollbar {
+.close-sidebar::-webkit-scrollbar {
   display: none;
 }
 

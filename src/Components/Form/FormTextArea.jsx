@@ -13,7 +13,13 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function FormTextArea({ name, control, label, required }) {
+export default function FormTextArea({
+  name,
+  control,
+  label,
+  required,
+  defaultValue,
+}) {
   const classes = useStyles();
   return (
     <Controller
@@ -33,6 +39,7 @@ export default function FormTextArea({ name, control, label, required }) {
           variant="outlined"
           onChange={onChange}
           value={value}
+          defaultValue={defaultValue || null}
           label={label}
           InputProps={{
             classes: { input: classes.messageText },

@@ -29,7 +29,8 @@ import FormTextArea from "../Components/Form/FormTextArea";
 import FormDropdown from "../Components/Form/FormDropdown";
 import FormAttachment from "../Components/Form/FormAttachment";
 import DocumentTitle from "../Components/DocumentTitle";
-import LinkJira from "../Components/LinkJira";
+import LinkJira from "../Components/Jira/LinkJira";
+import FetchAssignee from "../Components/Jira/FetchAssignee";
 import {
   fetchAssignee,
   fetchIssueTypes,
@@ -37,6 +38,7 @@ import {
   createIssue,
 } from "../Service/Jira.service";
 import { AvatarGroup } from "@material-ui/lab";
+import UpdateIssue from "../Components/Jira/UpdateIssue";
 
 const useStyles = makeStyles((theme) => ({
   popup: {
@@ -70,6 +72,7 @@ const defaultValues = {
   issueType: "",
   project: "",
   summary: "",
+  assignee: [],
   fileUpload: [],
 };
 
@@ -112,26 +115,28 @@ export default function Jira({ title }) {
     reset();
   };
 
-  const onSubmit = async (data) => {
-    setLoader(true);
-    const { status } = await createIssue(
-      data.project,
-      data.summary,
-      data.description,
-      data.issueType,
-      selectedAssignee,
-      data.fileUpload
-    );
-    if (!status) return;
+  const onSubmit = (data) => console.log(data);
 
-    setIssueType([]);
-    setProject([]);
-    setOptions([]);
-    setSelectedAssignee([]);
-    setLoader(false);
-    setOpen(false);
-    reset();
-  };
+  // const onSubmit = async (data) => {
+  //   setLoader(true);
+  //   const { status } = await createIssue(
+  //     data.project,
+  //     data.summary,
+  //     data.description,
+  //     data.issueType,
+  //     selectedAssignee,
+  //     data.fileUpload
+  //   );
+  //   if (!status) return;
+
+  //   setIssueType([]);
+  //   setProject([]);
+  //   setOptions([]);
+  //   setSelectedAssignee([]);
+  //   setLoader(false);
+  //   setOpen(false);
+  //   reset();
+  // };
 
   const assignee = () => {
     return (
@@ -247,6 +252,7 @@ export default function Jira({ title }) {
         <CircularProgress color="secondary" />
       </Backdrop>
       <LinkJira />
+      <UpdateIssue />
       <Button variant="contained" color="primary" onClick={handleClickOpen}>
         Create Issue
       </Button>
@@ -277,7 +283,13 @@ export default function Jira({ title }) {
               options={issueType}
               required={true}
             />
-            {assignee()}
+            {/* {assignee()} */}
+            <FetchAssignee
+              name="assignee"
+              label="Assignee"
+              control={control}
+              projectKey={projectKey[0]}
+            />
             <FormTextInput
               name="summary"
               control={control}
@@ -307,7 +319,6 @@ export default function Jira({ title }) {
           </Button>
         </DialogActions>
       </Dialog>
-      {console.log(projectKey)}
     </Box>
   );
 }

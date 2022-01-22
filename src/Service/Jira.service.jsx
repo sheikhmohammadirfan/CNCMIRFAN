@@ -41,5 +41,20 @@ export async function createIssue(
   if (files.length !== 0) {
     formData = Iterate(files, "file[]", formData);
   }
-  return post("/jira/newissue/", formData);
+  return await post("/jira/newissue/", formData);
+}
+
+export async function fetchIssueDetails() {
+  return await get("/jira/fetchissuedetails/TJOF-4/");
+}
+
+export async function updateIssue({ ...updatedValues }) {
+  let formData = new FormData();
+  formData.append("issue_key", "TJOF-4");
+  formData.append("assignee", updateIssue.assignee);
+  formData.append("reporter", updateIssue.reporter);
+  formData.append("components", updateIssue.components);
+  formData.append("customfield_10014", updateIssue.epicLink);
+  formData.append("customfield_10020", updateIssue.epicLink);
+  return await post("/jira/updateissue/", formData);
 }
