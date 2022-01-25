@@ -60,18 +60,6 @@ const useStyle = makeStyles((theme) => ({
 
     // Change background color of selected row
     "& tr.Mui-selected td": { background: "#d4e9e9 !important" },
-
-    // On open poam apply style on first 2 row
-    "&.o": {
-      "& table tbody tr:nth-child(1), & table tbody tr:nth-child(2)": {
-        "& td": {
-          pointerEvents: "none !important",
-          color: `${theme.palette.grey[600]} !important`,
-          "& .MuiCheckbox-root": { color: `#a2a2a2 !important` },
-          "& .MuiTypography-root": { fontWeight: "bold !important" },
-        },
-      },
-    },
   },
 
   // Style to make all cell height of 3 line
@@ -138,7 +126,7 @@ function Poam({ title }) {
   // State to managing dailog visibility
   const [formOpen, setFormOpen] = useState(false);
   const editRowData = () => {
-    setcurrentRow(selectedRow[0]);
+    setcurrentRow(selectedRow[0] + (isOpenPoam() ? 2 : 0));
     setFormOpen(true);
   };
   const addNewRow = () => {
@@ -194,7 +182,7 @@ function Poam({ title }) {
     fetchData(params);
   }, [location]);
 
-  // Metho to get row index from lis index
+  // Method to get row index from lis index
   const getRowIndex = (lstIndex) =>
     lstIndex === -1 ? -1 : Object.keys(poamData["POAM ID"])[lstIndex];
 
@@ -216,7 +204,7 @@ function Poam({ title }) {
   const mapDataToHeader = () => ({
     data: visibleColumns.map((txt, index) => ({
       text: <HeaderCell text={txt} />,
-      css: index === 0 ? { left: 120, zIndex: 2 } : {},
+      css: index === 0 ? { left: 50, zIndex: 2 } : {},
     })),
     cellStyle: {
       fontWeight: "bold",
@@ -232,7 +220,7 @@ function Poam({ title }) {
       css:
         index === 0
           ? {
-              left: 120,
+              left: 50,
               position: "sticky",
               zIndex: 1,
               background: "#fafafa",
@@ -241,22 +229,32 @@ function Poam({ title }) {
     }));
 
   // Combine rows
-  const rows = () => ({
-    rowData: Object.keys(poamData["POAM ID"]).map((_, idx) => ({
-      data: mapDataToRow(idx),
-      props: {
-        selected: selectedRow.some((i) => i === idx) || secondaryOpen === idx,
-        onClick: () => setSecondaryOpen(idx),
+  const rows = () => {
+    const rowData = [];
+    const rowCount = Object.keys(poamData["POAM ID"]).length;
+    const startIndex = isOpenPoam() ? 2 : 0;
+
+    for (let i = startIndex; i < rowCount; i++)
+      rowData.push({
+        data: mapDataToRow(i),
+        props: {
+          selected:
+            selectedRow.indexOf(i - startIndex) !== -1 || secondaryOpen === i,
+          onClick: () => setSecondaryOpen(i),
+        },
+      });
+
+    return {
+      rowData,
+      rowStyle: { cursor: "pointer" },
+      cellStyle: {
+        paddingTop: "6px",
+        paddingBottom: "4px",
+        verticalAlign: "top",
+        position: "relative",
       },
-    })),
-    rowStyle: { cursor: "pointer" },
-    cellStyle: {
-      paddingTop: "6px",
-      paddingBottom: "4px",
-      verticalAlign: "top",
-      position: "relative",
-    },
-  });
+    };
+  };
 
   // Method to create new row
   const createNewRow = async (newData) => {
@@ -283,7 +281,7 @@ function Poam({ title }) {
   // Method to move row to & from OPEN & CLOSE
   const moveRow = async (justification) => {
     // Get data
-    const rowIndex = getRowIndex(selectedRow[0]);
+    const rowIndex = getRowIndex(currentRow);
     const rowData = getRowData(rowIndex, allColumns, poamData);
 
     // Add justification

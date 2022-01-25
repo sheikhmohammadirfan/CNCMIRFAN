@@ -58,6 +58,7 @@ const DocumentChip = ({ type, doc, onDelete }) => {
 };
 
 const DocumentSelect = ({ open, onClose, onSelect, options }) => {
+  console.log("d");
   const classes = useStyle();
 
   // Default values of the RHF

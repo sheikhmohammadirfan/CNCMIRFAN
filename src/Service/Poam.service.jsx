@@ -12,7 +12,6 @@ function getLastIndex(data) {
 
   // Find MAX id
   const max = Math.max(...ids);
-  console.log(max);
   return max;
 }
 

@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { poam_header } from "../../assets/data/PoamData";
 import {
   DatepickerControl,
-  DropdownControl,
+  SelectControl,
   Form,
   RadioControl,
   SliderControl,
@@ -94,11 +94,11 @@ function FormDialog({ open, onClose, rowIndex, onSubmit, rows }) {
           >
             <Grid container spacing={2}>
               <Grid item xs={12} sm={6}>
-                <FormInput name="POAM ID" />
+                <FormInput name="POAM ID" disabled />
               </Grid>
 
               <Grid item xs={12} sm={6}>
-                <DropdownControl
+                <SelectControl
                   name="Controls"
                   variant="outlined"
                   styleProps={{ fullWidth: true }}

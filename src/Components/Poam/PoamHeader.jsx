@@ -24,13 +24,14 @@ const useStyle = makeStyles((theme) => ({
   // Style for tab switching button
   tabButton: {
     background: "black",
-    padding: theme.spacing(0.25),
-    borderRadius: `${theme.spacing(1.5)}px ${theme.spacing(1.5)}px 0 0`,
     paddingBottom: 0,
+    borderBottomLeftRadius: 0,
+    borderBottomRightRadius: 0,
     "& > .MuiButton-root": {
       color: "white",
-      borderRadius: `${theme.spacing(1.5)}px ${theme.spacing(1.5)}px 0 0`,
       borderBottom: "none",
+      "&:nth-child(1)": { borderRadius: "4px 0 0 0" },
+      "&:nth-child(2)": { borderRadius: "0 4px 0 0" },
       "&:disabled": { color: "black", background: "white" },
     },
   },

@@ -4,179 +4,225 @@ import {
   Avatar,
   Box,
   ButtonGroup,
+  Grid,
   Typography,
+  InputAdornment,
+  Icon,
 } from "@material-ui/core";
-import { makeStyles } from "@material-ui/styles";
-import { FormProvider, useForm } from "react-hook-form";
-import { getUser } from "../Service/UserFactory";
-import FormTextInput from "../Components/Form/FormTextInput";
-import FormDropdown from "../Components/Form/FormDropdown";
 import DocumentTitle from "../Components/DocumentTitle";
 import countries from "i18n-iso-countries";
+import {
+  DatepickerControl,
+  SelectControl,
+  PasswordControl,
+  TextControl,
+} from "../Components/Control";
 // Importing desired language
 import enLocale from "i18n-iso-countries/langs/en.json";
-import { FormDateInput } from "../Components/Form/FormDateInput";
+import { makeStyles } from "@material-ui/styles";
 
-const defaultValues = {
-  firstName: "",
-  lastName: "",
-  newPassword: "",
-  confirmPassword: "",
-  mobilePhone: "",
-  country: "",
-  city: "",
-};
-
-const useStyle = makeStyles((theme) => ({
-  nameBox: {
-    display: "flex",
-    width: "100%",
-    justifyContent: "space-between",
-    alignItems: "baseline",
-    // columnGap: "3.2rem",
+const useStyles = makeStyles((theme) => ({
+  container: {
+    width: "60%",
+    margin: `${theme.spacing(2)}px auto`,
+    padding: theme.spacing(2),
+    borderRadius: 6,
   },
-  profileBox: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "flex-start",
-    // width: "60%",
-    border: "1",
-    borderBottomLeftRadius: "6px",
-    borderBottomRightRadius: "6px",
-    borderTop: `3px solid ${theme.palette.primary.main}`,
-    padding: "0.6rem 1.15rem",
-    boxShadow: "1px 2px 6px rgba(0,0,0,0.3)",
+  subtitle: {
+    fontWeight: "bold",
+    borderBottom: `${theme.spacing(2 / 3)}px solid ${theme.palette.grey[300]}`,
   },
 }));
 
 export default function Profile({ title }) {
   DocumentTitle(title);
 
+  const classes = useStyles();
+
   countries.registerLocale(enLocale);
-
-  const classes = useStyle();
-  const userDetails = getUser();
-  const lastUpdated = new Date(userDetails.updated_at).toLocaleString(
-    undefined,
-    {
-      timeZone: "Asia/Kolkata",
-    }
-  );
+d
   const countryObj = countries.getNames("en", { select: "official" });
-  const countryArray = Object.entries(countryObj).map(([key, value]) => {
-    return {
-      label: value,
-      value: value,
-    };
-  });
-  const methods = useForm({ defaultValues: defaultValues });
-  const { handleSubmit, reset, register, control, watch } = methods;
-
-  const onSubmit = (data) => console.log(data);
+  const countryArray = Object.values(countryObj).map((value) => ({
+    text: value,
+    val: value,
+  }));
 
   return (
-    <Box
-      component="div"
-      display="flex"
-      justifyContent="center"
-      alignItems="center"
-      flexWrap="wrap"
-      padding="1rem"
-      // height="100%"
-      // width="100%"
-    >
-      <Box component="div" className={classes.profileBox}>
-        <FormProvider {...methods}>
-          <Box
-            style={{
-              marginBottom: "1rem",
-              borderBottom: "1px solid #aaa",
-            }}
-          >
-            <Box component="div" className={classes.nameBox}>
-              <FormTextInput
-                type="text"
-                name="firstName"
-                label="First Name"
-                control={control}
-              />
-              <FormTextInput
-                type="text"
-                name="lastName"
-                label="Last Name"
-                control={control}
-              />
-            </Box>
-            <FormTextInput
-              type="email"
-              name="email"
-              label="Email"
-              control={control}
-              defaultValue={userDetails.email}
-              disabled={true}
-            />
-          </Box>
-          <Box
-            component="div"
-            className={classes.nameBox}
-            style={{ columnGap: "1.5rem" }}
-          >
-            <FormTextInput
-              type="number"
-              name="mobilePhone"
-              label="Mobile Phone"
-              control={control}
-            />
-            <FormDateInput
-              name="birthDate"
-              label="Birth Date"
-              control={control}
-            />
-          </Box>
+    <Box>
+      <Box className={classes.container}>
+        <Grid container spacing={2}>
+          <Grid item xs={12}>
+            <Grid contrinar>
+              <Typography variant="h6" className={classes.subtitle}>
+                Personal Details
+              </Typography>
+            </Grid>
+          </Grid>
 
-          {/* <FormTextInput
-            type="password"
-            name="newPassword"
-            label="New Password"
-            control={control}
-          />
-          <FormTextInput
-            type="password"
-            name="confirmPassword"
-            label="Confirm Password"
-            control={control}
-          /> */}
-          <Box component="div" className={classes.nameBox}>
-            <FormDropdown
-              name="country"
-              label="Country"
-              control={control}
-              options={countryArray}
-            />
+          <Grid item xs={12}>
+            <Grid container spacing={2}>
+              <Grid item xs={6}>
+                <TextControl
+                  variant="outlined"
+                  size="small"
+                  name="First Name"
+                  gutter={false}
+                  fullWidth
+                />
+              </Grid>
+              <Grid item xs={6}>
+                <TextControl
+                  variant="outlined"
+                  size="small"
+                  name="Last Name"
+                  gutter={false}
+                  fullWidth
+                />
+              </Grid>
+              <Grid item xs={6}>
+                <TextControl
+                  variant="outlined"
+                  size="small"
+                  name="Contact No."
+                  gutter={false}
+                  fullWidth
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <Icon>call</Icon>
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+              </Grid>
+              <Grid item xs={6}>
+                <DatepickerControl
+                  name="Date Of Birth"
+                  size="small"
+                  variant="outlined"
+                  fullWidth
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextControl
+                  name="Room/Flat no, Street"
+                  variant="outlined"
+                  size="small"
+                  fullWidth
+                  gutter={false}
+                />
+              </Grid>
+              <Grid item xs={8}>
+                <TextControl
+                  name="Area / Locality"
+                  variant="outlined"
+                  size="small"
+                  fullWidth
+                  gutter={false}
+                />
+              </Grid>
+              <Grid item xs={4}>
+                <TextControl
+                  name="City"
+                  variant="outlined"
+                  size="small"
+                  fullWidth
+                  gutter={false}
+                />
+              </Grid>
+              <Grid item xs={8}>
+                <TextControl
+                  name="State"
+                  variant="outlined"
+                  size="small"
+                  fullWidth
+                  gutter={false}
+                />
+              </Grid>
+              <Grid item xs={4}>
+                <TextControl
+                  name="Pincode"
+                  variant="outlined"
+                  size="small"
+                  fullWidth
+                  gutter={false}
+                />
+              </Grid>
+              <Grid item xs={6}>
+                <SelectControl
+                  name="Country"
+                  options={countryArray}
+                  variant="outlined"
+                  styleProps={{ fullWidth: true, size: "small" }}
+                />
+              </Grid>
+            </Grid>
+            <Grid item xs={12} style={{ textAlign: "right" }}>
+              <Button variant="outlined" color="primary">
+                Update details
+              </Button>
+            </Grid>
+          </Grid>
 
-            <FormTextInput name="city" label="City" control={control} />
-          </Box>
-        </FormProvider>
-        <Box component="label">Last Updated</Box>
-        <Typography
-          style={{
-            color: "#aaa",
-            borderBottom: "1px solid #000",
-            marginBottom: "1rem",
-          }}
-        >
-          {lastUpdated}
-        </Typography>
+          <Grid item xs={12}>
+            <Grid contrinar>
+              <Typography variant="h6" className={classes.subtitle}>
+                User Credentials
+              </Typography>
+            </Grid>
+          </Grid>
 
-        <Button
-          type="submit"
-          color="primary"
-          variant="contained"
-          style={{ marginLeft: "auto" }}
-          onClick={() => handleSubmit(onSubmit)}
-        >
-          update
-        </Button>
+          <Grid item xs={12}>
+            <Grid container spacing={2}>
+              <Grid item xs={3}>
+                <Typography>Email:</Typography>
+              </Grid>
+              <Grid item xs={9}>
+                <TextControl
+                  variant="outlined"
+                  size="small"
+                  name=""
+                  value="mr.irshad@gmail.com"
+                  disabled={true}
+                  gutter={false}
+                  fullWidth
+                />
+              </Grid>
+
+              <Grid item xs={3}>
+                <Typography>New password:</Typography>
+              </Grid>
+              <Grid item xs={9}>
+                <PasswordControl
+                  variant="outlined"
+                  size="small"
+                  name=""
+                  gutter={false}
+                  fullWidth
+                />
+              </Grid>
+
+              <Grid item xs={3}>
+                <Typography>Confirm password:</Typography>
+              </Grid>
+              <Grid item xs={9}>
+                <PasswordControl
+                  variant="outlined"
+                  size="small"
+                  name=""
+                  gutter={false}
+                  fullWidth
+                />
+              </Grid>
+
+              <Grid item xs={12} style={{ textAlign: "right" }}>
+                <Button variant="outlined" color="primary">
+                  Change Password
+                </Button>
+              </Grid>
+            </Grid>
+          </Grid>
+        </Grid>
       </Box>
       {/* </ButtonGroup> */}
     </Box>

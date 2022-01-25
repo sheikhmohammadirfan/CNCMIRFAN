@@ -247,7 +247,7 @@ function Email({ title }) {
   useEffect(() => {
     const urlSearchParams = new URLSearchParams(location.search);
     const params = Object.fromEntries(urlSearchParams.entries());
-    setOpen(params.email);
+    setOpen(params.email === "true");
   }, [location]);
 
   const handleClose = () => {

@@ -6,33 +6,32 @@ import Signup from "../Components/Auth/Signup";
 import ForgotPassword from "../Components/Auth/ForgotPassword";
 import DocumentTitle from "../Components/DocumentTitle";
 import svgBackground from "../assets/img/login_background.svg";
-import logo from "../assets/img/company_logo_large.webp";
+import logo from "../assets/img/company_logo.png";
 import SingleSignon from "../Components/Auth/SingleSignon";
 
 // CSS class generator
 const useStyles = makeStyles((theme) => ({
   // Style for backgroud page
   page: {
-    minHeight: "100vh",
-    height: "min-content",
-    padding: theme.spacing(1),
+    height: "100vh",
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    background: "rgb(64, 86, 181, 0.1)",
-    backgroundImage: `url(${svgBackground}), linear-gradient(to right bottom, #D5EEBB, #7FC8A9)`,
-    backgroundSize: "cover",
-    backgroundRepeat: "no-repeat",
+    background: "rgb(200, 200, 255, 0.4)",
   },
 
   // Root grid container of page
   root: {
-    maxWidth: "90%",
-    background: `linear-gradient(to right bottom , ${theme.palette.primary.light}, ${theme.palette.primary.dark})`,
-    borderRadius: 2 * theme.shape.borderRadius,
-    padding: theme.spacing(1.5),
-    [theme.breakpoints.up("md")]: { maxWidth: "80%" },
-    [theme.breakpoints.up("lg")]: { maxWidth: "70%" },
+    borderTop: "1px solid rgb(64, 86, 181, 0.2)",
+    borderBottom: "1px solid rgb(64, 86, 181, 0.2)",
+    width: "100vw",
+    background: "white",
+    padding: `0 ${theme.spacing(20)}px`,
+    background: "#fafaff",
+    justifyContent: "center",
+    alignItems: "center",
+    [theme.breakpoints.down("sm")]: { padding: `0 ${theme.spacing(10)}px` },
+    [theme.breakpoints.down("xs")]: { padding: "0" },
   },
 
   // Form Container
@@ -41,17 +40,14 @@ const useStyles = makeStyles((theme) => ({
     overflow: "hidden",
     width: "100%",
     maxWidth: 350,
-    marginLeft: "auto", // Push form on right on large screen
+    marginRight: "auto",
     padding: `0 ${theme.spacing(2.5)}px`,
     paddingBottom: theme.spacing(1),
     borderRadius: 4 * theme.shape.borderRadius,
-    backgroundColor: theme.palette.background.paper,
     [theme.breakpoints.down("md")]: { padding: `0 ${theme.spacing(2)}px` },
-    [theme.breakpoints.down("sm")]: { padding: `0 ${theme.spacing(1.5)}px` },
-    // Center align form in small devices
-    [theme.breakpoints.down("xs")]: {
-      marginRight: "auto",
+    [theme.breakpoints.down("sm")]: {
       padding: `0 ${theme.spacing(1)}px`,
+      margin: "auto",
     },
   },
 
@@ -135,13 +131,10 @@ function Auth({ title }) {
   return (
     <Box className={classes.page}>
       <Grid container spacing={2} className={classes.root}>
-        <Grid item xs={12} sm={5} md={7}>
-          <Box textAlign="center" style={{ color: "white" }}>
-            <img src={logo} alt="logo" width="100%" />
-            <Hidden xsDown>
-              <Typography variant="h1" color="inherit">
-                CNCM
-              </Typography>
+        <Grid item sm={12} md={6}>
+          <Box textAlign="center">
+            <img src={logo} alt="logo" width="100%" style={{ maxWidth: 225 }} />
+            <Hidden smDown>
               <Typography variant="h4" color="inherit">
                 Welcome
               </Typography>
@@ -152,7 +145,7 @@ function Auth({ title }) {
           </Box>
         </Grid>
 
-        <Grid item xs={12} sm={7} md={5}>
+        <Grid item sm={12} md={6}>
           <main className={classes.formContainer}>
             <Box paddingTop={2} paddingBottom={3}>
               <Box className={classes.formHeading}>
@@ -183,7 +176,7 @@ function Auth({ title }) {
               </Box>
             </Box>
 
-            <SingleSignon />
+            {/* <SingleSignon /> */}
 
             <ForgotPassword
               title="FORGOT PASSWORD"
