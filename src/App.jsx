@@ -17,7 +17,8 @@ import Verify from "./Pages/Verify";
 import Home from "./Pages/Home";
 import Poam from "./Pages/Poam";
 import Email from "./Pages/Email";
-import Jira from "./Pages/Jira";
+import CreateIssue from "./Components/Jira/CreateIssue";
+import UpdateIssue from "./Components/Jira/UpdateIssue";
 import Profile from "./Pages/Profile";
 import Integrate from "./Pages/Integrate";
 import { useState } from "react";
@@ -122,9 +123,7 @@ function App() {
                     <Route exact path="/support">
                       <Poam title="POAM" />
                     </Route>
-                    <Route exact path="/issue">
-                      <Jira title="Jira" />
-                    </Route>
+
                     <Route exact path="/profile">
                       <Profile title="PROFILE" />
                     </Route>
@@ -137,6 +136,8 @@ function App() {
             </ProtectedRoutes>
           </Switch>
           <Email title="EMAIL" />
+          <CreateIssue title="Create Issue" />
+          <UpdateIssue title="Update Issue" />
         </Router>
       </Box>
     </ThemeProvider>

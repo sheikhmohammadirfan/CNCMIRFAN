@@ -1,4 +1,4 @@
-import { post, get } from "./CrudFactory";
+import { post, get, patch } from "./CrudFactory";
 import { Iterate } from "../Components/Utils/Iterate";
 
 export async function linkWithJira(link, email, api_token) {
@@ -49,12 +49,21 @@ export async function fetchIssueDetails() {
 }
 
 export async function updateIssue({ ...updatedValues }) {
+  const { data, status } = await fetchAssignee(updatedValues.project);
+  if (!status) return;
+  const reporter = data.find((dt) => dt.displayName === updatedValues.reporter);
+
   let formData = new FormData();
   formData.append("issue_key", "TJOF-4");
-  formData.append("assignee", updateIssue.assignee);
-  formData.append("reporter", updateIssue.reporter);
-  formData.append("components", updateIssue.components);
-  formData.append("customfield_10014", updateIssue.epicLink);
-  formData.append("customfield_10020", updateIssue.epicLink);
-  return await post("/jira/updateissue/", formData);
+  formData.append("assignee", updatedValues.assignee.id);
+  formData.append("description", updatedValues.description);
+  formData.append("summary", updatedValues.summary);
+  formData.append("duedate", updatedValues.duedate);
+  formData.append("reporter", reporter.id);
+  formData.append("components", updatedValues.components);
+  formData.append("labels", updatedValues.labels);
+  formData.append("priority", updatedValues.priority);
+  formData.append("customfield_10014", updatedValues.epicLink);
+  formData.append("customfield_10020", updatedValues.sprint);
+  return await patch("/jira/updateissue/", formData);
 }

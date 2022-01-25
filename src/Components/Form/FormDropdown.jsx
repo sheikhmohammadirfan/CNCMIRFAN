@@ -13,7 +13,7 @@ export default function FormDropDown({
   const generateSingleOptions = () => {
     return options.map((option) => {
       return (
-        <MenuItem key={option.label} value={option.value}>
+        <MenuItem key={option.label} value={`${option.value}`}>
           {option.label}
         </MenuItem>
       );
@@ -30,22 +30,24 @@ export default function FormDropDown({
         rules={{ required: required || false }}
         name={name}
         control={control}
-        render={({ field: { onChange, value }, fieldState: { invalid } }) => (
-          <Select
-            required={required ? true : false}
-            error={invalid}
-            variant="outlined"
-            fullWidth
-            onChange={onChange}
-            value={value}
-            displayEmpty
-          >
-            <MenuItem value="">
-              <span style={{ color: "#888" }}>{label}</span>
-            </MenuItem>
-            {generateSingleOptions()}
-          </Select>
-        )}
+        render={({ field: { onChange, value }, fieldState: { invalid } }) => {
+          return (
+            <Select
+              required={required ? true : false}
+              error={invalid}
+              variant="outlined"
+              fullWidth
+              onChange={onChange}
+              value={value}
+              displayEmpty
+            >
+              <MenuItem value="">
+                <span style={{ color: "#888" }}>{label}</span>
+              </MenuItem>
+              {generateSingleOptions()}
+            </Select>
+          );
+        }}
       />
     </FormControl>
   );

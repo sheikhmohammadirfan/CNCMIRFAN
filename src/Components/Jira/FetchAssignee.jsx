@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   TextField,
   IconButton,
@@ -13,12 +13,33 @@ import { Add } from "@material-ui/icons";
 import { AvatarGroup, Autocomplete } from "@material-ui/lab";
 import { Controller, useFormContext } from "react-hook-form";
 
-export default function FetchAssignee({ name, label, control, projectKey }) {
+export default function FetchAssignee({
+  name,
+  label,
+  control,
+  projectKey,
+  preAssigned = "",
+  selectedElements,
+  setSelectedElements,
+  multiple = true,
+}) {
   const [options, setOptions] = useState([]);
-  const [selectedAssignee, setSelectedAssignee] = useState([]);
   const [loading, setLoading] = useState(false);
   const [show, setShow] = useState(false);
   const methods = useFormContext();
+
+  useEffect(() => {
+    async function preFetch() {
+      if (preAssigned) {
+        const { data, status } = await fetchAssignee(projectKey);
+        if (!status) return;
+        setSelectedElements?.([
+          data.find((dt) => dt.displayName === preAssigned),
+        ]);
+      }
+    }
+    preFetch();
+  }, [preAssigned]);
 
   return (
     <Controller
@@ -26,7 +47,7 @@ export default function FetchAssignee({ name, label, control, projectKey }) {
       control={control}
       render={({ field: { onChange } }) => (
         <div style={{ position: "relative" }}>
-          <Typography>Assignee</Typography>
+          <Typography>{label}</Typography>
           <div
             style={{
               display: "flex",
@@ -54,9 +75,9 @@ export default function FetchAssignee({ name, label, control, projectKey }) {
             >
               <Add />
             </IconButton>
-            {selectedAssignee && (
+            {selectedElements && (
               <div style={{ display: "flex" }} className="avatar">
-                {selectedAssignee.map((assignee) => (
+                {selectedElements.map((assignee) => (
                   <AvatarGroup max={4}>
                     <Tooltip
                       TransitionComponent={Zoom}
@@ -95,12 +116,12 @@ export default function FetchAssignee({ name, label, control, projectKey }) {
               freeSolo
               onChange={(event, value) => {
                 if (!value) return;
-                if (selectedAssignee.includes(value)) return;
-                setSelectedAssignee([...selectedAssignee, value]);
-                console.log(selectedAssignee);
+                if (selectedElements.includes(value)) return;
+                setSelectedElements([...selectedElements, value]);
+                console.log(selectedElements);
                 console.log(methods.getValues(name));
-                // methods.setValue(name, JSON.stringify(selectedAssignee));
-                onChange([...selectedAssignee, value]);
+                // methods.setValue(name, JSON.stringify(selectedElements));
+                onChange([...selectedElements, value]);
               }}
               options={options}
               getOptionLabel={(option) => option.displayName}

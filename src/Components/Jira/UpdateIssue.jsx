@@ -17,13 +17,19 @@ import {
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/styles";
 import { FormProvider, useForm } from "react-hook-form";
+import { FormDateInput } from "../Form/FormDateInput";
+import {
+  fetchIssueTypes,
+  fetchIssueDetails,
+  updateIssue,
+} from "../../Service/Jira.service";
+import { useLocation } from "react-router-dom";
 import FormTextInput from "../Form/FormTextInput";
 import FormTextArea from "../Form/FormTextArea";
 import FormDropdown from "../Form/FormDropdown";
 import FormAttachment from "../Form/FormAttachment";
-import { FormDateInput } from "../Form/FormDateInput";
-import { fetchIssueTypes, fetchIssueDetails } from "../../Service/Jira.service";
 import FetchAssignee from "./FetchAssignee";
+import { useParams } from "../Utils/Hooks/useParams";
 
 const defaultValues = {
   description: "",
@@ -55,43 +61,48 @@ export default function UpdateIssue() {
   const [open, setOpen] = useState(false);
   const [loader, setLoader] = useState(false);
   const [issues, seTIssues] = useState(false);
-  const [showContent, setShowContent] = useState(true);
   const watcher = watch(["issueType", "assignee"]);
   const [components, setComponents] = useState([]);
   const [sprint, setSprint] = useState([]);
+  const [selectedAssignee, setSelectedAssignee] = useState([]);
+
+  // const location = useLocation();
   // useEffect(() => {
-  //   getIssueDetails();
-  //   return () => {
-  //     console.log("unmounted");
-  //   };
-  // }, []);
+  //   const urlSearchParams = new URLSearchParams(location.search);
+  //   const params = Object.fromEntries(urlSearchParams.entries());
+  //   setOpen(params.updateIssue === true);
+  // }, [location]);
+
+  const { getParams, deleteParams, location } = useParams();
+  useEffect(() => {
+    if (getParams().updateIssue === "true") {
+      console.log("run");
+      handleOpen();
+    }
+  }, [location]);
 
   useEffect(() => {
     if (fetchedDetails) {
       Object.entries(fetchedDetails).forEach(([name, value]) => {
-        setValue(name, value);
+        name === "sprint" ? setValue(name, value[0].id) : setValue(name, value);
       });
       setComponents(
         fetchedDetails.components.map((obj) => ({
-          label: obj.name,
-          value: obj.name,
+          label: obj,
+          value: obj,
         }))
       );
-      setSprint(dropDownFormat(fetchedDetails.sprint));
+      setSprint(
+        fetchedDetails.sprint.map((obj) => ({ label: obj.name, value: obj.id }))
+      );
     }
   }, [fetchedDetails]);
-
-  const dropDownFormat = (data) => {
-    return data.map((obj) => ({ label: obj.name, value: obj.id }));
-  };
 
   const handleOpen = async () => {
     setLoader(true);
 
     const { data, status } = await fetchIssueDetails();
     if (!status) return;
-
-    console.log(data);
 
     setFetchedDetails({
       assignee: data.assignee,
@@ -106,6 +117,7 @@ export default function UpdateIssue() {
       priority: data.priority,
       reporter: data.reporter,
       summary: data.summary,
+      project: data.project,
     });
 
     const { data: issueData, status: issueStatus } = await fetchIssueTypes();
@@ -116,26 +128,28 @@ export default function UpdateIssue() {
     setOpen(true);
   };
   const handleClose = () => {
-    // setOpen(false);
-    console.log(fetchedDetails);
+    setOpen(false);
+    deleteParams("updateIssue");
+    // console.log(fetchedDetails);
   };
 
-  const getIssueDetails = async () => {
+  const onSubmit = async (fields) => {
     setLoader(true);
 
+    const { data, status } = await updateIssue({
+      ...fields,
+      assignee: selectedAssignee[0],
+    });
     setLoader(false);
-    setShowContent(true);
+    if (!status) return;
+    setOpen(false);
   };
 
   return (
-    <Box component="div">
+    <>
       <Backdrop style={{ zIndex: "100" }} open={loader}>
         <CircularProgress color="secondary" />
       </Backdrop>
-      <Button variant="contained" color="primary" onClick={handleOpen}>
-        Update Issue
-      </Button>
-
       <Dialog
         maxWidth="xs"
         fullWidth
@@ -153,77 +167,89 @@ export default function UpdateIssue() {
               options={issues}
               required={true}
             />
-            {/* {issueTypeWatcher && getIssueDetails()} */}
-            {showContent && (
-              <Box>
-                <FormTextInput
-                  name="summary"
-                  control={control}
-                  label="Summary"
-                  required={true}
-                />
-                <FormTextArea
-                  name="description"
-                  control={control}
-                  label="Description"
-                  required={true}
-                />
-                <FormTextInput
-                  name="reporter"
-                  control={control}
-                  label="Reporter"
-                />
-                <FormTextInput
-                  name="labels"
-                  control={control}
-                  label="Labels"
-                  required={true}
-                />
-                <FormDropdown
-                  name="priority"
-                  label="Priority"
-                  control={control}
-                  options={temporary}
-                  required={true}
-                />
 
-                {/* <FetchAssignee
-                  name="assignee"
-                  label="Assignee"
+            <Box>
+              <FormTextInput
+                name="summary"
+                control={control}
+                label="Summary"
+                required={true}
+              />
+              <FormTextArea
+                name="description"
+                control={control}
+                label="Description"
+                required={true}
+              />
+              <FormTextInput
+                name="reporter"
+                control={control}
+                label="Reporter"
+              />
+              {/* <FetchAssignee
+                  name="reporter"
+                  label="Reporter"
                   control={control}
-                  projectKey={projectKey}
+                  projectKey={fetchedDetails?.project || ""}
+                  preAssigned={fetchedDetails?.reporter}
+                  selectedElements={reporter}
+                  setSelectedElements={setReporter}
+                  multiple={false}
                 /> */}
 
-                <FormTextInput
-                  name="epicLink"
-                  control={control}
-                  label="Epic Link"
-                />
+              <FormTextInput
+                name="labels"
+                control={control}
+                label="Labels"
+                required={true}
+              />
+              <FormDropdown
+                name="priority"
+                label="Priority"
+                control={control}
+                options={temporary}
+                required={true}
+              />
 
-                <FormDropdown
-                  name="components"
-                  label="Components"
-                  control={control}
-                  options={components}
-                  required={true}
-                />
+              <FetchAssignee
+                name="assignee"
+                label="Assignee"
+                control={control}
+                projectKey={fetchedDetails?.project || ""}
+                preAssigned={fetchedDetails?.assignee}
+                selectedElements={selectedAssignee}
+                setSelectedElements={setSelectedAssignee}
+              />
 
-                <FormDropdown
-                  name="sprint"
-                  label="Sprint"
-                  control={control}
-                  options={sprint}
-                  required={true}
-                />
+              <FormTextInput
+                name="epicLink"
+                control={control}
+                label="Epic Link"
+              />
 
-                <FormDateInput
-                  name="duedate"
-                  label="Due Date"
-                  control={control}
-                />
-                <FormAttachment name="attachment" />
-              </Box>
-            )}
+              <FormDropdown
+                name="components"
+                label="Components"
+                control={control}
+                options={components}
+                required={true}
+              />
+
+              <FormDropdown
+                name="sprint"
+                label="Sprint"
+                control={control}
+                options={sprint}
+                required={true}
+              />
+
+              <FormDateInput
+                name="duedate"
+                label="Due Date"
+                control={control}
+              />
+              <FormAttachment name="attachment" />
+            </Box>
           </FormProvider>
         </DialogContent>
         <DialogActions>
@@ -233,13 +259,13 @@ export default function UpdateIssue() {
           <Button
             type="submit"
             color="primary"
-            onClick={handleSubmit((data) => console.log(data, watcher[0]))}
+            onClick={handleSubmit(onSubmit)}
             variant="contained"
           >
             Save
           </Button>
         </DialogActions>
       </Dialog>
-    </Box>
+    </>
   );
 }
