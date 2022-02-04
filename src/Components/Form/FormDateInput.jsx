@@ -1,15 +1,15 @@
 import React, { useState } from "react";
-import DateFnsUtils from "@date-io/date-fns";
+import MomentUtils from "@date-io/moment";
 import {
   KeyboardDatePicker,
   MuiPickersUtilsProvider,
 } from "@material-ui/pickers";
 import { Controller } from "react-hook-form";
-const DATE_FORMAT = "yyyy-MM-dd";
+const DATE_FORMAT = "yyyy-MM-DD";
 
 export const FormDateInput = ({ name, control, label, defaultValue }) => {
   return (
-    <MuiPickersUtilsProvider utils={DateFnsUtils}>
+    <MuiPickersUtilsProvider utils={MomentUtils}>
       <Controller
         name={name}
         control={control}

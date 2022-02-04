@@ -1,9 +1,10 @@
-import { Box, makeStyles, Slide, Typography, Zoom } from "@material-ui/core";
+import { Box, Typography, Zoom } from "@material-ui/core";
 import React from "react";
 import CloseButton from "../Utils/CloseButton";
 import DataTable from "../Utils/DataTable/DataTable";
 
-function SecondaryTable({
+/* SECONDARY TALBE COMPONENT */
+export default function SecondaryTable({
   data,
   columnsList,
   currentRow,
@@ -62,7 +63,7 @@ function SecondaryTable({
           >
             <Typography variant="button">Secondary Table</Typography>
             <CloseButton size="small" click={closeTable} />
-        </Box>
+          </Box>
         ),
         params: { colSpan: 2 },
         css: { paddingTop: "6px", paddingBottom: "6px" },
@@ -84,5 +85,3 @@ function SecondaryTable({
     </Zoom>
   );
 }
-
-export default SecondaryTable;

@@ -5,19 +5,15 @@ import {
   Icon,
   makeStyles,
   Tooltip,
-  CircularProgress,
-  Grid,
-  Typography,
   InputAdornment,
 } from "@material-ui/core";
 import React, { useState } from "react";
 import ManageColumns from "./ManageColumns";
+import ManageJira from "./ManageJira";
 import DataTable from "../Utils/DataTable/DataTable";
 import DownloadPoam from "./DownloadPoam";
-import { TextControl } from "../Control";
+import { TextControl } from "../Utils/Control";
 import jira from "../../assets/img/jira-brands.svg";
-
-const clx = (...params) => params.filter((val) => val).join(" ");
 
 // Style generator
 const useStyle = makeStyles((theme) => ({
@@ -59,16 +55,23 @@ const useStyle = makeStyles((theme) => ({
   },
 }));
 
-function PoamHeader({
+/* POAM HEADER COMPONENT */
+export default function PoamHeader({
   selectedRow,
   zoom: { isZoomed, zoomIn, zoomOut },
-  data,
+  poam: { id, poamData, poamName },
   cols: { allColumns, secondaryColumns, hiddenColumns },
   manageCol: { moveToPrimary, moveToSecondary },
   manageRow: { editRowData, addNewRow, openJustify },
   manageSheet: { isOpenPoam, showOpenPoam, showClosePoam },
+  manageJira: { containIssue, showCreateIssue, showUpdateIssue },
 }) {
   const classes = useStyle();
+
+  // hook to Jira open / close status of Jira column
+  const [isJiraOpen, setIsJiraOpen] = useState(false);
+  const openJira = () => setIsJiraOpen(true);
+  const closeJira = () => setIsJiraOpen(false);
 
   // hook to manage open / close status of manage column
   const [isManageOpen, setIsManageOpen] = useState(false);
@@ -82,7 +85,7 @@ function PoamHeader({
 
   return (
     <>
-      {data && (
+      {poamData && (
         <>
           <Box
             display="flex"
@@ -109,7 +112,7 @@ function PoamHeader({
                   },
                   {
                     data: [
-                      { text: "POAM_FILE_001.xlsx" },
+                      { text: poamName },
                       { text: "ACME INC." },
                       { text: "HEALTH DEPARTMENT" },
                       { text: "HEALTH DEPARTMENT" },
@@ -133,11 +136,28 @@ function PoamHeader({
               aria-label="outlined primary button group"
               className={classes.searchContainer}
             >
-              <Tooltip arrow title="Manage issues">
-                <Button style={{ padding: "5px 15px" }}>
-                  <img src={jira} style={{ height: "24px" }} />
+              <ManageJira
+                isOpen={isJiraOpen}
+                closeMenu={closeJira}
+                checkIssue={containIssue}
+                createDialog={showCreateIssue}
+                updateDialog={showUpdateIssue}
+              >
+                <Button
+                  disabled={selectedRow.length !== 1}
+                  style={{ padding: "5px 15px" }}
+                  onClick={openJira}
+                >
+                  <img
+                    src={jira}
+                    alt="JIRA"
+                    style={{
+                      height: "24px",
+                      opacity: selectedRow.length !== 1 ? 0.4 : 1,
+                    }}
+                  />
                 </Button>
-              </Tooltip>
+              </ManageJira>
 
               <Tooltip
                 arrow
@@ -149,11 +169,13 @@ function PoamHeader({
                 >
                   {isOpenPoam() ? (
                     <img
+                      alt="move-close"
                       src="https://img.icons8.com/ios-filled/24/000000/move-right.png"
                       style={{ opacity: selectedRow.length !== 1 ? 0.4 : 1 }}
                     />
                   ) : (
                     <img
+                      alt="move-open"
                       src="https://img.icons8.com/ios-filled/24/000000/move-left.png"
                       style={{ opacity: selectedRow.length !== 1 ? 0.4 : 1 }}
                     />
@@ -248,7 +270,8 @@ function PoamHeader({
           </Box>
 
           <DownloadPoam
-            data={data}
+            poamID={id}
+            data={poamData}
             isOpenPoam={isOpenPoam()}
             open={isDownloadOpen}
             close={closeDownload}
@@ -260,5 +283,3 @@ function PoamHeader({
     </>
   );
 }
-
-export default PoamHeader;

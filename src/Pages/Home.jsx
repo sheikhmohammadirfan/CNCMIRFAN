@@ -5,13 +5,15 @@ import { useLayoutEffect, useState } from "react";
 import DocumentTitle from "../Components/DocumentTitle";
 import Drive from "../Components/Drive";
 
-// Add event listener on window width
+/* Add event listener on window width */
 function useWindowSize() {
+  // height & width resize listener
   const [size, setSize] = useState([0, 0]);
+
+  // Add event on mounting & remvoe on unmounting
   useLayoutEffect(() => {
-    function updateSize() {
-      setSize([window.innerWidth]);
-    }
+    const updateSize = () => setSize([window.innerWidth]);
+
     window.addEventListener("resize", updateSize);
     updateSize();
     return () => window.removeEventListener("resize", updateSize);
@@ -19,7 +21,7 @@ function useWindowSize() {
   return size;
 }
 
-/** Home component */
+/* Home component */
 export default function Home(props) {
   // Get width
   const [width] = useWindowSize();

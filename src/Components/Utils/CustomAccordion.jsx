@@ -7,7 +7,8 @@ import {
 } from "@material-ui/core";
 import React from "react";
 
-function CustomAccordion({
+/* Custom accordion component with some default porperty */
+export default function CustomAccordion({
   name,
   expandIcon = <Icon>arrow_drop_down</Icon>,
   summary,
@@ -26,10 +27,10 @@ function CustomAccordion({
       >
         {summary}
       </AccordionSummary>
+
       <Divider style={{ marginBottom: "6px" }} />
+
       <AccordionDetails {...detailProps}>{details}</AccordionDetails>
     </Accordion>
   );
 }
-
-export default CustomAccordion;

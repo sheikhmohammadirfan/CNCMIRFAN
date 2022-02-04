@@ -11,40 +11,39 @@ import {
 } from "@material-ui/core";
 import React, { useState, useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { Form, RadioControl, TextControl } from "../Control";
+import { RadioControl, TextControl } from "../Utils/Control";
 import CloseButton from "../Utils/CloseButton";
 import DialogBox from "../Utils/DialogBox";
 
 const useStyle = makeStyles((theme) => ({
+  // style for list-item
   documentList: {
     width: "100%",
-    "& > li": {
-      paddingLeft: 0,
-      paddingRight: 0,
-    },
-    "& > li:last-child": {
-      justifyContent: "flex-end",
-    },
+    "& > li": { paddingLeft: 0, paddingRight: 0 },
+    "& > li:last-child": { justifyContent: "flex-end" },
     "& .MuiChip-root": {
       margin: theme.spacing(1 / 2),
       maxWidth: `calc(100% - ${theme.spacing(1 / 2)}px)`,
     },
   },
+
+  // Title for supoarting document
   titleContainer: {
     padding: theme.spacing(1),
     display: "flex",
     justifyContent: "space-between",
   },
+
+  // Upload button component
   uploadButton: {
     marginRight: theme.spacing(1),
     padding: theme.spacing(1),
     minWidth: "auto",
-    "& .MuiButton-startIcon": {
-      margin: 0,
-    },
+    "& .MuiButton-startIcon": { margin: 0 },
   },
 }));
 
+// Chip for single component
 const DocumentChip = ({ type, doc, onDelete }) => {
   return (
     <Chip
@@ -57,8 +56,8 @@ const DocumentChip = ({ type, doc, onDelete }) => {
   );
 };
 
+// Document & Document type SELECTION dialog
 const DocumentSelect = ({ open, onClose, onSelect, options }) => {
-  console.log("d");
   const classes = useStyle();
 
   // Default values of the RHF
@@ -75,14 +74,15 @@ const DocumentSelect = ({ open, onClose, onSelect, options }) => {
     "Other Name": {
       validate: {
         requiredIfOther: (val) =>
-          !(getValues("Document Type") === "Other" && val === "") ||
-          "This field is required.",
+          (getValues("Document Type") === "Other" && val !== "") ||
+          getValues("Document Type") !== "Other" ||
+          "Document type is required.",
       },
     },
   };
 
   // Get object
-  const { handleSubmit, control, reset, getValues, setValue, watch } = useForm({
+  const { handleSubmit, control, getValues, setValue, watch } = useForm({
     defaultValues,
   });
 
@@ -135,70 +135,74 @@ const DocumentSelect = ({ open, onClose, onSelect, options }) => {
       }}
       content={
         <Box>
-          <Form control={control} rules={validation}>
-            <input
-              id="supporting-doc"
-              type="file"
-              accept="*"
-              onChange={getFileName}
-              hidden
-            />
-            <Box display="flex" alignItems="center">
-              <Tooltip title="Select Document">
-                <Button
-                  htmlFor="supporting-doc"
-                  component="label"
-                  startIcon={<Icon>file_upload</Icon>}
-                  color="primary"
-                  variant="contained"
-                  className={classes.uploadButton}
-                  size="large"
-                />
-              </Tooltip>
-              <TextControl
-                gutter={false}
-                size="small"
-                variant="standard"
-                name="Document Name"
-                fullWidth
+          <input
+            id="supporting-doc"
+            type="file"
+            accept="*"
+            onChange={getFileName}
+            hidden
+          />
+          <Box display="flex" alignItems="center">
+            <Tooltip title="Select Document">
+              <Button
+                htmlFor="supporting-doc"
+                component="label"
+                startIcon={<Icon>file_upload</Icon>}
+                color="primary"
+                variant="contained"
+                className={classes.uploadButton}
+                size="large"
               />
-              <Tooltip title="clear">
-                <Box>
-                  <CloseButton type="text" size="small" click={clearInput} />
-                </Box>
-              </Tooltip>
-            </Box>
-            <Box paddingY={1}>
-              <RadioControl
-                direction="row"
-                name="Document Type"
-                options={[
-                  ...options,
-                  {
-                    val: "Other",
-                    text: (
-                      <TextControl
-                        name="Other Name"
-                        label="Other"
-                        size="small"
-                        variant="standard"
-                        gutter={false}
-                      />
-                    ),
-                  },
-                ]}
-              />
-            </Box>
-            <Button
-              variant="contained"
-              color="primary"
+            </Tooltip>
+            <TextControl
+              control={control}
+              rules={validation}
+              gutter={false}
+              size="small"
+              variant="standard"
+              name="Document Name"
               fullWidth
-              startIcon={<Icon>add</Icon>}
-              onClick={handleSubmit(submitDoc)}
-            >
-              Add Document
-            </Button>
-          </Form>
+            />
+            <Tooltip title="clear">
+              <Box>
+                <CloseButton type="text" size="small" click={clearInput} />
+              </Box>
+            </Tooltip>
+          </Box>
+          <Box paddingY={1}>
+            <RadioControl
+              control={control}
+              rules={validation}
+              direction="row"
+              name="Document Type"
+              options={[
+                ...options,
+                {
+                  val: "Other",
+                  text: (
+                    <TextControl
+                      control={control}
+                      rules={validation}
+                      name="Other Name"
+                      label="Other"
+                      size="small"
+                      variant="standard"
+                      gutter={false}
+                    />
+                  ),
+                },
+              ]}
+            />
+          </Box>
+          <Button
+            variant="contained"
+            color="primary"
+            fullWidth
+            startIcon={<Icon>add</Icon>}
+            onClick={handleSubmit(submitDoc)}
+          >
+            Add Document
+          </Button>
         </Box>
       }
       contentProp={{ style: { paddingLeft: "12px", paddingRight: "12px" } }}
@@ -206,9 +210,11 @@ const DocumentSelect = ({ open, onClose, onSelect, options }) => {
   );
 };
 
-function SupportingDocuments({ name, control, options }) {
+/* SUPPORTING DOCUMENT LISTING & UPLOAD DIALOG */
+export default function SupportingDocuments({ name, control, options }) {
   const classes = useStyle();
 
+  // State to open/close dialog
   const [openDialog, setOpenDialog] = useState(false);
   const OpenDialog = () => setOpenDialog(true);
   const CloseDialog = () => setOpenDialog(false);
@@ -231,24 +237,20 @@ function SupportingDocuments({ name, control, options }) {
   };
 
   // Method to check to document already exit or not
-  const isExist = (val, type, doc) => {
-    let found = -1;
-    for (let i = 0; i < val.length; i++)
-      if (val[i].type === type) {
-        found = i;
+  const isExist = (collection, type, doc) => {
+    // Check if document type exist
+    let typeIndex = -1;
+    for (let i; i < collection.length; i++)
+      if (collection[i].type === type) {
+        typeIndex = i;
         break;
       }
+    if (typeIndex === -1) return false;
 
-    if (found === -1) return false;
-
-    let exist = false;
-    for (let i = 0; i < val[found].list.length; i++)
-      if (val[found].list[i] === doc) {
-        exist = true;
-        break;
-      }
-
-    return exist;
+    // Check if document exist
+    for (let savedDoc of collection[typeIndex].list)
+      if (savedDoc === doc) return true;
+    return false;
   };
 
   // Method to convert string to Documents object
@@ -315,6 +317,7 @@ function SupportingDocuments({ name, control, options }) {
               options={options}
             />
           )}
+
           <ListItem>
             <Box width={1} overflow="hidden">
               {getDocsFromString(value).map(({ type, list }) =>
@@ -331,6 +334,7 @@ function SupportingDocuments({ name, control, options }) {
               )}
             </Box>
           </ListItem>
+
           <ListItem>
             <Button color="primary" variant="contained" onClick={OpenDialog}>
               Add File
@@ -341,5 +345,3 @@ function SupportingDocuments({ name, control, options }) {
     />
   );
 }
-
-export default SupportingDocuments;

@@ -1,7 +1,7 @@
 import { Box, TablePagination } from "@material-ui/core";
 import React from "react";
 
-function DataTableFooter({
+export default function DataTableFooter({
   component,
   pageSize,
   rowsPerPage,
@@ -27,5 +27,3 @@ function DataTableFooter({
     </caption>
   );
 }
-
-export default DataTableFooter;

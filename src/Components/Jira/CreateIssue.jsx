@@ -1,201 +1,276 @@
 import React, { useState, useEffect } from "react";
-import {
-  Box,
-  Chip,
-  Icon,
-  TextField,
-  Button,
-  ButtonGroup,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-  IconButton,
-  Slide,
-  CircularProgress,
-  Avatar,
-  Backdrop,
-  Tooltip,
-  Zoom,
-  Typography,
-} from "@material-ui/core";
-import { makeStyles } from "@material-ui/styles";
-import { FormProvider, useForm } from "react-hook-form";
-import FormTextInput from "../Form/FormTextInput";
-import FormTextArea from "../Form/FormTextArea";
-import FormDropdown from "../Form/FormDropdown";
-import FormAttachment from "../Form/FormAttachment";
+import { Button, Typography, Grid } from "@material-ui/core";
+import { useForm } from "react-hook-form";
 import DocumentTitle from "../DocumentTitle";
-import LinkJira from "./LinkJira";
-import FetchAssignee from "./FetchAssignee";
+import SelectAssignee from "./SelectAssignee";
 import {
   fetchIssueTypes,
   fetchProjects,
   createIssue,
+  fetchAssignee,
 } from "../../Service/Jira.service";
-import { useLocation, useHistory } from "react-router-dom";
+import useParams from "../Utils/Hooks/useParams";
+import useLoading from "../Utils/Hooks/useLoading";
+import DialogBox from "../Utils/DialogBox";
+import {
+  Form,
+  SelectControl,
+  TextControl,
+  UploadControl,
+} from "../Utils/Control";
+import { notification } from "../Utils/Utils";
+import { getIntegratedPlatform } from "../../Service/UserFactory";
 
-const useStyles = makeStyles((theme) => ({
-  /** Classes **/
-}));
+// Status text based on loading value
+const LoadingStatus = (loading) => ({
+  prop: {
+    style: { flexGrow: 1, fontStyle: "italic", paddingLeft: 8 },
+  },
+  element: (
+    <Typography noWrap>
+      {loading("project")
+        ? "Loading Project..."
+        : loading("issuetype")
+        ? "Loading Issue type..."
+        : loading("assignee")
+        ? "Loading Assignees..."
+        : loading("submit")
+        ? "Submiting data..."
+        : ""}
+    </Typography>
+  ),
+});
 
-const defaultValues = {
-  description: "",
-  issueType: "",
-  project: "",
-  summary: "",
-  assignee: [],
-  fileUpload: [],
-};
-
-export default function Jira({ title }) {
+/* CREATE ISSUE */
+function CreateIssue({ title, poamID, close, rowIndex }) {
   DocumentTitle(title);
-  const methods = useForm({ defaultValues: defaultValues });
-  const { handleSubmit, reset, register, control, watch } = methods;
-  const projectKey = watch(["project", "assignee"]);
-  const [open, setOpen] = useState(false);
-  const [project, setProject] = useState([]);
-  const [issueType, setIssueType] = useState([]);
-  const [loader, setLoader] = useState(false);
-  const [options, setOptions] = useState([]);
-  const [selectedAssignee, setSelectedAssignee] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const classes = useStyles();
 
-  const location = useLocation();
-  const history = useHistory();
-  useEffect(() => {
-    const urlSearchParams = new URLSearchParams(location.search);
-    const params = Object.fromEntries(urlSearchParams.entries());
-    setOpen(params.createIssue === "true");
-    console.log("create");
-  }, [location]);
+  // State to update option list
+  const [projectList, setProject] = useState([]);
+  const [issueTypeList, setIssueType] = useState([]);
+  const [assigneeList, setAssignee] = useState([]);
 
-  useEffect(() => {
-    if (open === true) fetch();
-  }, [open]);
+  // Get loading status
+  const { isLoading, startLoading, stopLoading, updateLoading } = useLoading({
+    project: false,
+    issuetype: false,
+    assignee: false,
+    submit: false,
+  });
 
-  const fetch = async () => {
-    setLoader(true);
-
-    const { data, status } = await fetchProjects();
-    if (!status) return;
-    const { data: issueData, status: issueStatus } = await fetchIssueTypes();
-    if (!issueStatus) return;
-
-    setProject(() => data.map((res) => ({ label: res.name, value: res.key })));
-
-    setIssueType(() => issueData.map((res) => ({ label: res, value: res })));
-    setLoader(false);
-    setOpen(true);
+  // Apply validation on jira fields
+  const validation = {
+    project: { required: "This field is required." },
+    summary: { required: "This field is required." },
+    description: { required: "This field is required." },
+    issuetype: { required: "This field is required." },
   };
 
-  const handleClose = () => {
-    const urlSearchParams = new URLSearchParams(location.search);
-    const params = Object.fromEntries(urlSearchParams.entries());
-    urlSearchParams.delete("createIssue");
-    history.replace({
-      search: urlSearchParams.toString(),
-    });
-    setOpen(false);
-    setIssueType([]);
-    setProject([]);
-    setOptions([]);
-    setSelectedAssignee([]);
-    reset();
+  // Default values of jira issue fields
+  const defaultValues = {
+    project: "",
+    summary: "",
+    description: "",
+    issuetype: "",
+    assignee: "",
+    file: [],
   };
 
-  const onSubmit = async (data) => {
-    setLoader(true);
-    const { status } = await createIssue(
-      data.project,
-      data.summary,
-      data.description,
-      data.issueType,
-      selectedAssignee,
-      data.fileUpload
-    );
-    if (!status) return;
+  // Get methods of useForm
+  const { handleSubmit, control, watch, setValue } = useForm({ defaultValues });
+  // Watch project to update assignee option list
+  const projectWatcher = watch("project");
 
-    setIssueType([]);
-    setProject([]);
-    setOptions([]);
-    setSelectedAssignee([]);
-    setLoader(false);
-    setOpen(false);
-    reset();
+  // Fetch project & issuetype on mounting component
+  useEffect(() => {
+    // Fetch project types on mounting component
+    (async () => {
+      startLoading("project");
+      // Get project list
+      const { data: projectList, status: projectStatus } =
+        await fetchProjects();
+      if (!projectStatus) return stopLoading();
+      // Update dropdown options
+      setProject(
+        projectList.map((project) => ({ val: project.key, text: project.name }))
+      );
+
+      updateLoading({ project: false, issuetype: true });
+      // Get issue type list
+      const { data: issueTypeList, status: issueTypeStatus } =
+        await fetchIssueTypes();
+      if (!issueTypeStatus) return stopLoading();
+
+      setIssueType(issueTypeList);
+      stopLoading("issuetype");
+    })();
+  }, []);
+
+  // Fetch assginee on project key change
+  useEffect(() => {
+    if (projectWatcher !== "") {
+      (async () => {
+        startLoading("assignee");
+        // Fetch assginee only if project is selected
+        const { data, status } = await fetchAssignee(projectWatcher);
+        if (!status) return stopLoading();
+        setAssignee(data);
+        setValue("assignee", "");
+        stopLoading("assignee");
+      })();
+    }
+  }, [projectWatcher]);
+
+  // Method to submit data to create an issue
+  const onSubmit = async (formDetails) => {
+    startLoading("submit");
+    const { data, status } = await createIssue(formDetails, rowIndex, poamID);
+    if (!status) return stopLoading();
+    notification("jira-issue", data.success, "success");
+    stopLoading();
+    close(data.success.split(" ")[0]);
   };
 
   return (
-    <>
-      <Backdrop style={{ zIndex: "100" }} open={loader}>
-        <CircularProgress color="secondary" />
-      </Backdrop>
-      <Dialog
-        open={open}
-        onClose={handleClose}
-        style={{ zIndex: "99" }}
-        maxWidth="sm"
-        fullWidth
-      >
-        <DialogTitle>Create Issue</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            Create Jira issues in an instant
-          </DialogContentText>
-          <FormProvider {...methods}>
-            <FormDropdown
-              name="project"
-              label="Project *"
-              control={control}
-              options={project}
-              required={true}
-            />
-            <FormDropdown
-              name="issueType"
-              label="Issue Type *"
-              control={control}
-              options={issueType}
-              required={true}
-            />
-            <FetchAssignee
-              name="assignee"
-              label="Assignee"
-              control={control}
-              projectKey={projectKey[0]}
-              selectedElements={selectedAssignee}
-              setSelectedElements={selectedAssignee}
-            />
-            <FormTextInput
-              name="summary"
-              control={control}
-              label="Summary"
-              required={true}
-            />
-            <FormTextArea
-              name="description"
-              control={control}
-              label="Description"
-              required={true}
-            />
-            <FormAttachment name="fileUpload" />
-          </FormProvider>
-        </DialogContent>
-        <DialogActions>
-          <Button color="primary" onClick={handleClose} variant="outlined">
-            Cancel
-          </Button>
-          <Button
-            type="submit"
-            color="primary"
-            onClick={handleSubmit(onSubmit)}
-            variant="contained"
-          >
-            Create
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </>
+    <DialogBox
+      open={true}
+      maxWidth="sm"
+      fullWidth
+      loading={isLoading()}
+      bottomSeperator={true}
+      title={
+        <Typography variant="h6" style={{ fontWeight: "bold" }}>
+          Create Issue
+        </Typography>
+      }
+      contentProp={{ style: { padding: 16 } }}
+      content={
+        <Form control={control} rules={validation}>
+          <Grid container spacing={2}>
+            <Grid item xs={6}>
+              <SelectControl
+                name="project"
+                label="Project"
+                variant="outlined"
+                options={projectList}
+                loading={isLoading("project")}
+                styleProps={{ fullWidth: true, size: "small" }}
+              />
+            </Grid>
+
+            <Grid item xs={12}>
+              <Grid container spacing={2}>
+                <Grid item xs={6}>
+                  <SelectControl
+                    name="issuetype"
+                    label="Issue Type"
+                    variant="outlined"
+                    options={issueTypeList}
+                    loading={isLoading("issuetype")}
+                    styleProps={{ fullWidth: true, size: "small" }}
+                  />
+                </Grid>
+              </Grid>
+            </Grid>
+
+            <Grid item xs={12}>
+              <TextControl
+                variant="outlined"
+                name="summary"
+                label="Summary"
+                size="small"
+                fullWidth
+                multiline
+                gutter={false}
+                maxRows={3}
+              />
+            </Grid>
+
+            <Grid item xs={12}>
+              <TextControl
+                variant="outlined"
+                name="description"
+                label="Description"
+                size="small"
+                fullWidth
+                multiline
+                gutter={false}
+                maxRows={10}
+                minRows={4}
+              />
+            </Grid>
+
+            <Grid item xs={12}>
+              <SelectAssignee
+                name="assignee"
+                label="Assignee"
+                control={control}
+                rules={validation}
+                options={assigneeList}
+                loading={isLoading("assignee")}
+              />
+            </Grid>
+
+            <Grid item xs={12}>
+              <UploadControl name="file" />
+            </Grid>
+          </Grid>
+        </Form>
+      }
+      actions={[
+        LoadingStatus(isLoading),
+        <Button
+          color="secondary"
+          onClick={() => close()}
+          variant="outlined"
+          disabled={isLoading("submit")}
+        >
+          Cancel
+        </Button>,
+        <Button
+          type="submit"
+          color="secondary"
+          onClick={handleSubmit(onSubmit)}
+          variant="contained"
+          disabled={isLoading("submit")}
+        >
+          Create
+        </Button>,
+      ]}
+    />
+  );
+}
+
+/* CREATE JIRA ISSUE CONTAINER */
+export default function CreateIssueWrapper({ title, queryParams, close }) {
+  // Get params access
+  const { getParams, changeParams, deleteParams } = useParams();
+
+  // onClosing check if issueid is passed
+  const handleClose = (issueId) => {
+    if (issueId) changeParams({ issueId });
+    else deleteParams("rowIndex");
+    close();
+  };
+
+  // Check if jira is connected, else unmount component
+  const checkJiraIntegration = () => {
+    const integrationStatus = getIntegratedPlatform().jira;
+    if (!integrationStatus) {
+      notification("jira-issue", "No jira account is connected.", "error");
+      handleClose();
+      return false;
+    }
+    return true;
+  };
+  if (!checkJiraIntegration()) return null;
+
+  return (
+    <CreateIssue
+      title={title}
+      poamID={getParams().file}
+      rowIndex={queryParams.rowIndex}
+      close={handleClose}
+    />
   );
 }

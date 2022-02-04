@@ -1,6 +1,6 @@
 import { post, get, patch } from "./CrudFactory";
-import { Iterate } from "../Components/Utils/Iterate";
 
+/* Method to link JIRA to user */
 export async function linkWithJira(link, email, api_token) {
   return await post("/jira/register/", {
     link: link,
@@ -9,61 +9,80 @@ export async function linkWithJira(link, email, api_token) {
   });
 }
 
+/* Method to fetch all projects of user */
 export async function fetchProjects() {
   return await get("/jira/fetchprojects/");
 }
 
+/* Method to fetch issue type list */
 export async function fetchIssueTypes() {
   return await get("/jira/fetchissuetype/");
 }
 
+/* Method to fetch assignee list in project */
 export async function fetchAssignee(key) {
   return await get(`/jira/fetchassignee/${key}`);
 }
 
-export async function createIssue(
-  project,
-  summary,
-  description,
-  issueType,
-  assignee,
-  files
-) {
+/* Method to fetch priority list */
+export async function fetchPriority() {
+  return await get(`/jira/fetchpriorities`);
+}
+
+/* Method to fetch list of the epic issues list */
+export async function fetchEpicLink() {
+  return await get(`/jira/fetchepiclink`);
+}
+
+/* Method to fetch component list in a particular project */
+export async function fetchComponents(key) {
+  return await get(`/jira/fetchcomponents/${key}`);
+}
+
+/* Method to fetch list of sprint available */
+export async function fetchSprint() {
+  return await get(`/jira/fetchsprint`);
+}
+
+/* Method to fetch issue details of the given issue */
+export async function fetchIssueDetails(key) {
+  return await get(`/jira/fetchissuedetails/${key}/`);
+}
+
+/* Method to create issue & link it to given poam row */
+export async function createIssue(data, row_index, poamID) {
+  // create formData obj
+  const formData = new FormData();
+
+  // Add row_index
+  formData.append("row_index", row_index);
+
+  // Add all value except assignee & file
+  for (let key of Object.keys(data))
+    if (!["file", "asssignee"].includes(key)) formData.append(key, data[key]);
+
+  // Check if any file is attached, then add for formData
+  if (data.file.length > 0)
+    for (let file of data.file) formData.append("file[]", file);
+
+  // Check if any asignee is selected then, add it id
+  if (data.assignee) formData.append("assignee", data.assignee.id);
+
+  return await post(`/jira/newissue/${poamID}/`, formData);
+}
+
+/* Method to update issue with given details */
+export async function updateIssue(data) {
   let formData = new FormData();
-  formData.append("project", project);
-  formData.append("summary", summary);
-  formData.append("description", description);
-  formData.append("issuetype", issueType);
-  formData.append("assignee", assignee[0].id);
-  // if (assignee.length !== 0) {
-  //   formData = Iterate(assignee, "assignee", formData);
-  // }
-  if (files.length !== 0) {
-    formData = Iterate(files, "file[]", formData);
+
+  for (let key of Object.keys(data)) {
+    if (data[key] === "") {
+    } else if (key === "customfield_10020") formData.append(key, data[key]);
+    else if (["reporter", "assignee"].includes(key))
+      formData.append(key, data[key]?.id || "");
+    else if (data[key] === null) formData.append(key, "");
+    else formData.append(key, data[key]);
   }
-  return await post("/jira/newissue/", formData);
-}
 
-export async function fetchIssueDetails() {
-  return await get("/jira/fetchissuedetails/TJOF-4/");
-}
-
-export async function updateIssue({ ...updatedValues }) {
-  const { data, status } = await fetchAssignee(updatedValues.project);
-  if (!status) return;
-  const reporter = data.find((dt) => dt.displayName === updatedValues.reporter);
-
-  let formData = new FormData();
-  formData.append("issue_key", "TJOF-4");
-  formData.append("assignee", updatedValues.assignee.id);
-  formData.append("description", updatedValues.description);
-  formData.append("summary", updatedValues.summary);
-  formData.append("duedate", updatedValues.duedate);
-  formData.append("reporter", reporter.id);
-  formData.append("components", updatedValues.components);
-  formData.append("labels", updatedValues.labels);
-  formData.append("priority", updatedValues.priority);
-  formData.append("customfield_10014", updatedValues.epicLink);
-  formData.append("customfield_10020", updatedValues.sprint);
   return await patch("/jira/updateissue/", formData);
 }

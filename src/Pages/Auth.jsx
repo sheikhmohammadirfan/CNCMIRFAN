@@ -5,9 +5,7 @@ import Login from "../Components/Auth/Login";
 import Signup from "../Components/Auth/Signup";
 import ForgotPassword from "../Components/Auth/ForgotPassword";
 import DocumentTitle from "../Components/DocumentTitle";
-import svgBackground from "../assets/img/login_background.svg";
 import logo from "../assets/img/company_logo.png";
-import SingleSignon from "../Components/Auth/SingleSignon";
 
 // CSS class generator
 const useStyles = makeStyles((theme) => ({
@@ -25,7 +23,6 @@ const useStyles = makeStyles((theme) => ({
     borderTop: "1px solid rgb(64, 86, 181, 0.2)",
     borderBottom: "1px solid rgb(64, 86, 181, 0.2)",
     width: "100vw",
-    background: "white",
     padding: `0 ${theme.spacing(20)}px`,
     background: "#fafaff",
     justifyContent: "center",
@@ -96,8 +93,8 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-// Main Component
-function Auth({ title }) {
+/* AUTH ROOT COMPONENT */
+export default function Auth({ title }) {
   DocumentTitle(title);
   // Get Styles
   const classes = useStyles();
@@ -189,5 +186,3 @@ function Auth({ title }) {
     </Box>
   );
 }
-
-export default Auth;

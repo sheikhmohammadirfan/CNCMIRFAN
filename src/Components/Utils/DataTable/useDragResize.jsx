@@ -1,11 +1,11 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 
-export const useDragResize = (
+export default function useDragResize(
   colCount,
   draggerClass,
   minWidth,
   minCheckWidth
-) => {
+) {
   // Method to generate list of dictionary to save left & width of each col
   const getWidthList = (count, widthList = []) => {
     // if no list of width is passed, then create empty list with only minWidth
@@ -113,4 +113,4 @@ export const useDragResize = (
   );
 
   return { tableRef, VerticalResizer };
-};
+}

@@ -12,8 +12,9 @@ import { poam_header } from "../../assets/data/PoamData";
 import XLSX from "xlsx";
 import { getData } from "../../Service/Poam.service";
 import DialogBox from "../Utils/DialogBox";
-import { RadioControl, CheckboxControl } from "../Control";
+import { RadioControl, CheckboxControl } from "../Utils/Control";
 import { useState } from "react";
+import useCheck from "../Utils/Hooks/useCheck";
 
 const useStyle = makeStyles((theme) => ({
   // Apply style for radio elements
@@ -32,7 +33,8 @@ const useStyle = makeStyles((theme) => ({
 }));
 
 // Method to convert data into downladable excel or csv
-function DownloadPoam({
+export default function DownloadPoam({
+  poamID,
   data,
   isOpenPoam,
   open,
@@ -45,23 +47,19 @@ function DownloadPoam({
   // State to save radio input
   const [radioInput, setRadioInput] = useState("All Columns");
 
-  // State to select list of selected collumns
-  const [selectCols, setselectCols] = useState([]);
-  // Check given columns
-  const check = (index) => setselectCols((val) => [...val, index]);
-  // uncheck given columns
-  const uncheck = (index) =>
-    setselectCols((val) => val.filter((v) => v !== index));
-  // Select all columns
-  const selectAll = () =>
-    setselectCols(Array.from({ length: allColumns.length }, (v, k) => k));
-  // Deselect all columns
-  const deselectAll = () => setselectCols([]);
-  // Check if all columns is selected
-  const isAllSelected = () => selectCols.length === allColumns.length;
-  // Check if some columns is selected
-  const isSomeSelected = () =>
-    selectCols.length > 0 && selectCols.length < allColumns.length;
+  // State to save checkbox input
+  const [checkList, setCheckList] = useState([]);
+
+  // Get method to check collection of checkboxes
+  const {
+    checkAtIndex,
+    uncheckAtIndex,
+    checkAll,
+    uncheckAll,
+    isCheckedAtIndex,
+    isAllChecked,
+    isSomeChecked,
+  } = useCheck(checkList, setCheckList, allColumns.length);
 
   // Map data into XLSX util object
   const mapData = () =>
@@ -74,7 +72,7 @@ function DownloadPoam({
           radioInput === "All Columns" ||
           (radioInput === "Default Columns" && !hiddenColumns.includes(name)) ||
           (radioInput === "Hidden Columns" && hiddenColumns.includes(name)) ||
-          (radioInput === "Selected Columns" && selectCols.includes(i))
+          (radioInput === "Selected Columns" && isCheckedAtIndex(i))
         )
           temp[name] = data[name][id];
 
@@ -90,12 +88,18 @@ function DownloadPoam({
 
     if (isOpenPoam) {
       openData = mapData(data);
-      const { data: fData, status: fStatus } = await getData(!isOpenPoam);
+      const { data: fData, status: fStatus } = await getData(
+        !isOpenPoam,
+        poamID
+      );
       if (fStatus) closeData = mapData(fData);
       else return;
     } else {
       closeData = mapData(data);
-      const { data: fData, status: fStatus } = await getData(!isOpenPoam);
+      const { data: fData, status: fStatus } = await getData(
+        !isOpenPoam,
+        poamID
+      );
       if (fStatus) openData = mapData(fData);
       else return;
     }
@@ -104,7 +108,7 @@ function DownloadPoam({
 
   // Method to export file of given name and type
   const exportFile = async (fileName, type) => {
-    if (radioInput === "Selected Columns" && selectCols.length === 0) return;
+    if (radioInput === "Selected Columns" && checkList.length === 0) return;
 
     // Get mapped data
     const tableData = await getTableData();
@@ -150,17 +154,15 @@ function DownloadPoam({
               arrow
               color="default"
               placement="right"
-              title={isAllSelected() ? "Deselect all" : "Select all"}
+              title={isAllChecked() ? "Deselect all" : "Select all"}
             >
               <Checkbox
                 size="small"
                 style={{ padding: 0, paddingLeft: "8px" }}
                 disabled={radioInput !== "Selected Columns"}
-                indeterminate={isSomeSelected()}
-                checked={isAllSelected()}
-                onChange={(e) =>
-                  e.target.checked ? selectAll() : deselectAll()
-                }
+                indeterminate={isSomeChecked()}
+                checked={isAllChecked()}
+                onChange={(e) => (e.target.checked ? checkAll() : uncheckAll())}
               />
             </Tooltip>
           </span>
@@ -179,10 +181,11 @@ function DownloadPoam({
                   </Typography>
                 }
                 className={classes.checkboxInput}
-                checked={selectCols.includes(index)}
+                checked={isCheckedAtIndex(index)}
                 onChange={(e) => {
-                  e.target.checked ? check(index) : uncheck(index);
-                  console.log(e.target.checked);
+                  e.target.checked
+                    ? checkAtIndex(index)
+                    : uncheckAtIndex(index);
                 }}
               />
             </Grid>
@@ -277,5 +280,3 @@ function DownloadPoam({
     />
   );
 }
-
-export default DownloadPoam;

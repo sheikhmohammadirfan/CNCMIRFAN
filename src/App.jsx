@@ -12,7 +12,7 @@ import Header from "./Components/Header";
 import Sidebar from "./Components/Sidebar/Sidebar";
 import Auth from "./Pages/Auth";
 import "react-toastify/dist/ReactToastify.css";
-import ProtectedRoutes from "./Components/ProtectedRoutes";
+import ProtectedRoutes from "./Components/Utils/Routers/ProtectedRoutes";
 import Verify from "./Pages/Verify";
 import Home from "./Pages/Home";
 import Poam from "./Pages/Poam";
@@ -22,14 +22,18 @@ import UpdateIssue from "./Components/Jira/UpdateIssue";
 import Profile from "./Pages/Profile";
 import Integrate from "./Pages/Integrate";
 import { useState } from "react";
+import ParamsRoutes from "./Components/Utils/Routers/ParamsRoutes";
 
+// Custom values
 const sidebarSmall = 50;
 const sidebarLarge = 250;
+const headerHeight = 40;
 
 /** Theme generator */
 let theme = createTheme({
   sidebarSmall,
   sidebarLarge,
+  headerHeight,
   textOnPrimary: "#ffffff",
   palette: {
     primary: {
@@ -48,19 +52,17 @@ theme = responsiveFontSizes(theme);
 
 /** CSS class generator */
 const useStyles = makeStyles((theme) => ({
+  // Body container to check body width based on sidebar width
   body: {
     flexGrow: 1,
     width: `calc(100% - ${sidebarSmall}px)`,
-    "&.open": {
-      width: `calc(100% - ${sidebarLarge}px)`,
-    },
+    "&.open": { width: `calc(100% - ${sidebarLarge}px)` },
   },
+  // Wrapper to add a small padding to left to show sidebar over the content
   wrapper: {
-    minHeight: "calc(100vh - 40px)",
+    minHeight: `calc(100vh - ${headerHeight}px)`,
     overflow: "auto",
-    [theme.breakpoints.down("xs")]: {
-      paddingLeft: sidebarSmall,
-    },
+    [theme.breakpoints.down("xs")]: { paddingLeft: sidebarSmall },
   },
 }));
 
@@ -84,7 +86,7 @@ function App() {
   const [scrollTarget, setScrollTarget] = useState();
   const updateTarget = (target) => target && setScrollTarget(target);
 
-  // State to save scrollbar status
+  // State to save scrollbar open/close status
   const [isSidebarOpen, setSidebar] = useState(false);
 
   return (
@@ -108,6 +110,7 @@ function App() {
                 <Box>
                   <Sidebar isOpen={isSidebarOpen} toggleSidebar={setSidebar} />
                 </Box>
+
                 <Box
                   flexGrow={1}
                   className={`${classes.body} ${isSidebarOpen ? "open" : ""}`}
@@ -133,11 +136,21 @@ function App() {
                   </div>
                 </Box>
               </Box>
+
+              <Email title="EMAIL" />
+
+              <ParamsRoutes
+                params={["createIssue", "rowIndex"]}
+                removeParams={["createIssue"]}
+              >
+                <CreateIssue title="Create Issue" />
+              </ParamsRoutes>
+
+              <ParamsRoutes params={["updateIssue", "issues"]}>
+                <UpdateIssue title="Update Issue" />
+              </ParamsRoutes>
             </ProtectedRoutes>
           </Switch>
-          <Email title="EMAIL" />
-          <CreateIssue title="Create Issue" />
-          <UpdateIssue title="Update Issue" />
         </Router>
       </Box>
     </ThemeProvider>

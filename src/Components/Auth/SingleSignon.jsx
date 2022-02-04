@@ -27,7 +27,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 /** Flex row with Single Signon options */
-function SingleSignon({ google: googleSet }) {
+export default function SingleSignon({ google: googleSet }) {
   // Organize data
   const sso = [
     ["aws", aws, null],
@@ -72,5 +72,3 @@ function SingleSignon({ google: googleSet }) {
     </Box>
   );
 }
-
-export default SingleSignon;

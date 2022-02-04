@@ -1,10 +1,11 @@
 import { Box, Button, CircularProgress, makeStyles } from "@material-ui/core";
 import React, { useState } from "react";
-import { PasswordControl, TextControl, Form } from "../Control";
+import { PasswordControl, TextControl, Form } from "../Utils/Control";
 import { signup } from "../../Service/UserFactory";
 import { useForm } from "react-hook-form";
 import DocumentTitle from "../DocumentTitle";
 import { DisableAutoComplete } from "../Utils/Utils";
+import { EMAIL_REGEX } from "../../assets/data/Other";
 
 const useStyles = makeStyles((theme) => ({
   // Style to apply on login btn
@@ -20,19 +21,21 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 // Signup Component
-function Signup({ title, loginPage }) {
+export default function Signup({ title, loginPage }) {
   DocumentTitle(title);
 
   // Apply validation on field
   const validations = {
-    name: { required: "This field is required." },
+    first_name: { required: "First Name is required." },
+    last_name: { required: "Last Name is required." },
     email: {
       pattern: {
-        value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+        value: EMAIL_REGEX,
         message: "Invalid email address.",
       },
+      required: "Email is required.",
     },
-    password: { required: "This field is required." },
+    password: { required: "Password is required." },
   };
 
   // TODO: Reset is not working
@@ -68,11 +71,20 @@ function Signup({ title, loginPage }) {
         onSubmit={handleSubmit(submit)}
       >
         <TextControl
-          name="name"
+          name="first_name"
+          label="first name"
           size="small"
           fullWidth
           variant="standard"
-          {...DisableAutoComplete}
+          {...DisableAutoComplete()}
+        />
+        <TextControl
+          name="last_name"
+          label="label name"
+          size="small"
+          fullWidth
+          variant="standard"
+          {...DisableAutoComplete()}
         />
         <TextControl
           type="email"
@@ -80,7 +92,7 @@ function Signup({ title, loginPage }) {
           size="small"
           fullWidth
           variant="standard"
-          {...DisableAutoComplete}
+          {...DisableAutoComplete()}
         />
         <PasswordControl
           name="password"
@@ -100,5 +112,3 @@ function Signup({ title, loginPage }) {
     </Box>
   );
 }
-
-export default Signup;

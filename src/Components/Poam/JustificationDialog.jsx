@@ -1,14 +1,16 @@
-import { Button, Icon, Typography } from "@material-ui/core";
+import { Button, Typography } from "@material-ui/core";
 import React, { useRef } from "react";
 import { useState } from "react";
-import { TextControl } from "../Control";
+import { TextControl } from "../Utils/Control";
 import DialogBox from "../Utils/DialogBox";
 
-function JustificationDialog({ isOpen, onClose, onSubmit }) {
+/* JUSTIFICATION DIALOG COMPONENT */
+export default function JustificationDialog({ isOpen, onClose, onSubmit }) {
+  // input referenct
   const ref = useRef();
-
+  // error state
   const [error, setError] = useState(false);
-
+  // loading state
   const [loading, setLoading] = useState(false);
 
   return (
@@ -61,5 +63,3 @@ function JustificationDialog({ isOpen, onClose, onSubmit }) {
     />
   );
 }
-
-export default JustificationDialog;

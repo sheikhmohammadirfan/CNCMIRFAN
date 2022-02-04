@@ -1,21 +1,15 @@
 import React, { useState } from "react";
 import {
-  Box,
-  Chip,
   Icon,
-  TextField,
   Button,
-  ButtonGroup,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
   IconButton,
-  Slide,
   CircularProgress,
 } from "@material-ui/core";
 import CloseIcon from "@material-ui/icons/Close";
-import { makeStyles } from "@material-ui/styles";
 import { FormProvider, useForm } from "react-hook-form";
 import FormTextInput from "../Form/FormTextInput";
 import { linkWithJira } from "../../Service/Jira.service";
@@ -29,7 +23,7 @@ const defaultValues = {
 
 export default function LinkJira({ openJira, closeJira }) {
   const methods = useForm({ defaultValues: defaultValues });
-  const { handleSubmit, reset, register, control } = methods;
+  const { handleSubmit, control } = methods;
   const [loader, setLoader] = useState(false);
 
   const notification = (msg, type) => {

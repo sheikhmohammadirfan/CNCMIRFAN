@@ -1,15 +1,6 @@
-import {
-  Box,
-  Button,
-  ClickAwayListener,
-  Grid,
-  Icon,
-  makeStyles,
-  Typography,
-} from "@material-ui/core";
+import { Box, Grid, makeStyles, Typography } from "@material-ui/core";
 import React, { useEffect, useState } from "react";
 import { FullScreen, useFullScreenHandle } from "react-full-screen";
-import { useHistory, useLocation } from "react-router-dom";
 import {
   columns_width,
   hidden_columns,
@@ -23,7 +14,6 @@ import PoamHeader from "../Components/Poam/PoamHeader";
 import SecondaryTable from "../Components/Poam/SecondaryTable";
 import UploadPoam from "../Components/Poam/UploadPoam";
 import DataTable from "../Components/Utils/DataTable/DataTable";
-import DialogBox from "../Components/Utils/DialogBox";
 import SkeletonBox from "../Components/Utils/SkeletonBox";
 import {
   addRow,
@@ -35,12 +25,22 @@ import {
   updatePoam,
   updateRow,
 } from "../Service/Poam.service";
+import useParams from "../Components/Utils/Hooks/useParams";
 
-// Generate css style
+/* Generate css style */
 const useStyle = makeStyles((theme) => ({
+  // Root poam container
+  poamContainer: {
+    maxHeight: `calc(100vh - ${theme.headerHeight}px)`,
+    overflow: "hidden",
+    padding: theme.spacing(1),
+    "&.zoomed": { padding: theme.spacing(3) },
+  },
+
   //Header cell style
   headerCell: { fontWeight: "bold" },
 
+  // Set table style
   tableStyle: {
     // Make row cell background white
     "& tbody td": { background: "#fafafa !important" },
@@ -78,8 +78,8 @@ const useStyle = makeStyles((theme) => ({
   },
 }));
 
-/** POAM PAGE COMPONENT */
-function Poam({ title }) {
+/* POAM PAGE COMPONENT */
+export default function Poam({ title }) {
   const classes = useStyle();
 
   // Fullscreen handler to zoom in and zoom out
@@ -88,55 +88,48 @@ function Poam({ title }) {
   const zoomOut = fullScreenHandler.exit;
   const isZoomed = () => fullScreenHandler.active;
 
-  // React hook, to change routes
-  const history = useHistory();
-
-  // React hook, to update state of query params
-  const location = useLocation();
+  // Custom hook to handle Query params
+  const { params, changeParams, deleteParams } = useParams(
+    "sheet",
+    "issueId",
+    "file"
+  );
+  // Get sheet status
+  const isOpenPoam = () => params.sheet !== "close";
+  // Change status of poam
+  const showOpenPoam = () => changeParams({ sheet: "open" });
+  const showClosePoam = () => changeParams({ sheet: "close" });
 
   // React state to maintain loading status
   const [isDataLoading, setIsDataLoading] = useState(false);
   const startLoading = () => setIsDataLoading(true);
   const stopLoading = () => setIsDataLoading(false);
 
-  // React state to store Query params obj
-  const [queryParams, setQueryParams] = useState({});
-  // Get sheet status
-  const isOpenPoam = (params = queryParams) => params.sheet !== "close";
-
+  // React state to maintain justify dailog status
   const [justifyOpen, setJustifyOpen] = useState(false);
   const openJustify = () => setJustifyOpen(true);
   const closeJustify = () => setJustifyOpen(false);
 
   // hook to store selected rows
   const [selectedRow, setSelectedRow] = useState([]);
-
-  // hook to store index of current clicked row
-  const [currentRow, setcurrentRow] = useState(-1);
+  const getCurrentRow = () =>
+    selectedRow.length > 0 ? selectedRow[0] + (isOpenPoam() ? 2 : 0) : -1;
 
   // hook to store index of data to be shown in secondary tabel
   const [secondaryOpen, setSecondaryOpen] = useState(-1);
 
-  // Change status of poam
-  const onPoamChange = (status = isOpenPoam) =>
-    history.push(`/support?sheet=${status ? "open" : "close"}`);
-  const showOpenPoam = () => onPoamChange(true);
-  const showClosePoam = () => onPoamChange(false);
-
   // State to managing dailog visibility
   const [formOpen, setFormOpen] = useState(false);
-  const editRowData = () => {
-    setcurrentRow(selectedRow[0] + (isOpenPoam() ? 2 : 0));
-    setFormOpen(true);
-  };
+  const editRowData = () => setFormOpen(true);
   const addNewRow = () => {
-    setcurrentRow(-1);
+    setSelectedRow([]);
     setFormOpen(true);
   };
   const closeFormDialog = () => setFormOpen(false);
 
-  // State to save table data
+  // State to save table data & name
   const [poamData, setPoamData] = useState();
+  const [poamName, setPoamName] = useState();
 
   // List for all types of columns
   const [allColumns, setAllColumns] = useState(poam_header);
@@ -148,7 +141,9 @@ function Poam({ title }) {
   useEffect(
     () =>
       setVisibleColumns(
-        allColumns.filter((colName) => !secondaryColumns.includes(colName))
+        allColumns.filter(
+          (columnName) => !secondaryColumns.includes(columnName)
+        )
       ),
     [allColumns, secondaryColumns]
   );
@@ -161,26 +156,25 @@ function Poam({ title }) {
     setSecondaryColumns((prevCol) => prevCol.filter((c) => c !== colName));
 
   // Fetch data
-  const fetchData = async (params = {}) => {
+  const fetchData = async () => {
     startLoading();
-    const { data, status } = await getData(isOpenPoam(params));
-    if (status) setPoamData(data);
+    const { data, status } = await getData(isOpenPoam(), params.file);
+    if (!status) return stopLoading();
+    setPoamData(data.data);
+    setPoamName(data.file_name);
     stopLoading();
   };
 
   // Reset Current_Row, Selected_Row & update Query_Params state on route change
   useEffect(() => {
-    // Set current params
-    const urlSearchParams = new URLSearchParams(location.search);
-    const params = Object.fromEntries(urlSearchParams.entries());
-    setQueryParams(params);
-
-    // Reset table
-    setcurrentRow(-1);
-    setSelectedRow([]);
-
-    fetchData(params);
-  }, [location]);
+    if (params.file) {
+      setSelectedRow([]);
+      fetchData();
+      // if param contain rowIndex & issueId, then delete them
+      if (params.rowIndex || params.issueId)
+        deleteParams("rowIndex", "issueId");
+    }
+  }, [params]);
 
   // Method to get row index from lis index
   const getRowIndex = (lstIndex) =>
@@ -269,7 +263,7 @@ function Poam({ title }) {
 
   // Method to edit existing row
   const updateRowData = async (newData) => {
-    const rowIndex = getRowIndex(currentRow);
+    const rowIndex = getRowIndex(getCurrentRow());
     const { data, status } = await updateRow(rowIndex, newData);
 
     if (status)
@@ -281,7 +275,7 @@ function Poam({ title }) {
   // Method to move row to & from OPEN & CLOSE
   const moveRow = async (justification) => {
     // Get data
-    const rowIndex = getRowIndex(currentRow);
+    const rowIndex = getRowIndex(getCurrentRow());
     const rowData = getRowData(rowIndex, allColumns, poamData);
 
     // Add justification
@@ -289,8 +283,8 @@ function Poam({ title }) {
 
     // Make api call
     const { data, status } = await (isOpenPoam()
-      ? moveToClose(rowIndex, rowData)
-      : moveToOpen(rowIndex, rowData));
+      ? moveToClose(rowIndex, rowData, params.file)
+      : moveToOpen(rowIndex, rowData, params.file));
 
     // reset data
     if (status) {
@@ -299,19 +293,51 @@ function Poam({ title }) {
     }
   };
 
+  // Method to set rowindex in param and show createIssue dialog
+  const showCreateIssue = () => {
+    changeParams({ rowIndex: getRowIndex(getCurrentRow()), createIssue: true });
+  };
+
+  // Method to set issue details in param and show updateIssue dialog
+  const showUpdateIssue = () => {
+    const rowIndex = getRowIndex(getCurrentRow());
+    changeParams({
+      issues: JSON.stringify(poamData["jira_issues"][rowIndex]),
+      updateIssue: true,
+    });
+  };
+
+  // Method to check if row contains any issue
+  const containIssue = () => {
+    const rowIndex = getRowIndex(getCurrentRow());
+    return (
+      rowIndex !== -1 &&
+      Object.keys(poamData["jira_issues"][rowIndex]).length > 0
+    );
+  };
+
   DocumentTitle(!isOpenPoam() ? "CLOSE " + title : "OPEN " + title);
 
   return (
-    <FullScreen handle={fullScreenHandler}>
-      <Box padding={isZoomed() ? 3 : 1}>
+    <FullScreen
+      handle={fullScreenHandler}
+      onChange={(state, handle) => {
+        if (state) localStorage.setItem("fullScreen", "poam-root");
+      }}
+    >
+      <Box
+        id="poam-root"
+        className={`${classes.poamContainer} ${isZoomed() ? "zoomed" : ""}`}
+      >
         <PoamHeader
           selectedRow={selectedRow}
           zoom={{ isZoomed, zoomIn, zoomOut }}
-          data={poamData}
+          poam={{ id: params.file, poamData, poamName }}
           cols={{ allColumns, secondaryColumns, hiddenColumns }}
           manageCol={{ moveToPrimary, moveToSecondary }}
           manageRow={{ editRowData, addNewRow, openJustify }}
           manageSheet={{ isOpenPoam, showOpenPoam, showClosePoam }}
+          manageJira={{ containIssue, showCreateIssue, showUpdateIssue }}
         />
 
         {isDataLoading ? (
@@ -364,15 +390,14 @@ function Poam({ title }) {
       {formOpen && (
         <FormDialog
           rows={poamData}
-          rowIndex={getRowIndex(currentRow)}
+          rowIndex={getRowIndex(getCurrentRow())}
           open={formOpen}
           onClose={closeFormDialog}
           onSubmit={async (val) => {
             // Do edit or new operation
-            if (currentRow !== -1) await updateRowData(val);
+            if (getCurrentRow() !== -1) await updateRowData(val);
             else await createNewRow(val);
             // Reset status
-            setcurrentRow(-1);
             setSelectedRow([]);
             setFormOpen(false);
           }}
@@ -389,5 +414,3 @@ function Poam({ title }) {
     </FullScreen>
   );
 }
-
-export default Poam;

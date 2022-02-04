@@ -27,10 +27,6 @@ export default function FormAttachment({ name, control }) {
   const [selectedFiles, setSelectedFiles] = useState([]);
   const methods = useFormContext();
 
-  const removeFile = (index) => {
-    setSelectedFiles(selectedFiles.filter((_, idx) => idx !== index));
-  };
-
   return (
     <Controller
       name={name}

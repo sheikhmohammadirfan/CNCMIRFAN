@@ -1,5 +1,4 @@
-import React, { useState } from "react";
-import { FormControl, InputLabel, MenuItem, Select } from "@material-ui/core";
+import { FormControl, MenuItem, Select } from "@material-ui/core";
 import { Controller } from "react-hook-form";
 
 export default function FormDropDown({

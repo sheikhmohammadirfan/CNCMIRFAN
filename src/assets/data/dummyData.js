@@ -31,21 +31,21 @@ export const integratedPlatforms = [
   {
     name: "Slack",
     image: slack,
-    onClick: null,
+    onClick: () => {},
   },
   {
     name: "AWS",
     image: aws,
-    onClick: null,
+    onClick: () => {},
   },
   {
     name: "Google Cloud",
     image: googleCloud,
-    onClick: null,
+    onClick: () => {},
   },
   {
     name: "GitHub",
     image: github,
-    onClick: null,
+    onClick: () => {},
   },
 ];

@@ -2,11 +2,11 @@ import React, { useState } from "react";
 import { Grid, Tooltip } from "@material-ui/core";
 import { makeStyles } from "@material-ui/styles";
 import { integratedPlatforms } from "../assets/data/dummyData";
-// import { useLocalStorage } from "../Components/useLocalStorage";
-import { getUser } from "../Service/UserFactory";
+import { getIntegratedPlatform } from "../Service/UserFactory";
 import DocumentTitle from "../Components/DocumentTitle";
 import LinkJira from "../Components/Jira/LinkJira";
 
+/* Create styles */
 const useStyles = makeStyles((theme) => ({
   item: {
     cursor: "pointer",
@@ -35,10 +35,9 @@ export default function Integrate({ title }) {
   DocumentTitle(title);
   const classes = useStyles();
   const [show, setShow] = useState("");
-  // const [user, setUser] = useLocalStorage("user");
-  const user = getUser();
-  // const userArray = Object.entries(user).map((entry) => ( { [entry[0]]: entry[1] } ))
-  const userArray = [true, false, false, false, false];
+
+  const platforms = getIntegratedPlatform();
+
   return (
     <Grid
       container
@@ -52,15 +51,15 @@ export default function Integrate({ title }) {
             xs
             key={index}
             className={
-              userArray[index] === true
+              platforms[platform.name.toLowerCase()] === true
                 ? `${classes.item}`
                 : `${classes.item} ${classes.itemWithHover}`
             }
           >
             <img
               onClick={
-                userArray[index] === true
-                  ? null
+                platforms[platform.name.toLowerCase()] === true
+                  ? () => {}
                   : () => platform.onClick(setShow)
               }
               src={platform.image}

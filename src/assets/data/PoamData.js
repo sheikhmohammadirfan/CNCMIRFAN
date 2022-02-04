@@ -42,11 +42,3 @@ export const columns_width = [
   110, 100, 170, 210, 250, 250, 160, 160, 200, 230, 220, 250, 300, 400, 180,
   200, 240, 300, 200, 200, 170, 150, 230, 400, 400, 300, 150, 300,
 ];
-
-export const capitalizeList = (lst) =>
-  lst.map((name) =>
-    name
-      .split(" ")
-      .map((str) => str[0].toUpperCase() + str.slice(1))
-      .join(" ")
-  );

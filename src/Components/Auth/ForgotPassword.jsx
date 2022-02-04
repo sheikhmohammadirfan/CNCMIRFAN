@@ -1,6 +1,5 @@
 import { Box, Button, makeStyles, Typography } from "@material-ui/core";
-import React from "react";
-import { TextControl } from "../Control";
+import { TextControl } from "../Utils/Control";
 import CloseButton from "../Utils/CloseButton";
 
 // Generate CSS classes
@@ -43,7 +42,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 /** FORGOT PASSWORD COMPONENT */
-function ForgotPassword({ show, login }) {
+export default function ForgotPassword({ show, login }) {
   // Get styles
   const classes = useStyles();
 
@@ -71,5 +70,3 @@ function ForgotPassword({ show, login }) {
     </Box>
   );
 }
-
-export default ForgotPassword;

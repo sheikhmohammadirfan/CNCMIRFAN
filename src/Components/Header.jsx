@@ -3,13 +3,12 @@ import NotificationsIcon from "@material-ui/icons/Notifications";
 import React from "react";
 import Breadcrumbs from "./Breadcrumbs";
 
-/**
- * CSS class generator
- * */
+/** CSS class generator */
 const useStyles = makeStyles((theme) => ({
   // style for header roots
   root: {
     zIndex: 5,
+    maxHeight: theme.headerHeight,
     minHeight: "min-content",
     background: "#ddd",
     padding: theme.spacing(1),
@@ -27,9 +26,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-/**
- * Header component
- * */
+/* Header component */
 function Header({ scrollTarget }) {
   // Get styles
   const classes = useStyles();

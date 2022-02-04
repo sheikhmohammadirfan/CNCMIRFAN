@@ -1,21 +1,12 @@
 import instance from "axios";
-import { toast } from "react-toastify";
-import ErrMsg from "./ErrMsg";
 import { getToken, logout } from "./UserFactory";
+import { notification } from "../Components/Utils/Utils";
 
 // Base url
-// const baseURL = "http://127.0.0.1:8000";
-const baseURL = "https://internassign.herokuapp.com";
+export const baseURL = "https://internassign.herokuapp.com";
 
 // Setup axios object
-const axios = instance.create({ baseURL: baseURL + "/api" });
-
-// Generate toast template
-const notification = (msg, type) =>
-  toast(Array.isArray(msg) ? <ErrMsg data={msg} /> : msg, {
-    toastId: "api-toast",
-    type,
-  });
+export const axios = instance.create({ baseURL: baseURL + "/api" });
 
 // Generate Request Template
 async function request(requestOptions) {
@@ -29,14 +20,10 @@ async function request(requestOptions) {
   if (getToken()) headers["Authorization"] = `Bearer ${getToken()}`;
 
   // Get query params
-  if (method === "GET") {
-    let queryString = new URLSearchParams(data);
-    fullurl += `?${queryString}`;
-  }
+  if (method === "GET") fullurl += `?${new URLSearchParams(data)}`;
   // Set content type
-  else if (!(data instanceof FormData)) {
+  else if (!(data instanceof FormData))
     headers["Content-Type"] = "application/json";
-  }
 
   // Setup response template
   let res = { data: [], message: "", status: false };
@@ -55,42 +42,42 @@ async function request(requestOptions) {
     res.message = response.data.message;
     delete response.data.message;
     res.data = response.data;
+
     // Notify user
-    if (method !== "GET" && notify) notification(res.message, "success");
+    if (method !== "GET" && notify)
+      notification("api-toast", res.message, "success");
   } catch (e) {
     // If unauthorize then logout user
     if (e?.response?.status === 401) {
       logout();
-      notification("Session expired!", "error");
+      notification("api-toast", "Session expired!", "error");
     }
 
     // Setup Error response
     res.status = false;
     res.message = e?.response?.data?.error || "An error occured.";
     // Notify user
-    notification(res.message, "error");
+    notification("api-toast", res.message, "error");
   }
   return res;
 }
 
-async function get(url, data, requestOptions) {
+export async function get(url, data, requestOptions) {
   return request({ method: "GET", url, data, ...requestOptions });
 }
 
-async function post(url, data, requestOptions) {
+export async function post(url, data, requestOptions) {
   return request({ method: "POST", url, data, ...requestOptions });
 }
 
-async function put(url, data, requestOptions) {
+export async function put(url, data, requestOptions) {
   return request({ method: "PUT", url, data, ...requestOptions });
 }
 
-async function patch(url, data, requestOptions) {
+export async function patch(url, data, requestOptions) {
   return request({ method: "PATCH", url, data, ...requestOptions });
 }
 
-async function deletes(url, data, requestOptions) {
+export async function deletes(url, data, requestOptions) {
   return request({ method: "DELETE", url, data, ...requestOptions });
 }
-
-export { baseURL, axios, get, post, put, patch, deletes };

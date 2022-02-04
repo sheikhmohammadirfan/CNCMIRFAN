@@ -1,9 +1,6 @@
-import React, { useState } from "react";
 import {
   Button,
-  Avatar,
   Box,
-  ButtonGroup,
   Grid,
   Typography,
   InputAdornment,
@@ -12,15 +9,21 @@ import {
 import DocumentTitle from "../Components/DocumentTitle";
 import countries from "i18n-iso-countries";
 import {
-  DatepickerControl,
+  DateControl,
   SelectControl,
   PasswordControl,
   TextControl,
-} from "../Components/Control";
+  Form,
+} from "../Components/Utils/Control";
 // Importing desired language
 import enLocale from "i18n-iso-countries/langs/en.json";
 import { makeStyles } from "@material-ui/styles";
+import { getUser, setUser } from "../Service/UserFactory";
+import { useForm } from "react-hook-form";
+import { isPasswordValid } from "../Components/Utils/Utils";
+import { updateProfile } from "../Service/UserFactory";
 
+/* GENERATE STYLES */
 const useStyles = makeStyles((theme) => ({
   container: {
     width: "60%",
@@ -34,197 +37,268 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+/* PROFILE COMPONENT */
 export default function Profile({ title }) {
   DocumentTitle(title);
-
+  // Get styles
   const classes = useStyles();
 
+  // Setup contry dropdown list
   countries.registerLocale(enLocale);
-d
   const countryObj = countries.getNames("en", { select: "official" });
   const countryArray = Object.values(countryObj).map((value) => ({
     text: value,
     val: value,
   }));
 
+  // Validation to be the profile form fields
+  const validation = {
+    contact_no: {
+      pattern: { value: /^\d{10}$/, message: "Contact no. is invalid." },
+    },
+    date_of_birth: {
+      validate: {
+        invalid: (date) =>
+          new Date(date) < new Date() || "Invalid Date of Birth.",
+      },
+    },
+    postal_code: {
+      pattern: { value: /^\d{6}$/, message: "Pin code is invalid." },
+    },
+    "New Password": {
+      validate: { invalid: (val) => val === "" || isPasswordValid(val) },
+    },
+    "Confirm New Password": {
+      validate: {
+        invalid: (pass) =>
+          pass === getValues("New Password") || "Password do not match.",
+      },
+    },
+  };
+
+  // default values of form field
+  const defaultValues = {
+    email: getUser().email || "",
+    first_name: getUser().first_name || "",
+    last_name: getUser().last_name || "",
+    contact_no: getUser().contact_no || "",
+    date_of_birth: getUser().date_of_birth || null,
+    address: getUser().address || "",
+    city: getUser().city || "",
+    state: getUser().state || "",
+    postal_code: getUser().postal_code || "",
+    country: getUser().country || "",
+    "New Password": "",
+    "Confirm New Password": "",
+  };
+
+  // Get useFrom method to handle form
+  const { handleSubmit, control, getValues, reset } = useForm({
+    defaultValues,
+  });
+
+  // Call update api to update field, only if data is changed
+  const onSubmit = async (formData) => {
+    const { data, status } = await updateProfile(formData);
+    if (!status) return;
+    setUser({ ...getUser(), ...data });
+    // TODO RESET SI NOT WORKING HERE
+    reset({ defaultValues });
+  };
+
   return (
     <Box>
       <Box className={classes.container}>
-        <Grid container spacing={2}>
-          <Grid item xs={12}>
-            <Grid contrinar>
-              <Typography variant="h6" className={classes.subtitle}>
-                Personal Details
-              </Typography>
+        <Form
+          control={control}
+          rules={validation}
+          onSubmit={handleSubmit(onSubmit)}
+        >
+          <Grid container spacing={2}>
+            <Grid item xs={12}>
+              <Grid contrinar>
+                <Typography variant="h6" className={classes.subtitle}>
+                  Personal Details
+                </Typography>
+              </Grid>
             </Grid>
-          </Grid>
 
-          <Grid item xs={12}>
-            <Grid container spacing={2}>
-              <Grid item xs={6}>
-                <TextControl
-                  variant="outlined"
-                  size="small"
-                  name="First Name"
-                  gutter={false}
-                  fullWidth
-                />
-              </Grid>
-              <Grid item xs={6}>
-                <TextControl
-                  variant="outlined"
-                  size="small"
-                  name="Last Name"
-                  gutter={false}
-                  fullWidth
-                />
-              </Grid>
-              <Grid item xs={6}>
-                <TextControl
-                  variant="outlined"
-                  size="small"
-                  name="Contact No."
-                  gutter={false}
-                  fullWidth
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <Icon>call</Icon>
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-              </Grid>
-              <Grid item xs={6}>
-                <DatepickerControl
-                  name="Date Of Birth"
-                  size="small"
-                  variant="outlined"
-                  fullWidth
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextControl
-                  name="Room/Flat no, Street"
-                  variant="outlined"
-                  size="small"
-                  fullWidth
-                  gutter={false}
-                />
-              </Grid>
-              <Grid item xs={8}>
-                <TextControl
-                  name="Area / Locality"
-                  variant="outlined"
-                  size="small"
-                  fullWidth
-                  gutter={false}
-                />
-              </Grid>
-              <Grid item xs={4}>
-                <TextControl
-                  name="City"
-                  variant="outlined"
-                  size="small"
-                  fullWidth
-                  gutter={false}
-                />
-              </Grid>
-              <Grid item xs={8}>
-                <TextControl
-                  name="State"
-                  variant="outlined"
-                  size="small"
-                  fullWidth
-                  gutter={false}
-                />
-              </Grid>
-              <Grid item xs={4}>
-                <TextControl
-                  name="Pincode"
-                  variant="outlined"
-                  size="small"
-                  fullWidth
-                  gutter={false}
-                />
-              </Grid>
-              <Grid item xs={6}>
-                <SelectControl
-                  name="Country"
-                  options={countryArray}
-                  variant="outlined"
-                  styleProps={{ fullWidth: true, size: "small" }}
-                />
+            <Grid item xs={12}>
+              <Grid container spacing={2}>
+                <Grid item xs={6}>
+                  <TextControl
+                    variant="outlined"
+                    size="small"
+                    name="first_name"
+                    label="First Name"
+                    gutter={false}
+                    fullWidth
+                  />
+                </Grid>
+                
+                <Grid item xs={6}>
+                  <TextControl
+                    variant="outlined"
+                    size="small"
+                    name="last_name"
+                    label="Last Name"
+                    gutter={false}
+                    fullWidth
+                  />
+                </Grid>
+
+                <Grid item xs={6}>
+                  <TextControl
+                    variant="outlined"
+                    size="small"
+                    name="contact_no"
+                    label="Contact No."
+                    gutter={false}
+                    fullWidth
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <Icon>call</Icon>
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                </Grid>
+
+                <Grid item xs={6}>
+                  <DateControl
+                    name="date_of_birth"
+                    label="Date Of Birth"
+                    size="small"
+                    variant="outlined"
+                    format="Do MMMM yyyy"
+                    fullWidth
+                  />
+                </Grid>
+
+                <Grid item xs={12}>
+                  <TextControl
+                    name="address"
+                    label="Room/Flat no, Street"
+                    variant="outlined"
+                    size="small"
+                    fullWidth
+                    gutter={false}
+                  />
+                </Grid>
+
+                <Grid item xs={4}>
+                  <TextControl
+                    name="city"
+                    label="City"
+                    variant="outlined"
+                    size="small"
+                    fullWidth
+                    gutter={false}
+                  />
+                </Grid>
+
+                <Grid item xs={8}>
+                  <TextControl
+                    name="state"
+                    label="State"
+                    variant="outlined"
+                    size="small"
+                    fullWidth
+                    gutter={false}
+                  />
+                </Grid>
+
+                <Grid item xs={4}>
+                  <TextControl
+                    name="postal_code"
+                    label="Pincode"
+                    variant="outlined"
+                    size="small"
+                    fullWidth
+                    gutter={false}
+                  />
+                </Grid>
+
+                <Grid item xs={8}>
+                  <SelectControl
+                    name="country"
+                    label="Country"
+                    options={countryArray}
+                    variant="outlined"
+                    styleProps={{ fullWidth: true, size: "small" }}
+                  />
+                </Grid>
               </Grid>
             </Grid>
+
+            <Grid item xs={12}>
+              <Grid contrinar>
+                <Typography variant="h6" className={classes.subtitle}>
+                  User Credentials
+                </Typography>
+              </Grid>
+            </Grid>
+
+            <Grid item xs={12}>
+              <Grid container spacing={2}>
+                <Grid item xs={3}>
+                  <Typography>Email:</Typography>
+                </Grid>
+                <Grid item xs={9}>
+                  <TextControl
+                    variant="outlined"
+                    size="small"
+                    name="email"
+                    label=" "
+                    gutter={false}
+                    disabled
+                    fullWidth
+                    style={{ maxWidth: 400 }}
+                  />
+                </Grid>
+
+                <Grid item xs={3}>
+                  <Typography>New password:</Typography>
+                </Grid>
+                <Grid item xs={9}>
+                  <PasswordControl
+                    variant="outlined"
+                    size="small"
+                    name="New Password"
+                    label=" "
+                    gutter={false}
+                    fullWidth
+                    style={{ maxWidth: 400 }}
+                  />
+                </Grid>
+
+                <Grid item xs={3}>
+                  <Typography>Confirm password:</Typography>
+                </Grid>
+                <Grid item xs={9}>
+                  <PasswordControl
+                    variant="outlined"
+                    size="small"
+                    name="Confirm New Password"
+                    label=" "
+                    gutter={false}
+                    fullWidth
+                    forceHidden={true}
+                    style={{ maxWidth: 400 }}
+                  />
+                </Grid>
+              </Grid>
+            </Grid>
+
             <Grid item xs={12} style={{ textAlign: "right" }}>
-              <Button variant="outlined" color="primary">
-                Update details
+              <Button variant="outlined" color="primary" type="submit">
+                Update Details
               </Button>
             </Grid>
           </Grid>
-
-          <Grid item xs={12}>
-            <Grid contrinar>
-              <Typography variant="h6" className={classes.subtitle}>
-                User Credentials
-              </Typography>
-            </Grid>
-          </Grid>
-
-          <Grid item xs={12}>
-            <Grid container spacing={2}>
-              <Grid item xs={3}>
-                <Typography>Email:</Typography>
-              </Grid>
-              <Grid item xs={9}>
-                <TextControl
-                  variant="outlined"
-                  size="small"
-                  name=""
-                  value="mr.irshad@gmail.com"
-                  disabled={true}
-                  gutter={false}
-                  fullWidth
-                />
-              </Grid>
-
-              <Grid item xs={3}>
-                <Typography>New password:</Typography>
-              </Grid>
-              <Grid item xs={9}>
-                <PasswordControl
-                  variant="outlined"
-                  size="small"
-                  name=""
-                  gutter={false}
-                  fullWidth
-                />
-              </Grid>
-
-              <Grid item xs={3}>
-                <Typography>Confirm password:</Typography>
-              </Grid>
-              <Grid item xs={9}>
-                <PasswordControl
-                  variant="outlined"
-                  size="small"
-                  name=""
-                  gutter={false}
-                  fullWidth
-                />
-              </Grid>
-
-              <Grid item xs={12} style={{ textAlign: "right" }}>
-                <Button variant="outlined" color="primary">
-                  Change Password
-                </Button>
-              </Grid>
-            </Grid>
-          </Grid>
-        </Grid>
+        </Form>
       </Box>
-      {/* </ButtonGroup> */}
     </Box>
   );
 }

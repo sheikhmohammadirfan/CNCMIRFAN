@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { changeQueryParams } from "../../Components/Utils/Utils";
 
 /** Sidebar data to map */
 export const SidebarData = [
@@ -103,7 +104,10 @@ export const SidebarData = [
       {
         title: "Email",
         component: Link,
-        to: "?email=true",
+        to: (obj) => ({
+          ...obj,
+          search: `?${changeQueryParams({ email: true })}`,
+        }),
         icon: "email",
       },
       {

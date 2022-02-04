@@ -1,11 +1,12 @@
 import { useState } from "react";
+import useCheck from "../Hooks/useCheck";
 
-export const useRowSelect = (
+export default function useRowSelect(
   rowData,
   pageSize,
   selectedRows,
   setSelectedRows
-) => {
+) {
   // Page index and current Starting index
   const [page, setPage] = useState(0);
   const [startIndex, setStart] = useState(0);
@@ -15,40 +16,12 @@ export const useRowSelect = (
     setSelectedRows([]);
   };
 
-  // Method to add row
-  const addRow = (index) => [...selectedRows, index];
-
-  // Method to remove row
-  const removeRow = (index) => selectedRows.filter((i) => i !== index);
-
-  // Toggle check & uncheck status of row
-  const toggleRow = (index, checked) =>
-    setSelectedRows(() => (checked ? addRow(index) : removeRow(index)));
-
   // Method to splice row from start till length
   const sliceRowLength = (start, length) =>
     rowData.slice(start, start + length);
 
-  // Method to check if row in list
-  const isChecked = (index) => selectedRows.some((i) => i === index);
-
-  // Toggle select All btn
-  const toggleAllRows = (checked) =>
-    setSelectedRows(() =>
-      checked
-        ? Array.from(
-            Array(sliceRowLength(startIndex, rowsPerPage).length).keys()
-          )
-        : []
-    );
-
-  // Method to check if some files are selected
-  const isSomeChecked = () =>
-    selectedRows.length > 0 && selectedRows.length < getCurrMax();
-
-  // Method to check if all files are selected
-  const isAllChecked = () =>
-    selectedRows.length > 0 && selectedRows.length === getCurrMax();
+  // Store row per page
+  const rowsPerPage = pageSize ? pageSize : rowData.length;
 
   // Method get max row count of current page
   const getCurrMax = () =>
@@ -56,8 +29,23 @@ export const useRowSelect = (
       ? rowData.length - startIndex
       : rowsPerPage;
 
-  // Store row per page
-  const rowsPerPage = pageSize ? pageSize : rowData.length;
+  // Get method to manupulate check item list
+  const {
+    checkAtIndex,
+    uncheckAtIndex,
+    checkAll,
+    uncheckAll,
+    isCheckedAtIndex,
+    isAllChecked,
+    isSomeChecked,
+  } = useCheck(selectedRows, setSelectedRows, getCurrMax());
+
+  // Toggle check & uncheck status of row
+  const toggleRow = (index, checked) =>
+    checked ? checkAtIndex(index) : uncheckAtIndex(index);
+
+  // Toggle select All btn
+  const toggleAllRows = (checked) => (checked ? checkAll() : uncheckAll());
 
   return {
     sliceRowLength,
@@ -66,9 +54,9 @@ export const useRowSelect = (
     rowsPerPage,
     startIndex,
     toggleRow,
-    isChecked,
     toggleAllRows,
+    isChecked: isCheckedAtIndex,
     isSomeChecked,
     isAllChecked,
   };
-};
+}

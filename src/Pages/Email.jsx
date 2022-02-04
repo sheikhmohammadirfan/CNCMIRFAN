@@ -1,4 +1,4 @@
-import React, { useState, useRef, forwardRef } from "react";
+import React, { useState, forwardRef } from "react";
 import {
   Box,
   Chip,
@@ -17,11 +17,11 @@ import {
 import { makeStyles } from "@material-ui/styles";
 import { toast } from "react-toastify";
 import sendMail from "../Service/email.service";
-import useScrollBox from "../Components/ScrollBar/useScrollBar";
 import DocumentTitle from "../Components/DocumentTitle";
 import { useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import CloseButton from "../Components/Utils/CloseButton";
+import { EMAIL_REGEX } from "../assets/data/Other";
 
 const Transition = forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -218,8 +218,6 @@ function Email({ title }) {
   const [message, setMessage] = useState("");
   const [files, setFiles] = useState([]);
   const [tags, setTags] = useState({ to: [], cc: [], bcc: [] });
-  const scrollWrapperRef = useRef();
-  const { isDragging } = useScrollBox(scrollWrapperRef);
 
   const addTags = (event) => {
     const value = event.target.value.trim();
@@ -265,8 +263,7 @@ function Email({ title }) {
   };
 
   const emailValidation = (email) => {
-    const regex =
-      /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
+    const regex = EMAIL_REGEX;
     if (!email || regex.test(email) === false) {
       return false;
     }
@@ -279,7 +276,6 @@ function Email({ title }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // console.log(subject, tags.to, tags.cc, tags.bcc, message);
     setLoader(true);
     if (tags.to.length === 0 && message.length === 0) {
       notification(
@@ -294,7 +290,6 @@ function Email({ title }) {
       notification("'Message' field cannot be empty!", "warning");
       setLoader(false);
     } else {
-      // console.log(subject, tags.to, tags.cc, tags.bcc, message);
       sendMail(subject, tags.to, tags.cc, tags.bcc, message, files)
         .then(() => {
           setMailAcknowledgement(true);
@@ -402,17 +397,8 @@ function Email({ title }) {
                 </span>
                 <div key={index} style={{ width: "calc(100% - 32px)" }}>
                   <div className={classes.scrollBox}>
-                    <div
-                      className={classes.scrollBoxWrapper}
-                      ref={scrollWrapperRef}
-                    >
-                      <div
-                        className={classes.scrollBoxContainer}
-                        role="list"
-                        style={{
-                          pointerEvents: isDragging ? "none" : undefined,
-                        }}
-                      >
+                    <div className={classes.scrollBoxWrapper}>
+                      <div className={classes.scrollBoxContainer} role="list">
                         {tags[item.name].map((tag, idx) => (
                           <Chip
                             style={{ overflow: "hidden", margin: "2px" }}

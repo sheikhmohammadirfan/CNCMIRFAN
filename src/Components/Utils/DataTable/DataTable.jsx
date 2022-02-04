@@ -1,5 +1,4 @@
 import {
-  Box,
   Checkbox,
   Table,
   TableContainer,
@@ -8,14 +7,10 @@ import {
   TableRow,
   TableCell,
   makeStyles,
-  Button,
-  Typography,
 } from "@material-ui/core";
-import React, { useCallback, useEffect, useRef } from "react";
-import { useState } from "react";
 import DataTableFooter from "./DataTableFooter";
-import { useDragResize } from "./useDragResize";
-import { useRowSelect } from "./useRowSelect";
+import useDragResize from "./useDragResize";
+import useRowSelect from "./useRowSelect";
 
 /** CSS classe generator */
 const useStyles = makeStyles((theme) => ({

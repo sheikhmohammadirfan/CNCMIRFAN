@@ -12,7 +12,6 @@ import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { SidebarData } from "../../assets/data/SidebarData";
 import { logout } from "../../Service/UserFactory";
-import ProfileBtn from "./ProfileBtn";
 import SidebarItem from "./SidebarItem";
 
 /** CSS Class Generator */
@@ -71,7 +70,7 @@ const useStyles = makeStyles((theme) => {
 /**
  * Sidebar Component to show logo btn, profile btn and Navigation
  * */
-function Sidebar({ isOpen, toggleSidebar }) {
+export default function Sidebar({ isOpen, toggleSidebar }) {
   // Get Styles
   const classes = useStyles();
 
@@ -129,6 +128,7 @@ function Sidebar({ isOpen, toggleSidebar }) {
         component={Link}
         to="/profile"
       />
+
       <SidebarItem
         sidebarOpen={isOpen}
         xs={xs}
@@ -151,5 +151,3 @@ function Sidebar({ isOpen, toggleSidebar }) {
     </Box>
   );
 }
-
-export default Sidebar;

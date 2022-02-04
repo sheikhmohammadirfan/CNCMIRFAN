@@ -5,18 +5,19 @@ import {
   makeStyles,
   Typography,
 } from "@material-ui/core";
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   TextControl,
   PasswordControl,
   CheckboxControl,
   Form,
-} from "../Control";
+} from "../Utils/Control";
 import { login } from "../../Service/UserFactory";
 import { Link } from "react-router-dom";
 import DocumentTitle from "../DocumentTitle";
 import { useForm } from "react-hook-form";
 import { DisableAutoComplete } from "../Utils/Utils";
+import { EMAIL_REGEX } from "../../assets/data/Other";
 
 // CSS class generator
 const useStyles = makeStyles((theme) => ({
@@ -43,16 +44,17 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 // Login Component
-function Login({ title, homePage }) {
+export default function Login({ title, homePage }) {
   DocumentTitle(title);
 
   // Rules for validation for each field
   const validation = {
     email: {
       pattern: {
-        value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+        value: EMAIL_REGEX,
         message: "Invalid email address.",
       },
+      required: "Email is required.",
     },
     password: { required: "Password is required." },
   };
@@ -91,14 +93,14 @@ function Login({ title, homePage }) {
           size="small"
           variant="standard"
           fullWidth
-          {...DisableAutoComplete}
+          {...DisableAutoComplete()}
         />
         <PasswordControl
           name="password"
           size="small"
           variant="standard"
           fullWidth
-          {...DisableAutoComplete}
+          {...DisableAutoComplete()}
         />
 
         <Box textAlign="right" marginBottom={2}>
@@ -115,10 +117,9 @@ function Login({ title, homePage }) {
           color="primary"
           name="remember"
           label={<Typography variant="body2">Stay Logged in</Typography>}
+          noControls={true}
         />
       </Form>
     </Box>
   );
 }
-
-export default Login;

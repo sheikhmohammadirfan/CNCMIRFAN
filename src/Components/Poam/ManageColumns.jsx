@@ -1,7 +1,6 @@
 import {
   Box,
   ClickAwayListener,
-  Divider,
   List,
   ListItem,
   makeStyles,
@@ -26,7 +25,7 @@ const useStyle = makeStyles((theme) => ({
 }));
 
 // Main ManageColumn tooltip component
-function ManageColumns({
+export default function ManageColumns({
   children,
   isOpen,
   closeMenu,
@@ -39,8 +38,6 @@ function ManageColumns({
 
   // Hook to get store of timeout reference
   const [timer, setTimer] = useState();
-
-  // Start & stop timer
   const startTimeout = () => setTimer(setTimeout(closeMenu, 5000));
   const stopTimeout = useCallback(() => clearTimeout(timer), [timer]);
 
@@ -65,6 +62,7 @@ function ManageColumns({
                   Default Columns
                 </Typography>
               </ListItem>
+
               {allColumns
                 .filter((name) => !hiddenColumns.includes(name))
                 .map((headerName, index) => (
@@ -98,6 +96,7 @@ function ManageColumns({
                   Hidden columns
                 </Typography>
               </ListItem>
+
               {hiddenColumns.map((headerName, index) => (
                 <ListItem key={index} disableGutters dense>
                   <Box
@@ -132,5 +131,3 @@ function ManageColumns({
     </Tooltip>
   );
 }
-
-export default ManageColumns;

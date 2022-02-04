@@ -7,17 +7,11 @@ import {
   TextField,
   Typography,
 } from "@material-ui/core";
-import { toast } from "react-toastify";
 import unknownLogo from "../../assets/img/unknown.svg";
 import otherLogo from "../../assets/img/other.svg";
 import CloseButton from "../Utils/CloseButton";
 import DialogBox from "./DialogBox";
-
-// Function to handle Notification toast
-function notification(msg, type) {
-  toast(msg, { type, toastId: "upload-toast", position: "top-center" });
-}
-
+import { notification } from "./Utils";
 // Function to return, File type as integer
 function getExt(name) {
   return /(?:\.([^.]+))?$/.exec(name)[0]?.toLowerCase();
@@ -81,7 +75,7 @@ function Upload({
     // Get uploaded file obj
     const fileList = e.target.files;
     if (Object.keys(fileList).length + files.length > maxFile)
-      notification("Upload Limit exceeded.", "error");
+      notification("upload-toast", "Upload Limit exceeded.", "error");
     // Add new files
     else
       setFiles((file) => [

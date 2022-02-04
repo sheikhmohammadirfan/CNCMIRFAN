@@ -3,17 +3,16 @@ import DialogBox from "../Utils/DialogBox";
 import React, { useState } from "react";
 import { poam_header } from "../../assets/data/PoamData";
 import {
-  DatepickerControl,
+  DateControl,
   SelectControl,
   Form,
   RadioControl,
   SliderControl,
   TextControl,
-} from "../Control";
+} from "../Utils/Control";
 import CustomAccordion from "../Utils/CustomAccordion";
 import SupportingDocuments from "./SupportingDocuments";
 import { useForm } from "react-hook-form";
-import { useEffect } from "react";
 
 // Style generator
 const useStyle = makeStyles((theme) => ({
@@ -45,12 +44,19 @@ const FormInput = ({ ...rest }) => (
 );
 
 // MAIN FORM COMPONENT
-function FormDialog({ open, onClose, rowIndex, onSubmit, rows }) {
+export default function FormDialog({
+  open,
+  onClose,
+  rowIndex,
+  onSubmit,
+  rows,
+}) {
   const classes = useStyle();
 
   // Loading status for dialog
   const [isLoading, setisLoading] = useState(false);
 
+  // Options list
   const controlsList = ["RA-5", "SA-9", "PF-07"];
   const sliderInput = [
     { value: 0, label: "Low" },
@@ -58,21 +64,24 @@ function FormDialog({ open, onClose, rowIndex, onSubmit, rows }) {
     { value: 100, label: "High" },
   ];
 
+  // Set dafault values for Create Form, for Edit Form populate existing details
   const defaultValues = {};
-
   for (var name of poam_header)
     defaultValues[name] =
       rowIndex === -1
         ? name.toLowerCase().includes("date")
-          ? undefined
+          ? null
           : ""
         : rows[name][rowIndex];
 
+  // Get useForm Methods
   const { handleSubmit, control } = useForm({ defaultValues });
 
+  // Push data onsubmit
   const submitForm = async (data) => {
     setisLoading(true);
-    await onSubmit(data);
+    // Push jira_issues column in datatable
+    await onSubmit({ ...data, jira_issues: rows.jira_issues[rowIndex] || {} });
     setisLoading(false);
   };
 
@@ -151,7 +160,7 @@ function FormDialog({ open, onClose, rowIndex, onSubmit, rows }) {
               <Grid item xs={12}>
                 <Grid container spacing={2}>
                   <Grid item xs={12} sm={6}>
-                    <DatepickerControl
+                    <DateControl
                       name="Original Detection Date"
                       variant="outlined"
                       fullWidth
@@ -159,7 +168,7 @@ function FormDialog({ open, onClose, rowIndex, onSubmit, rows }) {
                   </Grid>
 
                   <Grid item xs={12} sm={6}>
-                    <DatepickerControl
+                    <DateControl
                       name="Scheduled Completion Date"
                       variant="outlined"
                       fullWidth
@@ -187,11 +196,7 @@ function FormDialog({ open, onClose, rowIndex, onSubmit, rows }) {
               </Grid>
 
               <Grid item xs={12} sm={6}>
-                <DatepickerControl
-                  name="Status Date"
-                  variant="outlined"
-                  fullWidth
-                />
+                <DateControl name="Status Date" variant="outlined" fullWidth />
               </Grid>
 
               <Grid item xs={12}>
@@ -210,7 +215,7 @@ function FormDialog({ open, onClose, rowIndex, onSubmit, rows }) {
                       </Grid>
 
                       <Grid item xs={12} sm={5}>
-                        <DatepickerControl
+                        <DateControl
                           name="Last Vendor Check-in Date"
                           variant="outlined"
                           fullWidth
@@ -355,5 +360,3 @@ function FormDialog({ open, onClose, rowIndex, onSubmit, rows }) {
     />
   );
 }
-
-export default FormDialog;

@@ -193,7 +193,14 @@ function WithoutSubMenu({ sidebarOpen, text, icon, ...rest }) {
 }
 
 /** Generate Sidebar Item */
-function SidebarItem({ sidebarOpen, xs, text, icon, subMenu, ...rest }) {
+export default function SidebarItem({
+  sidebarOpen,
+  xs,
+  text,
+  icon,
+  subMenu,
+  ...rest
+}) {
   return subMenu ? (
     <WithSubMenu
       sidebarOpen={sidebarOpen}
@@ -212,5 +219,3 @@ function SidebarItem({ sidebarOpen, xs, text, icon, subMenu, ...rest }) {
     />
   );
 }
-
-export default SidebarItem;

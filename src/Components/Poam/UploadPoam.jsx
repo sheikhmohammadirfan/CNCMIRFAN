@@ -15,6 +15,20 @@ import { uploadFile } from "../../Service/Poam.service";
 const useStyle = makeStyles((theme) => ({
   // Style for drag-n-drop contained
   dragContainer: {
+    // Change label color on hover for clic trigger
+    "& label": {
+      color: "#0000ff6e",
+      cursor: "pointer",
+      "&:hover": { color: "blue" },
+    },
+
+    // format text
+    "& .MuiTypography-root": {
+      padding: theme.spacing(1 / 2),
+      fontWeight: "bold",
+    },
+
+    // root style for drop container
     "& .file-drop-target": {
       width: "100%",
       color: "#0000004d",
@@ -22,15 +36,8 @@ const useStyle = makeStyles((theme) => ({
       padding: theme.spacing(2.5),
       transition: "all 0.2s linear",
     },
-    "& label": {
-      color: "#0000ff6e",
-      cursor: "pointer",
-      "&:hover": { color: "blue" },
-    },
-    "& .MuiTypography-root": {
-      padding: theme.spacing(1 / 2),
-      fontWeight: "bold",
-    },
+
+    // wrapper for text
     "& .wrapper": {
       height: "80vh",
       borderRadius: theme.shape.borderRadius,
@@ -39,6 +46,8 @@ const useStyle = makeStyles((theme) => ({
       justifyContent: "center",
       alignItems: "center",
     },
+
+    // file container
     "& .file-container": {
       width: "100%",
       padding: theme.spacing(1),
@@ -48,23 +57,22 @@ const useStyle = makeStyles((theme) => ({
       alignItems: "center",
       overflow: "hidden",
     },
+
+    // Set file selected style
     "&.active": {
       "& .file-drop-target": {
         color: "black",
         background: theme.palette.grey[200],
         border: `1px solid ${theme.palette.grey[400]}`,
       },
-      "& .wrapper": {
-        borderColor: "black",
-      },
-      "& label": {
-        color: "blue",
-      },
+      "& .wrapper": { borderColor: "black" },
+      "& label": { color: "blue" },
     },
   },
 }));
 
-function UploadPoam({ fetchData }) {
+/* ROOT UPLOAD POAM FILE COMPNENT */
+export default function UploadPoam({ fetchData }) {
   const classes = useStyle();
 
   // Hook to save loading state
@@ -99,6 +107,7 @@ function UploadPoam({ fetchData }) {
       >
         <Box className="wrapper">
           <Icon fontSize="large">upload_file</Icon>
+
           <Box display="flex">
             <input
               multiple
@@ -108,10 +117,12 @@ function UploadPoam({ fetchData }) {
               onChange={(e) => setPickedFile(e.target.files[0])}
               hidden
             />
+
             <Typography variant="h6" noWrap>
               <label htmlFor="poam-file-upload">Choose file</label> or Drop here
             </Typography>
           </Box>
+
           {pickedFile && (
             <Zoom in={pickedFile}>
               <Box className="file-container">
@@ -122,6 +133,7 @@ function UploadPoam({ fetchData }) {
                   style={{ maxWidth: "100%", marginBottom: "8px" }}
                   onDelete={() => setPickedFile(null)}
                 />
+
                 <Button
                   variant="contained"
                   color="primary"
@@ -144,5 +156,3 @@ function UploadPoam({ fetchData }) {
     </Box>
   );
 }
-
-export default UploadPoam;

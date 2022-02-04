@@ -1,41 +1,13 @@
-import { post } from "./CrudFactory";
+import { patch, post } from "./CrudFactory";
 
+/************ TOKEN *************/
 // Get User from storage
-function getUser() {
-  const user = localStorage.getItem("user");
-  if (user) return JSON.parse(user);
-  return null;
-}
-
-// Get integrated plarform status
-function getIntegratedPlatform() {
-  const items = localStorage.getItem("integration");
-  if (items) return JSON.parse(items);
-  return null;
-}
-
-// Set User to Storage
-function setUser(userObj) {
-  localStorage.setItem("user", JSON.stringify(userObj));
-}
-
-// Set integrated plarform status
-function setIntegratedPlatform(obj) {
-  localStorage.setItem("integration", JSON.stringify(obj));
-}
-
-// Delete User from Storage
-function deleteUser() {
-  localStorage.removeItem("user");
-}
-
-// Get User from storage
-function getToken() {
+export function getToken() {
   return localStorage.getItem("accessToken");
 }
 
 // Set User to Storage
-function setToken(token) {
+export function setToken(token) {
   localStorage.setItem("accessToken", token);
 }
 
@@ -44,8 +16,45 @@ function deleteToken() {
   localStorage.removeItem("accessToken");
 }
 
+/************ USER *************/
+// Get User from storage
+export function getUser() {
+  const user = localStorage.getItem("user");
+  if (user) return JSON.parse(user);
+  return null;
+}
+
+// Set User to Storage
+export function setUser(userObj) {
+  localStorage.setItem("user", JSON.stringify(userObj));
+}
+
+// Delete User from Storage
+function deleteUser() {
+  localStorage.removeItem("user");
+}
+
+/************ INTEGRATION PLATFORM *************/
+// Get integrated plarform status
+export function getIntegratedPlatform() {
+  const items = localStorage.getItem("integration");
+  if (items) return JSON.parse(items);
+  return null;
+}
+
+// Set integrated plarform status
+function setIntegratedPlatform(obj) {
+  localStorage.setItem("integration", JSON.stringify(obj));
+}
+
+// Delete User from Storage
+function deleteIntegratedPlatform() {
+  localStorage.removeItem("integration");
+}
+
+/************ ROUTING *************/
 // Login user
-async function login(details) {
+export async function login(details) {
   const { data, status } = await post("/user/login", details);
 
   // if success then set token
@@ -59,27 +68,42 @@ async function login(details) {
 }
 
 // Signup user
-async function signup(details) {
+export async function signup(details) {
   const { status } = await post("/user", details);
   return status;
 }
 
 // Logout user
-function logout() {
+export function logout() {
   deleteToken();
   deleteUser();
-  window.location.href = "/login";
+  deleteIntegratedPlatform();
+  window.location.replace("/login");
 }
 
-export {
-  getUser,
-  getIntegratedPlatform,
-  setUser,
-  deleteUser,
-  getToken,
-  setToken,
-  deleteToken,
-  login,
-  signup,
-  logout,
-};
+// Update user details
+export async function updateProfile(formData) {
+  // Object save new data only
+  const newData = {};
+  // Get exsisting data, to check what has changed
+  const prevData = getUser();
+
+  // Loop and get all updated data while skipping email & password field
+  for (let key of Object.keys(formData))
+    if (
+      !["email", "New Password", "Confirm New Password"].includes(key) &&
+      formData[key] !== prevData[key]
+    )
+      newData[key] = formData[key];
+
+  // Check if password is changed
+  if (formData["New Password"] !== "")
+    newData["password"] = formData["New Password"];
+
+  // Check if any data is change, then only send update request
+  if (Object.keys(newData).length > 0)
+    return await patch(`/user/${prevData.id}/`, newData);
+
+  // Else return false value
+  return { data: null, status: false };
+}

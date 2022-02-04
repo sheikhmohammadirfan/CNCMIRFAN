@@ -7,7 +7,7 @@ import {
 import { post } from "./CrudFactory";
 import { setToken, setUser } from "./UserFactory";
 import { toast } from "react-toastify";
-import { STATUS } from "../assets/data/status";
+import { STATUS } from "../assets/data/Other";
 
 // Gapi status variables
 export let GAPI_SETUP_STATUS = STATUS.INCOMPLETE;
@@ -18,6 +18,30 @@ const gapi = window?.gapi;
 let GAPI_AUTH = null;
 export let GAPI_TOKEN = null;
 export let GAPI_USER = null;
+
+/* Method to set/unset gapi token on log-in/log-out */
+function updateSigninStatus(signin) {
+  GAPI_SIGNIN_STATUS = signin;
+  if (signin) setGapiToken();
+  else unsetGapiToken();
+}
+
+/* Method to set GAPI TOKEN */
+async function setGapiToken() {
+  GAPI_TOKEN = gapi.auth.getToken();
+  GAPI_USER = GAPI_AUTH.currentUser.get().getBasicProfile();
+  // console.log(GAPI_TOKEN);
+  // console.log(GAPI_USER);
+  createPicker();
+  // if (GAPI_REFRESH_TOKEN) {
+  //   const { data, status } = await post("/user/gdrive", {
+  //     gdrive_accesstoken: GAPI_TOKEN.access_token,
+  //     gdrive_refreshtoken: GAPI_REFRESH_TOKEN,
+  //     gdrive_expiry_time: new Date(GAPI_TOKEN.expires_at).toISOString(),
+  //   });
+  //   console.log(data, status);
+  // }
+}
 
 /* Method to load gapi client modules, & trigger callback */
 export function initGapi() {
@@ -66,6 +90,7 @@ function auth_failure_callback(error) {
   console.error(error);
 }
 
+/* Prompt google signin */
 export async function gapi_signin() {
   try {
     // Show signin prompt
@@ -91,32 +116,12 @@ export async function gapi_signin() {
   }
 }
 
+/* Signout user */
 export function gapi_signout() {
   GAPI_AUTH.signOut();
 }
 
-function updateSigninStatus(signin) {
-  GAPI_SIGNIN_STATUS = signin;
-  if (signin) setGapiToken();
-  else unsetGapiToken();
-}
-
-async function setGapiToken() {
-  GAPI_TOKEN = gapi.auth.getToken();
-  GAPI_USER = GAPI_AUTH.currentUser.get().getBasicProfile();
-  // console.log(GAPI_TOKEN);
-  // console.log(GAPI_USER);
-  createPicker();
-  // if (GAPI_REFRESH_TOKEN) {
-  //   const { data, status } = await post("/user/gdrive", {
-  //     gdrive_accesstoken: GAPI_TOKEN.access_token,
-  //     gdrive_refreshtoken: GAPI_REFRESH_TOKEN,
-  //     gdrive_expiry_time: new Date(GAPI_TOKEN.expires_at).toISOString(),
-  //   });
-  //   console.log(data, status);
-  // }
-}
-
+/* Method to unset GAPI TOKEN */
 function unsetGapiToken() {
   GAPI_TOKEN = null;
 }
@@ -124,18 +129,31 @@ function unsetGapiToken() {
 /**
  ******************************************************************
  */
-
+/* DRIVE PICKER STATUS */
 let picker_loaded = false;
 let GAPI_PICKER = null;
 let PICKER = null;
 
+/* After drive picker api is loaded, then create picker obj */
 function init_picker_callback() {
   picker_loaded = true;
   PICKER = window.google?.picker;
   createPicker();
 }
 
+/* Method to execute after file is selected or dialog is closed */
+function pickerCallback(data) {
+  var url = "nothing";
+  if (data[PICKER.Response.ACTION] === PICKER.Action.PICKED) {
+    var doc = data[PICKER.Response.DOCUMENTS][0];
+    url = doc[PICKER.Document.URL];
+  }
+  console.log(url);
+}
+
+/* Method to google picker object */
 export function createPicker() {
+  // Check if picker api is loaded, & user is logged in
   if (picker_loaded && GAPI_TOKEN) {
     const viewGroup = new PICKER.ViewGroup(
       new PICKER.DocsView(PICKER.ViewId.SPREADSHEETS).setLabel("PPT & DOC")
@@ -147,6 +165,7 @@ export function createPicker() {
       "Excel"
     );
 
+    // Set picker object
     GAPI_PICKER = new PICKER.PickerBuilder()
       .addViewGroup(viewGroup)
       .addView(view)
@@ -157,19 +176,10 @@ export function createPicker() {
   }
 }
 
-function pickerCallback(data) {
-  var url = "nothing";
-  if (data[PICKER.Response.ACTION] === PICKER.Action.PICKED) {
-    var doc = data[PICKER.Response.DOCUMENTS][0];
-    url = doc[PICKER.Document.URL];
-  }
-  console.log(url);
-}
-
+// Method to toggle visibility of drive picker
 export function showPicker() {
   GAPI_PICKER.setVisible(true);
 }
-
 export function closePicker() {
   GAPI_PICKER.setVisible(false);
 }
