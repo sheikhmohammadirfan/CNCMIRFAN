@@ -34,9 +34,7 @@ const useStyle = makeStyles((theme) => ({
 
 // Method to convert data into downladable excel or csv
 export default function DownloadPoam({
-  poamID,
   data,
-  isOpenPoam,
   open,
   close,
   allColumns,
@@ -62,8 +60,8 @@ export default function DownloadPoam({
   } = useCheck(checkList, setCheckList, allColumns.length);
 
   // Map data into XLSX util object
-  const mapData = () =>
-    Object.keys(data["POAM ID"]).map((id) => {
+  const mapData = (sheet) =>
+    Object.keys(sheet["POAM ID"]).map((id) => {
       const temp = {};
       let i = 0;
       for (let name of poam_header) {
@@ -74,7 +72,7 @@ export default function DownloadPoam({
           (radioInput === "Hidden Columns" && hiddenColumns.includes(name)) ||
           (radioInput === "Selected Columns" && isCheckedAtIndex(i))
         )
-          temp[name] = data[name][id];
+          temp[name] = sheet[name][id];
 
         i++;
       }
@@ -83,26 +81,9 @@ export default function DownloadPoam({
 
   // Fetch open & close sheet data and convert into XLSX format
   const getTableData = async () => {
-    let openData;
-    let closeData;
+    let openData = mapData(data.open);
+    let closeData = mapData(data.close);
 
-    if (isOpenPoam) {
-      openData = mapData(data);
-      const { data: fData, status: fStatus } = await getData(
-        !isOpenPoam,
-        poamID
-      );
-      if (fStatus) closeData = mapData(fData);
-      else return;
-    } else {
-      closeData = mapData(data);
-      const { data: fData, status: fStatus } = await getData(
-        !isOpenPoam,
-        poamID
-      );
-      if (fStatus) openData = mapData(fData);
-      else return;
-    }
     return { openData, closeData };
   };
 

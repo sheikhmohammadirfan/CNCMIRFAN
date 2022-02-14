@@ -53,7 +53,11 @@ export default function SelectLabels({ name, label, control, rules, ...rest }) {
           filterSelectedOptions
           renderTags={(value, props) =>
             value.map((label, index) => (
-              <LabelChip label={label} onDelete={props({ index }).onDelete} />
+              <LabelChip
+                key={index}
+                label={label}
+                onDelete={props({ index }).onDelete}
+              />
             ))
           }
           renderInput={(params) => (

@@ -26,7 +26,7 @@ export default function Form({
 }
 
 // Map child component into a controller if control props is passed
-function Field({ field, noControls, ...rest }) {
+export function Field({ field, noControls, ...rest }) {
   // Get control form props
   const restControl = {
     control: rest.control,
@@ -53,5 +53,3 @@ function Field({ field, noControls, ...rest }) {
     field(rest)
   );
 }
-
-export { Field };

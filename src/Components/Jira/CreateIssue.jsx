@@ -64,6 +64,7 @@ function CreateIssue({ title, poamID, close, rowIndex }) {
     summary: { required: "This field is required." },
     description: { required: "This field is required." },
     issuetype: { required: "This field is required." },
+    assignee: { required: "This field is required." },
   };
 
   // Default values of jira issue fields
@@ -249,7 +250,7 @@ export default function CreateIssueWrapper({ title, queryParams, close }) {
   // onClosing check if issueid is passed
   const handleClose = (issueId) => {
     if (issueId) changeParams({ issueId });
-    else deleteParams("rowIndex");
+    deleteParams("rowIndex");
     close();
   };
 

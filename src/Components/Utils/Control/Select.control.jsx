@@ -38,10 +38,10 @@ export default function SelectControl(props) {
             {...controls?.field}
             {...others}
           >
-            {options.length === 0 ? (
-              <MenuItem disabled={true}>No Options</MenuItem>
-            ) : loading ? (
+            {loading ? (
               <MenuItem disabled={true}>Loading...</MenuItem>
+            ) : options.length === 0 ? (
+              <MenuItem disabled={true}>No Options</MenuItem>
             ) : (
               options.map((val, index) => (
                 <MenuItem

@@ -1,16 +1,10 @@
-import { Box, Typography, Zoom } from "@material-ui/core";
+import { Box, Grid, Typography, Zoom } from "@material-ui/core";
 import React from "react";
 import CloseButton from "../Utils/CloseButton";
 import DataTable from "../Utils/DataTable/DataTable";
 
 /* SECONDARY TALBE COMPONENT */
-export default function SecondaryTable({
-  data,
-  columnsList,
-  currentRow,
-  closeTable,
-  maxHeight,
-}) {
+function SecondaryTable({ data, columnsList, currentRow, closeTable }) {
   // Cell component
   const Cell = ({ text }) => (
     <Typography
@@ -75,13 +69,19 @@ export default function SecondaryTable({
   const rows = () => ({ rowData: mapDataToRow() });
 
   return (
-    <Zoom in={currentRow !== -1}>
-      <DataTable
-        verticalBorder={true}
-        header={header()}
-        rowList={rows()}
-        serialNo={false}
-      />
-    </Zoom>
+    <Grid item xs={3}>
+      <Zoom in={currentRow !== -1}>
+        <DataTable
+          verticalBorder={true}
+          header={header()}
+          rowList={rows()}
+          serialNo={false}
+        />
+      </Zoom>
+    </Grid>
   );
+}
+
+export default function SecondaryTableWrapper(props) {
+  return props.currentRow !== -1 ? <SecondaryTable {...props} /> : null;
 }

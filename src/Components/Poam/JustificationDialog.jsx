@@ -5,7 +5,7 @@ import { TextControl } from "../Utils/Control";
 import DialogBox from "../Utils/DialogBox";
 
 /* JUSTIFICATION DIALOG COMPONENT */
-export default function JustificationDialog({ isOpen, onClose, onSubmit }) {
+function JustificationDialog({ onClose, onSubmit }) {
   // input referenct
   const ref = useRef();
   // error state
@@ -15,7 +15,7 @@ export default function JustificationDialog({ isOpen, onClose, onSubmit }) {
 
   return (
     <DialogBox
-      open={isOpen}
+      open={true}
       onClose={onClose}
       maxWidth="xs"
       fullWidth
@@ -62,4 +62,8 @@ export default function JustificationDialog({ isOpen, onClose, onSubmit }) {
       ]}
     />
   );
+}
+
+export default function JustificationDialogWrapper(props) {
+  return props.isOpen ? <JustificationDialog {...props} /> : null;
 }

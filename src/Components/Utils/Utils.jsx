@@ -1,14 +1,5 @@
 import { toast } from "react-toastify";
 
-// Object to be passed to Textfield to diable autocomplete
-export const DisableAutoComplete = ({ inputProps, formProps } = {}) => ({
-  inputProps: {
-    autocomplete: "new-password",
-    form: { autocomplete: "off", ...formProps },
-    ...inputProps,
-  },
-});
-
 // Generate toast template
 const ErrMsg = ({ data }) => (
   <div>
@@ -22,6 +13,42 @@ export const notification = (id, msg, type) =>
     toastId: id,
     type,
   });
+
+// Method to deep copy an array/object
+export function copyObject(originalValue) {
+  let returnValue;
+
+  if (Array.isArray(originalValue)) {
+    returnValue = [];
+    for (let value of originalValue) returnValue.push(copyObject(value));
+  } else if (typeof originalValue === "object" && originalValue !== null) {
+    returnValue = {};
+    for (let key of Object.keys(originalValue))
+      returnValue[key] = copyObject(originalValue[key]);
+  } else returnValue = originalValue;
+
+  return returnValue;
+}
+
+// Method to check if object is empty
+export function isEmpty(value) {
+  if (value === null || value === undefined) return true;
+  return Object.keys(value).length === 0;
+}
+
+// Method to set element id element going in full screen
+export const setFullScreenID = (state, id) => {
+  if (state) localStorage.setItem("fullScreen", id);
+};
+
+// Object to be passed to Textfield to diable autocomplete
+export const DisableAutoComplete = ({ inputProps, formProps } = {}) => ({
+  inputProps: {
+    autocomplete: "new-password",
+    form: { autocomplete: "off", ...formProps },
+    ...inputProps,
+  },
+});
 
 // method to repalce/remove current query params
 export const changeQueryParams = (params, removeAll) => {

@@ -59,10 +59,10 @@ const useStyle = makeStyles((theme) => ({
 export default function PoamHeader({
   selectedRow,
   zoom: { isZoomed, zoomIn, zoomOut },
-  poam: { id, poamData, poamName },
+  poam: { fileID, poamData, poamName },
   cols: { allColumns, secondaryColumns, hiddenColumns },
   manageCol: { moveToPrimary, moveToSecondary },
-  manageRow: { editRowData, addNewRow, openJustify },
+  manageRow: { openEditFrom, openCreateForm, openJustify },
   manageSheet: { isOpenPoam, showOpenPoam, showClosePoam },
   manageJira: { containIssue, showCreateIssue, showUpdateIssue },
 }) {
@@ -161,13 +161,13 @@ export default function PoamHeader({
 
               <Tooltip
                 arrow
-                title={isOpenPoam() ? "Move to close" : "Move to open  "}
+                title={isOpenPoam ? "Move to close" : "Move to open  "}
               >
                 <Button
                   disabled={selectedRow.length !== 1}
                   onClick={openJustify}
                 >
-                  {isOpenPoam() ? (
+                  {isOpenPoam ? (
                     <img
                       alt="move-close"
                       src="https://img.icons8.com/ios-filled/24/000000/move-right.png"
@@ -183,11 +183,11 @@ export default function PoamHeader({
                 </Button>
               </Tooltip>
 
-              {isOpenPoam() && (
+              {isOpenPoam && (
                 <Tooltip arrow title="Edit row">
                   <Button
                     disabled={selectedRow.length !== 1}
-                    onClick={editRowData}
+                    onClick={openEditFrom}
                   >
                     <Icon>edit</Icon>
                   </Button>
@@ -225,16 +225,16 @@ export default function PoamHeader({
           >
             <Box>
               <ButtonGroup className={classes.tabButton}>
-                <Button disabled={isOpenPoam()} onClick={showOpenPoam}>
+                <Button disabled={isOpenPoam} onClick={showOpenPoam}>
                   Open
                 </Button>
-                <Button disabled={!isOpenPoam()} onClick={showClosePoam}>
+                <Button disabled={!isOpenPoam} onClick={showClosePoam}>
                   Close
                 </Button>
               </ButtonGroup>
             </Box>
 
-            <Box marginY={1} paddingBottom={Number(!isOpenPoam())}>
+            <Box marginY={1} paddingBottom={Number(!isOpenPoam)}>
               <TextControl
                 variant="outlined"
                 placeholder="Search here"
@@ -251,11 +251,11 @@ export default function PoamHeader({
                   ),
                 }}
               />
-              {isOpenPoam() && (
+              {isOpenPoam && (
                 <Button
                   size="small"
                   variant="outlined"
-                  onClick={addNewRow}
+                  onClick={openCreateForm}
                   startIcon={<Icon>add</Icon>}
                   style={{
                     background: "black",
@@ -270,9 +270,9 @@ export default function PoamHeader({
           </Box>
 
           <DownloadPoam
-            poamID={id}
+            poamID={fileID}
             data={poamData}
-            isOpenPoam={isOpenPoam()}
+            isOpenPoam={isOpenPoam}
             open={isDownloadOpen}
             close={closeDownload}
             allColumns={allColumns}

@@ -120,7 +120,12 @@ function DataTable({
   const addColsToHeader = (data) => {
     const temp = [...data];
 
-    if (serialNo) temp.unshift({ text: headerWrapper("Sr. No.") });
+    if (serialNo)
+      temp.unshift({
+        text: "Sr. No.",
+        params: { serialNo: "", header: "" },
+      });
+
     if (checkbox)
       temp.unshift({
         text: (
@@ -134,6 +139,7 @@ function DataTable({
             }}
           />
         ),
+        params: { checkbox: "", header: "" },
       });
 
     return temp;
@@ -143,7 +149,11 @@ function DataTable({
   const addColsToRow = (data, index) => {
     const temp = [...data];
 
-    if (serialNo) temp.unshift({ text: rowWrapper(index + 1) });
+    if (serialNo)
+      temp.unshift({
+        text: index + 1,
+        params: { serialNo: "", row: "" },
+      });
     if (checkbox)
       temp.unshift({
         text: (
@@ -154,6 +164,7 @@ function DataTable({
             onClick={(e) => e.stopPropagation()}
           />
         ),
+        params: { checkbox: "", row: "" },
       });
 
     return temp;
@@ -212,7 +223,7 @@ function DataTable({
                 style={{ ...header.cellStyle, ...css }}
                 padding={checkbox && index === 0 ? "checkbox" : "normal"}
               >
-                {text}
+                {headerWrapper(text)}
                 {reiszeTable && <VerticalResizer index={index} />}
               </TableCell>
             ))}
@@ -239,7 +250,7 @@ function DataTable({
                         checkbox && colIndex === 0 ? "checkbox" : "normal"
                       }
                     >
-                      {text}
+                      {rowWrapper(text)}
                     </TableCell>
                   )
                 )}

@@ -5,5 +5,5 @@ export { default as CheckboxControl } from "./Checkbox.control";
 export { default as RadioControl } from "./Radio.control";
 export { default as DateControl } from "./Date.control";
 export { default as SelectControl } from "./Select.control";
-export { default as UploadControl } from "./Upload.control";
+export { default as UploadControl } from "./UploadControl";
 export { default as SliderControl } from "./Slider.control";

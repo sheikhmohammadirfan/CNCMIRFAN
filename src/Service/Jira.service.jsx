@@ -59,7 +59,7 @@ export async function createIssue(data, row_index, poamID) {
 
   // Add all value except assignee & file
   for (let key of Object.keys(data))
-    if (!["file", "asssignee"].includes(key)) formData.append(key, data[key]);
+    if (!["file", "assignee"].includes(key)) formData.append(key, data[key]);
 
   // Check if any file is attached, then add for formData
   if (data.file.length > 0)
@@ -75,14 +75,20 @@ export async function createIssue(data, row_index, poamID) {
 export async function updateIssue(data) {
   let formData = new FormData();
 
+  // Append data to formdata
   for (let key of Object.keys(data)) {
-    if (data[key] === "") {
-    } else if (key === "customfield_10020") formData.append(key, data[key]);
-    else if (["reporter", "assignee"].includes(key))
-      formData.append(key, data[key]?.id || "");
-    else if (data[key] === null) formData.append(key, "");
-    else formData.append(key, data[key]);
+    // avoid issuetye field
+    if (key !== "issuetype") {
+      // Check if any value is passed
+      if (data[key]) {
+        // Check if it is assignee or repoeter, then push their ids
+        if (key === "assignee" || key === "reporter")
+          formData.append(key, data[key].id);
+        else formData.append(key, data[key]);
+      }
+    }
   }
 
+  // make update request
   return await patch("/jira/updateissue/", formData);
 }

@@ -97,8 +97,8 @@ function UpdateIssue({ title, close, issues }) {
     issuetype: "",
     summary: "",
     description: "",
-    reporter: "",
-    assignee: "",
+    reporter: null,
+    assignee: null,
     labels: [],
     priority: "",
     customfield_10014: "",
@@ -129,7 +129,7 @@ function UpdateIssue({ title, close, issues }) {
         setValue(
           key,
           // Check if assignee list is updated or not
-          (newAssigneeList ? newAssigneeList : assigneeList).find(
+          (newAssigneeList || assigneeList).find(
             (val) => val.displayName === issueData[key]
           )
         );
@@ -187,6 +187,11 @@ function UpdateIssue({ title, close, issues }) {
     return assigneeData;
   };
 
+  // Onmounting component check if contains only one issue, then fetch them directly
+  useEffect(() => {
+    if (issueIDs.length === 1) setValue("issue_key", issueIDs[0]);
+  }, []);
+
   // Fetch issue details & options list
   useEffect(() => {
     (async () => {
@@ -206,16 +211,13 @@ function UpdateIssue({ title, close, issues }) {
     })();
   }, [issueWatcher]);
 
-  // Onmounting component check if contains only one issue, then fetch them directly
-  useEffect(() => {
-    if (issueIDs.length === 1) setValue("issue_key", issueIDs[0]);
-  }, []);
-
   // Method to submit data to create an issue
   const onSubmit = async (formDetails) => {
     startLoading("submit");
     const { data, status } = await updateIssue(formDetails);
-    console.log(data, status);
+    if (!status) return stopLoading();
+    notification("update-toast", "Issue updated successfully.", "success");
+    close();
     stopLoading();
   };
 
