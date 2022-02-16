@@ -45,7 +45,7 @@ export const setFullScreenID = (state, id) => {
 export const DisableAutoComplete = ({ inputProps, formProps } = {}) => ({
   inputProps: {
     autocomplete: "new-password",
-    form: { autocomplete: "off", ...formProps },
+    form: "",
     ...inputProps,
   },
 });

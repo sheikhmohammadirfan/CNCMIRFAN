@@ -99,7 +99,7 @@ const AddNewPoamDialog = ({
     file: null,
     file_name: "",
     csp: "",
-    department_name: "",
+    system_name: "",
     agency_name: "",
   };
 
@@ -119,7 +119,7 @@ const AddNewPoamDialog = ({
       },
     },
     csp: { required: "This field is required." },
-    department_name: { required: "This field is required." },
+    system_name: { required: "This field is required." },
     agency_name: { required: "This field is required." },
   };
 
@@ -209,8 +209,8 @@ const AddNewPoamDialog = ({
                   <Grid item xs={12}>
                     <TextControl
                       variant="outlined"
-                      name="department_name"
-                      label="Department Name"
+                      name="system_name"
+                      label="System Name"
                       size="small"
                       fullWidth
                       gutter={false}

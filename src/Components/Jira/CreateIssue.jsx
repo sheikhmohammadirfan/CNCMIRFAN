@@ -20,6 +20,7 @@ import {
 } from "../Utils/Control";
 import { notification } from "../Utils/Utils";
 import { getIntegratedPlatform } from "../../Service/UserFactory";
+import SelectLabels from "./SelectLabels";
 
 // Status text based on loading value
 const LoadingStatus = (loading) => ({
@@ -74,6 +75,7 @@ function CreateIssue({ title, poamID, close, rowIndex }) {
     description: "",
     issuetype: "",
     assignee: "",
+    labels: [],
     file: [],
   };
 
@@ -198,6 +200,15 @@ function CreateIssue({ title, poamID, close, rowIndex }) {
                 gutter={false}
                 maxRows={10}
                 minRows={4}
+              />
+            </Grid>
+
+            <Grid item xs={12}>
+              <SelectLabels
+                name="labels"
+                label="Labels"
+                control={control}
+                rules={validation}
               />
             </Grid>
 
