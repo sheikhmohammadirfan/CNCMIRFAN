@@ -30,6 +30,7 @@ import DialogBox from "../Utils/DialogBox";
 import { Form, TextControl, UploadControl } from "../Utils/Control";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { PoamUpload as defaultValues } from "../../assets/data/DefaultValue";
 
 // Generate styles
 const useStyle = makeStyles((theme) => ({
@@ -94,15 +95,6 @@ const AddNewPoamDialog = ({
   selectFile,
   cspName,
 }) => {
-  // default form values
-  const defaultValues = {
-    file: null,
-    file_name: "",
-    csp: "",
-    system_name: "",
-    agency_name: "",
-  };
-
   // Check if csp name is passed, then set it
   if (cspName) defaultValues.csp = cspName;
 

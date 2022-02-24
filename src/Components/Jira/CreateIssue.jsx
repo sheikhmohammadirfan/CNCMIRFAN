@@ -21,6 +21,7 @@ import {
 import { notification } from "../Utils/Utils";
 import { getIntegratedPlatform } from "../../Service/UserFactory";
 import SelectLabels from "./SelectLabels";
+import { CreateIssue as defaultValues } from "../../assets/data/DefaultValue";
 
 // Status text based on loading value
 const LoadingStatus = (loading) => ({
@@ -66,17 +67,6 @@ function CreateIssue({ title, poamID, close, rowIndex }) {
     description: { required: "This field is required." },
     issuetype: { required: "This field is required." },
     assignee: { required: "This field is required." },
-  };
-
-  // Default values of jira issue fields
-  const defaultValues = {
-    project: "",
-    summary: "",
-    description: "",
-    issuetype: "",
-    assignee: "",
-    labels: [],
-    file: [],
   };
 
   // Get methods of useForm

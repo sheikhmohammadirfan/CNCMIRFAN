@@ -4,7 +4,7 @@ import { PasswordControl, TextControl, Form } from "../Utils/Control";
 import { signup } from "../../Service/UserFactory";
 import { useForm } from "react-hook-form";
 import DocumentTitle from "../DocumentTitle";
-import { DisableAutoComplete } from "../Utils/Utils";
+import { DisableAutoComplete, isPasswordValid } from "../Utils/Utils";
 import { EMAIL_REGEX } from "../../assets/data/Other";
 
 const useStyles = makeStyles((theme) => ({
@@ -35,7 +35,10 @@ export default function Signup({ title, loginPage }) {
       },
       required: "Email is required.",
     },
-    password: { required: "Password is required." },
+    password: {
+      required: "Password is required.",
+      validate: { invalid: (val) => val === "" || isPasswordValid(val) },
+    },
   };
 
   // TODO: Reset is not working
@@ -51,8 +54,13 @@ export default function Signup({ title, loginPage }) {
       setLoading(false);
       // If success
       if (status) {
-        reset();
         loginPage();
+        reset({
+          first_name: "",
+          last_name: "",
+          email: "",
+          password: "",
+        });
       }
     }
   };
@@ -70,22 +78,25 @@ export default function Signup({ title, loginPage }) {
         rules={validations}
         onSubmit={handleSubmit(submit)}
       >
-        <TextControl
-          name="first_name"
-          label="first name"
-          size="small"
-          fullWidth
-          variant="standard"
-          {...DisableAutoComplete()}
-        />
-        <TextControl
-          name="last_name"
-          label="label name"
-          size="small"
-          fullWidth
-          variant="standard"
-          {...DisableAutoComplete()}
-        />
+        <Box display="flex">
+          <TextControl
+            name="first_name"
+            label="first name"
+            size="small"
+            fullWidth
+            variant="standard"
+            {...DisableAutoComplete()}
+          />
+          <Box width={20} />
+          <TextControl
+            name="last_name"
+            label="Last name"
+            size="small"
+            fullWidth
+            variant="standard"
+            {...DisableAutoComplete()}
+          />
+        </Box>
         <TextControl
           type="email"
           name="email"

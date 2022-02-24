@@ -25,6 +25,7 @@ import {
 import { useState } from "react";
 import SelectAssignee from "./SelectAssignee";
 import SelectLabels from "./SelectLabels";
+import { UpdateIssue as defaultValues } from "../../assets/data/DefaultValue";
 
 // Status text based on loading value
 const LoadingStatus = (loading) => ({
@@ -88,23 +89,6 @@ function UpdateIssue({ title, close, issues }) {
     },
     summary: { required: "This field is required." },
     description: { required: "This field is required." },
-  };
-
-  // Default values of jira issue fields
-  const defaultValues = {
-    project: "",
-    issue_key: "",
-    issuetype: "",
-    summary: "",
-    description: "",
-    reporter: null,
-    assignee: null,
-    labels: [],
-    priority: "",
-    customfield_10014: "",
-    components: "",
-    customfield_10020: "",
-    duedate: null,
   };
 
   // Get methods of useForm

@@ -22,6 +22,7 @@ import { getUser, setUser } from "../Service/UserFactory";
 import { useForm } from "react-hook-form";
 import { isPasswordValid } from "../Components/Utils/Utils";
 import { updateProfile } from "../Service/UserFactory";
+import { Profile as defaultValues } from "../assets/data/DefaultValue";
 
 /* GENERATE STYLES */
 const useStyles = makeStyles((theme) => ({
@@ -76,34 +77,22 @@ export default function Profile({ title }) {
     },
   };
 
-  // default values of form field
-  const defaultValues = {
-    email: getUser().email || "",
-    first_name: getUser().first_name || "",
-    last_name: getUser().last_name || "",
-    contact_no: getUser().contact_no || "",
-    date_of_birth: getUser().date_of_birth || null,
-    address: getUser().address || "",
-    city: getUser().city || "",
-    state: getUser().state || "",
-    postal_code: getUser().postal_code || "",
-    country: getUser().country || "",
-    "New Password": "",
-    "Confirm New Password": "",
-  };
-
   // Get useFrom method to handle form
   const { handleSubmit, control, getValues, reset } = useForm({
-    defaultValues,
+    defaultValues: defaultValues(getUser),
   });
 
   // Call update api to update field, only if data is changed
   const onSubmit = async (formData) => {
-    const { data, status } = await updateProfile(formData);
+    const formatDate = (date) =>
+      typeof date === "string" ? date : date?.format("YYYY-MM-DD");
+    const { data, status } = await updateProfile({
+      ...formData,
+      date_of_birth: formatDate(formData.date_of_birth),
+    });
     if (!status) return;
     setUser({ ...getUser(), ...data });
-    // TODO RESET SI NOT WORKING HERE
-    reset({ defaultValues });
+    reset(data);
   };
 
   return (
@@ -135,7 +124,7 @@ export default function Profile({ title }) {
                     fullWidth
                   />
                 </Grid>
-                
+
                 <Grid item xs={6}>
                   <TextControl
                     variant="outlined"

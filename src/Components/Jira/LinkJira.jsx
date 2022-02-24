@@ -14,15 +14,10 @@ import { FormProvider, useForm } from "react-hook-form";
 import FormTextInput from "../Form/FormTextInput";
 import { linkWithJira } from "../../Service/Jira.service";
 import { toast } from "react-toastify";
-
-const defaultValues = {
-  link: "",
-  email: "",
-  api_token: "",
-};
+import { LinkJira as defaultValues } from "../../assets/data/DefaultValue";
 
 export default function LinkJira({ openJira, closeJira }) {
-  const methods = useForm({ defaultValues: defaultValues });
+  const methods = useForm({ defaultValues });
   const { handleSubmit, control } = methods;
   const [loader, setLoader] = useState(false);
 

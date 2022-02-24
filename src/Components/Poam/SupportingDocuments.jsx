@@ -14,6 +14,7 @@ import { Controller, useForm } from "react-hook-form";
 import { RadioControl, TextControl } from "../Utils/Control";
 import CloseButton from "../Utils/CloseButton";
 import DialogBox from "../Utils/DialogBox";
+import { DocumentSelect as defaultValues } from "../../assets/data/DefaultValue";
 
 const useStyle = makeStyles((theme) => ({
   // style for list-item
@@ -59,13 +60,6 @@ const DocumentChip = ({ type, doc, onDelete }) => {
 // Document & Document type SELECTION dialog
 const DocumentSelect = ({ open, onClose, onSelect, options }) => {
   const classes = useStyle();
-
-  // Default values of the RHF
-  const defaultValues = {
-    "Document Name": "",
-    "Document Type": "Other",
-    "Other Name": "",
-  };
 
   // Validation for input fields
   const validation = {
