@@ -107,18 +107,44 @@ const AddNewPoamDialog = ({
     },
     file_name: {
       validate: {
-        valid: (val) => !isCreate() || val !== "" || "This field is required.",
+        valid: (val) => {
+          if (!isCreate()) return true;
+          if (!val) return "This field is required.";
+          if (val.length < 4)
+            return "File name should have atleast 4 characters.";
+          if (!val.match(/\.xls(x|m)$/i))
+            return "File name should ends with .xlsx or .xlsm";
+        },
       },
     },
-    csp: { required: "This field is required." },
-    system_name: { required: "This field is required." },
-    agency_name: { required: "This field is required." },
+    csp: {
+      required: "This field is required.",
+      minLength: {
+        value: 4,
+        message: "CSP Name should have atleast 4 characters.",
+      },
+    },
+    system_name: {
+      required: "This field is required.",
+      minLength: {
+        value: 4,
+        message: "System name should have atleast 4 characters.",
+      },
+    },
+    agency_name: {
+      required: "This field is required.",
+      minLength: {
+        value: 4,
+        message: "Agency name should have atleast 4 characters.",
+      },
+    },
   };
 
   // Get form object
-  const { handleSubmit, control, watch, setValue } = useForm({
+  const { handleSubmit, control, watch, setValue, formState } = useForm({
     defaultValues,
   });
+  console.log(formState.errors);
   const watchFile = watch("file");
 
   // Make create api call with onsubmitting form
@@ -141,19 +167,22 @@ const AddNewPoamDialog = ({
   );
 
   // Drag content element
-  const Content = (isDragActive, isDragAbove) => (
+  const Content = (isDragActive, isDragAbove, error) => (
     <Box
       className={`${useStyle().dragContent} pulse`}
       drag-active={String(isDragActive)}
       drag-above={String(isDragAbove)}
     >
-      {!watchFile && <span>Drag n Drop</span>}
-      {watchFile && (
+      {watchFile ? (
         <Chip
           label={watchFile.name}
           style={{ overflow: "hidden" }}
           onDelete={() => setValue("file", null)}
         />
+      ) : error ? (
+        <span style={{ color: "red" }}>Select a File !</span>
+      ) : (
+        <span>Drag n Drop</span>
       )}
     </Box>
   );
@@ -231,7 +260,9 @@ const AddNewPoamDialog = ({
                     hideFileList={true}
                     hideDragNDrop={false}
                     dragContainer={Container}
-                    dragContent={Content}
+                    dragContent={(active, above) =>
+                      Content(active, above, formState.errors.file)
+                    }
                   />
                 </Grid>
               )}

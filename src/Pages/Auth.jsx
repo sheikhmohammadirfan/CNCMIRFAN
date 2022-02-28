@@ -131,14 +131,12 @@ export default function Auth({ title }) {
         <Grid item sm={12} md={6}>
           <Box textAlign="center">
             <img src={logo} alt="logo" width="100%" style={{ maxWidth: 225 }} />
-            <Hidden smDown>
-              <Typography variant="h4" color="inherit">
-                Welcome
-              </Typography>
-              <Typography variant="h6" color="inherit">
-                We are happy to have you.
-              </Typography>
-            </Hidden>
+            <Typography variant="h4" color="inherit">
+              Welcome
+            </Typography>
+            <Typography variant="h6" color="inherit">
+              We are happy to have you.
+            </Typography>
           </Box>
         </Grid>
 

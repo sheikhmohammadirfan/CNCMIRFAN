@@ -27,7 +27,7 @@ const useStyles = makeStyles((theme) => ({
   // Table style
   table: {
     overflow: "visible",
-    width: "100%",
+    width: "max-content",
     display: "grid",
     "& thead, & tbody, & tr": { display: "contents" },
     // Make cell relative to put dragger inside cell

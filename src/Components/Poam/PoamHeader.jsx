@@ -19,16 +19,14 @@ import jira from "../../assets/img/jira-brands.svg";
 const useStyle = makeStyles((theme) => ({
   // Style for tab switching button
   tabButton: {
-    background: "black",
     paddingBottom: 0,
     borderBottomLeftRadius: 0,
     borderBottomRightRadius: 0,
     "& > .MuiButton-root": {
-      color: "white",
       borderBottom: "none",
       "&:nth-child(1)": { borderRadius: "4px 0 0 0" },
       "&:nth-child(2)": { borderRadius: "0 4px 0 0" },
-      "&:disabled": { color: "black", background: "white" },
+      "&:disabled": { color: "white", background: "black" },
     },
   },
 

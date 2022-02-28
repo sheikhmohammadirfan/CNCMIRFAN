@@ -16,7 +16,7 @@ export default function useCheck(checkList, setCheckLst, length) {
   const isCheckedAtIndex = (index) => checkList.includes(index);
 
   // Check if all checkbox is selected
-  const isAllChecked = () => checkList.length === length;
+  const isAllChecked = () => checkList.length === length && length > 0;
 
   // Check if some checkbox is selected
   const isSomeChecked = () => checkList.length > 0 && checkList.length < length;

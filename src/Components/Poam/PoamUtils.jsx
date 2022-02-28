@@ -170,7 +170,7 @@ export const movePoamRow = (setter, isOpen, data, fromIndex, toIndex) => {
     const toSheet = temp[!isOpen ? "open" : "close"];
     // put new data to toSheet & remove from fromSheet
     for (let columnsName of labels) {
-      toSheet[columnsName][toIndex] = fromSheet[columnsName][fromIndex];
+      toSheet[columnsName][toIndex] = data[columnsName];
       delete fromSheet[columnsName][fromIndex];
     }
     return temp;
