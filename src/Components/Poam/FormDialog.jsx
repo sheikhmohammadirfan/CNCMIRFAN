@@ -14,6 +14,7 @@ import CustomAccordion from "../Utils/CustomAccordion";
 import SupportingDocuments from "./SupportingDocuments";
 import { useForm } from "react-hook-form";
 import { validateID } from "./PoamUtils";
+import { stringToMoment } from "../Utils/Utils";
 
 // Style generator
 const useStyle = makeStyles((theme) => ({
@@ -67,12 +68,14 @@ function FormDialog({ poamID_data, rows, open, onClose, rowIndex, onSubmit }) {
 
   // Set dafault values for Create Form, for Edit Form populate existing details
   const defaultValues = {};
-  for (var name of poam_header)
-    defaultValues[name] = isCreateForm()
-      ? name.toLowerCase().includes("date")
-        ? null
-        : ""
-      : rows[name][rowIndex];
+  for (var name of poam_header) {
+    if (!name.toLowerCase().includes("date"))
+      defaultValues[name] = isCreateForm() ? "" : rows[name][rowIndex];
+    else
+      defaultValues[name] = stringToMoment(
+        isCreateForm() ? "" : rows[name][rowIndex]
+      );
+  }
 
   // Set default POAM ID, form is of create type
   if (isCreateForm())

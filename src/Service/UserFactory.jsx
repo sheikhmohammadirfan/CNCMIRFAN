@@ -1,3 +1,4 @@
+import { notification } from "../Components/Utils/Utils";
 import { patch, post } from "./CrudFactory";
 
 /************ TOKEN *************/
@@ -43,7 +44,7 @@ export function getIntegratedPlatform() {
 }
 
 // Set integrated plarform status
-function setIntegratedPlatform(obj) {
+export function setIntegratedPlatform(obj) {
   localStorage.setItem("integration", JSON.stringify(obj));
 }
 
@@ -88,6 +89,10 @@ export async function updateProfile(formData) {
   // Get exsisting data, to check what has changed
   const prevData = getUser();
 
+  // Convert date of birth to given format
+  if (formData.date_of_birth)
+    formData.date_of_birth = formData.date_of_birth?.format("YYYY-MM-DD");
+
   // Loop and get all updated data while skipping email & password field
   for (let key of Object.keys(formData))
     if (
@@ -105,5 +110,10 @@ export async function updateProfile(formData) {
     return await patch(`/user/${prevData.id}/`, newData);
 
   // Else return false value
+  notification(
+    "profile-toast",
+    "Please Edit fields before submitting...",
+    "error"
+  );
   return { data: null, status: false };
 }

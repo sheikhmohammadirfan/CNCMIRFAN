@@ -1,3 +1,4 @@
+import moment from "moment";
 import { toast } from "react-toastify";
 
 // Generate toast template
@@ -40,15 +41,6 @@ export function isEmpty(value) {
 export const setFullScreenID = (state, id) => {
   if (state) localStorage.setItem("fullScreen", id);
 };
-
-// Object to be passed to Textfield to diable autocomplete
-export const DisableAutoComplete = ({ inputProps, formProps } = {}) => ({
-  inputProps: {
-    autocomplete: "new-password",
-    form: "",
-    ...inputProps,
-  },
-});
 
 // method to repalce/remove current query params
 export const changeQueryParams = (params, removeAll) => {
@@ -94,3 +86,9 @@ export const getLabel = (label, name) => (label === " " ? "" : label || name);
 // Get error message from error or control.error
 export const getError = (error1, error2, gutter) =>
   error1 ? error1 : error2 ? error2.message : gutter ? " " : "";
+
+// Convert data to moment object
+export const stringToMoment = (date) => {
+  if (!date || date === "None") return null;
+  return moment(date);
+};

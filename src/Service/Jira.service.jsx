@@ -84,6 +84,9 @@ export async function updateIssue(data) {
         // Check if it is assignee or repoeter, then push their ids
         if (key === "assignee" || key === "reporter")
           formData.append(key, data[key].id);
+        // else if key is dueDate, the convert it into same format
+        else if (key === "duedate")
+          formData.append(key, data[key]?.format("YYYY-MM-DD"));
         else formData.append(key, data[key]);
       }
     }

@@ -24,16 +24,17 @@ const checkLoading = (keys, loading) =>
 
 export default function useLoading(initial) {
   // state to save loading status
-  const [loading, setLoading] = useState(initial ? initial : false);
+  const isUndefiend = () => initial === undefined;
+  const [loading, setLoading] = useState(isUndefiend() ? false : initial);
 
   // Method to start loading for any parameter passed, elsed set all
   const startLoading = (...newVal) =>
     setLoading((prevVal) =>
       newVal.length > 0
         ? setFew(prevVal, newVal, true)
-        : initial
-        ? setAll(initial, true)
-        : true
+        : isUndefiend()
+        ? true
+        : setAll(initial, true)
     );
 
   // Method to stop loading for any parameter passed, elsed unset all
@@ -41,9 +42,9 @@ export default function useLoading(initial) {
     setLoading((prevVal) =>
       newVal.length > 0
         ? setFew(prevVal, newVal, false)
-        : initial
-        ? setAll(initial, false)
-        : false
+        : isUndefiend()
+        ? false
+        : setAll(initial, false)
     );
 
   // Method to set & unset loading value based on given status
@@ -52,7 +53,7 @@ export default function useLoading(initial) {
 
   // Method to check if any state is loading, or any of all state is loading if no parameter is passed.
   const isLoading = useCallback(
-    (...keys) => (initial ? checkLoading(keys, loading) : loading),
+    (...keys) => (isUndefiend() ? loading : checkLoading(keys, loading)),
     [loading]
   );
 

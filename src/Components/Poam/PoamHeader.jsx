@@ -142,7 +142,7 @@ export default function PoamHeader({
                 updateDialog={showUpdateIssue}
               >
                 <Button
-                  disabled={selectedRow.length !== 1}
+                  disabled={!(isOpenPoam && selectedRow.length === 1)}
                   style={{ padding: "5px 15px" }}
                   onClick={openJira}
                 >
@@ -151,7 +151,9 @@ export default function PoamHeader({
                     alt="JIRA"
                     style={{
                       height: "24px",
-                      opacity: selectedRow.length !== 1 ? 0.4 : 1,
+                      opacity: !(isOpenPoam && selectedRow.length === 1)
+                        ? 0.4
+                        : 1,
                     }}
                   />
                 </Button>

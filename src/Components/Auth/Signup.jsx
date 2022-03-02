@@ -4,7 +4,7 @@ import { PasswordControl, TextControl, Form } from "../Utils/Control";
 import { signup } from "../../Service/UserFactory";
 import { useForm } from "react-hook-form";
 import DocumentTitle from "../DocumentTitle";
-import { DisableAutoComplete, isPasswordValid } from "../Utils/Utils";
+import { isPasswordValid } from "../Utils/Utils";
 import { EMAIL_REGEX } from "../../assets/data/Other";
 
 const useStyles = makeStyles((theme) => ({
@@ -77,6 +77,7 @@ export default function Signup({ title, loginPage }) {
         control={control}
         rules={validations}
         onSubmit={handleSubmit(submit)}
+        autoComplete="off"
       >
         <Box display="flex">
           <TextControl
@@ -85,7 +86,6 @@ export default function Signup({ title, loginPage }) {
             size="small"
             fullWidth
             variant="standard"
-            {...DisableAutoComplete()}
           />
           <Box width={20} />
           <TextControl
@@ -94,7 +94,6 @@ export default function Signup({ title, loginPage }) {
             size="small"
             fullWidth
             variant="standard"
-            {...DisableAutoComplete()}
           />
         </Box>
         <TextControl
@@ -103,7 +102,6 @@ export default function Signup({ title, loginPage }) {
           size="small"
           fullWidth
           variant="standard"
-          {...DisableAutoComplete()}
         />
         <PasswordControl
           name="password"

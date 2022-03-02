@@ -3,7 +3,7 @@ import { Button, Grid, Typography, Divider } from "@material-ui/core";
 import { getIntegratedPlatform } from "../../Service/UserFactory";
 import DialogBox from "../Utils/DialogBox";
 import useLoading from "../Utils/Hooks/useLoading";
-import { notification } from "../Utils/Utils";
+import { notification, stringToMoment } from "../Utils/Utils";
 import {
   DateControl,
   Form,
@@ -89,6 +89,14 @@ function UpdateIssue({ title, close, issues }) {
     },
     summary: { required: "This field is required." },
     description: { required: "This field is required." },
+    duedate: {
+      validate: {
+        isTodayOrAfter: (val) =>
+          val === null ||
+          val.isSameOrAfter(new Date(), "day") ||
+          "Due Date should be of today or afterwards.",
+      },
+    },
   };
 
   // Get methods of useForm
@@ -109,6 +117,7 @@ function UpdateIssue({ title, close, issues }) {
   /* Method to populate fetched issue-data to form */
   const setIssueDetails = async (issueData, newAssigneeList) => {
     for (let key of Object.keys(defaultValues)) {
+      // Set Assignee from person names
       if (["reporter", "assignee"].includes(key))
         setValue(
           key,
@@ -117,11 +126,11 @@ function UpdateIssue({ title, close, issues }) {
             (val) => val.displayName === issueData[key]
           )
         );
+      // Set duedate, if none is passed then set null
+      else if (key === "duedate") setValue(key, stringToMoment(issueData[key]));
+      // Set Other value except issue_key
       else if (key !== "issue_key")
-        setValue(
-          key,
-          !issueData[key] || issueData[key] === "None" ? "" : issueData[key]
-        );
+        setValue(key, issueData[key] !== "None" ? issueData[key] : "");
     }
   };
 
@@ -385,7 +394,7 @@ function UpdateIssue({ title, close, issues }) {
           variant="contained"
           disabled={isLoading("submit", "fetchingIssue")}
         >
-          Create
+          Update
         </Button>,
       ]}
     />

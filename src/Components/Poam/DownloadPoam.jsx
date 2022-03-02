@@ -111,7 +111,9 @@ export default function DownloadPoam({
     XLSX.writeFile(book, `${fileName}.${type}`);
   };
 
+  const exportAsXLS = () => exportFile("POAM FILE", "xls");
   const exportAsXLSX = () => exportFile("POAM FILE", "xlsx");
+  const exportAsXLSM = () => exportFile("POAM FILE", "xlsm");
   const exportAsCSV = () => exportFile("POAM FILE", "csv");
 
   // Create component to show text & caption
@@ -253,9 +255,27 @@ export default function DownloadPoam({
           size="large"
           fullWidth
           color="primary"
+          onClick={exportAsXLS}
+        >
+          .xls
+        </Button>,
+        <Button
+          variant="contained"
+          size="large"
+          fullWidth
+          color="primary"
           onClick={exportAsXLSX}
         >
           .xlsx
+        </Button>,
+        <Button
+          variant="contained"
+          size="large"
+          fullWidth
+          color="primary"
+          onClick={exportAsXLSM}
+        >
+          .xlsm
         </Button>,
       ]}
     />

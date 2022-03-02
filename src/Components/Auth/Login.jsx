@@ -16,7 +16,6 @@ import { login } from "../../Service/UserFactory";
 import { Link } from "react-router-dom";
 import DocumentTitle from "../DocumentTitle";
 import { useForm } from "react-hook-form";
-import { DisableAutoComplete } from "../Utils/Utils";
 import { EMAIL_REGEX } from "../../assets/data/Other";
 
 // CSS class generator
@@ -86,6 +85,7 @@ export default function Login({ title, homePage }) {
         control={control}
         rules={validation}
         onSubmit={handleSubmit(submit)}
+        autoComplete="off"
       >
         <TextControl
           type="email"
@@ -93,14 +93,12 @@ export default function Login({ title, homePage }) {
           size="small"
           variant="standard"
           fullWidth
-          {...DisableAutoComplete()}
         />
         <PasswordControl
           name="password"
           size="small"
           variant="standard"
           fullWidth
-          {...DisableAutoComplete()}
         />
 
         <Box textAlign="right" marginBottom={2}>

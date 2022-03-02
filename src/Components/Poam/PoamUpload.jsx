@@ -84,6 +84,32 @@ const useStyle = makeStyles((theme) => ({
     },
     "&[drag-active=true][drag-above=false]": { "--color": "50, 150, 150" },
   },
+
+  // Upload Button
+  fileUploadBtn: {
+    padding: theme.spacing(3 / 4),
+    borderRadius: theme.spacing(1),
+    textAlign: "center",
+    "&[error='true']": {
+      color: "#f44336",
+      background: theme.palette.grey[100],
+      border: `1px solid ${theme.palette.grey[300]}`,
+    },
+  },
+
+  // Backdrop style
+  backdrop: {
+    zIndex: 1000,
+    display: "flex",
+    flexDirection: "column",
+    color: "white",
+    "&  .backdrop-label": {
+      marginTop: 10,
+      fontWeight: "bold",
+      letterSpacing: 1,
+      fontStyle: "italic",
+    },
+  },
 }));
 
 /* DIALOG TO ADD/CREATE NEW POAM */
@@ -95,6 +121,8 @@ const AddNewPoamDialog = ({
   selectFile,
   cspName,
 }) => {
+  const classes = useStyle();
+
   // Check if csp name is passed, then set it
   if (cspName) defaultValues.csp = cspName;
 
@@ -169,7 +197,7 @@ const AddNewPoamDialog = ({
   // Drag content element
   const Content = (isDragActive, isDragAbove, error) => (
     <Box
-      className={`${useStyle().dragContent} pulse`}
+      className={`${classes.dragContent} pulse`}
       drag-active={String(isDragActive)}
       drag-above={String(isDragAbove)}
     >
@@ -179,10 +207,14 @@ const AddNewPoamDialog = ({
           style={{ overflow: "hidden" }}
           onDelete={() => setValue("file", null)}
         />
-      ) : error ? (
-        <span style={{ color: "red" }}>Select a File !</span>
       ) : (
-        <span>Drag n Drop</span>
+        <span
+          className={classes.fileUploadBtn}
+          error={Boolean(error).toString()}
+        >
+          {error ? "File is required !" : "Drag n Drop"}
+          <br />
+        </span>
       )}
     </Box>
   );
@@ -191,7 +223,7 @@ const AddNewPoamDialog = ({
     <DialogBox
       open={isOpen}
       onClose={close}
-      title={isCreate() ? "Create New Poam" : "Upload New Poam"}
+      title={isCreate() ? "Create New Poam" : "Add New Poam"}
       maxWidth={isCreate() ? "xs" : "sm"}
       fullWidth
       bottomSeperator={true}
@@ -279,7 +311,7 @@ const AddNewPoamDialog = ({
           color="secondary"
           onClick={handleSubmit(onSubmit)}
         >
-          {isCreate() ? "Create" : "Upload"}
+          {isCreate() ? "Create" : "Add"}
         </Button>,
       ]}
     />
@@ -307,6 +339,7 @@ export default function PoamUpload({ selectFile }) {
 
   // Manage add new poam dialog status
   const [dialogOpen, setDialogOpen] = useState(-1);
+  const isDialogOpen = () => dialogOpen !== -1;
   const isCreateDialog = () => dialogOpen === 1;
   const isUploadDialog = () => dialogOpen === 0;
   const openCreateDialog = () => setDialogOpen(1);
@@ -318,7 +351,7 @@ export default function PoamUpload({ selectFile }) {
   const [poamList, setPoamList] = useState({});
 
   // State to save download props
-  const [downloadData, setDownloadData] = useState();
+  const [downloadPoamProps, setDownloadPoamProps] = useState();
 
   // Loader state
   const { isLoading, startLoading, stopLoading } = useLoading({
@@ -351,10 +384,10 @@ export default function PoamUpload({ selectFile }) {
     const { data, status } = await getData(val);
     if (!status) return stopLoading("download");
 
-    setDownloadData({
+    setDownloadPoamProps({
       data: { open: data.open_data, close: data.closed_data },
       poamID: val,
-      close: () => setDownloadData(),
+      close: () => setDownloadPoamProps(),
       allColumns: poam_header,
       hiddenColumns: hidden_columns,
     });
@@ -400,7 +433,7 @@ export default function PoamUpload({ selectFile }) {
 
         <ButtonGroup variant="contained" style={{ width: "100%" }}>
           <Button onClick={openUploadDialog} style={{ flexGrow: 1 }}>
-            Upload File
+            Add File
           </Button>
 
           <Button onClick={openCreateDialog} style={{ flexGrow: 1 }}>
@@ -409,36 +442,23 @@ export default function PoamUpload({ selectFile }) {
         </ButtonGroup>
       </Box>
 
-      <Backdrop
-        style={{
-          zIndex: 1000,
-          display: "flex",
-          flexDirection: "column",
-          color: "white",
-        }}
-        open={isLoading("download")}
-      >
+      <Backdrop className={classes.backdrop} open={isLoading("download")}>
         <CircularProgress color="inherit" />
-        <Typography
-          style={{
-            marginTop: 10,
-            fontWeight: "bold",
-            letterSpacing: 1,
-            fontStyle: "italic",
-          }}
-          variant="h5"
-        >
+        <Typography className="backdrop-label" variant="h5">
           Fetching data...
         </Typography>
       </Backdrop>
 
-      {downloadData && (
-        <DownloadPoam open={Boolean(downloadData)} {...downloadData} />
+      {downloadPoamProps && (
+        <DownloadPoam
+          open={Boolean(downloadPoamProps)}
+          {...downloadPoamProps}
+        />
       )}
 
-      {(isCreateDialog() || isUploadDialog()) && (
+      {isDialogOpen() && (
         <AddNewPoamDialog
-          isOpen={isCreateDialog() || isUploadDialog()}
+          isOpen={isDialogOpen()}
           close={closeDialog}
           isCreate={isCreateDialog}
           loading={{

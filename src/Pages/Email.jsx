@@ -213,6 +213,11 @@ function Email({ title }) {
   const classes = useStyles();
 
   const [mailAcknowledgement, setMailAcknowledgement] = useState(false);
+  useEffect(() => {
+    if (mailAcknowledgement)
+      setTimeout(() => setMailAcknowledgement(false), 1000);
+  }, [mailAcknowledgement]);
+
   const [loader, setLoader] = useState(false);
   const [subject, setSubject] = useState("");
   const [message, setMessage] = useState("");
@@ -340,16 +345,6 @@ function Email({ title }) {
             check_circle
           </Icon>
         </DialogContent>
-        <DialogActions>
-          <Button
-            variant="outlined"
-            size="small"
-            color="primary"
-            onClick={handleClose}
-          >
-            Okay
-          </Button>
-        </DialogActions>
       </Dialog>
 
       <Dialog open={open} maxWidth="sm" fullWidth>

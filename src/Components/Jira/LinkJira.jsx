@@ -8,6 +8,7 @@ import {
   DialogTitle,
   IconButton,
   CircularProgress,
+  Box,
 } from "@material-ui/core";
 import CloseIcon from "@material-ui/icons/Close";
 import { FormProvider, useForm } from "react-hook-form";
@@ -15,6 +16,10 @@ import FormTextInput from "../Form/FormTextInput";
 import { linkWithJira } from "../../Service/Jira.service";
 import { toast } from "react-toastify";
 import { LinkJira as defaultValues } from "../../assets/data/DefaultValue";
+import {
+  getIntegratedPlatform,
+  setIntegratedPlatform,
+} from "../../Service/UserFactory";
 
 export default function LinkJira({ openJira, closeJira }) {
   const methods = useForm({ defaultValues });
@@ -28,9 +33,12 @@ export default function LinkJira({ openJira, closeJira }) {
   const linkJira = (data) => {
     setLoader(true);
     linkWithJira(data.link, data.email, data.api_token)
-      .then(() => {
+      .then((res) => {
         setLoader(false);
-        closeJira();
+        if (res.status) {
+          setIntegratedPlatform({ ...getIntegratedPlatform(), jira: true });
+          closeJira();
+        }
       })
       .catch((err) => notification(err, "error"));
   };
@@ -45,7 +53,7 @@ export default function LinkJira({ openJira, closeJira }) {
           alignItems: "center",
         }}
       >
-        <h2>Link Jira with Cncm</h2>
+        <h2>Integrate Jira </h2>
         <IconButton onClick={closeJira}>
           <CloseIcon />
         </IconButton>
@@ -82,14 +90,12 @@ export default function LinkJira({ openJira, closeJira }) {
           onClick={handleSubmit(linkJira)}
           variant="contained"
         >
-          Link
+          Integrate
+          <Box width={5} />
           {loader ? (
-            <CircularProgress
-              size={20}
-              style={{ color: "#fff", marginLeft: "6px" }}
-            />
+            <CircularProgress size={20} color="inherit" />
           ) : (
-            <Icon style={{ marginLeft: "4px", fontSize: "18px" }}>link</Icon>
+            <Icon>link</Icon>
           )}
         </Button>
       </DialogActions>

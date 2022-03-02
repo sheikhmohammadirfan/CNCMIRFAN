@@ -1,3 +1,5 @@
+import { stringToMoment } from "../../Components/Utils/Utils";
+
 export const CreateIssue = {
   project: "",
   summary: "",
@@ -49,7 +51,7 @@ export const Profile = (getUser) => ({
   first_name: getUser().first_name || "",
   last_name: getUser().last_name || "",
   contact_no: getUser().contact_no || "",
-  date_of_birth: getUser().date_of_birth || null,
+  date_of_birth: stringToMoment(getUser().date_of_birth),
   address: getUser().address || "",
   city: getUser().city || "",
   state: getUser().state || "",

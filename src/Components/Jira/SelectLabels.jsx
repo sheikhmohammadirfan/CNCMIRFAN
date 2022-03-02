@@ -39,7 +39,7 @@ export default function SelectLabels({ name, label, control, rules, ...rest }) {
       name={name}
       control={control}
       rules={rules[name]}
-      render={({ field: { value, onChange }, fieldState: { error } }) => (
+      render={({ field: { value, onChange } }) => (
         <Autocomplete
           value={value}
           onChange={(e, newVal) => {

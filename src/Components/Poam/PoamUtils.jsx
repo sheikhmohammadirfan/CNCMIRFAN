@@ -142,12 +142,14 @@ export const updateColumns = (allColumns, secondaryColumns) =>
   allColumns.filter((columnName) => !secondaryColumns.includes(columnName));
 
 /* Method to put issue in the current poam sheet */
-export const putIssueInData = (setter, getSheet, index, issueID) =>
-  setter((prevData) => {
-    const temp = copyObject(prevData);
-    getSheet(temp).jira_issues[index][issueID] = true;
-    return temp;
-  });
+export const putIssueInData = (setter, getSheet, index, issueID) => {
+  if (index !== -1)
+    setter((prevData) => {
+      const temp = copyObject(prevData);
+      getSheet(temp).jira_issues[index][issueID] = true;
+      return temp;
+    });
+};
 
 /* Method to update row with new data in given poam data */
 export const updatePoamRow = (setter, getSheet, newData, index) => {

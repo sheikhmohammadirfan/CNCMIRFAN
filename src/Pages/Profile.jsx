@@ -5,6 +5,7 @@ import {
   Typography,
   InputAdornment,
   Icon,
+  CircularProgress,
 } from "@material-ui/core";
 import DocumentTitle from "../Components/DocumentTitle";
 import countries from "i18n-iso-countries";
@@ -16,13 +17,16 @@ import {
   Form,
 } from "../Components/Utils/Control";
 // Importing desired language
-import enLocale from "i18n-iso-countries/langs/en.json";
 import { makeStyles } from "@material-ui/styles";
 import { getUser, setUser } from "../Service/UserFactory";
-import { useForm } from "react-hook-form";
-import { isPasswordValid } from "../Components/Utils/Utils";
+import { Controller, useForm } from "react-hook-form";
+import { isPasswordValid, stringToMoment } from "../Components/Utils/Utils";
 import { updateProfile } from "../Service/UserFactory";
 import { Profile as defaultValues } from "../assets/data/DefaultValue";
+import enLocale from "i18n-iso-countries/langs/en.json";
+import countryCodes from "country-codes-list";
+import useLoading from "../Components/Utils/Hooks/useLoading";
+import moment from "moment";
 
 /* GENERATE STYLES */
 const useStyles = makeStyles((theme) => ({
@@ -36,15 +40,99 @@ const useStyles = makeStyles((theme) => ({
     fontWeight: "bold",
     borderBottom: `${theme.spacing(2 / 3)}px solid ${theme.palette.grey[300]}`,
   },
+  countryDropdown: {
+    minWidth: 80,
+    marginLeft: theme.spacing(1 / 2),
+    "& .MuiInput-formControl": {
+      margin: 0,
+      "&::before": { content: "", border: "none" },
+    },
+    "& .MuiInput-underline": { "&::after": { content: "", border: "none" } },
+    "& .MuiSelect-root": {
+      background: "transparent",
+    },
+  },
 }));
+
+// Custom test input for countact number with country code dropdown selector
+const ContactNumControl = ({ name, label, control, rules }) => {
+  // Generate styles
+  const classes = useStyles();
+
+  // Get mapping of countryCode with callingCode
+  const callingCodes = countryCodes.customList(
+    "countryCode",
+    "+{countryCallingCode}"
+  );
+
+  // Map countryCode to options
+  const options = Object.entries(callingCodes).map(([val, text]) => ({
+    val,
+    text: `${val} ${text}`,
+  }));
+
+  return (
+    <Controller
+      name={name}
+      control={control}
+      rules={rules[name]}
+      render={({ field: { value, onChange }, fieldState: { error } }) => {
+        // Extract callingcode & number
+        const [code, num] = value.split("-");
+
+        // Extract countryCode from callingCode to populate Select input
+        const getCountryCode = () => {
+          if (!code) return "";
+          for (let countryCode in callingCodes)
+            if (callingCodes[countryCode] === code) return countryCode;
+          return "";
+        };
+
+        // Country code selection input
+        const Adornment = () => (
+          <InputAdornment position="start">
+            <Icon>call</Icon>
+            <SelectControl
+              name="option"
+              label=" "
+              styleProps={{ className: classes.countryDropdown }}
+              options={options}
+              value={getCountryCode()}
+              onChange={(e) =>
+                onChange(`${callingCodes[e.target.value]}-${num || ""}`)
+              }
+            />
+          </InputAdornment>
+        );
+
+        return (
+          <TextControl
+            name={name}
+            label={label}
+            error={error?.message}
+            noControls={true}
+            variant="outlined"
+            size="small"
+            gutter={false}
+            fullWidth
+            value={num === undefined ? "" : num}
+            onChange={(e) => onChange(`${code}-${e.target.value}`)}
+            InputProps={{ startAdornment: <Adornment /> }}
+          />
+        );
+      }}
+    />
+  );
+};
 
 /* PROFILE COMPONENT */
 export default function Profile({ title }) {
   DocumentTitle(title);
   // Get styles
   const classes = useStyles();
+  // Loader
+  const { isLoading, startLoading, stopLoading } = useLoading();
 
-  // Setup contry dropdown list
   countries.registerLocale(enLocale);
   const countryObj = countries.getNames("en", { select: "official" });
   const countryArray = Object.values(countryObj).map((value) => ({
@@ -54,13 +142,23 @@ export default function Profile({ title }) {
 
   // Validation to be the profile form fields
   const validation = {
+    first_name: { required: "This field is required." },
+    last_name: { required: "This field is required." },
     contact_no: {
-      pattern: { value: /^\d{10}$/, message: "Contact no. is invalid." },
+      validate: {
+        invalid: (val) => {
+          if (val === "") return true;
+          const [code, num] = val.split("-");
+          if (!num?.match(/^\d{10}$/)) return "Countact no. invalid.";
+          if (code === "") return "Select Country code.";
+          return true;
+        },
+      },
     },
     date_of_birth: {
       validate: {
         invalid: (date) =>
-          new Date(date) < new Date() || "Invalid Date of Birth.",
+          date.isBefore(new Date()) || "Invalid Date of Birth.",
       },
     },
     postal_code: {
@@ -84,15 +182,14 @@ export default function Profile({ title }) {
 
   // Call update api to update field, only if data is changed
   const onSubmit = async (formData) => {
-    const formatDate = (date) =>
-      typeof date === "string" ? date : date?.format("YYYY-MM-DD");
-    const { data, status } = await updateProfile({
-      ...formData,
-      date_of_birth: formatDate(formData.date_of_birth),
-    });
-    if (!status) return;
-    setUser({ ...getUser(), ...data });
-    reset(data);
+    if (!isLoading()) {
+      startLoading();
+      const { data, status } = await updateProfile(formData);
+      if (!status) return stopLoading();
+      setUser({ ...getUser(), ...data });
+      reset({ ...data, date_of_birth: stringToMoment(data.date_of_birth) });
+      stopLoading();
+    }
   };
 
   return (
@@ -137,20 +234,11 @@ export default function Profile({ title }) {
                 </Grid>
 
                 <Grid item xs={6}>
-                  <TextControl
-                    variant="outlined"
-                    size="small"
+                  <ContactNumControl
                     name="contact_no"
                     label="Contact No."
-                    gutter={false}
-                    fullWidth
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          <Icon>call</Icon>
-                        </InputAdornment>
-                      ),
-                    }}
+                    control={control}
+                    rules={validation}
                   />
                 </Grid>
 
@@ -281,8 +369,13 @@ export default function Profile({ title }) {
             </Grid>
 
             <Grid item xs={12} style={{ textAlign: "right" }}>
-              <Button variant="outlined" color="primary" type="submit">
-                Update Details
+              <Button
+                variant="outlined"
+                color="primary"
+                type="submit"
+                endIcon={isLoading() && <CircularProgress size={20} />}
+              >
+                {isLoading() ? "Updating..." : "Update Details"}
               </Button>
             </Grid>
           </Grid>
