@@ -172,7 +172,6 @@ const AddNewPoamDialog = ({
   const { handleSubmit, control, watch, setValue, formState } = useForm({
     defaultValues,
   });
-  console.log(formState.errors);
   const watchFile = watch("file");
 
   // Make create api call with onsubmitting form
