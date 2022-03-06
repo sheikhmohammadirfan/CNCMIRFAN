@@ -40,8 +40,7 @@ async function request(requestOptions) {
     // Setup Success response
     res.status = true;
     res.message = response.data.message;
-    delete response.data.message;
-    res.data = response.data;
+    res.data = response.data.data;
 
     // Notify user
     if (method !== "GET" && notify)

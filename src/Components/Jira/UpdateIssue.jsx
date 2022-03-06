@@ -89,14 +89,6 @@ function UpdateIssue({ title, close, issues }) {
     },
     summary: { required: "This field is required." },
     description: { required: "This field is required." },
-    duedate: {
-      validate: {
-        isTodayOrAfter: (val) =>
-          val === null ||
-          val.isSameOrAfter(new Date(), "day") ||
-          "Due Date should be of today or afterwards.",
-      },
-    },
   };
 
   // Get methods of useForm
@@ -207,9 +199,8 @@ function UpdateIssue({ title, close, issues }) {
   // Method to submit data to create an issue
   const onSubmit = async (formDetails) => {
     startLoading("submit");
-    const { data, status } = await updateIssue(formDetails);
+    const { status } = await updateIssue(formDetails);
     if (!status) return stopLoading();
-    notification("update-toast", "Issue updated successfully.", "success");
     close();
     stopLoading();
   };

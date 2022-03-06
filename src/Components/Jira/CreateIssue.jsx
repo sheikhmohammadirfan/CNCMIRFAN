@@ -117,11 +117,10 @@ function CreateIssue({ title, poamID, close, rowIndex }) {
   // Method to submit data to create an issue
   const onSubmit = async (formDetails) => {
     startLoading("submit");
-    const { data, status } = await createIssue(formDetails, rowIndex, poamID);
+    const { message, status } = await createIssue(formDetails, rowIndex, poamID);
     if (!status) return stopLoading();
-    notification("jira-issue", data.success, "success");
     stopLoading();
-    close(data.success.split(" ")[0]);
+    close(message.split(" ")[0]);
   };
 
   return (

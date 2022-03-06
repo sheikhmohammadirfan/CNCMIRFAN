@@ -107,7 +107,7 @@ export async function updateProfile(formData) {
 
   // Check if any data is change, then only send update request
   if (Object.keys(newData).length > 0)
-    return await patch(`/user/${prevData.id}/`, newData);
+    return await patch(`/user/update/`, newData);
 
   // Else return false value
   notification(
