@@ -3,7 +3,11 @@ import { Button, Grid, Typography, Divider } from "@material-ui/core";
 import { getIntegratedPlatform } from "../../Service/UserFactory";
 import DialogBox from "../Utils/DialogBox";
 import useLoading from "../Utils/Hooks/useLoading";
-import { notification, stringToMoment } from "../Utils/Utils";
+import {
+  notification,
+  replaceIdWithName,
+  stringToMoment,
+} from "../Utils/Utils";
 import {
   DateControl,
   Form,
@@ -199,7 +203,12 @@ function UpdateIssue({ title, close, issues }) {
   // Method to submit data to create an issue
   const onSubmit = async (formDetails) => {
     startLoading("submit");
-    const { status } = await updateIssue(formDetails);
+    const { message, status } = await updateIssue(formDetails);
+    notification(
+      "jira-issue",
+      replaceIdWithName(message),
+      status ? "success" : "error"
+    );
     if (!status) return stopLoading();
     close();
     stopLoading();

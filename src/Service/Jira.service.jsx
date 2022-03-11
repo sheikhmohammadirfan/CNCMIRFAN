@@ -68,7 +68,7 @@ export async function createIssue(data, row_index, poamID) {
   // Check if any asignee is selected then, add it id
   if (data.assignee) formData.append("assignee", data.assignee.id);
 
-  return await post(`/jira/newissue/${poamID}/`, formData);
+  return await post(`/jira/newissue/${poamID}/`, formData, { notify: false });
 }
 
 /* Method to update issue with given details */
@@ -93,5 +93,5 @@ export async function updateIssue(data) {
   }
 
   // make update request
-  return await patch("/jira/updateissue/", formData);
+  return await patch("/jira/updateissue/", formData, { notify: false });
 }

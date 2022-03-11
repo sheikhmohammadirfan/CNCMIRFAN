@@ -56,7 +56,7 @@ async function request(requestOptions) {
     res.status = false;
     res.message = e?.response?.data?.error || "An error occured.";
     // Notify user
-    notification("api-toast", res.message, "error");
+    if (notify) notification("api-toast", res.message, "error");
   }
   return res;
 }

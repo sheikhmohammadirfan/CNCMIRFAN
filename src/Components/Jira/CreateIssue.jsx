@@ -18,7 +18,7 @@ import {
   TextControl,
   UploadControl,
 } from "../Utils/Control";
-import { notification } from "../Utils/Utils";
+import { notification, replaceIdWithName } from "../Utils/Utils";
 import { getIntegratedPlatform } from "../../Service/UserFactory";
 import SelectLabels from "./SelectLabels";
 import { CreateIssue as defaultValues } from "../../assets/data/DefaultValue";
@@ -117,7 +117,16 @@ function CreateIssue({ title, poamID, close, rowIndex }) {
   // Method to submit data to create an issue
   const onSubmit = async (formDetails) => {
     startLoading("submit");
-    const { message, status } = await createIssue(formDetails, rowIndex, poamID);
+    const { message, status } = await createIssue(
+      formDetails,
+      rowIndex,
+      poamID
+    );
+    notification(
+      "jira-issue",
+      replaceIdWithName(message),
+      status ? "success" : "error"
+    );
     if (!status) return stopLoading();
     stopLoading();
     close(message.split(" ")[0]);
