@@ -19,7 +19,7 @@ export const SidebarData = [
     icon: "manage_accounts",
     title: "Manage Artifacts",
     component: Link,
-    to: "/support",
+    to: "/artifacts",
   },
   {
     icon: "category",

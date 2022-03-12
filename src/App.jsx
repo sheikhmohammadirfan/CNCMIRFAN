@@ -123,10 +123,9 @@ function App() {
                     <Route exact path="/verify">
                       <Verify title="VERIFY" />
                     </Route>
-                    <Route exact path="/support">
+                    <Route exact path="/artifacts">
                       <Poam title="POAM" />
                     </Route>
-
                     <Route exact path="/profile">
                       <Profile title="PROFILE" />
                     </Route>

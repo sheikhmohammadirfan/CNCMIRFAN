@@ -140,8 +140,7 @@ const AddNewPoamDialog = ({
           if (!val) return "This field is required.";
           if (val.length < 4)
             return "File name should have atleast 4 characters.";
-          if (!val.match(/\.xls(x|m)$/i))
-            return "File name should ends with .xlsx or .xlsm";
+          return true;
         },
       },
     },
@@ -365,7 +364,7 @@ export default function PoamUpload({ selectFile }) {
       startLoading("load");
       const { data, status } = await getPoamList();
       if (!status) return stopLoading("load");
-      setPoamList(data);
+      if (data) setPoamList(data);
 
       const res = await getCSP();
       if (!res.status) return;

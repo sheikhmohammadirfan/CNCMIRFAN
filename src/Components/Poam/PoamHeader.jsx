@@ -57,7 +57,8 @@ const useStyle = makeStyles((theme) => ({
 export default function PoamHeader({
   selectedRow,
   zoom: { isZoomed, zoomIn, zoomOut },
-  poam: { fileID, poamData, poamName },
+  details: { fileID, fileName, cspName, systemName, agencyName },
+  poamData,
   cols: { allColumns, secondaryColumns, hiddenColumns },
   manageCol: { moveToPrimary, moveToSecondary },
   manageRow: { openEditFrom, openCreateForm, openJustify },
@@ -110,10 +111,10 @@ export default function PoamHeader({
                   },
                   {
                     data: [
-                      { text: poamName },
-                      { text: "ACME INC." },
-                      { text: "HEALTH DEPARTMENT" },
-                      { text: "HEALTH DEPARTMENT" },
+                      { text: fileName },
+                      { text: cspName },
+                      { text: systemName },
+                      { text: agencyName },
                     ],
                   },
                 ],

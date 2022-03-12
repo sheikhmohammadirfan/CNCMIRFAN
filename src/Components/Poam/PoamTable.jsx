@@ -67,7 +67,7 @@ export default function PoamTable({ fileID }) {
   };
 
   // React State to save table name
-  const [poamName, setPoamName] = useState();
+  const [poamDetails, setPoamDetails] = useState();
 
   // List for all types of columns
   const [allColumns, setAllColumns] = useState(poam_header);
@@ -118,7 +118,12 @@ export default function PoamTable({ fileID }) {
       if (!status) return stopLoading();
       // Update state
       setPoamData({ open: data.open_data, close: data.closed_data });
-      setPoamName(data.file_name);
+      setPoamDetails({
+        fileName: data.file_name,
+        cspName: data.csp,
+        systemName: data.system_name,
+        agencyName: data.agency_name,
+      });
       stopLoading();
     })();
   }, []);
@@ -239,7 +244,8 @@ export default function PoamTable({ fileID }) {
         <PoamHeader
           selectedRow={selectedRow}
           zoom={{ isZoomed, zoomIn, zoomOut }}
-          poam={{ fileID, poamData, poamName }}
+          details={{ fileID, ...poamDetails }}
+          poamData={poamData}
           cols={{ allColumns, secondaryColumns, hiddenColumns }}
           manageCol={{ moveToPrimary, moveToSecondary }}
           manageRow={{ openEditFrom, openCreateForm, openJustify }}
