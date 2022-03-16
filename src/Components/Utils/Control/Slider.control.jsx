@@ -1,9 +1,12 @@
 import { FormControl, FormLabel, Slider } from "@material-ui/core";
-import { getLabel } from "../Utils";
+import { checkNameProps } from "../Utils";
+import { getLabel } from "./ControlsUtils";
 import { Field } from "./Form";
+import PropTypes from "prop-types";
+import { forwardRef } from "react";
 
 // Get Slider input
-export default function SliderControl(props) {
+const SliderControl = forwardRef((props, ref) => {
   // Map marker label to numeric value
   const mapToValue = (label) =>
     props.markers.find((mark) => mark.label === label)?.value || 0;
@@ -42,15 +45,31 @@ export default function SliderControl(props) {
         <FormControl {...styleProps}>
           <FormLabel component="legend">{getLabel(label, name)}</FormLabel>
           <Slider
+            ref={ref}
             step={returnLabel ? null : step}
             marks={markers}
             {...controls?.field}
             value={getValue(controls, value)}
             onChange={(_, val) => setValue(val, controls, onChange)}
             {...other}
+            data-test="slider-container"
           />
         </FormControl>
       )}
     />
   );
-}
+});
+SliderControl.propTypes = {
+  name: checkNameProps,
+  controls: PropTypes.object,
+  markers: PropTypes.arrayOf(
+    PropTypes.shape({
+      label: PropTypes.string.isRequired,
+      value: PropTypes.string.isRequired,
+    })
+  ),
+  onChange: PropTypes.func.isRequired,
+  returnLabel: PropTypes.bool,
+};
+
+export default SliderControl;

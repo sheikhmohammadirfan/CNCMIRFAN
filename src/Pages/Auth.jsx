@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
 import { makeStyles, Typography, Box, Grid, Hidden } from "@material-ui/core";
 import Login from "../Components/Auth/Login";
@@ -87,9 +87,9 @@ const useStyles = makeStyles((theme) => ({
   formBody: {
     display: "flex",
     width: "200%",
-    transform: "translateX(-50%)",
+    transform: "translateX(0%)",
     transition: "transform .5s cubic-bezier(.63,-0.58,.63,1.58)",
-    "&.login": { transform: "translateX(0%)" },
+    "&.login": { transform: "translateX(-50%)" },
   },
 }));
 
@@ -119,10 +119,10 @@ export default function Auth({ title }) {
   const homePage = () => history.push("/");
 
   // React hook to update  state on path change
-  useEffect(() => {
+  React.useEffect(() => {
     if (history.location.pathname === "/signup") setPageState(0);
     else if (history.location.pathname === "/login") setPageState(1);
-    else setPageState(2);
+    else if (history.location.pathname === "/forgotpassword") setPageState(2);
   }, [history.location.pathname]);
 
   return (
@@ -151,6 +151,7 @@ export default function Auth({ title }) {
                   variant="subtitle1"
                   className={`${classes.headings} ${!loginIn ? "active" : ""}`}
                   onClick={signupUser}
+                  data-test="signup-btn"
                 >
                   Sign Up
                 </Typography>
@@ -158,6 +159,7 @@ export default function Auth({ title }) {
                   variant="subtitle1"
                   className={`${classes.headings} ${loginIn ? "active" : ""}`}
                   onClick={loginUser}
+                  data-test="login-btn"
                 >
                   Login
                 </Typography>
@@ -165,7 +167,10 @@ export default function Auth({ title }) {
             </Box>
 
             <Box overflow="hidden">
-              <Box className={`${classes.formBody} ${loginIn ? "" : "login"}`}>
+              <Box
+                className={`${classes.formBody} ${loginIn ? "login" : ""}`}
+                data-test="form-wrapper"
+              >
                 <Signup title="SIGN UP" loginPage={loginUser} />
                 <Login title="LOGIN" homePage={homePage} />
               </Box>

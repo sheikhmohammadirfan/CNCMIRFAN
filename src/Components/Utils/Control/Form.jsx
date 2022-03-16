@@ -1,5 +1,6 @@
-import { createContext, useContext } from "react";
+import React, { createContext } from "react";
 import { Controller } from "react-hook-form";
+import PropTypes from "prop-types";
 
 // Create controller context
 const ControllerContext = createContext({
@@ -24,6 +25,12 @@ export default function Form({
     </form>
   );
 }
+Form.propTypes = {
+  control: PropTypes.object.isRequired,
+  children: PropTypes.element.isRequired,
+  rules: PropTypes.object,
+  controlProps: PropTypes.object,
+};
 
 // Map child component into a controller if control props is passed
 export function Field({ field, noControls, ...rest }) {
@@ -35,7 +42,7 @@ export function Field({ field, noControls, ...rest }) {
   };
 
   // Get control from form context
-  const formControl = useContext(ControllerContext);
+  const formControl = React.useContext(ControllerContext);
 
   const { control, rules, controlProps } = restControl.control
     ? restControl
@@ -48,8 +55,13 @@ export function Field({ field, noControls, ...rest }) {
       rules={rules[rest.name]}
       {...controlProps}
       render={(controls) => field({ controls, ...rest })}
+      data-test="controller"
     />
   ) : (
     field(rest)
   );
 }
+Field.propTypes = {
+  field: PropTypes.func.isRequired,
+  noControls: PropTypes.bool,
+};

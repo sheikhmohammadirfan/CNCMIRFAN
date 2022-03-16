@@ -29,11 +29,11 @@ export const RenderListItem = ({ listItem, fileName, index, removeFile }) => {
   return listItem ? (
     listItem(fileName, index, removeFile)
   ) : (
-    <ListItem className={classes.fileListItem} button dense>
+    <ListItem className={classes.fileListItem} button dense  data-test="listitem-container">
       <Typography variant="body2" noWrap>
         {fileName}
       </Typography>
-      <IconButton size="small" onClick={removeFile}>
+      <IconButton size="small" onClick={removeFile} data-test="listitem-remove-btn">
         <Icon>clear</Icon>
       </IconButton>
     </ListItem>

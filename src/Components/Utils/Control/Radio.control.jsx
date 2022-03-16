@@ -5,18 +5,21 @@ import {
   Radio,
   RadioGroup,
 } from "@material-ui/core";
-import { getLabel } from "../Utils";
+import { checkNameProps } from "../Utils";
+import { getLabel } from "./ControlsUtils";
 import { Field } from "./Form";
+import PropTypes from "prop-types";
+import { forwardRef } from "react";
 
 // Radiocontrol state
-export default function RadioControl(props) {
+const RadioControl = forwardRef((props, ref) => {
   return (
     <Field
       {...props}
       field={({
-        name = "",
+        name,
         label = "",
-        direction = "",
+        direction,
         options,
         hideLabel = false,
         controls,
@@ -25,19 +28,24 @@ export default function RadioControl(props) {
       }) => (
         <FormControl {...styleProps}>
           {!hideLabel && (
-            <FormLabel component="legend">{getLabel(label, name)}</FormLabel>
+            <FormLabel component="legend" data-test="radio-label">
+              {getLabel(label, name)}
+            </FormLabel>
           )}
           <RadioGroup
+            ref={ref}
             row={direction === "row"}
             {...controls?.field}
             {...others}
+            data-test="radio-input"
           >
             {options.map((val, index) => (
               <FormControlLabel
-                value={val?.val ? val.val : val}
+                value={val?.val !== undefined ? val.val : val}
                 key={index}
                 control={<Radio />}
-                label={val?.text ? val.text : val}
+                label={val?.text !== undefined ? val.text : val}
+                data-test={`radio-option-${val?.val ? val.val : val}`}
               />
             ))}
           </RadioGroup>
@@ -45,4 +53,20 @@ export default function RadioControl(props) {
       )}
     />
   );
-}
+});
+RadioControl.propTypes = {
+  name: checkNameProps,
+  controls: PropTypes.object,
+  direction: PropTypes.oneOf(["row", "column"]),
+  options: PropTypes.arrayOf(
+    PropTypes.oneOfType([
+      PropTypes.shape({
+        val: PropTypes.string.isRequired,
+        text: PropTypes.any.isRequired,
+      }),
+      PropTypes.string,
+    ])
+  ).isRequired,
+};
+
+export default RadioControl;

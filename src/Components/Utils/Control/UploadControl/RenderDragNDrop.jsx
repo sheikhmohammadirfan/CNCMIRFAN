@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { FileDrop } from "react-file-drop";
 import DialogBox from "../../DialogBox";
 import ReactDOM from "react-dom";
+import PropTypes from "prop-types";
 
 // Generate styles
 const useStyles = makeStyles((theme) => ({
@@ -54,7 +55,7 @@ const DragContent = (isDragActive, isDragAbove) => {
   };
 
   return (
-    <Box padding={1} width={1} height={1}>
+    <Box padding={1} width={1} height={1} data-test="drag-n-drop-target">
       <Box
         className={`${classes.root} pulse`}
         frame-drag={String(isDragActive)}
@@ -67,7 +68,7 @@ const DragContent = (isDragActive, isDragAbove) => {
 };
 
 // Method to render drag-n-drop inside a dialog / show drag-n-drop in given function or container reference
-export const RenderDragNDrop = ({
+const RenderDragNDrop = ({
   trigger,
   onChange,
   dialogOpen,
@@ -93,13 +94,14 @@ export const RenderDragNDrop = ({
     <FileDrop
       className={classes.fileDrop}
       targetClassName={classes.fileDropTarget}
-      onTargetClick={trigger}
+      onTargetClick={() => trigger() & closeDrag()}
       onFrameDragEnter={() => setDragActive(true)}
       onFrameDragLeave={() => setDragActive(false)}
       onFrameDrop={() => resetState() & closeDrag()}
       onDragOver={() => setDragAbove(true)}
       onDragLeave={() => setDragAbove(false)}
       onDrop={(files) => resetState() & onChange(files) & closeDrag()}
+      data-test="drag-n-drop-fileDrop"
     >
       {(content || DragContent)(isDragActive, isDragAbove)}
     </FileDrop>
@@ -130,6 +132,13 @@ export const RenderDragNDrop = ({
           {FileDropElement}
         </Box>
       }
+      data-test="drag-n-drop-dialog-box"
     />
   );
 };
+RenderDragNDrop.propTypes = {
+  trigger: PropTypes.func.isRequired,
+  onChange: PropTypes.func.isRequired,
+};
+
+export { RenderDragNDrop };

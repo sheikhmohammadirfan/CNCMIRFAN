@@ -6,10 +6,12 @@ import {
   Select,
 } from "@material-ui/core";
 import { Field } from "./Form";
-import { getLabel, getError } from "../Utils";
+import { getLabel, getError } from "./ControlsUtils";
+import PropTypes from "prop-types";
+import { forwardRef } from "react";
 
 // Get dropdown input
-export default function SelectControl(props) {
+const SelectControl = forwardRef((props, ref) => {
   return (
     <Field
       {...props}
@@ -31,12 +33,14 @@ export default function SelectControl(props) {
             {getLabel(label, name)}
           </InputLabel>
           <Select
+            ref={ref}
             labelId={`${name.replaceAll(" ", "-")}-id`}
             id={`${name.replaceAll(" ", "-")}`}
             label={getLabel(label, name)}
             error={Boolean(error || controls?.fieldState.error)}
             {...controls?.field}
             {...others}
+            data-test="select-input"
           >
             {loading ? (
               <MenuItem disabled={true}>Loading...</MenuItem>
@@ -48,6 +52,7 @@ export default function SelectControl(props) {
                   value={val?.val ? val.val : val}
                   key={index}
                   {...optionProps}
+                  data-test={`select-option-${val?.val ? val.val : val}`}
                 >
                   {val?.text ? val.text : val}
                 </MenuItem>
@@ -61,4 +66,20 @@ export default function SelectControl(props) {
       )}
     />
   );
-}
+});
+SelectControl.propTypes = {
+  name: PropTypes.string.isRequired,
+  value: PropTypes.string,
+  options: PropTypes.arrayOf(
+    PropTypes.oneOfType([
+      PropTypes.shape({
+        val: PropTypes.string.isRequired,
+        text: PropTypes.any.isRequired,
+      }),
+      PropTypes.string,
+    ])
+  ).isRequired,
+  controls: PropTypes.object,
+};
+
+export default SelectControl;

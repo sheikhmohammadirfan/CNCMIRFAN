@@ -4,7 +4,7 @@ import { PasswordControl, TextControl, Form } from "../Utils/Control";
 import { signup } from "../../Service/UserFactory";
 import { useForm } from "react-hook-form";
 import DocumentTitle from "../DocumentTitle";
-import { isPasswordValid } from "../Utils/Utils";
+import { isPasswordValid } from "../Utils/Control/ControlsUtils";
 import { EMAIL_REGEX } from "../../assets/data/Other";
 
 const useStyles = makeStyles((theme) => ({

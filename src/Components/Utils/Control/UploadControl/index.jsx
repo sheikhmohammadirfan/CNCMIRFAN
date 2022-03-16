@@ -1,12 +1,13 @@
-import { useState } from "react";
+import { useState, forwardRef } from "react";
 import { Field } from "../Form";
 import { RenderChildren } from "./RenderChildren";
 import { RenderDragNDrop } from "./RenderDragNDrop";
 import { RenderListContainer } from "./RenderListContainer";
 import { RenderListItem } from "./RenderListItem";
+import PropTypes from "prop-types";
 
 /* UPLOAD CONTROL INPUT */
-export default function UploadControl(props) {
+const UploadControl = forwardRef((props, ref) => {
   // State to manage drag n drop dialog visibility
   const [dialogOpen, setDialogOpen] = useState(false);
   const openDragDialog = () => setDialogOpen(true);
@@ -89,6 +90,7 @@ export default function UploadControl(props) {
         return (
           <>
             <input
+              ref={ref}
               multiple={multiple}
               id={`${name.replaceAll(" ", "_")}-id`}
               type="file"
@@ -98,6 +100,7 @@ export default function UploadControl(props) {
               value=""
               onChange={(e) => setValue(e.target.files, multiple, setter)}
               hidden
+              data-test="upload-input"
             />
 
             {!hideButtons && (
@@ -107,7 +110,10 @@ export default function UploadControl(props) {
                 trigger={() => inputTrigger(name)}
                 removeAll={() => removeAllFiles(setter)}
                 openDrag={openDragDialog}
-                hideDragNDrop={hideDragNDrop || dragContainer || dragRef}
+                hideDragNDrop={Boolean(
+                  hideDragNDrop || dragContainer || dragRef
+                )}
+                data-test="upload-button"
               />
             )}
 
@@ -120,12 +126,12 @@ export default function UploadControl(props) {
                 container={dragContainer}
                 containerRef={dragRef}
                 content={dragContent}
+                data-test="upload-drag-n-drop"
               />
             )}
 
             {!hideFileList && (
               <RenderListContainer
-                fileList={selectFiles}
                 container={listContainer}
                 containerRef={listRef}
                 listItems={selectFiles.map((file, index) => (
@@ -135,8 +141,10 @@ export default function UploadControl(props) {
                     fileName={file.name}
                     index={index}
                     removeFile={() => removeFileAtIndex(index, setter)}
+                    data-test="upload-file-item"
                   />
                 ))}
+                data-test="upload-file-list"
               />
             )}
           </>
@@ -144,4 +152,9 @@ export default function UploadControl(props) {
       }}
     />
   );
-}
+});
+UploadControl.propTypes = {
+  name: PropTypes.string.isRequired,
+};
+
+export default UploadControl;

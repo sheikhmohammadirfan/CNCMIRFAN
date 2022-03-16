@@ -1,6 +1,9 @@
 import { TextField, withStyles } from "@material-ui/core";
-import { getError, getLabel } from "../Utils";
+import { checkNameProps } from "../Utils";
+import { getError, getLabel } from "./ControlsUtils";
 import { Field } from "./Form";
+import PropTypes from "prop-types";
+import { forwardRef } from "react";
 
 // Get New text field with some default values
 const TextControl = withStyles({
@@ -33,6 +36,7 @@ const TextControl = withStyles({
     }) => (
       <TextField
         variant={variant}
+        name={name}
         label={getLabel(label, name)}
         error={Boolean(error || controls?.fieldState.error)}
         helperText={getError(error, controls?.fieldState.error, gutter)}
@@ -42,5 +46,9 @@ const TextControl = withStyles({
     )}
   />
 ));
+TextControl.propTypes = {
+  name: checkNameProps,
+  controls: PropTypes.object,
+};
 
 export default TextControl;

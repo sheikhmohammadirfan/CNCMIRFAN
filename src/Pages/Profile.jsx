@@ -20,13 +20,13 @@ import {
 import { makeStyles } from "@material-ui/styles";
 import { getUser, setUser } from "../Service/UserFactory";
 import { Controller, useForm } from "react-hook-form";
-import { isPasswordValid, stringToMoment } from "../Components/Utils/Utils";
+import { isPasswordValid } from "../Components/Utils/Control/ControlsUtils";
 import { updateProfile } from "../Service/UserFactory";
 import { Profile as defaultValues } from "../assets/data/DefaultValue";
 import enLocale from "i18n-iso-countries/langs/en.json";
 import countryCodes from "country-codes-list";
 import useLoading from "../Components/Utils/Hooks/useLoading";
-import moment from "moment";
+import { stringToMoment } from "../Components/Utils/Utils";
 
 /* GENERATE STYLES */
 const useStyles = makeStyles((theme) => ({
@@ -155,12 +155,6 @@ export default function Profile({ title }) {
         },
       },
     },
-    date_of_birth: {
-      validate: {
-        invalid: (date) =>
-          date.isBefore(new Date()) || "Invalid Date of Birth.",
-      },
-    },
     postal_code: {
       pattern: { value: /^\d{6}$/, message: "Pin code is invalid." },
     },
@@ -250,6 +244,7 @@ export default function Profile({ title }) {
                     variant="outlined"
                     format="Do MMMM yyyy"
                     fullWidth
+                    disableFuture
                   />
                 </Grid>
 

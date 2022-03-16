@@ -1,10 +1,12 @@
 import { Icon, InputAdornment } from "@material-ui/core";
 import { DatePicker } from "@material-ui/pickers";
-import { getError, getLabel } from "../Utils";
+import { checkNameProps } from "../Utils";
+import { getError, getLabel } from "./ControlsUtils";
 import { Field } from "./Form";
+import PropTypes from "prop-types";
 
 // Get Datepicker
-export default function DateControl(props) {
+function DateControl(props) {
   return (
     <Field
       {...props}
@@ -34,8 +36,16 @@ export default function DateControl(props) {
           helperText={getError(error, controls?.fieldState.error, gutter)}
           {...controls?.field}
           {...other}
+          data-test="date-container"
         />
       )}
     />
   );
 }
+DateControl.propTypes = {
+  name: checkNameProps,
+  controls: PropTypes.object,
+  onChange: PropTypes.func.isRequired,
+};
+
+export default DateControl;

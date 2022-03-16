@@ -57,13 +57,17 @@ export const deleteQueryParams = (...paramList) => {
   return query;
 };
 
-// method to check name props during prop-type checking
-export const checkNameProps = (props, propName, componentName) => {
-  if (props.controls && !props.name)
+// PropType test for props which are required if a other props is set
+export const propsRequiredIF = (props, propName, componentName, based) => {
+  if (props[based] && !props[propName])
     return new Error(
-      `Invalid prop name supplied to ${componentName}. Validation failed.`
+      `Invalid prop ${propName} supplied to ${componentName}. Validation failed.`
     );
 };
+
+// method to check name props during prop-type checking
+export const checkNameProps = (props, propName, componentName) =>
+  propsRequiredIF(props, propName, componentName, "controls");
 
 // Convert data to moment object
 export const stringToMoment = (date) => {
@@ -88,13 +92,10 @@ export const replaceIdWithName = (val) => {
   };
 
   const mappedMessage = (value) => {
-    let s = "";
+    let temp = value;
     for (let keys in mapper)
-      if (value.includes(keys)) {
-        s = value.replaceAll(keys, mapper[keys]);
-        break;
-      }
-    return s;
+      if (value.includes(keys)) temp = temp.replaceAll(keys, mapper[keys]);
+    return temp;
   };
 
   if (Array.isArray(val)) {
