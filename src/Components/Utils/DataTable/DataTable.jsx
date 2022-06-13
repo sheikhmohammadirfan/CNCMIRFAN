@@ -11,6 +11,8 @@ import {
 import DataTableFooter from "./DataTableFooter";
 import useDragResize from "./useDragResize";
 import useRowSelect from "./useRowSelect";
+import PropTypes from "prop-types";
+import { propsRequiredIF, PropType_Component } from "../Utils";
 
 /** CSS classe generator */
 const useStyles = makeStyles((theme) => ({
@@ -82,7 +84,7 @@ function DataTable({
   stickyHeader = true,
   footerComponent,
   verticalBorder = false,
-  reiszeTable = false,
+  resizeTable = false,
   header = { data: [], props: {}, style: {}, cellStyle: {} },
   // data: { text = "", props = {}, css = {} },
   rowList: {
@@ -122,7 +124,7 @@ function DataTable({
 
     if (serialNo)
       temp.unshift({
-        text: "Sr. No.",
+        text: <span data-test="datatable-header-serialNo">Sr. No.</span>,
         params: { serialNo: "", header: "" },
       });
 
@@ -137,6 +139,9 @@ function DataTable({
               toggleAllRows(e.target.checked);
               e.stopPropagation();
             }}
+            data-test="datatable-header-checkbox"
+            // disableRipple
+            // style={{ padding: 0, margin: "0 9px" }}
           />
         ),
         params: { checkbox: "", header: "" },
@@ -151,7 +156,7 @@ function DataTable({
 
     if (serialNo)
       temp.unshift({
-        text: index + 1,
+        text: <span data-test="datatable-row-serialNo">{index + 1}</span>,
         params: { serialNo: "", row: "" },
       });
     if (checkbox)
@@ -162,6 +167,9 @@ function DataTable({
             checked={isChecked(index)}
             onChange={(e) => toggleRow(startIndex + index, e.target.checked)}
             onClick={(e) => e.stopPropagation()}
+            data-test="datatable-row-checkbox"
+            // disableRipple
+            // style={{ padding: 0, margin: "0 9px" }}
           />
         ),
         params: { checkbox: "", row: "" },
@@ -206,14 +214,16 @@ function DataTable({
       {...rest}
     >
       <Table
-        className={reiszeTable ? classes.table : ""}
+        className={resizeTable ? classes.table : ""}
         style={{ gridTemplateColumns: generateTemplate() }}
         ref={tableRef}
+        data-test="datatable-table"
       >
         <TableHead
           className={`${classes.headerStyle} ${stickyHeader ? "sticky" : ""}`}
           style={header.style}
           {...header.props}
+          data-test="datatable-header-container"
         >
           <TableRow>
             {HEADERS.map(({ text = "", params = {}, css = {} }, index) => (
@@ -222,9 +232,12 @@ function DataTable({
                 {...params}
                 style={{ ...header.cellStyle, ...css }}
                 padding={checkbox && index === 0 ? "checkbox" : "normal"}
+                data-test="datatable-header-cell"
               >
                 {headerWrapper(text)}
-                {reiszeTable && <VerticalResizer index={index} />}
+                {resizeTable && (
+                  <VerticalResizer index={index} data-test="column-resizer" />
+                )}
               </TableCell>
             ))}
           </TableRow>
@@ -238,6 +251,7 @@ function DataTable({
                 {...rowProps}
                 {...props}
                 style={{ ...rowStyle, ...style }}
+                data-test="datatable-row-container"
               >
                 {addColsToRow(data, rowIndex).map(
                   ({ text = "", params = {}, css = {} }, colIndex) => (
@@ -249,6 +263,7 @@ function DataTable({
                       padding={
                         checkbox && colIndex === 0 ? "checkbox" : "normal"
                       }
+                      data-test="datatable-row-cell"
                     >
                       {rowWrapper(text)}
                     </TableCell>
@@ -271,5 +286,62 @@ function DataTable({
     </TableContainer>
   );
 }
+
+// PropTypes for header
+const PropType_HeaderCell = PropTypes.shape({
+  text: PropType_Component.isRequired,
+  params: PropTypes.object,
+  css: PropTypes.object,
+});
+const PropType_HeaderRow = PropTypes.arrayOf(PropType_HeaderCell);
+const PropType_Header = PropTypes.shape({
+  data: PropType_HeaderRow.isRequired,
+  props: PropTypes.object,
+  style: PropTypes.object,
+  cellStyle: PropTypes.object,
+});
+
+// PropTypes for Row
+const PropType_TableCell = PropTypes.shape({
+  text: PropType_Component.isRequired,
+  params: PropTypes.object,
+  css: PropTypes.object,
+});
+const PropType_TableRow = PropTypes.shape({
+  data: PropTypes.arrayOf(PropType_TableCell).isRequired,
+  props: PropTypes.object,
+  style: PropTypes.object,
+});
+const PropType_TableBody = PropTypes.shape({
+  rowData: PropTypes.arrayOf(PropType_TableRow).isRequired,
+  rowProps: PropTypes.object,
+  rowStyle: PropTypes.object,
+  cellProps: PropTypes.object,
+  cellStyle: PropTypes.object,
+});
+
+DataTable.propTypes = {
+  selectedRows: (...params) => propsRequiredIF(...params, "checkbox", "array"),
+  setSelectedRows: (...params) =>
+    propsRequiredIF(...params, "checkbox", "function"),
+  pageSize: PropTypes.number,
+  checkbox: PropTypes.bool,
+  serialNo: PropTypes.bool,
+  stickyHeader: PropTypes.bool,
+  footerComponent: PropType_Component,
+  verticalBorder: PropTypes.bool,
+  resizeTable: PropTypes.bool,
+  header: PropType_Header,
+  rowList: PropType_TableBody,
+  headerWrapper: PropTypes.func,
+  rowWrapper: PropTypes.func,
+  minCellWidth: PropTypes.oneOfType([
+    PropTypes.number,
+    PropTypes.arrayOf(PropTypes.number),
+  ]),
+  minCheckboxWidth: (...params) =>
+    propsRequiredIF(...params, "checkbox", "number"),
+  className: PropTypes.string,
+};
 
 export default DataTable;

@@ -6,7 +6,7 @@ import {
   Select,
 } from "@material-ui/core";
 import { Field } from "./Form";
-import { getLabel, getError } from "./ControlsUtils";
+import { getLabel, getError } from "./Controls.utils.js";
 import PropTypes from "prop-types";
 import { forwardRef } from "react";
 
@@ -43,9 +43,9 @@ const SelectControl = forwardRef((props, ref) => {
             data-test="select-input"
           >
             {loading ? (
-              <MenuItem disabled={true}>Loading...</MenuItem>
+              <MenuItem disabled>Loading...</MenuItem>
             ) : options.length === 0 ? (
-              <MenuItem disabled={true}>No Options</MenuItem>
+              <MenuItem disabled>No Options</MenuItem>
             ) : (
               options.map((val, index) => (
                 <MenuItem

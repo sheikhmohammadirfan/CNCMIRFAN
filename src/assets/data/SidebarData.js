@@ -11,19 +11,19 @@ export const SidebarData = [
   },
   {
     icon: "verified",
-    title: "Verify Complaince",
+    title: "Verify Compliance",
     component: Link,
     to: "/verify",
   },
   {
     icon: "manage_accounts",
-    title: "Manage Artifacts",
+    title: "Manage Poam",
     component: Link,
-    to: "/artifacts",
+    to: "/poam",
   },
   {
     icon: "category",
-    title: "Complaince Mapping",
+    title: "Compliance Mapping",
     component: Link,
     to: "/contact",
     subMenu: [

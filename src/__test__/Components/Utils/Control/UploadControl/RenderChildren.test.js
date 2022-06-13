@@ -1,6 +1,6 @@
 import { shallow } from "enzyme";
 import { RenderChildren } from "../../../../../Components/Utils/Control/UploadControl/RenderChildren";
-import { checkProps, findByAttr } from "../../../../TestUtils";
+import { testProps, findByAttr } from "../../../../Test.utils";
 
 describe("<RenderChildren />", () => {
   const setup = (props) => {
@@ -19,7 +19,7 @@ describe("<RenderChildren />", () => {
   });
 
   test("Test props of component", () => {
-    checkProps(RenderChildren, { fileList: [] });
+    testProps(RenderChildren, { fileList: [] });
   });
 
   test("Test drag btn won't be visible, if hideDragNDrop is set", () => {

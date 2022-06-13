@@ -2,7 +2,7 @@ import { Icon, IconButton, InputAdornment } from "@material-ui/core";
 import { useState, forwardRef } from "react";
 import TextControl from "./Text.control";
 import PropTypes from "prop-types";
-import { checkNameProps } from "../Utils";
+import { controlledName } from "../Utils";
 
 // Get Paassword field with show/hide password btn
 const PasswordControl = forwardRef(({ forceHidden, ...others }, ref) => {
@@ -35,7 +35,7 @@ const PasswordControl = forwardRef(({ forceHidden, ...others }, ref) => {
   );
 });
 PasswordControl.propTypes = {
-  name: checkNameProps,
+  name: controlledName,
   controls: PropTypes.object,
 };
 

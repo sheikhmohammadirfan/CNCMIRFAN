@@ -20,7 +20,7 @@ import {
 import { makeStyles } from "@material-ui/styles";
 import { getUser, setUser } from "../Service/UserFactory";
 import { Controller, useForm } from "react-hook-form";
-import { isPasswordValid } from "../Components/Utils/Control/ControlsUtils";
+import { isPasswordValid } from "../Components/Utils/Control/Controls.utils.js";
 import { updateProfile } from "../Service/UserFactory";
 import { Profile as defaultValues } from "../assets/data/DefaultValue";
 import enLocale from "i18n-iso-countries/langs/en.json";
@@ -51,6 +51,11 @@ const useStyles = makeStyles((theme) => ({
     "& .MuiSelect-root": {
       background: "transparent",
     },
+  },
+  contact_input: {
+    maxWidth: 400,
+    "& label": { display: "none" },
+    "& legend": { display: "none" },
   },
 }));
 
@@ -91,7 +96,6 @@ const ContactNumControl = ({ name, label, control, rules }) => {
         // Country code selection input
         const Adornment = () => (
           <InputAdornment position="start">
-            <Icon>call</Icon>
             <SelectControl
               name="option"
               label=" "
@@ -118,6 +122,8 @@ const ContactNumControl = ({ name, label, control, rules }) => {
             value={num === undefined ? "" : num}
             onChange={(e) => onChange(`${code}-${e.target.value}`)}
             InputProps={{ startAdornment: <Adornment /> }}
+            className={classes.contact_input}
+            style={{ maxWidth: 400 }}
           />
         );
       }}
@@ -149,7 +155,7 @@ export default function Profile({ title }) {
         invalid: (val) => {
           if (val === "") return true;
           const [code, num] = val.split("-");
-          if (!num?.match(/^\d{10}$/)) return "Countact no. invalid.";
+          if (!num?.match(/^\d{10}$/)) return "Contact no. invalid.";
           if (code === "") return "Select Country code.";
           return true;
         },
@@ -203,7 +209,7 @@ export default function Profile({ title }) {
               </Grid>
             </Grid>
 
-            <Grid item xs={12}>
+            {/* <Grid item xs={12}>
               <Grid container spacing={2}>
                 <Grid item xs={6}>
                   <TextControl
@@ -236,6 +242,8 @@ export default function Profile({ title }) {
                   />
                 </Grid>
 
+                <Grid item xs={6}></Grid>
+
                 <Grid item xs={6}>
                   <DateControl
                     name="date_of_birth"
@@ -259,7 +267,7 @@ export default function Profile({ title }) {
                   />
                 </Grid>
 
-                <Grid item xs={4}>
+                <Grid item xs={6}>
                   <TextControl
                     name="city"
                     label="City"
@@ -270,7 +278,7 @@ export default function Profile({ title }) {
                   />
                 </Grid>
 
-                <Grid item xs={8}>
+                <Grid item xs={6}>
                   <TextControl
                     name="state"
                     label="State"
@@ -281,7 +289,7 @@ export default function Profile({ title }) {
                   />
                 </Grid>
 
-                <Grid item xs={4}>
+                <Grid item xs={6}>
                   <TextControl
                     name="postal_code"
                     label="Pincode"
@@ -292,7 +300,7 @@ export default function Profile({ title }) {
                   />
                 </Grid>
 
-                <Grid item xs={8}>
+                <Grid item xs={6}>
                   <SelectControl
                     name="country"
                     label="Country"
@@ -302,18 +310,80 @@ export default function Profile({ title }) {
                   />
                 </Grid>
               </Grid>
-            </Grid>
+            </Grid> */}
 
             <Grid item xs={12}>
-              <Grid contrinar>
-                <Typography variant="h6" className={classes.subtitle}>
-                  User Credentials
-                </Typography>
+              <Grid container spacing={2} alignItems="center">
+                <Grid item xs={3}>
+                  <Typography>First Name:</Typography>
+                </Grid>
+                <Grid item xs={9}>
+                  <TextControl
+                    variant="outlined"
+                    size="small"
+                    name="first_name"
+                    label=" "
+                    gutter={false}
+                    fullWidth
+                    style={{ maxWidth: 400 }}
+                  />
+                </Grid>
+
+                <Grid item xs={3}>
+                  <Typography>Last Name:</Typography>
+                </Grid>
+                <Grid item xs={9}>
+                  <TextControl
+                    variant="outlined"
+                    size="small"
+                    name="last_name"
+                    label=" "
+                    gutter={false}
+                    fullWidth
+                    style={{ maxWidth: 400 }}
+                  />
+                </Grid>
+
+                <Grid item xs={3}>
+                  <Typography>Contact No:</Typography>
+                </Grid>
+                <Grid item xs={9}>
+                  <ContactNumControl
+                    name="contact_no"
+                    label="Contact No."
+                    control={control}
+                    rules={validation}
+                  />
+                </Grid>
+
+                <Grid item xs={3}>
+                  <Typography>Role:</Typography>
+                </Grid>
+                <Grid item xs={9}>
+                  <SelectControl
+                    variant="outlined"
+                    name="role"
+                    label="-"
+                    fullWidth
+                    styleProps={{
+                      fullWidth: true,
+                      style: { maxWidth: 400 },
+                      size: "small",
+                    }}
+                    options={["Employee", "Owner", "Proprietor", "Tech"]}
+                  />
+                </Grid>
               </Grid>
             </Grid>
 
             <Grid item xs={12}>
-              <Grid container spacing={2}>
+              <Typography variant="h6" className={classes.subtitle}>
+                User Credentials
+              </Typography>
+            </Grid>
+
+            <Grid item xs={12}>
+              <Grid container spacing={2} alignItems="center">
                 <Grid item xs={3}>
                   <Typography>Email:</Typography>
                 </Grid>

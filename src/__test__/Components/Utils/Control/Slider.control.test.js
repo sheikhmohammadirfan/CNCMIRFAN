@@ -1,7 +1,7 @@
 import { shallow } from "enzyme";
 import React from "react";
 import SliderControl from "../../../../Components/Utils/Control/Slider.control";
-import { checkProps, findByAttr } from "../../../TestUtils";
+import { testProps, findByAttr } from "../../../Test.utils";
 
 describe("<SliderControl />", () => {
   const setup = (props) => {
@@ -19,7 +19,7 @@ describe("<SliderControl />", () => {
   });
 
   test("Select render with props without error", () => {
-    checkProps(SliderControl, {
+    testProps(SliderControl, {
       name: "Dropdown",
       controls: {},
       markers: [

@@ -1,6 +1,6 @@
 import { Checkbox, FormControlLabel, withStyles } from "@material-ui/core";
-import { checkNameProps } from "../Utils";
-import { getLabel } from "./ControlsUtils";
+import { controlledName } from "../Utils";
+import { getLabel } from "./Controls.utils.js";
 import { Field } from "./Form";
 import PropTypes from "prop-types";
 import { forwardRef } from "react";
@@ -30,7 +30,7 @@ const CheckboxControl = withStyles({ root: { margin: 0 } })(
   ))
 );
 CheckboxControl.propTypes = {
-  name: checkNameProps,
+  name: controlledName,
   controls: PropTypes.object,
 };
 

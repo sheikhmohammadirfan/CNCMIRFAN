@@ -1,9 +1,8 @@
 import { TextField, withStyles } from "@material-ui/core";
-import { checkNameProps } from "../Utils";
-import { getError, getLabel } from "./ControlsUtils";
+import { controlledName } from "../Utils";
+import { getError, getLabel } from "./Controls.utils.js";
 import { Field } from "./Form";
 import PropTypes from "prop-types";
-import { forwardRef } from "react";
 
 // Get New text field with some default values
 const TextControl = withStyles({
@@ -47,7 +46,7 @@ const TextControl = withStyles({
   />
 ));
 TextControl.propTypes = {
-  name: checkNameProps,
+  name: controlledName,
   controls: PropTypes.object,
 };
 

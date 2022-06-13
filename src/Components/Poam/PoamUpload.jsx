@@ -13,6 +13,7 @@ import {
   Backdrop,
   CircularProgress,
   Chip,
+  FormHelperText,
 } from "@material-ui/core";
 import React from "react";
 import {
@@ -37,7 +38,6 @@ const useStyle = makeStyles((theme) => ({
   // style for list title
   titleStyle: {
     fontWeight: "bold",
-    borderBottom: `1px solid ${theme.palette.grey[400]}`,
   },
 
   // style for list container
@@ -49,17 +49,13 @@ const useStyle = makeStyles((theme) => ({
     borderRadius: 4,
     border: "1px solid rgba(0, 0, 0, 0.2)",
     transition: "all 0.1s linear",
-    "& .MuiIconButton-root": {
-      padding: 0,
-      overflow: "hidden",
-      width: 0,
-      transition: "all 0.1s linear",
-    },
+    display: "flex",
+    justifyContent: "space-between",
+    "& .MuiIconButton-root": { padding: "0 3px", width: 24 },
     "&:hover": {
       borderColor: "black",
       background: "transparent",
       boxShadow: theme.shadows[1],
-      "& .MuiIconButton-root": { padding: "0 3px", width: 24 },
     },
   },
 
@@ -185,38 +181,6 @@ const AddNewPoamDialog = ({
     stopLoading();
   };
 
-  // Drag container element
-  const Container = (child) => (
-    <Box width={1} height={1}>
-      {child}
-    </Box>
-  );
-
-  // Drag content element
-  const Content = (isDragActive, isDragAbove, error) => (
-    <Box
-      className={`${classes.dragContent} pulse`}
-      drag-active={String(isDragActive)}
-      drag-above={String(isDragAbove)}
-    >
-      {watchFile ? (
-        <Chip
-          label={watchFile.name}
-          style={{ overflow: "hidden" }}
-          onDelete={() => setValue("file", null)}
-        />
-      ) : (
-        <span
-          className={classes.fileUploadBtn}
-          error={Boolean(error).toString()}
-        >
-          {error ? "File is required !" : "Drag n Drop"}
-          <br />
-        </span>
-      )}
-    </Box>
-  );
-
   return (
     <DialogBox
       open={isOpen}
@@ -227,73 +191,89 @@ const AddNewPoamDialog = ({
       bottomSeperator={true}
       loading={isLoading()}
       content={
-        <Box marginY={2}>
-          <Form control={control} rules={validation}>
+        <Box marginY={2} maxWidth="100%">
+          <Form
+            control={control}
+            rules={validation}
+            onSubmit={handleSubmit(onSubmit)}
+          >
             <Grid container spacing={1}>
-              <Grid item xs={isCreate() ? 12 : 7}>
-                <Grid container spacing={2}>
-                  {isCreate() && (
-                    <Grid item xs={12}>
-                      <TextControl
-                        variant="outlined"
-                        name="file_name"
-                        label="File Name"
-                        size="small"
-                        fullWidth
-                        gutter={false}
-                      />
-                    </Grid>
-                  )}
-
-                  <Grid item xs={12}>
-                    <TextControl
-                      variant="outlined"
-                      name="csp"
-                      label="CSP Name"
-                      size="small"
-                      fullWidth
-                      disabled={Boolean(cspName)}
-                      gutter={false}
-                    />
-                  </Grid>
-
-                  <Grid item xs={12}>
-                    <TextControl
-                      variant="outlined"
-                      name="system_name"
-                      label="System Name"
-                      size="small"
-                      fullWidth
-                      gutter={false}
-                    />
-                  </Grid>
-
-                  <Grid item xs={12}>
-                    <TextControl
-                      variant="outlined"
-                      name="agency_name"
-                      label="Agency Name"
-                      size="small"
-                      fullWidth
-                      gutter={false}
-                    />
-                  </Grid>
+              {isCreate() && (
+                <Grid item xs={12}>
+                  <TextControl
+                    variant="outlined"
+                    name="file_name"
+                    label="File Name"
+                    size="small"
+                    fullWidth
+                    gutter={false}
+                  />
                 </Grid>
+              )}
+
+              <Grid item xs={12}>
+                <TextControl
+                  variant="outlined"
+                  name="csp"
+                  label="CSP Name"
+                  size="small"
+                  fullWidth
+                  disabled={Boolean(cspName)}
+                  gutter={false}
+                />
+              </Grid>
+
+              <Grid item xs={12}>
+                <TextControl
+                  variant="outlined"
+                  name="system_name"
+                  label="System Name"
+                  size="small"
+                  fullWidth
+                  gutter={false}
+                />
+              </Grid>
+
+              <Grid item xs={12}>
+                <TextControl
+                  variant="outlined"
+                  name="agency_name"
+                  label="Agency Name"
+                  size="small"
+                  fullWidth
+                  gutter={false}
+                />
               </Grid>
 
               {!isCreate() && (
-                <Grid item xs={5}>
-                  <UploadControl
-                    name="file"
-                    multiple={false}
-                    hideButtons={true}
-                    hideFileList={true}
-                    hideDragNDrop={false}
-                    dragContainer={Container}
-                    dragContent={(active, above) =>
-                      Content(active, above, formState.errors.file)
-                    }
-                  />
+                <Grid item xs={12}>
+                  <UploadControl name="file" multiple={false}>
+                    {(trigger) => (
+                      <>
+                        <Button
+                          variant="outlined"
+                          startIcon={
+                            <Icon>{watchFile ? "delete" : "attach_file"}</Icon>
+                          }
+                          onClick={() =>
+                            watchFile ? setValue("file", null) : trigger()
+                          }
+                        >
+                          <span style={{ textTransform: "none" }}>
+                            {watchFile ? watchFile.name : "SELECT FILE"}
+                          </span>
+                        </Button>
+                        {formState.errors.file && (
+                          <FormHelperText
+                            error={Boolean(formState.errors.file)}
+                          >
+                            Please select a Poam File
+                          </FormHelperText>
+                        )}
+                      </>
+                      // formState
+                    )}
+                  </UploadControl>
                 </Grid>
               )}
             </Grid>
@@ -317,16 +297,25 @@ const AddNewPoamDialog = ({
 };
 
 /* COMPONENT FORM ITEM OF POAM LIST */
-const PoamListItem = ({ text, children, iconTooltip = "", ...rest }) => (
+const PoamListItem = ({
+  text,
+  onDownload,
+  loading = false,
+  iconTooltip = "",
+  ...rest
+}) => (
   <ListItem button disableRipple className={useStyle().listItem} {...rest}>
-    <Typography noWrap style={{ flexGrow: 1 }}>
-      {text}
-    </Typography>
-    {children && (
-      <Tooltip arrow title={iconTooltip}>
-        {children}
+    <Typography noWrap>{text}</Typography>
+
+    {onDownload && (
+      <Tooltip arrow title="Download file">
+        <IconButton size="small" onClick={onDownload}>
+          <Icon>file_download</Icon>
+        </IconButton>
       </Tooltip>
     )}
+
+    {loading && <CircularProgress size={20} color="inherit" />}
   </ListItem>
 );
 
@@ -394,50 +383,42 @@ export default function PoamUpload({ selectFile }) {
   };
 
   return (
-    <Box
-      height="80vh"
-      width="100%"
-      display="flex"
-      justifyContent="center"
-      alignItems="center"
-    >
-      <Box width="60%" maxWidth={400}>
-        <Typography noWrap variant="h6" className={classes.titleStyle}>
-          List of Poam files
-        </Typography>
+    <Box height="80vh" width="100%" paddingX={2} paddingY={3}>
+      <Box width="100%">
+        <Box
+          display="flex"
+          justifyContent="space-between"
+          alignItems="end"
+          borderBottom={1}
+          paddingY={1}
+        >
+          <Typography noWrap variant="h6" className={classes.titleStyle}>
+            List of Poam files
+          </Typography>
+
+          <ButtonGroup size="small" variant="contained">
+            <Button onClick={openUploadDialog}>Add File</Button>
+
+            <Button onClick={openCreateDialog}>Create New</Button>
+          </ButtonGroup>
+        </Box>
 
         <List disablePadding className={classes.listContainer}>
           {isLoading("load") ? (
-            <PoamListItem text="Loading..." disabled>
-              <CircularProgress size={20} color="inherit" />
-            </PoamListItem>
+            <PoamListItem text="Loading..." loading={true} disabled />
           ) : Object.values(poamList).length === 0 ? (
-            <PoamListItem disabled text="NO POAM FILE" />
+            <PoamListItem text="NO POAM FILE" disabled />
           ) : (
             Object.keys(poamList).map((val, index) => (
               <PoamListItem
                 key={index}
                 text={poamList[val]}
-                iconTooltip="Download file"
                 onClick={() => selectFile(val)}
-              >
-                <IconButton size="small" onClick={(e) => downloadPoam(e, val)}>
-                  <Icon>file_download</Icon>
-                </IconButton>
-              </PoamListItem>
+                onDownload={(e) => downloadPoam(e, val)}
+              />
             ))
           )}
         </List>
-
-        <ButtonGroup variant="contained" style={{ width: "100%" }}>
-          <Button onClick={openUploadDialog} style={{ flexGrow: 1 }}>
-            Add File
-          </Button>
-
-          <Button onClick={openCreateDialog} style={{ flexGrow: 1 }}>
-            Create New
-          </Button>
-        </ButtonGroup>
       </Box>
 
       <Backdrop className={classes.backdrop} open={isLoading("download")}>

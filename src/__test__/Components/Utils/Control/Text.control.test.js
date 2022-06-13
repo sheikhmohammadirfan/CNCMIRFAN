@@ -1,6 +1,6 @@
 import { shallow } from "enzyme";
 import TextControl from "../../../../Components/Utils/Control/Text.control";
-import { checkProps, findByAttr } from "../../../TestUtils";
+import { testProps, findByAttr } from "../../../Test.utils";
 
 describe("<TextControl />", () => {
   const setup = (props) => {
@@ -16,7 +16,7 @@ describe("<TextControl />", () => {
   });
 
   test("Text field props work without error", () => {
-    checkProps(TextControl, { name: "text", controls: {} });
+    testProps(TextControl, { name: "name", controls: {} });
   });
 
   test("Test value changes without error", () => {

@@ -1,7 +1,7 @@
 import { shallow } from "enzyme";
 import React from "react";
 import SelectControl from "../../../../Components/Utils/Control/Select.control";
-import { checkProps, findByAttr } from "../../../TestUtils";
+import { testProps, findByAttr } from "../../../Test.utils";
 
 describe("<SelectControl />", () => {
   const setup = (props) => {
@@ -23,7 +23,7 @@ describe("<SelectControl />", () => {
   });
 
   test("Select render with props without error", () => {
-    checkProps(SelectControl, {
+    testProps(SelectControl, {
       name: "Dropdown",
       controls: {},
       options: ["a", "b", { val: "d", text: "d" }],

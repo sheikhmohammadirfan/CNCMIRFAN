@@ -21,8 +21,8 @@ import CreateIssue from "./Components/Jira/CreateIssue";
 import UpdateIssue from "./Components/Jira/UpdateIssue";
 import Profile from "./Pages/Profile";
 import Integrate from "./Pages/Integrate";
-import { useState } from "react";
 import ParamsRoutes from "./Components/Utils/Routers/ParamsRoutes";
+import React from "react";
 
 // Custom values
 const sidebarSmall = 50;
@@ -83,11 +83,11 @@ function App() {
   const classes = useStyles();
 
   // State to get target node, to upate scroll event on header
-  const [scrollTarget, setScrollTarget] = useState();
+  const [scrollTarget, setScrollTarget] = React.useState();
   const updateTarget = (target) => target && setScrollTarget(target);
 
   // State to save scrollbar open/close status
-  const [isSidebarOpen, setSidebar] = useState(false);
+  const [isSidebarOpen, setSidebar] = React.useState(false);
 
   return (
     <ThemeProvider theme={theme}>
@@ -104,6 +104,9 @@ function App() {
             <Route path="/forgotpassword" exact>
               <Auth title="FORGOT PASSWORD" />
             </Route>
+            <Route path="/resetpassword">
+              <Auth title="RESET PASSWORD" />
+            </Route>
 
             <ProtectedRoutes>
               <Box display="flex">
@@ -114,6 +117,7 @@ function App() {
                 <Box
                   flexGrow={1}
                   className={`${classes.body} ${isSidebarOpen ? "open" : ""}`}
+                  data-test="body-wrapper"
                 >
                   <Header scrollTarget={scrollTarget} />
                   <div className={classes.wrapper}>
@@ -123,7 +127,7 @@ function App() {
                     <Route exact path="/verify">
                       <Verify title="VERIFY" />
                     </Route>
-                    <Route exact path="/artifacts">
+                    <Route exact path="/poam">
                       <Poam title="POAM" />
                     </Route>
                     <Route exact path="/profile">

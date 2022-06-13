@@ -6,11 +6,11 @@ import {
   makeStyles,
   Tooltip,
   InputAdornment,
+  Typography,
 } from "@material-ui/core";
 import React, { useState } from "react";
 import ManageColumns from "./ManageColumns";
 import ManageJira from "./ManageJira";
-import DataTable from "../Utils/DataTable/DataTable";
 import DownloadPoam from "./DownloadPoam";
 import { TextControl } from "../Utils/Control";
 import jira from "../../assets/img/jira-brands.svg";
@@ -50,6 +50,30 @@ const useStyle = makeStyles((theme) => ({
       padding: "0",
       borderColor: "transparent",
     },
+  },
+
+  chip_container: {
+    display: "flex",
+    alignItems: "center",
+    padding: `${theme.spacing(0.6)}px ${theme.spacing(1.5)}px`,
+    background: theme.palette.grey[300],
+    borderRadius: 2 * theme.shape.borderRadius,
+    border: `1px solid ${theme.palette.grey[400]}`,
+    cursor: "default",
+  },
+
+  chip_label: {
+    fontWeight: "bold",
+    marginRight: theme.spacing(1.5),
+    textTransform: "uppercase",
+  },
+
+  chip_data: {
+    padding: `${theme.spacing(0)}px ${theme.spacing(1)}px`,
+    background: "#fafafa",
+    opacity: 0.9,
+    borderRadius: theme.shape.borderRadius,
+    maxWidth: 200,
   },
 }));
 
@@ -92,40 +116,35 @@ export default function PoamHeader({
             justifyContent="space-between"
             marginY={0.5}
           >
-            <DataTable
-              style={{
-                border: "none",
-                marginRight: "10rem",
-                width: "fit-content",
-              }}
-              serialNo={false}
-              rowList={{
-                rowData: [
-                  {
-                    data: [
-                      { text: "File Name", css: { fontWeight: "bold" } },
-                      { text: "CSP Name", css: { fontWeight: "bold" } },
-                      { text: "System Name", css: { fontWeight: "bold" } },
-                      { text: "Agency Name", css: { fontWeight: "bold" } },
-                    ],
-                  },
-                  {
-                    data: [
-                      { text: fileName },
-                      { text: cspName },
-                      { text: systemName },
-                      { text: agencyName },
-                    ],
-                  },
-                ],
-                cellStyle: {
-                  border: "none",
-                  borderRight: "16px solid transparent",
-                  padding: 2,
-                  textAlign: "center",
-                },
-              }}
-            />
+            <Box className={`${classes.chip_container} title`}>
+              <Typography className={classes.chip_label}>File</Typography>
+              <Tooltip title={fileName} placement="bottom" arrow>
+                <Typography noWrap className={classes.chip_data}>
+                  {fileName}
+                </Typography>
+              </Tooltip>
+              <Box width={24} />
+              <Typography className={classes.chip_label}>CSP</Typography>
+              <Tooltip title={cspName} placement="bottom" arrow>
+                <Typography noWrap className={classes.chip_data}>
+                  {cspName}
+                </Typography>
+              </Tooltip>
+              <Box width={24} />
+              <Typography className={classes.chip_label}>System</Typography>
+              <Tooltip title={systemName} placement="bottom" arrow>
+                <Typography className={classes.chip_data}>
+                  {systemName}
+                </Typography>
+              </Tooltip>
+              <Box width={24} />
+              <Typography className={classes.chip_label}>Agency</Typography>
+              <Tooltip title={agencyName} placement="bottom" arrow>
+                <Typography noWrap className={classes.chip_data}>
+                  {agencyName}
+                </Typography>
+              </Tooltip>
+            </Box>
 
             <ButtonGroup
               disableElevation

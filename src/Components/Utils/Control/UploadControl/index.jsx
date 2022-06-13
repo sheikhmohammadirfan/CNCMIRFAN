@@ -1,10 +1,15 @@
-import { useState, forwardRef } from "react";
+import React, { useState, forwardRef, useEffect } from "react";
 import { Field } from "../Form";
 import { RenderChildren } from "./RenderChildren";
 import { RenderDragNDrop } from "./RenderDragNDrop";
 import { RenderListContainer } from "./RenderListContainer";
 import { RenderListItem } from "./RenderListItem";
 import PropTypes from "prop-types";
+import {
+  addFiles,
+  removeAllFiles,
+  removeFileAtIndex,
+} from "./UploadControl.utils";
 
 /* UPLOAD CONTROL INPUT */
 const UploadControl = forwardRef((props, ref) => {
@@ -14,50 +19,13 @@ const UploadControl = forwardRef((props, ref) => {
   const closeDragDialog = () => setDialogOpen(false);
 
   // List of selected files to populate on next select
-  const [selectFiles, setSelectFiles] = useState([]);
-
-  // Method to check if a file is already selected
-  const checkFileExist = (test) =>
-    selectFiles.find(
-      (file) =>
-        file.name === test.name && file.lastModified === test.lastModified
-    ) !== undefined;
-
-  // Method to set on change value
-  const setValue = (files, multiple, onChange) => {
-    // if multiple file option is not selected then return imediately
-    if (!multiple) return onChange(files[0]);
-    // Generate a list of newly selected files
-    const newFile = Object.values(files);
-
-    // List to store on those file, which are not selected
-    const uniqueFile = [];
-    // Populate unique file
-    for (let value of newFile)
-      if (!checkFileExist(value)) uniqueFile.push(value);
-
-    // Check if any unique file is selected then only update the state
-    if (uniqueFile.length > 0)
-      setSelectFiles((prevFile) => [...prevFile, ...uniqueFile]);
-    // Update selected file list
-    return onChange(
-      uniqueFile.length > 0 ? [...selectFiles, ...uniqueFile] : selectFiles
-    );
-  };
-
-  // Remove all selected files by
-  const removeAllFiles = (onChange) => {
-    setSelectFiles([]);
-    onChange([]);
-  };
-
-  // Remove file at specific index
-  const removeFileAtIndex = (index, onChange) =>
-    setSelectFiles((file) => {
-      const newVal = file.filter((v, idx) => idx !== index);
-      onChange(newVal);
-      return newVal;
-    });
+  const [selectedFiles, setSelectedFiles] = React.useState([]);
+  // Create template for input change method, to passed in useEffect
+  let changeInput = () => {};
+  // Update input field, on state change
+  useEffect(() => {
+    if (props.multiple) changeInput(selectedFiles);
+  }, [selectedFiles]);
 
   // method to trigger input file selection dialog
   const inputTrigger = () =>
@@ -84,8 +52,8 @@ const UploadControl = forwardRef((props, ref) => {
         controls,
         ...others
       }) => {
-        // Select Form onChange or default onChange
-        const setter = controls?.field.onChange || onChange;
+        // Populate onChange, with onChange listener
+        changeInput = controls?.field.onChange || onChange;
 
         return (
           <>
@@ -98,7 +66,14 @@ const UploadControl = forwardRef((props, ref) => {
               {...controls?.field}
               {...others}
               value=""
-              onChange={(e) => setValue(e.target.files, multiple, setter)}
+              onChange={(e) =>
+                addFiles(
+                  multiple,
+                  e.target.files,
+                  changeInput,
+                  setSelectedFiles
+                )
+              }
               hidden
               data-test="upload-input"
             />
@@ -106,9 +81,9 @@ const UploadControl = forwardRef((props, ref) => {
             {!hideButtons && (
               <RenderChildren
                 children={children}
-                fileList={selectFiles}
+                fileList={selectedFiles}
                 trigger={() => inputTrigger(name)}
-                removeAll={() => removeAllFiles(setter)}
+                removeAll={() => removeAllFiles(setSelectedFiles)}
                 openDrag={openDragDialog}
                 hideDragNDrop={Boolean(
                   hideDragNDrop || dragContainer || dragRef
@@ -120,7 +95,9 @@ const UploadControl = forwardRef((props, ref) => {
             {!hideDragNDrop && (
               <RenderDragNDrop
                 trigger={() => inputTrigger(name)}
-                onChange={(files) => setValue(files, multiple, setter)}
+                onChange={(files) =>
+                  addFiles(multiple, files, changeInput, setSelectedFiles)
+                }
                 dialogOpen={dialogOpen}
                 closeDrag={closeDragDialog}
                 container={dragContainer}
@@ -134,13 +111,15 @@ const UploadControl = forwardRef((props, ref) => {
               <RenderListContainer
                 container={listContainer}
                 containerRef={listRef}
-                listItems={selectFiles.map((file, index) => (
+                listItems={selectedFiles.map((file, index) => (
                   <RenderListItem
                     key={index}
                     listItem={listItem}
                     fileName={file.name}
                     index={index}
-                    removeFile={() => removeFileAtIndex(index, setter)}
+                    removeFile={() =>
+                      removeFileAtIndex(index, setSelectedFiles)
+                    }
                     data-test="upload-file-item"
                   />
                 ))}

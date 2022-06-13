@@ -1,7 +1,7 @@
 import { shallow } from "enzyme";
 import React from "react";
 import RadioControl from "../../../../Components/Utils/Control/Radio.control";
-import { checkProps, findByAttr } from "../../../TestUtils";
+import { testProps, findByAttr } from "../../../Test.utils";
 
 describe("<RadioControl />", () => {
   const setup = (props) => {
@@ -21,7 +21,7 @@ describe("<RadioControl />", () => {
   });
 
   test("Radio render with props without error", () => {
-    checkProps(RadioControl, {
+    testProps(RadioControl, {
       name: "radio",
       controls: {},
       direction: "row",

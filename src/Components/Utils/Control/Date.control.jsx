@@ -1,7 +1,7 @@
 import { Icon, InputAdornment } from "@material-ui/core";
 import { DatePicker } from "@material-ui/pickers";
-import { checkNameProps } from "../Utils";
-import { getError, getLabel } from "./ControlsUtils";
+import { controlledName } from "../Utils";
+import { getError, getLabel } from "./Controls.utils.js";
 import { Field } from "./Form";
 import PropTypes from "prop-types";
 
@@ -43,7 +43,7 @@ function DateControl(props) {
   );
 }
 DateControl.propTypes = {
-  name: checkNameProps,
+  name: controlledName,
   controls: PropTypes.object,
   onChange: PropTypes.func.isRequired,
 };

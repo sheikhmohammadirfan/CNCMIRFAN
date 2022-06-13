@@ -1,6 +1,6 @@
 import { FormControl, FormLabel, Slider } from "@material-ui/core";
-import { checkNameProps } from "../Utils";
-import { getLabel } from "./ControlsUtils";
+import { controlledName } from "../Utils";
+import { getLabel } from "./Controls.utils.js";
 import { Field } from "./Form";
 import PropTypes from "prop-types";
 import { forwardRef } from "react";
@@ -60,7 +60,7 @@ const SliderControl = forwardRef((props, ref) => {
   );
 });
 SliderControl.propTypes = {
-  name: checkNameProps,
+  name: controlledName,
   controls: PropTypes.object,
   markers: PropTypes.arrayOf(
     PropTypes.shape({

@@ -67,7 +67,12 @@ export default function PoamTable({ fileID }) {
   };
 
   // React State to save table name
-  const [poamDetails, setPoamDetails] = useState();
+  const [poamDetails, setPoamDetails] = useState({
+    fileName: "",
+    cspName: "",
+    systemName: "",
+    agencyName: "",
+  });
 
   // List for all types of columns
   const [allColumns, setAllColumns] = useState(poam_header);
@@ -269,7 +274,7 @@ export default function PoamTable({ fileID }) {
                 rowList={mapTableBody()}
                 checkbox={true}
                 serialNo={false}
-                reiszeTable={true}
+                resizeTable={true}
                 selectedRows={selectedRow}
                 setSelectedRows={setSelectedRow}
                 headerWrapper={(text) => <HeaderCell text={text} />}

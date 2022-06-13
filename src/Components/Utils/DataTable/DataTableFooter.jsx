@@ -1,7 +1,8 @@
 import { Box, TablePagination } from "@material-ui/core";
 import React from "react";
+import PropTypes from "prop-types";
 
-export default function DataTableFooter({
+function DataTableFooter({
   component,
   pageSize,
   rowsPerPage,
@@ -21,9 +22,20 @@ export default function DataTableFooter({
             onPageChange={onPageChange}
             count={count}
             component={Box}
+            data-test="footer-pagination"
           />
         )}
       </Box>
     </caption>
   );
 }
+DataTableFooter.propTypes = {
+  component: PropTypes.element,
+  pageSize: PropTypes.number.isRequired,
+  rowsPerPage: PropTypes.number.isRequired,
+  page: PropTypes.number.isRequired,
+  onPageChange: PropTypes.func.isRequired,
+  count: PropTypes.number.isRequired,
+};
+
+export default DataTableFooter;

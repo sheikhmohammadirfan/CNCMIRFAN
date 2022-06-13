@@ -1,7 +1,7 @@
 import { mount } from "enzyme";
 import React from "react";
 import CheckboxControl from "../../../../Components/Utils/Control/Checkbox.control";
-import { checkProps, findByAttr } from "../../../TestUtils";
+import { testProps, findByAttr } from "../../../Test.utils";
 
 describe("<CheckboxControl />", () => {
   const setup = (props) => {
@@ -19,7 +19,7 @@ describe("<CheckboxControl />", () => {
   });
 
   test("Checkbox render with props without error", () => {
-    checkProps(CheckboxControl, { name: "check", controls: {} });
+    testProps(CheckboxControl, { name: "check", controls: {} });
   });
 
   test("Checkbox is uncheck by default", () => {

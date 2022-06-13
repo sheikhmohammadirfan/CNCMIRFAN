@@ -6,6 +6,8 @@ import Signup from "../Components/Auth/Signup";
 import ForgotPassword from "../Components/Auth/ForgotPassword";
 import DocumentTitle from "../Components/DocumentTitle";
 import logo from "../assets/img/company_logo.png";
+import ParamsRoutes from "../Components/Utils/Routers/ParamsRoutes";
+import ResetPassword from "../Components/Auth/ResetPassword";
 
 // CSS class generator
 const useStyles = makeStyles((theme) => ({
@@ -108,7 +110,9 @@ export default function Auth({ title }) {
       ? 0
       : history.location.pathname === "/login"
       ? 1
-      : 2
+      : !history.location.pathname.match(/resetpassword.*/)
+      ? 2
+      : 3
   );
 
   // Method to login user
@@ -123,6 +127,7 @@ export default function Auth({ title }) {
     if (history.location.pathname === "/signup") setPageState(0);
     else if (history.location.pathname === "/login") setPageState(1);
     else if (history.location.pathname === "/forgotpassword") setPageState(2);
+    else setPageState(3);
   }, [history.location.pathname]);
 
   return (
@@ -186,6 +191,13 @@ export default function Auth({ title }) {
           </main>
         </Grid>
       </Grid>
+
+      {history.location.pathname.match(/resetpassword.*/) && (
+        <ResetPassword
+          path={history.location.pathname}
+          onClose={() => history.replace("/login")}
+        />
+      )}
     </Box>
   );
 }

@@ -1,10 +1,15 @@
 import { shallow } from "enzyme";
 import { RenderDragNDrop } from "../../../../../Components/Utils/Control/UploadControl/RenderDragNDrop";
-import { checkProps, findByAttr } from "../../../../TestUtils";
+import { testProps, findByAttr } from "../../../../Test.utils";
 
 describe("<RenderDragNDrop />", () => {
   const setup = (props) => {
-    const defaultProps = { onChange: () => {}, trigger: () => {} };
+    const defaultProps = {
+      onChange: () => {},
+      trigger: () => {},
+      dialogOpen: true,
+      closeDrag: jest.fn(),
+    };
     const wrapper = shallow(<RenderDragNDrop {...defaultProps} {...props} />);
     return wrapper.debug() ? wrapper.dive() : wrapper;
   };
@@ -19,7 +24,12 @@ describe("<RenderDragNDrop />", () => {
   });
 
   test("Test props of component", () => {
-    checkProps(RenderDragNDrop, { onChange: jest.fn(), trigger: jest.fn() });
+    testProps(RenderDragNDrop, {
+      onChange: jest.fn(),
+      trigger: jest.fn(),
+      dialogOpen: true,
+      closeDrag: jest.fn(),
+    });
   });
 
   test("Test if container is passed, dialog-box won't mount", () => {

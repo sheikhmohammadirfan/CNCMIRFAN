@@ -1,6 +1,7 @@
-import { mount, shallow } from "enzyme";
+import { mount } from "enzyme";
+import React from "react";
 import UploadControl from "../../../../../Components/Utils/Control/UploadControl";
-import { checkProps, findByAttr } from "../../../../TestUtils";
+import { testProps, findByAttr } from "../../../../Test.utils";
 
 describe("<UploadControl />", () => {
   const setup = (props) => {
@@ -18,24 +19,13 @@ describe("<UploadControl />", () => {
   });
 
   test("Test props of UploadControl component", () => {
-    checkProps(UploadControl, { name: "upload filed" });
+    testProps(UploadControl, { name: "upload filed" });
   });
 
   test("Test input field id generated correctly", () => {
     const wrapper = setup({ name: "Upload Input Field" });
     const inputField = findByAttr(wrapper, "upload-input");
     expect(inputField.props().id).toBe("Upload_Input_Field-id");
-  });
-
-  test("Test onChange props is called on input change", () => {
-    const mock_onChange = jest.fn();
-    const wrapper = setup({ onChange: mock_onChange });
-
-    // Trigger change event
-    const inputField = findByAttr(wrapper, "upload-input");
-    inputField.simulate("change", { target: { files: [] } });
-
-    expect(mock_onChange).toBeCalledWith([]);
   });
 
   test("Test components won't be visible, if hide props is set", () => {
@@ -96,4 +86,6 @@ describe("<UploadControl />", () => {
     const secondItem = findByAttr(wrapper, "upload-file-item", 1);
     expect(secondItem.exists()).toBeFalsy;
   });
+
+  // TODO: Test onChange method
 });

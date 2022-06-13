@@ -149,7 +149,7 @@ export default function Verify(props) {
       data: [
         { text: index + 1 },
         { text: file.file_name },
-        { text: file.file.split("/")[5], params: { align: "right" } },
+        { text: "", params: { align: "right" } },
       ],
     })),
   });

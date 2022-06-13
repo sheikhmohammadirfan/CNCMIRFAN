@@ -1,11 +1,24 @@
-import { Box, Button, CircularProgress, makeStyles } from "@material-ui/core";
+import {
+  Box,
+  Button,
+  CircularProgress,
+  Icon,
+  InputAdornment,
+  makeStyles,
+} from "@material-ui/core";
 import React, { useState } from "react";
-import { PasswordControl, TextControl, Form } from "../Utils/Control";
+import {
+  PasswordControl,
+  TextControl,
+  Form,
+  SelectControl,
+} from "../Utils/Control";
 import { signup } from "../../Service/UserFactory";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import DocumentTitle from "../DocumentTitle";
-import { isPasswordValid } from "../Utils/Control/ControlsUtils";
+import { isPasswordValid } from "../Utils/Control/Controls.utils.js";
 import { EMAIL_REGEX } from "../../assets/data/Other";
+import countryCodesList from "country-codes-list";
 
 const useStyles = makeStyles((theme) => ({
   // Style to apply on login btn
@@ -18,7 +31,89 @@ const useStyles = makeStyles((theme) => ({
     color: theme.textOnPrimary,
     marginBottom: theme.spacing(1),
   },
+  countryDropdown: {
+    minWidth: 80,
+    marginLeft: theme.spacing(1 / 2),
+    "& .MuiInput-formControl": {
+      margin: 0,
+      "&::before": { content: "", border: "none" },
+    },
+    "& .MuiInput-underline": { "&::after": { content: "", border: "none" } },
+    "& .MuiSelect-root": {
+      background: "transparent",
+    },
+  },
 }));
+
+// Custom test input for countact number with country code dropdown selector
+const ContactNumControl = ({ name, label, control, rules }) => {
+  // Generate styles
+  const classes = useStyles();
+
+  // Get mapping of countryCode with callingCode
+  const callingCodes = countryCodesList.customList(
+    "countryCode",
+    "+{countryCallingCode}"
+  );
+
+  // Map countryCode to options
+  const options = Object.entries(callingCodes).map(([val, text]) => ({
+    val,
+    text: `${val} ${text}`,
+  }));
+
+  return (
+    <Controller
+      name={name}
+      control={control}
+      rules={rules?.[name]}
+      render={({ field: { value, onChange }, fieldState: { error } }) => {
+        // Extract callingcode & number
+        const [code, num] = (value || "").split("-");
+
+        // Extract countryCode from callingCode to populate Select input
+        const getCountryCode = () => {
+          if (!code) return "";
+          for (let countryCode in callingCodes)
+            if (callingCodes[countryCode] === code) return countryCode;
+          return "";
+        };
+
+        // Country code selection input
+        const Adornment = () => (
+          <InputAdornment position="start">
+            <Icon>call</Icon>
+            <SelectControl
+              name="option"
+              label=" "
+              styleProps={{ className: classes.countryDropdown }}
+              options={options}
+              value={getCountryCode()}
+              onChange={(e) =>
+                onChange(`${callingCodes[e.target.value]}-${num || ""}`)
+              }
+            />
+          </InputAdornment>
+        );
+
+        return (
+          <TextControl
+            name={name}
+            label={label}
+            error={error?.message}
+            noControls={true}
+            variant="standard"
+            size="small"
+            fullWidth
+            value={num === undefined ? "" : num}
+            onChange={(e) => onChange(`${code}-${e.target.value}`)}
+            InputProps={{ startAdornment: <Adornment /> }}
+          />
+        );
+      }}
+    />
+  );
+};
 
 // Signup Component
 export default function Signup({ title, loginPage }) {
@@ -38,6 +133,17 @@ export default function Signup({ title, loginPage }) {
     password: {
       required: "Password is required.",
       validate: { invalid: (val) => val === "" || isPasswordValid(val) },
+    },
+    contact_no: {
+      required: "Number is required.",
+      validate: {
+        invalid: (val) => {
+          const [code, num] = val.split("-");
+          if (!num?.match(/^\d{10}$/)) return "Contact no. invalid.";
+          if (code === "") return "Select Country code.";
+          return true;
+        },
+      },
     },
   };
 
@@ -96,6 +202,12 @@ export default function Signup({ title, loginPage }) {
             variant="standard"
           />
         </Box>
+        <ContactNumControl
+          control={control}
+          rules={validations}
+          label="contact no"
+          name="contact_no"
+        />
         <TextControl
           type="email"
           name="email"

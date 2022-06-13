@@ -2,9 +2,9 @@ import {
   getError,
   getLabel,
   isPasswordValid,
-} from "../../../../Components/Utils/Control/ControlsUtils";
+} from "../../../../Components/Utils/Control/Controls.utils.js";
 
-describe("ControlsUtils--isPasswordValid()", () => {
+describe("isPasswordValid()", () => {
   describe("invaildMessage is set", () => {
     const invaildMessage = "This password is invaild.";
     const checker = (pass) => isPasswordValid(pass, invaildMessage);
@@ -65,7 +65,7 @@ describe("ControlsUtils--isPasswordValid()", () => {
   });
 });
 
-describe("ControlsUtils--getLabel()", () => {
+describe("getLabel()", () => {
   test("Test when label is passed, method returns label", () => {
     expect(getLabel("label", "name")).toBe("label");
   });
@@ -79,7 +79,7 @@ describe("ControlsUtils--getLabel()", () => {
   });
 });
 
-describe("ControlsUtils--getError()", () => {
+describe("getError()", () => {
   test("Test when no error is passed & gutter is set, method returns single space", () => {
     expect(getError(null, null, true)).toBe(" ");
   });

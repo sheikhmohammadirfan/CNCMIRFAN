@@ -1,6 +1,7 @@
 import React, { createContext } from "react";
 import { Controller } from "react-hook-form";
 import PropTypes from "prop-types";
+import { PropType_Component } from "../Utils";
 
 // Create controller context
 const ControllerContext = createContext({
@@ -22,12 +23,13 @@ export default function Form({
       <ControllerContext.Provider value={{ control, rules, controlProps }}>
         {children}
       </ControllerContext.Provider>
+      <button type="submit" hidden />
     </form>
   );
 }
 Form.propTypes = {
   control: PropTypes.object.isRequired,
-  children: PropTypes.element.isRequired,
+  children: PropType_Component,
   rules: PropTypes.object,
   controlProps: PropTypes.object,
 };

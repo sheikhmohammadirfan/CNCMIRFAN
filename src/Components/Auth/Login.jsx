@@ -17,6 +17,7 @@ import { Link } from "react-router-dom";
 import DocumentTitle from "../DocumentTitle";
 import { useForm } from "react-hook-form";
 import { EMAIL_REGEX } from "../../assets/data/Other";
+import PropTypes from "prop-types";
 
 // CSS class generator
 const useStyles = makeStyles((theme) => ({
@@ -43,7 +44,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 // Login Component
-export default function Login({ title, homePage }) {
+function Login({ title, homePage }) {
   DocumentTitle(title);
 
   // Rules for validation for each field
@@ -61,7 +62,9 @@ export default function Login({ title, homePage }) {
   const { handleSubmit, control } = useForm();
 
   // handle on Submit
-  const submit = async (data) => {
+  const submit = async (data) => 
+  {
+    console.log("s");
     // Check if all input valid and form is not loading
     if (!isLoading) {
       setLoading(true);
@@ -80,7 +83,13 @@ export default function Login({ title, homePage }) {
   const classes = useStyles();
 
   return (
-    <Box display="flex" flexDirection="column" width={1} paddingX={1}>
+    <Box
+      display="flex"
+      flexDirection="column"
+      width={1}
+      paddingX={1}
+      data-test="login-container"
+    >
       <Form
         control={control}
         rules={validation}
@@ -93,12 +102,14 @@ export default function Login({ title, homePage }) {
           size="small"
           variant="standard"
           fullWidth
+          data-test="login-email-field"
         />
         <PasswordControl
           name="password"
           size="small"
           variant="standard"
           fullWidth
+          data-test="login-password-field"
         />
 
         <Box textAlign="right" marginBottom={2}>
@@ -107,7 +118,11 @@ export default function Login({ title, homePage }) {
           </Link>
         </Box>
 
-        <Button className={classes.submitBtn} type="submit">
+        <Button
+          className={classes.submitBtn}
+          type="submit"
+          data-test="login-submit-btn"
+        >
           {isLoading ? <CircularProgress color="inherit" size={35} /> : "Go"}
         </Button>
 
@@ -121,3 +136,9 @@ export default function Login({ title, homePage }) {
     </Box>
   );
 }
+Login.propTypes = {
+  title: PropTypes.string.isRequired,
+  homePage: PropTypes.func.isRequired,
+};
+
+export default Login;

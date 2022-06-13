@@ -80,7 +80,10 @@ export default function Sidebar({ isOpen, toggleSidebar }) {
   useEffect(() => toggleSidebar(!xs), [xs]);
 
   return (
-    <Box className={`${classes.sidebar} ${isOpen ? "" : "close"}`}>
+    <Box
+      className={`${classes.sidebar} ${isOpen ? "" : "close"}`}
+      data-test="sidebar-container"
+    >
       <SidebarItem
         className={classes.logoBtn}
         text={
@@ -89,6 +92,7 @@ export default function Sidebar({ isOpen, toggleSidebar }) {
           </Typography>
         }
         sidebarOpen={isOpen}
+        data-test="sidebar-logo"
       />
 
       <Divider />
@@ -110,6 +114,7 @@ export default function Sidebar({ isOpen, toggleSidebar }) {
             icon={<Icon>{icon}</Icon>}
             subMenu={subMenu}
             {...rest}
+            data-test="sidebar-menu-item"
           />
         ))}
       </List>
@@ -127,6 +132,7 @@ export default function Sidebar({ isOpen, toggleSidebar }) {
         icon={<Icon>settings</Icon>}
         component={Link}
         to="/profile"
+        data-test="sidebar-profile"
       />
 
       <SidebarItem
@@ -139,12 +145,14 @@ export default function Sidebar({ isOpen, toggleSidebar }) {
         }
         icon={<Icon>logout</Icon>}
         onClick={logout}
+        data-test="sidebar-logout"
       />
 
       <IconButton
         size="small"
         className={classes.toggleBtn}
         onClick={() => toggleSidebar(!isOpen)}
+        data-test="sidebar-toggler"
       >
         <Icon>{isOpen ? "arrow_back" : "menu"}</Icon>
       </IconButton>

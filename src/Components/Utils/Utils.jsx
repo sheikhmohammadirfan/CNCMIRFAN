@@ -1,5 +1,6 @@
 import moment from "moment";
 import { toast } from "react-toastify";
+import PropTypes from "prop-types";
 
 // Generate toast template
 const ErrMsg = ({ data }) => (
@@ -57,18 +58,6 @@ export const deleteQueryParams = (...paramList) => {
   return query;
 };
 
-// PropType test for props which are required if a other props is set
-export const propsRequiredIF = (props, propName, componentName, based) => {
-  if (props[based] && !props[propName])
-    return new Error(
-      `Invalid prop ${propName} supplied to ${componentName}. Validation failed.`
-    );
-};
-
-// method to check name props during prop-type checking
-export const checkNameProps = (props, propName, componentName) =>
-  propsRequiredIF(props, propName, componentName, "controls");
-
 // Convert data to moment object
 export const stringToMoment = (date) => {
   if (!date || date === "None") return null;
@@ -93,8 +82,7 @@ export const replaceIdWithName = (val) => {
 
   const mappedMessage = (value) => {
     let temp = value;
-    for (let keys in mapper)
-      if (value.includes(keys)) temp = temp.replaceAll(keys, mapper[keys]);
+    for (let keys in temp) temp = temp.replaceAll(keys, mapper[keys]);
     return temp;
   };
 
@@ -107,3 +95,55 @@ export const replaceIdWithName = (val) => {
 
   return mappedMessage(val);
 };
+
+// PropType test for props which are required if a other props is set
+export const propsRequiredIF = (
+  props,
+  propName,
+  componentName,
+  label,
+  location,
+  secret,
+  basedOn,
+  requiredType
+) => {
+  // check if bassed on props are passed
+  if (basedOn && props[basedOn] !== undefined) {
+    // If required props is not passed
+    if (!props[propName])
+      return new Error(`Prop ${propName} is required to ${componentName}.`);
+
+    // Method to test if type is matched
+    const isMatched = (t) =>
+      t === "array"
+        ? Array.isArray(props[propName])
+        : typeof props[propName] === t;
+
+    // Match propName type from given list of type or single type
+    const matchPropType = () => {
+      if (Array.isArray(requiredType)) {
+        if (!requiredType.some((testType) => isMatched(testType))) return false;
+      } else if (!isMatched(requiredType)) return false;
+      return true;
+    };
+
+    // Check if type is matched, if not throw error
+    if (!matchPropType())
+      return new Error(
+        `Invalid Prop ${propName} should be of type ${requiredType} in ${componentName}.`
+      );
+  }
+};
+
+// method to check name props during prop-type checking
+export const controlledName = (...params) =>
+  propsRequiredIF(...params, "controls", "string");
+
+// Method to check pros is component or not
+export const PropType_Component = PropTypes.oneOfType([
+  PropTypes.element,
+  PropTypes.string,
+  PropTypes.number,
+  PropTypes.bool,
+  PropTypes.arrayOf(PropTypes.element),
+]);

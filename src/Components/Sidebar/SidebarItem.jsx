@@ -11,8 +11,7 @@ import {
   Tooltip,
   withStyles,
 } from "@material-ui/core";
-import React, { useState } from "react";
-import { useEffect } from "react";
+import React, { useState, useEffect } from "react";
 
 /** Custom ListItem to act as Sidebar Item */
 const Item = withStyles((theme) => {
@@ -149,8 +148,12 @@ function WithSubMenu({
           {...tooltipProps}
         >
           <Item className={menuOpen ? "active" : ""} button {...rest}>
-            <ListItemIcon>{icon}</ListItemIcon>
-            <ListItemText>{text}</ListItemText>
+            <ListItemIcon data-test="sidebaritem-with-icon">
+              {icon}
+            </ListItemIcon>
+            <ListItemText data-test="sidebaritem-with-text">
+              {text}
+            </ListItemText>
             <IconButton color="inherit" onClick={toggleMenu}>
               <Icon>
                 {xs
@@ -185,8 +188,10 @@ function WithoutSubMenu({ sidebarOpen, text, icon, ...rest }) {
       placement="right"
     >
       <Item button {...rest}>
-        <ListItemIcon color="inherit">{icon}</ListItemIcon>
-        <ListItemText>{text}</ListItemText>
+        <ListItemIcon color="inherit" data-test="sidebaritem-without-icon">
+          {icon}
+        </ListItemIcon>
+        <ListItemText data-test="sidebaritem-without-text">{text}</ListItemText>
       </Item>
     </CustomTooltip>
   );

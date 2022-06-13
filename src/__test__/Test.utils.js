@@ -1,12 +1,12 @@
 import { checkPropTypes } from "prop-types";
 
-export const checkProps = (Component, props) => {
+export const testProps = (Component, props) => {
   const errorConsole = jest.spyOn(console, "error");
   const propsError = checkPropTypes(
     Component.propTypes,
     props,
     "prop",
-    Component.name
+    Component?.render?.displayName
   );
   expect(errorConsole).not.toBeCalled();
 };

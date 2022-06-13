@@ -117,3 +117,26 @@ export async function updateProfile(formData) {
   );
   return { data: null, status: false };
 }
+
+export async function checkPasswordReset(data) {
+  const { status } = await post("/user/reset-token-check/", data, {
+    notify: false,
+  });
+  if (!status)
+    notification(
+      "login-id",
+      "Link is invalid or expired, please generate new one...",
+      "error"
+    );
+  return status;
+}
+
+export async function requestPasswordReset(email) {
+  const { status } = await post("/user/request-password-reset/", email);
+  return status;
+}
+
+export async function resetPassword(data) {
+  const { status } = await patch("/user/password-reset/", data);
+  return status;
+}

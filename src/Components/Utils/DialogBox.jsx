@@ -8,9 +8,11 @@ import {
   LinearProgress,
 } from "@material-ui/core";
 import React from "react";
+import PropTypes from "prop-types";
+import { PropType_Component } from "./Utils";
 
 /* Dialog component */
-export default function DialogBox({
+function DialogBox({
   open,
   close,
   loading = false,
@@ -32,19 +34,26 @@ export default function DialogBox({
         document.getElementById(localStorage.getItem("fullScreen"))
       }
       {...rest}
+      data-test="dialogbox-container"
     >
-      <DialogTitle {...titleProp}>{title}</DialogTitle>
+      <DialogTitle {...titleProp} data-test="dialogbox-title">
+        {title}
+      </DialogTitle>
 
       <DialogContent style={{ overflow: "hidden", padding: 0 }}>
-        {loading && <LinearProgress />}
-        {!loading && <Divider />}
+        {loading && <LinearProgress data-test="dialogbox-loader" />}
+        {!loading && <Divider data-test="dialogbox-divider" />}
       </DialogContent>
 
-      {content && <DialogContent {...contentProp}>{content}</DialogContent>}
+      {content && (
+        <DialogContent {...contentProp} data-test="dialogbox-content">
+          {content}
+        </DialogContent>
+      )}
 
       {actions && (
         <>
-          {bottomSeperator && <Divider />}
+          {bottomSeperator && <Divider data-test="dialogbox-bottom-divider" />}
 
           <DialogActions disableSpacing>
             <Grid
@@ -55,7 +64,12 @@ export default function DialogBox({
               {...actionProp}
             >
               {actions.map((element, index) => (
-                <Grid item key={index} {...element.prop}>
+                <Grid
+                  item
+                  key={index}
+                  {...element.prop}
+                  data-test="dialogbox-actions-btn"
+                >
                   {element.element ? element.element : element}
                 </Grid>
               ))}
@@ -66,3 +80,17 @@ export default function DialogBox({
     </Dialog>
   );
 }
+DialogBox.propTypes = {
+  open: PropTypes.bool.isRequired,
+  close: PropTypes.func.isRequired,
+  loading: PropTypes.bool,
+  title: PropType_Component,
+  titleProp: PropTypes.object,
+  content: PropType_Component,
+  contentProp: PropTypes.object,
+  actions: PropTypes.arrayOf(PropType_Component),
+  actionProp: PropTypes.object,
+  bottomSeperator: PropTypes.bool,
+};
+
+export default DialogBox;

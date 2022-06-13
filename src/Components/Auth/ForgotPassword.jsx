@@ -1,6 +1,17 @@
-import { Box, Button, makeStyles, Typography } from "@material-ui/core";
-import { TextControl } from "../Utils/Control";
+import {
+  Box,
+  Button,
+  CircularProgress,
+  makeStyles,
+  Typography,
+} from "@material-ui/core";
+import { Form, TextControl } from "../Utils/Control";
 import CloseButton from "../Utils/CloseButton";
+import { useForm } from "react-hook-form";
+import { requestPasswordReset } from "../../Service/UserFactory";
+import { useHistory } from "react-router-dom";
+import { useState } from "react";
+import { EMAIL_REGEX } from "../../assets/data/Other";
 
 // Generate CSS classes
 const useStyles = makeStyles((theme) => ({
@@ -46,26 +57,72 @@ export default function ForgotPassword({ show, login }) {
   // Get styles
   const classes = useStyles();
 
+  const { control, handleSubmit, reset } = useForm();
+
+  const [loading, setLoading] = useState(false);
+
+  const history = useHistory();
+
+  const onSubmit = async (data) => {
+    if (!loading) {
+      setLoading(true);
+      const status = await requestPasswordReset(data);
+      setLoading(false);
+      if (status) {
+        history.push("/login");
+        reset({ email: "" });
+      }
+    }
+  };
+
   return (
     <Box className={`${classes.root} ${show ? "active" : ""}`}>
       <Box display="flex" alignItems="center" justifyContent="space-between">
         <Typography className={classes.title}>Forgot Password</Typography>
-        <CloseButton click={login} />
+        <CloseButton
+          click={() => {
+            reset({ email: "" });
+            login();
+          }}
+        />
       </Box>
 
       <Box height={1} display="flex" flexDirection="column">
-        <Box padding={1} flexGrow={1}>
-          <TextControl
-            fullWidth
-            name="Email id to Recover"
-            variant="standard"
-          />
-        </Box>
-        <Box padding={1} display="flex" justifyContent="flex-end">
-          <Button variant="contained" className={classes.submitBtn}>
-            Submit
-          </Button>
-        </Box>
+        <Form
+          control={control}
+          autoComplete="off"
+          rules={{
+            email: {
+              pattern: {
+                value: EMAIL_REGEX,
+                message: "Invalid email address.",
+              },
+              required: "Email is required.",
+            },
+          }}
+          onSubmit={handleSubmit(onSubmit)}
+        >
+          <Box padding={1} flexGrow={1}>
+            <TextControl
+              fullWidth
+              label="Email id"
+              name="email"
+              variant="standard"
+            />
+          </Box>
+          <Box padding={1} display="flex" justifyContent="flex-end">
+            <Button
+              variant="contained"
+              className={classes.submitBtn}
+              type="submit"
+              endIcon={
+                loading ? <CircularProgress size={20} color="inherit" /> : null
+              }
+            >
+              Submit
+            </Button>
+          </Box>
+        </Form>
       </Box>
     </Box>
   );

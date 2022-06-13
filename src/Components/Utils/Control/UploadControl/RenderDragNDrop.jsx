@@ -136,9 +136,24 @@ const RenderDragNDrop = ({
     />
   );
 };
+
+const PropTypes_Conditional = (props, propName, componentName) => {
+  if (props["containerRef"] || props["container"]) return;
+
+  if (props[propName] === undefined)
+    return new Error(`${propName} props is required.`);
+
+  if (propName === "dialogOpen" && typeof props[propName] !== "boolean")
+    return new Error(`Invalid ${propName} props is passed.`);
+  if (propName === "closeDrag" && typeof props[propName] !== "function")
+    return new Error(`Invalid ${propName} props is passed.`);
+};
+
 RenderDragNDrop.propTypes = {
   trigger: PropTypes.func.isRequired,
   onChange: PropTypes.func.isRequired,
+  dialogOpen: PropTypes_Conditional,
+  closeDrag: PropTypes_Conditional,
 };
 
 export { RenderDragNDrop };

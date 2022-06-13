@@ -1,6 +1,6 @@
 import { shallow } from "enzyme";
 import { RenderListItem } from "../../../../../Components/Utils/Control/UploadControl/RenderListItem";
-import { checkProps, findByAttr } from "../../../../TestUtils";
+import { testProps, findByAttr } from "../../../../Test.utils";
 
 describe("<RenderListItem />", () => {
   const setup = (props) => {
@@ -19,7 +19,7 @@ describe("<RenderListItem />", () => {
   });
 
   test("Test props of component", () => {
-    checkProps(RenderListItem, {
+    testProps(RenderListItem, {
       listItem: jest.fn(),
       fileName: "hello.py",
       index: 0,

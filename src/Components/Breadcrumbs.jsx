@@ -44,7 +44,11 @@ const Breadcrumbs = ({ history, location: { pathname } }) => {
 
   return (
     <MUIBreadcrumbs aria-label="breadcrumb" separator=">">
-      <Text link={pathnames.length > 0} path={"/"}>
+      <Text
+        link={pathnames.length > 0}
+        path={"/"}
+        data-test="breadcrumbs-path-chip"
+      >
         Home
       </Text>
 
@@ -53,6 +57,7 @@ const Breadcrumbs = ({ history, location: { pathname } }) => {
           key={index}
           link={index < pathnames.length - 1}
           path={`/${pathnames.slice(0, index + 1).join("/")}`}
+          data-test="breadcrumbs-path-chip"
         >
           {text}
         </Text>

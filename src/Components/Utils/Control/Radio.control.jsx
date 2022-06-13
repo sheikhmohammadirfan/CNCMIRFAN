@@ -5,8 +5,8 @@ import {
   Radio,
   RadioGroup,
 } from "@material-ui/core";
-import { checkNameProps } from "../Utils";
-import { getLabel } from "./ControlsUtils";
+import { controlledName } from "../Utils";
+import { getLabel } from "./Controls.utils.js";
 import { Field } from "./Form";
 import PropTypes from "prop-types";
 import { forwardRef } from "react";
@@ -55,7 +55,7 @@ const RadioControl = forwardRef((props, ref) => {
   );
 });
 RadioControl.propTypes = {
-  name: checkNameProps,
+  name: controlledName,
   controls: PropTypes.object,
   direction: PropTypes.oneOf(["row", "column"]),
   options: PropTypes.arrayOf(
