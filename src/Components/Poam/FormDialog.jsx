@@ -15,6 +15,7 @@ import SupportingDocuments from "./SupportingDocuments";
 import { useForm } from "react-hook-form";
 import { validateID } from "./PoamUtils";
 import { stringToMoment } from "../Utils/Utils";
+import { Autocomplete } from "@material-ui/lab";
 
 // Style generator
 const useStyle = makeStyles((theme) => ({
@@ -91,7 +92,9 @@ function FormDialog({ poamID_data, rows, open, onClose, rowIndex, onSubmit }) {
   };
 
   // Get useForm Methods
-  const { handleSubmit, control } = useForm({ defaultValues });
+  const { handleSubmit, getValues, setValue, control } = useForm({
+    defaultValues,
+  });
 
   // Push data onsubmit
   const submitForm = async (data) => {
@@ -124,11 +127,23 @@ function FormDialog({ poamID_data, rows, open, onClose, rowIndex, onSubmit }) {
               </Grid>
 
               <Grid item xs={12} sm={6}>
-                <SelectControl
-                  name="Controls"
-                  variant="outlined"
-                  styleProps={{ fullWidth: true }}
+                <Autocomplete
+                  value={getValues("Controls")}
+                  onChange={(e, v) => setValue("Controls", v || "")}
+                  freeSolo
                   options={controlsList}
+                  renderInput={(props) => (
+                    <TextControl
+                      {...props}
+                      noControls
+                      variant="outlined"
+                      name="Controls"
+                      value={getValues("Controls")}
+                      onChange={(e) =>
+                        setValue("Controls", e.target.value || "")
+                      }
+                    />
+                  )}
                 />
               </Grid>
 
