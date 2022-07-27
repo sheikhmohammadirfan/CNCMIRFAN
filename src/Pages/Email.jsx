@@ -487,7 +487,6 @@ function Email({ title, close }) {
       </Dialog>
     </>
   );
-  s;
 }
 
 export default Email;
