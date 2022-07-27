@@ -140,7 +140,9 @@ function App() {
                 </Box>
               </Box>
 
-              <Email title="EMAIL" />
+              <ParamsRoutes params={["email"]}>
+                <Email title="EMAIL" />
+              </ParamsRoutes>
 
               <ParamsRoutes
                 params={["createIssue", "rowIndex"]}

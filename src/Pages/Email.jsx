@@ -202,7 +202,7 @@ const textfields = [
   },
 ];
 
-function Email({ title }) {
+function Email({ title, close }) {
   DocumentTitle(title);
   const current = new Date();
   const date = `${current.toLocaleString("en-us", {
@@ -245,26 +245,13 @@ function Email({ title }) {
     });
   };
 
-  const location = useLocation();
-  const [open, setOpen] = useState(false);
-  useEffect(() => {
-    const urlSearchParams = new URLSearchParams(location.search);
-    const params = Object.fromEntries(urlSearchParams.entries());
-    setOpen(params.email === "true");
-  }, [location]);
-
   const handleClose = () => {
-    resetFields();
     setMailAcknowledgement(false);
+    resetFields();
   };
 
   const resetFields = () => {
-    setOpen(false);
-    setTags({ to: [], cc: [], bcc: [] });
-    setSubject("");
-    setMessage("");
-    setLoader(false);
-    setFiles([]);
+    close();
   };
 
   const emailValidation = (email) => {
@@ -347,7 +334,7 @@ function Email({ title }) {
         </DialogContent>
       </Dialog>
 
-      <Dialog open={open} maxWidth="sm" fullWidth>
+      <Dialog open={true} maxWidth="sm" fullWidth>
         <DialogTitle>
           <Box
             display="flex"
@@ -362,7 +349,7 @@ function Email({ title }) {
           <DialogContentText>
             Write Mails To Clients Effectively.
           </DialogContentText>
-          <Box component="form" className={classes.form}>
+          <Box className={classes.form}>
             <Box className={classes.heading}>
               <TextField
                 autoFocus
@@ -500,6 +487,7 @@ function Email({ title }) {
       </Dialog>
     </>
   );
+  s;
 }
 
 export default Email;
