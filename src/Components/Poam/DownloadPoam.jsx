@@ -103,8 +103,8 @@ export default function DownloadPoam({
     const book = XLSX.utils.book_new();
 
     // Append sheets
-    XLSX.utils.book_append_sheet(book, sheetOpen, "OPEN");
-    XLSX.utils.book_append_sheet(book, sheetClose, "CLOSE");
+    XLSX.utils.book_append_sheet(book, sheetOpen, "Open POA&M Items");
+    XLSX.utils.book_append_sheet(book, sheetClose, "Closed POA&M Items");
 
     // Save & download file
     XLSX.write(book, { bookType: type, type: "binary" });
@@ -237,7 +237,7 @@ export default function DownloadPoam({
           onClick={close}
         >
           CANCEL
-        </Button>,  
+        </Button>,
         <Button
           variant="contained"
           size="large"
