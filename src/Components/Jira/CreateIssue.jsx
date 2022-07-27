@@ -124,7 +124,7 @@ function CreateIssue({ title, poamID, close, rowIndex }) {
     );
     notification(
       "jira-issue",
-      replaceIdWithName(message),
+      status ? message : replaceIdWithName(message),
       status ? "success" : "error"
     );
     if (!status) return stopLoading();
