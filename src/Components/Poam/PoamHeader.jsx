@@ -182,6 +182,10 @@ export default function PoamHeader({
               <Tooltip
                 arrow
                 title={isOpenPoam ? "Move to close" : "Move to open  "}
+                PopperProps={{
+                  container: () =>
+                    document.getElementById(localStorage.getItem("fullScreen")),
+                }}
               >
                 <Button
                   disabled={selectedRow.length !== 1}
@@ -204,7 +208,16 @@ export default function PoamHeader({
               </Tooltip>
 
               {isOpenPoam && (
-                <Tooltip arrow title="Edit row">
+                <Tooltip
+                  arrow
+                  title="Edit row"
+                  PopperProps={{
+                    container: () =>
+                      document.getElementById(
+                        localStorage.getItem("fullScreen")
+                      ),
+                  }}
+                >
                   <Button
                     disabled={selectedRow.length !== 1}
                     onClick={openEditFrom}
@@ -230,7 +243,14 @@ export default function PoamHeader({
                 <Icon>file_download</Icon>
               </Button>
 
-              <Tooltip arrow title="Zoom in">
+              <Tooltip
+                arrow
+                title="Zoom in"
+                PopperProps={{
+                  container: () =>
+                    document.getElementById(localStorage.getItem("fullScreen")),
+                }}
+              >
                 <Button onClick={isZoomed() ? zoomOut : zoomIn}>
                   <Icon>{isZoomed() ? "zoom_in_map" : "zoom_out_map"}</Icon>
                 </Button>

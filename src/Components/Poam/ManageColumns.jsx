@@ -50,6 +50,10 @@ export default function ManageColumns({
       open={isOpen}
       onOpen={stopTimeout}
       onClose={startTimeout}
+      PopperProps={{
+        container: () =>
+          document.getElementById(localStorage.getItem("fullScreen")),
+      }}
       classes={{ tooltip: classes.customTooltip }}
       interactive
       {...rest}
