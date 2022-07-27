@@ -237,19 +237,7 @@ export default function DownloadPoam({
           onClick={close}
         >
           CANCEL
-        </Button>,
-        <Button variant="contained" size="large" fullWidth color="primary">
-          .pdf
-        </Button>,
-        <Button
-          variant="contained"
-          size="large"
-          fullWidth
-          color="primary"
-          onClick={exportAsCSV}
-        >
-          .csv
-        </Button>,
+        </Button>,  
         <Button
           variant="contained"
           size="large"
