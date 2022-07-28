@@ -32,6 +32,10 @@ function DateControl(props) {
               </InputAdornment>
             ),
           }}
+          DialogProps={{
+            container: () =>
+              document.getElementById(localStorage.getItem("fullScreen")),
+          }}
           error={Boolean(error || controls?.fieldState.error)}
           helperText={getError(error, controls?.fieldState.error, gutter)}
           {...controls?.field}

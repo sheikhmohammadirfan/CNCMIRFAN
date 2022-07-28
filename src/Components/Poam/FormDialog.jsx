@@ -131,11 +131,13 @@ function FormDialog({ poamID_data, rows, open, onClose, rowIndex, onSubmit }) {
                   value={getValues("Controls")}
                   onChange={(e, v) => setValue("Controls", v || "")}
                   freeSolo
+                  disablePortal
                   options={controlsList}
                   renderInput={(props) => (
                     <TextControl
                       {...props}
                       noControls
+                      gutter={false}
                       variant="outlined"
                       name="Controls"
                       value={getValues("Controls")}
