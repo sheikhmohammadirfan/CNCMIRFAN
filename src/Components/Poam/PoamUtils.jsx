@@ -19,13 +19,20 @@ export const useStyle = makeStyles((theme) => ({
     "& tbody td": { background: "#fafafa !important" },
 
     // Stick All checkbox in table to be sticky left
-    "& [checkbox]": { position: "sticky !important", left: 0, zIndex: 1 },
+    "& [checkbox]": { position: "sticky !important", left: 0, zIndex: 2 },
 
     // Make poam ID column to sticky left with offset of 50px
-    "& [poam-id]": { position: "sticky !important", left: 50, zIndex: 1 },
+    "& [poam-id]": {
+      position: "sticky !important",
+      left: 50,
+      zIndex: 1,
+    },
 
     // Increase z-index of header
-    "& [header]": { zIndex: "2 !important" },
+    "& [header]": {
+      zIndex: "3 !important",
+      "&[poam-id]": { zIndex: "2 !important" },
+    },
 
     // Change background color of selected row
     "& tr.Mui-selected td": { background: "#d4e9e9 !important" },

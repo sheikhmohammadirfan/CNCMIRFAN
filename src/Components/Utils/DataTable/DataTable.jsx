@@ -183,8 +183,7 @@ function DataTable({
 
   // Generate css grid template
   const generateTemplate = () => {
-    var temp = [];
-
+    let temp = [];
     // Check if multiple minwidth for each col is passed
     if (Array.isArray(minCellWidth)) {
       if (checkbox) temp.push(`${minCheckboxWidth}px`);
@@ -194,7 +193,6 @@ function DataTable({
       temp = Array(HEADERS.length).fill(`${minCellWidth}px`);
       if (checkbox) temp[0] = `${minCheckboxWidth}px`;
     }
-
     return temp.join(" ");
   };
 

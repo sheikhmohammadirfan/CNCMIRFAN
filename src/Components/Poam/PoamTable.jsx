@@ -80,6 +80,13 @@ export default function PoamTable({ fileID }) {
   const [secondaryColumns, setSecondaryColumns] = useState(secondary_columns);
   const [visibleColumns, setVisibleColumns] = useState([]);
 
+  useEffect(() => {
+    const _l = document.querySelectorAll("table [poam-id]");
+    for (let i = 0; i < _l.length; i++) {
+      _l[i].style.left = "50px";
+    }
+  }, [visibleColumns]);
+
   // React state to maintain poam sheet status
   const [isOpenPoam, setPoamSheet] = useState(true);
   const showOpenPoam = () => setPoamSheet(true);
@@ -268,7 +275,9 @@ export default function PoamTable({ fileID }) {
           >
             <Grid item xs={secondaryOpen !== -1 ? 9 : 12}>
               <DataTable
-                className={`${classes.tableStyle} ${isOpenPoam ? "o" : ""}`}
+                className={`poam-table ${classes.tableStyle} ${
+                  isOpenPoam ? "o" : ""
+                }`}
                 verticalBorder={true}
                 header={mapTableHeader()}
                 rowList={mapTableBody()}

@@ -50,15 +50,17 @@ export default function useDragResize(
       const gridColumns = colsWidth.map((col, i) => {
         if (i === activeIndex) {
           // Calculate the column width
-          const width =
-            e.clientX -
-            col.left -
-            tableRef.current.offsetLeft +
-            tableRef.current.parentNode.scrollLeft;
+          let width = e.clientX - col.left - tableRef.current.offsetLeft;
+          if (i > 1) width += tableRef.current.parentNode.scrollLeft;
 
-          if (i === 0)
-            return `${width >= minCheckWidth ? width : minCheckWidth}px`;
-          else if (Array.isArray(minWidth))
+          if (i === 0) {
+            const _w = `${width >= minCheckWidth ? width : minCheckWidth}px`;
+            const _l = document.querySelectorAll("table [poam-id]");
+            for (let i = 0; i < _l.length; i++) {
+              _l[i].style.left = _w;
+            }
+            return _w;
+          } else if (Array.isArray(minWidth))
             return `${width >= minWidth[i - 1] ? width : minWidth[i - 1]}px`;
           else return `${width >= minWidth ? width : minWidth}px`;
         }
