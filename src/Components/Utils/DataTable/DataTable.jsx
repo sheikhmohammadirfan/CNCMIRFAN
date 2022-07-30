@@ -233,7 +233,7 @@ function DataTable({
                 data-test="datatable-header-cell"
               >
                 {headerWrapper(text)}
-                {resizeTable && (
+                {resizeTable && index > 1 && (
                   <VerticalResizer index={index} data-test="column-resizer" />
                 )}
               </TableCell>

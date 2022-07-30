@@ -68,7 +68,11 @@ export default function ManageColumns({
               </ListItem>
 
               {allColumns
-                .filter((name) => !hiddenColumns.includes(name))
+                .filter(
+                  (name) =>
+                    !hiddenColumns.includes(name) &&
+                    name.toLowerCase() !== "poam id"
+                )
                 .map((headerName, index) => (
                   <ListItem key={index} disableGutters dense>
                     <Box
