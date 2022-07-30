@@ -201,7 +201,8 @@ function DataTable({
     HEADERS.length,
     classes.resizeHandle,
     minCellWidth,
-    minCheckboxWidth
+    minCheckboxWidth,
+    header
   );
 
   return (

@@ -4,7 +4,8 @@ export default function useDragResize(
   colCount,
   draggerClass,
   minWidth,
-  minCheckWidth
+  minCheckWidth,
+  header
 ) {
   // Method to generate list of dictionary to save left & width of each col
   const getWidthList = (count, widthList = []) => {
@@ -39,7 +40,7 @@ export default function useDragResize(
   // Update table height state on mounting component
   useEffect(() => {
     if (tableRef.current) setTableHeight(tableRef.current.offsetHeight);
-  }, [tableRef]);
+  }, [tableRef, header]);
 
   // Change active index on clicking on dragger
   const onMouseDown = (index) => setActiveIndex(index);
