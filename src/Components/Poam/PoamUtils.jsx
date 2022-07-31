@@ -43,11 +43,9 @@ export const useStyle = makeStyles((theme) => ({
 
   // Style to make all cell height of 3 line
   tableCell: {
-    whiteSpace: "pre-line",
-    display: "-webkit-box",
-    WebkitBoxOrient: "vertical",
-    WebkitLineClamp: "3",
+    whiteSpace: "pre",
     overflow: "hidden",
+    userSelect: "none",
   },
 
   // Style for table container

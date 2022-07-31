@@ -13,6 +13,7 @@ import useDragResize from "./useDragResize";
 import useRowSelect from "./useRowSelect";
 import PropTypes from "prop-types";
 import { propsRequiredIF, PropType_Component } from "../Utils";
+import useHeightResize from "./useHeightResize";
 
 /** CSS classe generator */
 const useStyles = makeStyles((theme) => ({
@@ -46,6 +47,20 @@ const useStyles = makeStyles((theme) => ({
     top: 0,
     zIndex: 1,
     borderRight: "2px solid transparent",
+    "&:hover": { borderColor: "#ccc" },
+    "&.active": { borderColor: "#517ea5" },
+  },
+
+  // Style for dragger handle
+  expandHandle: {
+    display: "block",
+    position: "absolute",
+    cursor: "row-resize",
+    height: 7,
+    left: 0,
+    bottom: 0,
+    zIndex: 1,
+    borderBottom: "2px solid transparent",
     "&:hover": { borderColor: "#ccc" },
     "&.active": { borderColor: "#517ea5" },
   },
@@ -182,7 +197,7 @@ function DataTable({
   const HEADERS = addColsToHeader(header.data);
 
   // Generate css grid template
-  const generateTemplate = () => {
+  const generateColumns = () => {
     let temp = [];
     // Check if multiple minwidth for each col is passed
     if (Array.isArray(minCellWidth)) {
@@ -205,6 +220,14 @@ function DataTable({
     header
   );
 
+  const HeightResizer = useHeightResize(
+    rowData.length + 1,
+    classes.expandHandle,
+    50,
+    tableRef,
+    rowData
+  );
+
   return (
     <TableContainer
       className={`${classes.root} ${
@@ -214,7 +237,16 @@ function DataTable({
     >
       <Table
         className={resizeTable ? classes.table : ""}
-        style={{ gridTemplateColumns: generateTemplate() }}
+        style={
+          resizeTable
+            ? {
+                gridTemplateColumns: generateColumns(),
+                gridTemplateRows: Array(rowData.length + 1)
+                  .fill("50px")
+                  .join(" "),
+              }
+            : {}
+        }
         ref={tableRef}
         data-test="datatable-table"
       >
@@ -265,6 +297,9 @@ function DataTable({
                       data-test="datatable-row-cell"
                     >
                       {rowWrapper(text)}
+                      {resizeTable && colIndex == 0 && (
+                        <HeightResizer index={rowIndex + 1} />
+                      )}
                     </TableCell>
                   )
                 )}

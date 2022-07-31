@@ -28,6 +28,8 @@ export default function useDragResize(
   // React hook to save reference of table
   const tableRef = useRef(null);
 
+  const draggerRef = useRef(null);
+
   // React hook to save the height of table
   const [tableHeight, setTableHeight] = useState("auto");
 
@@ -36,6 +38,9 @@ export default function useDragResize(
 
   // React hook to store left & width of each col as list of dictionary
   const [colsWidth, setcolsWidth] = useState(getWidthList(colCount));
+  useEffect(() => {
+    setcolsWidth(getWidthList(colCount));
+  }, [header]);
 
   // Update table height state on mounting component
   useEffect(() => {
@@ -54,14 +59,9 @@ export default function useDragResize(
           let width = e.clientX - col.left - tableRef.current.offsetLeft;
           if (i > 1) width += tableRef.current.parentNode.scrollLeft;
 
-          if (i === 0) {
-            const _w = `${width >= minCheckWidth ? width : minCheckWidth}px`;
-            const _l = document.querySelectorAll("table [poam-id]");
-            for (let i = 0; i < _l.length; i++) {
-              _l[i].style.left = _w;
-            }
-            return _w;
-          } else if (Array.isArray(minWidth))
+          if (i === 0)
+            return `${width >= minCheckWidth ? width : minCheckWidth}px`;
+          else if (Array.isArray(minWidth))
             return `${width >= minWidth[i - 1] ? width : minWidth[i - 1]}px`;
           else return `${width >= minWidth ? width : minWidth}px`;
         }
@@ -109,8 +109,9 @@ export default function useDragResize(
   // UI component to show Vertical resizer
   const VerticalResizer = ({ index }) => (
     <div
+      ref={draggerRef}
       style={{ height: tableHeight }}
-      className={draggerClass}
+      className={draggerClass + " " + (activeIndex === index ? "active" : " ")}
       onMouseDown={(i) => onMouseDown(index)}
     />
   );
