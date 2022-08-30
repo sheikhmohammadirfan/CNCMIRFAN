@@ -71,7 +71,9 @@ export default function ManageJira({
                   closeMenu();
                 }}
               >
-                <Typography variant="button">Create Issue</Typography>
+                <Typography id="create-issue-btn" variant="button">
+                  Create Issue
+                </Typography>
               </ListItem>
 
               {checkIssue() && (
@@ -83,7 +85,9 @@ export default function ManageJira({
                     closeMenu();
                   }}
                 >
-                  <Typography variant="button">Update Issue</Typography>
+                  <Typography id="update-issue-btn" variant="button">
+                    Update Issue
+                  </Typography>
                 </ListItem>
               )}
             </List>

@@ -188,6 +188,7 @@ export default function PoamHeader({
                 }}
               >
                 <Button
+                  id="move-row-btn"
                   disabled={selectedRow.length !== 1}
                   onClick={openJustify}
                 >
@@ -219,6 +220,7 @@ export default function PoamHeader({
                   }}
                 >
                   <Button
+                    id="edit-row-btn"
                     disabled={selectedRow.length !== 1}
                     onClick={openEditFrom}
                   >
@@ -239,7 +241,7 @@ export default function PoamHeader({
                 </Button>
               </ManageColumns>
 
-              <Button onClick={openDownload}>
+              <Button id="download-file-btn" onClick={openDownload}>
                 <Icon>file_download</Icon>
               </Button>
 
@@ -251,7 +253,10 @@ export default function PoamHeader({
                     document.getElementById(localStorage.getItem("fullScreen")),
                 }}
               >
-                <Button onClick={isZoomed() ? zoomOut : zoomIn}>
+                <Button
+                  id="poam-zoom-btn"
+                  onClick={isZoomed() ? zoomOut : zoomIn}
+                >
                   <Icon>{isZoomed() ? "zoom_in_map" : "zoom_out_map"}</Icon>
                 </Button>
               </Tooltip>

@@ -397,9 +397,11 @@ export default function PoamUpload({ selectFile }) {
           </Typography>
 
           <ButtonGroup size="small" variant="contained">
-            <Button onClick={openUploadDialog}>Add File</Button>
+            <Button id="add-file-btn" onClick={openUploadDialog}>
+              Add File
+            </Button>
 
-            <Button onClick={openCreateDialog}>Create New</Button>
+            <Button id="create-file-btn" onClick={openCreateDialog}>Create New</Button>
           </ButtonGroup>
         </Box>
 

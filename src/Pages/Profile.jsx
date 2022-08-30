@@ -8,7 +8,6 @@ import {
   CircularProgress,
 } from "@material-ui/core";
 import DocumentTitle from "../Components/DocumentTitle";
-import countries from "i18n-iso-countries";
 import {
   DateControl,
   SelectControl,
@@ -23,7 +22,6 @@ import { Controller, useForm } from "react-hook-form";
 import { isPasswordValid } from "../Components/Utils/Control/Controls.utils.js";
 import { updateProfile } from "../Service/UserFactory";
 import { Profile as defaultValues } from "../assets/data/DefaultValue";
-import enLocale from "i18n-iso-countries/langs/en.json";
 import countryCodes from "country-codes-list";
 import useLoading from "../Components/Utils/Hooks/useLoading";
 import { stringToMoment } from "../Components/Utils/Utils";
@@ -139,13 +137,6 @@ export default function Profile({ title }) {
   // Loader
   const { isLoading, startLoading, stopLoading } = useLoading();
 
-  countries.registerLocale(enLocale);
-  const countryObj = countries.getNames("en", { select: "official" });
-  const countryArray = Object.values(countryObj).map((value) => ({
-    text: value,
-    val: value,
-  }));
-
   // Validation to be the profile form fields
   const validation = {
     first_name: { required: "This field is required." },
@@ -208,109 +199,6 @@ export default function Profile({ title }) {
                 </Typography>
               </Grid>
             </Grid>
-
-            {/* <Grid item xs={12}>
-              <Grid container spacing={2}>
-                <Grid item xs={6}>
-                  <TextControl
-                    variant="outlined"
-                    size="small"
-                    name="first_name"
-                    label="First Name"
-                    gutter={false}
-                    fullWidth
-                  />
-                </Grid>
-
-                <Grid item xs={6}>
-                  <TextControl
-                    variant="outlined"
-                    size="small"
-                    name="last_name"
-                    label="Last Name"
-                    gutter={false}
-                    fullWidth
-                  />
-                </Grid>
-
-                <Grid item xs={6}>
-                  <ContactNumControl
-                    name="contact_no"
-                    label="Contact No."
-                    control={control}
-                    rules={validation}
-                  />
-                </Grid>
-
-                <Grid item xs={6}></Grid>
-
-                <Grid item xs={6}>
-                  <DateControl
-                    name="date_of_birth"
-                    label="Date Of Birth"
-                    size="small"
-                    variant="outlined"
-                    format="Do MMMM yyyy"
-                    fullWidth
-                    disableFuture
-                  />
-                </Grid>
-
-                <Grid item xs={12}>
-                  <TextControl
-                    name="address"
-                    label="Room/Flat no, Street"
-                    variant="outlined"
-                    size="small"
-                    fullWidth
-                    gutter={false}
-                  />
-                </Grid>
-
-                <Grid item xs={6}>
-                  <TextControl
-                    name="city"
-                    label="City"
-                    variant="outlined"
-                    size="small"
-                    fullWidth
-                    gutter={false}
-                  />
-                </Grid>
-
-                <Grid item xs={6}>
-                  <TextControl
-                    name="state"
-                    label="State"
-                    variant="outlined"
-                    size="small"
-                    fullWidth
-                    gutter={false}
-                  />
-                </Grid>
-
-                <Grid item xs={6}>
-                  <TextControl
-                    name="postal_code"
-                    label="Pincode"
-                    variant="outlined"
-                    size="small"
-                    fullWidth
-                    gutter={false}
-                  />
-                </Grid>
-
-                <Grid item xs={6}>
-                  <SelectControl
-                    name="country"
-                    label="Country"
-                    options={countryArray}
-                    variant="outlined"
-                    styleProps={{ fullWidth: true, size: "small" }}
-                  />
-                </Grid>
-              </Grid>
-            </Grid> */}
 
             <Grid item xs={12}>
               <Grid container spacing={2} alignItems="center">
