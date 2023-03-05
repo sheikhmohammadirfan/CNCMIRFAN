@@ -1,12 +1,4 @@
-import {
-  Box,
-  Button,
-  Checkbox,
-  Grid,
-  makeStyles,
-  Tooltip,
-  Typography,
-} from "@material-ui/core";
+import { Box, Button, Checkbox, Grid, makeStyles, Tooltip, Typography } from "@material-ui/core";
 import React from "react";
 import { poam_header } from "../../assets/data/PoamData";
 import XLSX from "xlsx";
@@ -33,13 +25,7 @@ const useStyle = makeStyles((theme) => ({
 }));
 
 // Method to convert data into downladable excel or csv
-export default function DownloadPoam({
-  data,
-  open,
-  close,
-  allColumns,
-  hiddenColumns,
-}) {
+export default function DownloadPoam({ data, open, close, allColumns, hiddenColumns }) {
   const classes = useStyle();
 
   // State to save radio input
@@ -49,19 +35,12 @@ export default function DownloadPoam({
   const [checkList, setCheckList] = useState([]);
 
   // Get method to check collection of checkboxes
-  const {
-    checkAtIndex,
-    uncheckAtIndex,
-    checkAll,
-    uncheckAll,
-    isCheckedAtIndex,
-    isAllChecked,
-    isSomeChecked,
-  } = useCheck(checkList, setCheckList, allColumns.length);
+  const { checkAtIndex, uncheckAtIndex, checkAll, uncheckAll, isCheckedAtIndex, isAllChecked, isSomeChecked } =
+    useCheck(checkList, setCheckList, allColumns.length);
 
   // Map data into XLSX util object
   const mapData = (sheet) =>
-    Object.keys(sheet["POAM ID"]).map((id) => {
+    Object.keys(sheet["POA&M ID"]).map((id) => {
       const temp = {};
       let i = 0;
       for (let name of poam_header) {
@@ -111,10 +90,10 @@ export default function DownloadPoam({
     XLSX.writeFile(book, `${fileName}.${type}`);
   };
 
-  const exportAsXLS = () => exportFile("POAM FILE", "xls");
-  const exportAsXLSX = () => exportFile("POAM FILE", "xlsx");
-  const exportAsXLSM = () => exportFile("POAM FILE", "xlsm");
-  const exportAsCSV = () => exportFile("POAM FILE", "csv");
+  const exportAsXLS = () => exportFile("POA&M FILE", "xls");
+  const exportAsXLSX = () => exportFile("POA&M FILE", "xlsx");
+  const exportAsXLSM = () => exportFile("POA&M FILE", "xlsm");
+  const exportAsCSV = () => exportFile("POA&M FILE", "csv");
 
   // Create component to show text & caption
   const OptionText = ({ text, caption }) => (
@@ -133,12 +112,7 @@ export default function DownloadPoam({
         text={
           <span>
             Select Columns
-            <Tooltip
-              arrow
-              color="default"
-              placement="right"
-              title={isAllChecked() ? "Deselect all" : "Select all"}
-            >
+            <Tooltip arrow color="default" placement="right" title={isAllChecked() ? "Deselect all" : "Select all"}>
               <Checkbox
                 size="small"
                 style={{ padding: 0, paddingLeft: "8px" }}
@@ -166,9 +140,7 @@ export default function DownloadPoam({
                 className={classes.checkboxInput}
                 checked={isCheckedAtIndex(index)}
                 onChange={(e) => {
-                  e.target.checked
-                    ? checkAtIndex(index)
-                    : uncheckAtIndex(index);
+                  e.target.checked ? checkAtIndex(index) : uncheckAtIndex(index);
                 }}
               />
             </Grid>
@@ -191,21 +163,11 @@ export default function DownloadPoam({
     },
     {
       val: "Default Columns",
-      text: (
-        <OptionText
-          text="Default Columns"
-          caption="The file will include only FeDRMP specified columns."
-        />
-      ),
+      text: <OptionText text="Default Columns" caption="The file will include only FeDRMP specified columns." />,
     },
     {
       val: "Hidden Columns",
-      text: (
-        <OptionText
-          text="Hidden Columns"
-          caption="The file will include only additional columns."
-        />
-      ),
+      text: <OptionText text="Hidden Columns" caption="The file will include only additional columns." />,
     },
     { val: "Selected Columns", text: <SelectColumns /> },
   ];
@@ -217,7 +179,7 @@ export default function DownloadPoam({
       open={open}
       onClose={close}
       bottomSeperator={true}
-      title="Download POAM file"
+      title="Download POA&M file"
       content={
         <Box>
           <RadioControl
@@ -229,40 +191,16 @@ export default function DownloadPoam({
         </Box>
       }
       actions={[
-        <Button
-          variant="outlined"
-          size="large"
-          fullWidth
-          color="primary"
-          onClick={close}
-        >
+        <Button variant="outlined" size="large" fullWidth color="primary" onClick={close}>
           CANCEL
         </Button>,
-        <Button
-          variant="contained"
-          size="large"
-          fullWidth
-          color="primary"
-          onClick={exportAsXLS}
-        >
+        <Button variant="contained" size="large" fullWidth color="primary" onClick={exportAsXLS}>
           .xls
         </Button>,
-        <Button
-          variant="contained"
-          size="large"
-          fullWidth
-          color="primary"
-          onClick={exportAsXLSX}
-        >
+        <Button variant="contained" size="large" fullWidth color="primary" onClick={exportAsXLSX}>
           .xlsx
         </Button>,
-        <Button
-          variant="contained"
-          size="large"
-          fullWidth
-          color="primary"
-          onClick={exportAsXLSM}
-        >
+        <Button variant="contained" size="large" fullWidth color="primary" onClick={exportAsXLSM}>
           .xlsm
         </Button>,
       ]}

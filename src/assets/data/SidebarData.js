@@ -5,9 +5,62 @@ import { changeQueryParams } from "../../Components/Utils/Utils";
 export const SidebarData = [
   {
     icon: "description",
-    title: "Compliance Documention",
+    title: "Document Compliance",
     component: Link,
     to: "/about-us",
+    subMenu: [
+      {
+        title: "Policies",
+        component: Link,
+        to: "/services/services1",
+        icon: "",
+      },
+      {
+        title: "Procedures",
+        component: Link,
+        to: "/services/services2",
+      },
+      {
+        title: "Plans",
+        component: Link,
+        to: "/services/services3",
+      },
+      {
+        title: "Artifacts",
+        component: Link,
+        to: "/services/services3",
+      },
+      {
+        title: "Audit Reports",
+        component: Link,
+        to: "/services/services3",
+      },
+      {
+        title: "Vendor Risk",
+        component: Link,
+        to: "/services/services3",
+      },
+      {
+        title: "Templates",
+        component: Link,
+        to: "/services/services3",
+      },
+      {
+        title: "Scan Results",
+        component: Link,
+        to: "/services/services3",
+      },
+      {
+        title: "System Inventory",
+        component: Link,
+        to: "/services/services3",
+      },
+      {
+        title: "System Diagrams",
+        component: Link,
+        to: "/services/services3",
+      },
+    ],
   },
   {
     icon: "verified",
@@ -17,13 +70,13 @@ export const SidebarData = [
   },
   {
     icon: "manage_accounts",
-    title: "Manage Poam",
+    title: "Manage POA&M",
     component: Link,
     to: "/poam",
   },
   {
     icon: "category",
-    title: "Compliance Mapping",
+    title: "Security Control Mapping",
     component: Link,
     to: "/contact",
     subMenu: [
@@ -31,51 +84,21 @@ export const SidebarData = [
         title: "FEDRAMP / FISMA",
         component: Link,
         to: "/services/services1",
-        icon: "star",
       },
       {
         title: "HIPAA",
         component: Link,
         to: "/services/services2",
-        icon: "star",
       },
       {
         title: "PCI DSS",
         component: Link,
         to: "/services/services3",
-        icon: "star",
       },
       {
         title: "ISO 27001",
         component: Link,
         to: "/services/services3",
-        icon: "star",
-        subMenu: [
-          {
-            title: "Compliance",
-            component: Link,
-            to: "/events",
-            icon: "star",
-          },
-          {
-            title: "MY TASKS",
-            component: Link,
-            to: "/events",
-            icon: "star",
-          },
-          {
-            title: "MY TASKS",
-            component: Link,
-            to: "/events",
-            icon: "star",
-          },
-          {
-            title: "MY TASKS",
-            component: Link,
-            to: "/events",
-            icon: "star",
-          },
-        ],
       },
     ],
   },
@@ -108,25 +131,6 @@ export const SidebarData = [
           ...obj,
           search: `?${changeQueryParams({ email: true })}`,
         }),
-        icon: "email",
-      },
-      {
-        title: "MY TASKS",
-        component: Link,
-        to: "/events",
-        icon: "star",
-      },
-      {
-        title: "MY TASKS",
-        component: Link,
-        to: "/events",
-        icon: "star",
-      },
-      {
-        title: "MY TASKS",
-        component: Link,
-        to: "/events",
-        icon: "star",
       },
     ],
   },

@@ -1,11 +1,4 @@
-import {
-  CssBaseline,
-  ThemeProvider,
-  createTheme,
-  Box,
-  makeStyles,
-  responsiveFontSizes,
-} from "@material-ui/core";
+import { CssBaseline, ThemeProvider, createTheme, Box, makeStyles, responsiveFontSizes } from "@material-ui/core";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import { Flip, toast } from "react-toastify";
 import Header from "./Components/Header";
@@ -26,7 +19,7 @@ import React from "react";
 
 // Custom values
 const sidebarSmall = 50;
-const sidebarLarge = 250;
+const sidebarLarge = 280;
 const headerHeight = 40;
 
 /** Theme generator */
@@ -114,11 +107,7 @@ function App() {
                   <Sidebar isOpen={isSidebarOpen} toggleSidebar={setSidebar} />
                 </Box>
 
-                <Box
-                  flexGrow={1}
-                  className={`${classes.body} ${isSidebarOpen ? "open" : ""}`}
-                  data-test="body-wrapper"
-                >
+                <Box flexGrow={1} className={`${classes.body} ${isSidebarOpen ? "open" : ""}`} data-test="body-wrapper">
                   <Header scrollTarget={scrollTarget} />
                   <div className={classes.wrapper}>
                     <Route exact path="/">
@@ -128,7 +117,7 @@ function App() {
                       <Verify title="VERIFY" />
                     </Route>
                     <Route exact path="/poam">
-                      <Poam title="POAM" />
+                      <Poam title="POA&M" />
                     </Route>
                     <Route exact path="/profile">
                       <Profile title="PROFILE" />
@@ -144,10 +133,7 @@ function App() {
                 <Email title="EMAIL" />
               </ParamsRoutes>
 
-              <ParamsRoutes
-                params={["createIssue", "rowIndex"]}
-                removeParams={["createIssue"]}
-              >
+              <ParamsRoutes params={["createIssue", "rowIndex"]} removeParams={["createIssue"]}>
                 <CreateIssue title="Create Issue" />
               </ParamsRoutes>
 
