@@ -40,7 +40,7 @@ import {
   getPoamID_data,
 } from "./PoamUtils";
 
-/* POAM TABLE COMPONENT */
+/* POA&M TABLE COMPONENT */
 export default function PoamTable({ fileID }) {
   const classes = useStyle();
 
@@ -60,7 +60,7 @@ export default function PoamTable({ fileID }) {
 
   // React State to save table data
   const [poamData, setPoamData] = useState();
-  // Method to get open/close poam data based on isOpenPoamState
+  // Method to get open/close POA&M data based on isOpenPoamState
   const getPoam = (data) => {
     let obj = data || poamData;
     return obj ? (isOpenPoam ? obj?.open : obj?.close) : {};
@@ -87,7 +87,7 @@ export default function PoamTable({ fileID }) {
     }
   }, [visibleColumns]);
 
-  // React state to maintain poam sheet status
+  // React state to maintain POA&M sheet status
   const [isOpenPoam, setPoamSheet] = useState(true);
   const showOpenPoam = () => setPoamSheet(true);
   const showClosePoam = () => setPoamSheet(false);
@@ -125,7 +125,7 @@ export default function PoamTable({ fileID }) {
   useEffect(() => {
     (async () => {
       startLoading();
-      // Fetch poam data
+      // Fetch POA&M data
       const { data, status } = await getData(fileID);
       if (!status) return stopLoading();
       // Update state

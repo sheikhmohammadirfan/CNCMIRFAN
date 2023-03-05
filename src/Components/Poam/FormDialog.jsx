@@ -53,7 +53,7 @@ function FormDialog({ poamID_data, rows, open, onClose, rowIndex, onSubmit }) {
   // Method to check if form is of create or update row
   const isCreateForm = () => rowIndex === -1;
 
-  // Get current max POAM ID & prefix value
+  // Get current max POA&M ID & prefix value
   const { prefix, maxValue } = poamID_data;
 
   // Loading status for dialog
@@ -78,12 +78,12 @@ function FormDialog({ poamID_data, rows, open, onClose, rowIndex, onSubmit }) {
       );
   }
 
-  // Set default POAM ID, form is of create type
+  // Set default POA&M ID, form is of create type
   if (isCreateForm())
     defaultValues["POAM ID"] =
       prefix + "-" + String(maxValue + 1).padStart(3, "0");
 
-  // Validate POAM ID, on creating new row in table
+  // Validate POA&M ID, on creating new row in table
   const validation = {
     "POAM ID": {
       validate: { valid: (val) => validateID(val, prefix, maxValue) },
@@ -123,7 +123,11 @@ function FormDialog({ poamID_data, rows, open, onClose, rowIndex, onSubmit }) {
           >
             <Grid container spacing={2}>
               <Grid item xs={12} sm={6}>
-                <FormInput name="POAM ID" disabled={!isCreateForm()} />
+                <FormInput
+                  name="POAM ID"
+                  label="POA&M ID"
+                  disabled={!isCreateForm()}
+                />
               </Grid>
 
               <Grid item xs={12} sm={6}>

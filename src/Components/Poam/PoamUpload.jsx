@@ -16,7 +16,13 @@ import {
   FormHelperText,
 } from "@material-ui/core";
 import React from "react";
-import { getData, createPoam as createNewPoam, getPoamList, getCSP, uploadPoam } from "../../Service/Poam.service";
+import {
+  getData,
+  createPoam as createNewPoam,
+  getPoamList,
+  getCSP,
+  uploadPoam,
+} from "../../Service/Poam.service";
 import useLoading from "../Utils/Hooks/useLoading";
 import { useState } from "react";
 import { hidden_columns, poam_header } from "../../assets/data/PoamData";
@@ -102,7 +108,7 @@ const useStyle = makeStyles((theme) => ({
   },
 }));
 
-/* DIALOG TO ADD/CREATE NEW POAM */
+/* DIALOG TO ADD/CREATE NEW POA&M */
 const AddNewPoamDialog = ({
   isOpen,
   close,
@@ -128,7 +134,8 @@ const AddNewPoamDialog = ({
         valid: (val) => {
           if (!isCreate()) return true;
           if (!val) return "This field is required.";
-          if (val.length < 4) return "File name should have atleast 4 characters.";
+          if (val.length < 4)
+            return "File name should have atleast 4 characters.";
           return true;
         },
       },
@@ -165,7 +172,9 @@ const AddNewPoamDialog = ({
   // Make create api call with onsubmitting form
   const onSubmit = async (formData) => {
     startLoading();
-    const { data, status } = await (isCreate() ? createNewPoam(formData) : uploadPoam(formData));
+    const { data, status } = await (isCreate()
+      ? createNewPoam(formData)
+      : uploadPoam(formData));
     if (!status) return stopLoading();
     close();
     selectFile(data.file_id);
@@ -176,14 +185,18 @@ const AddNewPoamDialog = ({
     <DialogBox
       open={isOpen}
       onClose={close}
-      title={isCreate() ? "Create New Poam" : "Add New Poam"}
+      title={isCreate() ? "Create New POA&M" : "Add New POA&M"}
       maxWidth={isCreate() ? "xs" : "sm"}
       fullWidth
       bottomSeperator={true}
       loading={isLoading()}
       content={
         <Box marginY={2} maxWidth="100%">
-          <Form control={control} rules={validation} onSubmit={handleSubmit(onSubmit)}>
+          <Form
+            control={control}
+            rules={validation}
+            onSubmit={handleSubmit(onSubmit)}
+          >
             <Grid container spacing={1}>
               {isCreate() && (
                 <Grid item xs={12}>
@@ -239,14 +252,22 @@ const AddNewPoamDialog = ({
                       <>
                         <Button
                           variant="outlined"
-                          startIcon={<Icon>{watchFile ? "delete" : "attach_file"}</Icon>}
-                          onClick={() => (watchFile ? setValue("file", null) : trigger())}
+                          startIcon={
+                            <Icon>{watchFile ? "delete" : "attach_file"}</Icon>
+                          }
+                          onClick={() =>
+                            watchFile ? setValue("file", null) : trigger()
+                          }
                         >
-                          <span style={{ textTransform: "none" }}>{watchFile ? watchFile.name : "SELECT FILE"}</span>
+                          <span style={{ textTransform: "none" }}>
+                            {watchFile ? watchFile.name : "SELECT FILE"}
+                          </span>
                         </Button>
                         {formState.errors.file && (
-                          <FormHelperText error={Boolean(formState.errors.file)}>
-                            Please select a Poam File
+                          <FormHelperText
+                            error={Boolean(formState.errors.file)}
+                          >
+                            Please select a POA&M File
                           </FormHelperText>
                         )}
                       </>
@@ -263,7 +284,11 @@ const AddNewPoamDialog = ({
         <Button variant="outlined" color="secondary" onClick={close}>
           Cancel
         </Button>,
-        <Button variant="contained" color="secondary" onClick={handleSubmit(onSubmit)}>
+        <Button
+          variant="contained"
+          color="secondary"
+          onClick={handleSubmit(onSubmit)}
+        >
           {isCreate() ? "Create" : "Add"}
         </Button>,
       ]}
@@ -271,8 +296,14 @@ const AddNewPoamDialog = ({
   );
 };
 
-/* COMPONENT FORM ITEM OF POAM LIST */
-const PoamListItem = ({ text, onDownload, loading = false, iconTooltip = "", ...rest }) => (
+/* COMPONENT FORM ITEM OF POA&M LIST */
+const PoamListItem = ({
+  text,
+  onDownload,
+  loading = false,
+  iconTooltip = "",
+  ...rest
+}) => (
   <ListItem button disableRipple className={useStyle().listItem} {...rest}>
     <Typography noWrap>{text}</Typography>
 
@@ -293,7 +324,7 @@ export default function PoamUpload({ selectFile }) {
   // Get css styles
   const classes = useStyle();
 
-  // Manage add new poam dialog status
+  // Manage add new POA&M dialog status
   const [dialogOpen, setDialogOpen] = useState(-1);
   const isDialogOpen = () => dialogOpen !== -1;
   const isCreateDialog = () => dialogOpen === 1;
@@ -316,7 +347,7 @@ export default function PoamUpload({ selectFile }) {
     load: false,
   });
 
-  // fetch poam list on component mount
+  // fetch POA&M list on component mount
   useEffect(() => {
     (async () => {
       startLoading("load");
@@ -354,7 +385,13 @@ export default function PoamUpload({ selectFile }) {
   return (
     <Box height="80vh" width="100%" paddingX={2} paddingY={3}>
       <Box width="100%">
-        <Box display="flex" justifyContent="space-between" alignItems="end" borderBottom={1} paddingY={1}>
+        <Box
+          display="flex"
+          justifyContent="space-between"
+          alignItems="end"
+          borderBottom={1}
+          paddingY={1}
+        >
           <Typography noWrap variant="h6" className={classes.titleStyle}>
             List of POA&M files
           </Typography>
@@ -395,7 +432,12 @@ export default function PoamUpload({ selectFile }) {
         </Typography>
       </Backdrop>
 
-      {downloadPoamProps && <DownloadPoam open={Boolean(downloadPoamProps)} {...downloadPoamProps} />}
+      {downloadPoamProps && (
+        <DownloadPoam
+          open={Boolean(downloadPoamProps)}
+          {...downloadPoamProps}
+        />
+      )}
 
       {isDialogOpen() && (
         <AddNewPoamDialog

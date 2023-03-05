@@ -1,11 +1,11 @@
 import { get, post, put } from "./CrudFactory";
 
-/* Method to create new poam */
+/* Method to create new POA&M */
 export async function createPoam(data) {
   return await post("/poam/createnew/", data);
 }
 
-/* Method to upload a poam file */
+/* Method to upload a POA&M file */
 export async function uploadPoam(data) {
   const formData = new FormData();
   for (let key of Object.keys(data)) formData.append(key, data[key]);
@@ -18,7 +18,7 @@ export async function getCSP() {
   return await get("/poam/fetchcsp/");
 }
 
-/* Method to get POAM data from Open or close sheet */
+/* Method to get POA&M data from Open or close sheet */
 export async function getData(id) {
   return await get(`/poam/fetchexcel/${id}`);
 }
@@ -44,7 +44,7 @@ export async function updateRow(fileID, data, rowIndex) {
   });
 }
 
-/* Method to move data from OPEN Poam to CLOSE */
+/* Method to move data from OPEN POA&M to CLOSE */
 async function moveToClose(fileID, data, rowIndex, newIndex) {
   return await put(`/poam/movetoclosed/${fileID}`, {
     move_row: data,
@@ -52,7 +52,7 @@ async function moveToClose(fileID, data, rowIndex, newIndex) {
     closed_row_index: newIndex,
   });
 }
-/* Method to move data from CLOSE Poam to OPEN */
+/* Method to move data from CLOSE POA&MM to OPEN */
 async function moveToOpen(fileID, data, rowIndex, newIndex) {
   return await put(`/poam/movetoopen/${fileID}`, {
     move_row: data,

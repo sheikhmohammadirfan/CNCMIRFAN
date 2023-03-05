@@ -1,11 +1,11 @@
 import { makeStyles, Typography } from "@material-ui/core";
 import { copyObject } from "../Utils/Utils";
 
-//! POAM TABLE ----------------------------- STARTS
+//! POA&M TABLE ----------------------------- STARTS
 
-/* Generate poam table styles */
+/* Generate POA&M table styles */
 export const useStyle = makeStyles((theme) => ({
-  // Root poam container
+  // Root POA&M container
   poamContainer: {
     maxHeight: `calc(100vh - ${theme.headerHeight}px)`,
     overflow: "hidden",
@@ -21,7 +21,7 @@ export const useStyle = makeStyles((theme) => ({
     // Stick All checkbox in table to be sticky left
     "& [checkbox]": { position: "sticky !important", left: 0, zIndex: 2 },
 
-    // Make poam ID column to sticky left with offset of 50px
+    // Make POA&M ID column to sticky left with offset of 50px
     "& [poam-id]": {
       position: "sticky !important",
       left: 50,
@@ -88,7 +88,7 @@ export const mapDataToHeader = (visibleColumns) => ({
   },
 });
 
-/* Method to map a poam data to row dictionary */
+/* Method to map a POA&M data to row dictionary */
 const mapDataToRow = (data, columns, rowIndex) =>
   columns.map((columnName, index) => ({
     text: data[columnName][rowIndex],
@@ -111,7 +111,7 @@ export const generateRows = (
   // Set initial offset for open sheet
   const offset = isOpen ? 2 : 0;
 
-  // Generate row of poam table
+  // Generate row of POA&M table
   for (let i = offset; i < rowCount; i++)
     rowData.push({
       data: mapDataToRow(data, columns, getRowIndex(data, i)),
@@ -134,9 +134,9 @@ export const generateRows = (
   };
 };
 
-//! POAM TABLE ----------------------------- END
+//! POA&M TABLE ----------------------------- END
 
-//! POAM UTILITY --------------------------- START
+//! POA&M UTILITY --------------------------- START
 
 /* Method to get data row index from table index */
 export const getRowIndex = (data, index) =>
@@ -146,7 +146,7 @@ export const getRowIndex = (data, index) =>
 export const updateColumns = (allColumns, secondaryColumns) =>
   allColumns.filter((columnName) => !secondaryColumns.includes(columnName));
 
-/* Method to put issue in the current poam sheet */
+/* Method to put issue in the current POA&M sheet */
 export const putIssueInData = (setter, getSheet, index, issueID) => {
   if (index !== -1)
     setter((prevData) => {
@@ -156,7 +156,7 @@ export const putIssueInData = (setter, getSheet, index, issueID) => {
     });
 };
 
-/* Method to update row with new data in given poam data */
+/* Method to update row with new data in given POA&M data */
 export const updatePoamRow = (setter, getSheet, newData, index) => {
   const columns = Object.keys(newData);
   setter((prevData) => {
@@ -207,11 +207,11 @@ export function getLastIndex(data) {
   return max;
 }
 
-/* Method to get current max poam id & poam id prefix */
+/* Method to get current max POA&M id & POA&M id prefix */
 export function getPoamID_data(data) {
   if (!data) return { prefix: "", maxValue: "" };
 
-  // Map sheet data to list of POAM ID
+  // Map sheet data to list of POA&M ID
   const mapPOAM = (val) =>
     Object.values(val)
       .slice(2)
@@ -219,11 +219,11 @@ export function getPoamID_data(data) {
   const openIDList = mapPOAM(data.open["POAM ID"]);
   const closeIDList = mapPOAM(data.close["POAM ID"]);
 
-  // max exsisting POAM ID
+  // max exsisting POA&M ID
   let maxValue = Math.max(...openIDList, ...closeIDList);
   maxValue = maxValue < 0 ? 0 : maxValue;
 
-  // prefix for POAM ID
+  // prefix for POA&M ID
   const prefix =
     Object.values(
       data[openIDList.length ? "open" : "close"]["POAM ID"]
@@ -232,14 +232,14 @@ export function getPoamID_data(data) {
   return { prefix, maxValue };
 }
 
-/* Method to validate poam id */
+/* Method to validate POA&M id */
 export function validateID(val, prefix, maxValue) {
   let l = val.split("-");
-  if (l.length !== 2) return "POAM ID should be in V-XX format";
-  if (l[0] !== prefix) return `POAM ID should have prefix ${prefix}-`;
-  if (isNaN(l[1])) return "POAM ID should be a number.";
+  if (l.length !== 2) return "POA&M ID should be in V-XX format";
+  if (l[0] !== prefix) return `POA&M ID should have prefix ${prefix}-`;
+  if (isNaN(l[1])) return "POA&M ID should be a number.";
   if (Number(l[1]) <= maxValue)
-    return `POAM ID should be atleast ${maxValue + 1}`;
+    return `POA&M ID should be atleast ${maxValue + 1}`;
   return true;
 }
 

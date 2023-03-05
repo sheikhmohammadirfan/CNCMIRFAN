@@ -96,7 +96,7 @@ npm run dev
       C -- ?email --> E[Email]
 ```
 
-#### [Poam](./src/Pages/Poam.jsx)
+#### [POA&M](./src/Pages/Poam.jsx)
 
 ```mermaid
   graph LR;

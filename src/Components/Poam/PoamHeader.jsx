@@ -77,7 +77,7 @@ const useStyle = makeStyles((theme) => ({
   },
 }));
 
-/* POAM HEADER COMPONENT */
+/* POA&M HEADER COMPONENT */
 export default function PoamHeader({
   selectedRow,
   zoom: { isZoomed, zoomIn, zoomOut },

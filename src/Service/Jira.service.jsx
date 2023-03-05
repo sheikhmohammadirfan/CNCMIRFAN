@@ -49,7 +49,7 @@ export async function fetchIssueDetails(key) {
   return await get(`/jira/fetchissuedetails/${key}/`);
 }
 
-/* Method to create issue & link it to given poam row */
+/* Method to create issue & link it to given POA&M row */
 export async function createIssue(data, row_index, poamID) {
   // create formData obj
   const formData = new FormData();
