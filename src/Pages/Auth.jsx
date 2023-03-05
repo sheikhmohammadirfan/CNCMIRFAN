@@ -137,10 +137,10 @@ export default function Auth({ title }) {
           <Box textAlign="center">
             <img src={logo} alt="logo" width="100%" style={{ maxWidth: 225 }} />
             <Typography variant="h4" color="inherit">
-              Welcome
+              Welcome To Falcon
             </Typography>
             <Typography variant="h6" color="inherit">
-              We are happy to have you.
+              No Hassle Compliance experience.
             </Typography>
           </Box>
         </Grid>

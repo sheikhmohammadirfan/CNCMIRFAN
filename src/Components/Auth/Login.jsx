@@ -62,8 +62,7 @@ function Login({ title, homePage }) {
   const { handleSubmit, control } = useForm();
 
   // handle on Submit
-  const submit = async (data) => 
-  {
+  const submit = async (data) => {
     console.log("s");
     // Check if all input valid and form is not loading
     if (!isLoading) {
@@ -100,14 +99,18 @@ function Login({ title, homePage }) {
           type="email"
           name="email"
           size="small"
-          variant="standard"
+          variant="outlined"
+          label=" "
+          placeholder="Email"
           fullWidth
           data-test="login-email-field"
         />
         <PasswordControl
           name="password"
           size="small"
-          variant="standard"
+          variant="outlined"
+          label=" "
+          placeholder="Password"
           fullWidth
           data-test="login-password-field"
         />

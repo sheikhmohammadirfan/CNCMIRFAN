@@ -39,9 +39,26 @@ const useStyles = makeStyles((theme) => ({
       "&::before": { content: "", border: "none" },
     },
     "& .MuiInput-underline": { "&::after": { content: "", border: "none" } },
+
     "& .MuiSelect-root": {
       background: "transparent",
+      paddingLeft: 4,
+      paddingTop: 8,
     },
+  },
+  countryInput: {
+    "& .MuiOutlinedInput-adornedStart": {
+      paddingLeft: 4,
+    },
+    "& .MuiInputAdornment-root": {
+      width: 0,
+      overflow: "hidden",
+    },
+    "&:focus-within .MuiInputAdornment-root, & .MuiInputAdornment-root.valued":
+      {
+        width: "unset",
+        overflow: "visible",
+      },
   },
 }));
 
@@ -67,10 +84,11 @@ const ContactNumControl = ({ name, label, control, rules }) => {
 
         // Country code selection input
         const Adornment = () => (
-          <InputAdornment position="start">
+          <InputAdornment position="start" className={code ? "valued" : ""}>
             <SelectControl
               name="option"
               label=" "
+              placeholder="Code"
               styleProps={{ className: classes.countryDropdown }}
               options={Object.values(callingCodes)}
               value={code}
@@ -82,15 +100,17 @@ const ContactNumControl = ({ name, label, control, rules }) => {
         return (
           <TextControl
             name={name}
-            label={label}
             error={error?.message}
             noControls={true}
-            variant="standard"
+            variant="outlined"
+            label=" "
+            placeholder="Contact No."
             size="small"
             fullWidth
             value={num === undefined ? "" : num}
             onChange={(e) => onChange(`${code}-${e.target.value}`)}
             InputProps={{ startAdornment: <Adornment /> }}
+            className={classes.countryInput}
           />
         );
       }}
@@ -176,18 +196,20 @@ export default function Signup({ title, loginPage }) {
         <Box display="flex">
           <TextControl
             name="first_name"
-            label="first name"
             size="small"
             fullWidth
-            variant="standard"
+            variant="outlined"
+            label=" "
+            placeholder="First Name"
           />
           <Box width={20} />
           <TextControl
             name="last_name"
-            label="Last name"
             size="small"
             fullWidth
-            variant="standard"
+            variant="outlined"
+            label=" "
+            placeholder="Last Name"
           />
         </Box>
         <ContactNumControl
@@ -201,13 +223,17 @@ export default function Signup({ title, loginPage }) {
           name="email"
           size="small"
           fullWidth
-          variant="standard"
+          variant="outlined"
+          label=" "
+          placeholder="Email"
         />
         <PasswordControl
           name="password"
           size="small"
           fullWidth
-          variant="standard"
+          variant="outlined"
+          label=" "
+          placeholder="Password"
         />
 
         <Button className={classes.submitBtn} type="submit">
