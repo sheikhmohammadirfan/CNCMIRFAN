@@ -53,14 +53,8 @@ const ContactNumControl = ({ name, label, control, rules }) => {
   // Get mapping of countryCode with callingCode
   const callingCodes = countryCodesList.customList(
     "countryCode",
-    "+{countryCallingCode}"
+    "{countryCode} +{countryCallingCode}"
   );
-
-  // Map countryCode to options
-  const options = Object.entries(callingCodes).map(([val, text]) => ({
-    val,
-    text: `${val} ${text}`,
-  }));
 
   return (
     <Controller
@@ -71,27 +65,16 @@ const ContactNumControl = ({ name, label, control, rules }) => {
         // Extract callingcode & number
         const [code, num] = (value || "").split("-");
 
-        // Extract countryCode from callingCode to populate Select input
-        const getCountryCode = () => {
-          if (!code) return "";
-          for (let countryCode in callingCodes)
-            if (callingCodes[countryCode] === code) return countryCode;
-          return "";
-        };
-
         // Country code selection input
         const Adornment = () => (
           <InputAdornment position="start">
-            <Icon>call</Icon>
             <SelectControl
               name="option"
               label=" "
               styleProps={{ className: classes.countryDropdown }}
-              options={options}
-              value={getCountryCode()}
-              onChange={(e) =>
-                onChange(`${callingCodes[e.target.value]}-${num || ""}`)
-              }
+              options={Object.values(callingCodes)}
+              value={code}
+              onChange={(e) => onChange(`${e.target.value}-${num || ""}`)}
             />
           </InputAdornment>
         );
@@ -152,6 +135,11 @@ export default function Signup({ title, loginPage }) {
 
   // handle on Submit
   const submit = async (data) => {
+    // update contact number
+    if (data.contact_no) {
+      data.contact_no = data.contact_no.split(" ")[1];
+    }
+
     // Check if all input valid and form is not loading
     if (!isLoading) {
       setLoading(true);
