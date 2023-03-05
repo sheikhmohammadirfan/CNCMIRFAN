@@ -90,7 +90,7 @@ function SubMenu({ padding = true, menu = true, subMenu, sidebarOpen, xs }) {
               {title}
             </Typography>
           }
-          icon={<Icon>{icon}</Icon>}
+          icon={icon ? <Icon>{icon}</Icon> : null}
           subMenu={subMenu}
           {...rest}
         />
@@ -100,7 +100,15 @@ function SubMenu({ padding = true, menu = true, subMenu, sidebarOpen, xs }) {
 }
 
 /** Generate Item with no subMenu */
-function WithSubMenu({ sidebarOpen, xs, text, icon, subMenu, tooltipProps, ...rest }) {
+function WithSubMenu({
+  sidebarOpen,
+  xs,
+  text,
+  icon,
+  subMenu,
+  tooltipProps,
+  ...rest
+}) {
   // React hook, to manage dropdown open/close
   const [menuOpen, setMenuOpen] = useState(false);
   const toggleMenu = (e) => {
@@ -140,17 +148,35 @@ function WithSubMenu({ sidebarOpen, xs, text, icon, subMenu, tooltipProps, ...re
           {...tooltipProps}
         >
           <Item className={menuOpen ? "active" : ""} button {...rest}>
-            <ListItemIcon data-test="sidebaritem-with-icon">{icon}</ListItemIcon>
-            <ListItemText data-test="sidebaritem-with-text">{text}</ListItemText>
+            {icon && (
+              <ListItemIcon data-test="sidebaritem-with-icon">
+                {icon}
+              </ListItemIcon>
+            )}
+            <ListItemText data-test="sidebaritem-with-text">
+              {text}
+            </ListItemText>
             <IconButton color="inherit" onClick={toggleMenu}>
-              <Icon>{xs ? (menuOpen ? "arrow_drop_up" : "arrow_drop_down") : "arrow_right"}</Icon>
+              <Icon>
+                {xs
+                  ? menuOpen
+                    ? "arrow_drop_up"
+                    : "arrow_drop_down"
+                  : "arrow_right"}
+              </Icon>
             </IconButton>
           </Item>
         </CustomTooltip>
       </ClickAwayListener>
 
       <Hidden smUp>
-        <SubMenu sidebarOpen={sidebarOpen} xs={xs} padding={false} menu={menuOpen} subMenu={subMenu} />
+        <SubMenu
+          sidebarOpen={sidebarOpen}
+          xs={xs}
+          padding={false}
+          menu={menuOpen}
+          subMenu={subMenu}
+        />
       </Hidden>
     </>
   );
@@ -159,11 +185,16 @@ function WithSubMenu({ sidebarOpen, xs, text, icon, subMenu, tooltipProps, ...re
 /** Generate Item with no subMenu */
 function WithoutSubMenu({ sidebarOpen, text, icon, ...rest }) {
   return (
-    <CustomTooltip title={sidebarOpen ? "" : TooltipText(text.props.children)} placement="right">
+    <CustomTooltip
+      title={sidebarOpen ? "" : TooltipText(text.props.children)}
+      placement="right"
+    >
       <Item button {...rest}>
-        <ListItemIcon color="inherit" data-test="sidebaritem-without-icon">
-          {icon}
-        </ListItemIcon>
+        {icon && (
+          <ListItemIcon color="inherit" data-test="sidebaritem-without-icon">
+            {icon}
+          </ListItemIcon>
+        )}
         <ListItemText data-test="sidebaritem-without-text">{text}</ListItemText>
       </Item>
     </CustomTooltip>
@@ -171,10 +202,29 @@ function WithoutSubMenu({ sidebarOpen, text, icon, ...rest }) {
 }
 
 /** Generate Sidebar Item */
-export default function SidebarItem({ sidebarOpen, xs, text, icon, subMenu, ...rest }) {
+export default function SidebarItem({
+  sidebarOpen,
+  xs,
+  text,
+  icon,
+  subMenu,
+  ...rest
+}) {
   return subMenu ? (
-    <WithSubMenu sidebarOpen={sidebarOpen} xs={xs} text={text} icon={icon} subMenu={subMenu} {...rest} />
+    <WithSubMenu
+      sidebarOpen={sidebarOpen}
+      xs={xs}
+      text={text}
+      icon={icon}
+      subMenu={subMenu}
+      {...rest}
+    />
   ) : (
-    <WithoutSubMenu sidebarOpen={sidebarOpen} text={text} icon={icon} {...rest} />
+    <WithoutSubMenu
+      sidebarOpen={sidebarOpen}
+      text={text}
+      icon={icon}
+      {...rest}
+    />
   );
 }

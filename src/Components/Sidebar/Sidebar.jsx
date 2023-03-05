@@ -1,4 +1,13 @@
-import { Box, Icon, List, makeStyles, Typography, useMediaQuery, IconButton, Divider } from "@material-ui/core";
+import {
+  Box,
+  Icon,
+  List,
+  makeStyles,
+  Typography,
+  useMediaQuery,
+  IconButton,
+  Divider,
+} from "@material-ui/core";
 import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { SidebarData } from "../../assets/data/SidebarData";
@@ -71,7 +80,10 @@ export default function Sidebar({ isOpen, toggleSidebar }) {
   useEffect(() => toggleSidebar(!xs), [xs]);
 
   return (
-    <Box className={`${classes.sidebar} ${isOpen ? "" : "close"}`} data-test="sidebar-container">
+    <Box
+      className={`${classes.sidebar} ${isOpen ? "" : "close"}`}
+      data-test="sidebar-container"
+    >
       <SidebarItem
         className={classes.logoBtn}
         text={
@@ -85,7 +97,10 @@ export default function Sidebar({ isOpen, toggleSidebar }) {
 
       <Divider />
 
-      <List className={`${classes.navContainer} ${!isOpen ? "close-sidebar" : ""}`} disablePadding>
+      <List
+        className={`${classes.navContainer} ${!isOpen ? "close-sidebar" : ""}`}
+        disablePadding
+      >
         {SidebarData.map(({ title, icon, subMenu, ...rest }, index) => (
           <SidebarItem
             key={index}
@@ -96,7 +111,7 @@ export default function Sidebar({ isOpen, toggleSidebar }) {
                 {title}
               </Typography>
             }
-            icon={<Icon>{icon}</Icon>}
+            icon={icon ? <Icon>{icon}</Icon> : null}
             subMenu={subMenu}
             {...rest}
             data-test="sidebar-menu-item"

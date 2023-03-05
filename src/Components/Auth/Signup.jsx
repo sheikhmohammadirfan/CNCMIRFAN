@@ -84,7 +84,7 @@ const ContactNumControl = ({ name, label, control, rules }) => {
 
         // Country code selection input
         const Adornment = () => (
-          <InputAdornment position="start" className={code ? "valued" : ""}>
+          <InputAdornment position="start" className={value ? "valued" : ""}>
             <SelectControl
               name="option"
               label=" "
