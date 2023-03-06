@@ -55,17 +55,16 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     position: "relative",
     overflow: "hidden",
-    borderRadius: 4 * theme.shape.borderRadius,
+    borderRadius: 2 * theme.shape.borderRadius,
     border: `1px solid ${theme.palette.grey[400]}`,
   },
 
   // Heading TAB style
   headings: {
     width: "50%",
-    padding: `${theme.spacing(1)}px 0`,
+    padding: `${theme.spacing(3 / 4)}px 0`,
     textAlign: "center",
     fontWeight: "bold",
-    textTransform: "uppercase",
     letterSpacing: 2,
     cursor: "pointer",
     zIndex: 2,
@@ -78,9 +77,9 @@ const useStyles = makeStyles((theme) => ({
     height: "100%",
     width: "50%",
     position: "absolute",
-    borderRadius: 4 * theme.shape.borderRadius,
+    borderRadius: 2 * theme.shape.borderRadius,
     zIndex: 1,
-    background: `linear-gradient(to right, ${theme.palette.secondary.dark}, ${theme.palette.secondary.light})`,
+    background: theme.palette.primary.main,
     transition: "transform .5s cubic-bezier(.63,-0.58,.63,1.58)",
     "&.login": { transform: "translateX(100%)" },
   },
@@ -140,7 +139,7 @@ export default function Auth({ title }) {
               Welcome To Falcon
             </Typography>
             <Typography variant="h6" color="inherit">
-              No Hassle Compliance experience.
+              No Hassle Compliance Experience
             </Typography>
           </Box>
         </Grid>

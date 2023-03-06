@@ -2,8 +2,7 @@ import {
   Box,
   Button,
   CircularProgress,
-  Icon,
-  InputAdornment,
+    InputAdornment,
   makeStyles,
 } from "@material-ui/core";
 import React, { useState } from "react";
@@ -23,16 +22,16 @@ import countryCodesList from "country-codes-list";
 const useStyles = makeStyles((theme) => ({
   // Style to apply on login btn
   submitBtn: {
-    borderRadius: 3 * theme.shape.borderRadius,
+    borderRadius: 2 * theme.shape.borderRadius,
     width: "100%",
-    fontSize: theme.spacing(2.5),
+    fontSize: theme.spacing(2),
     fontWeight: "bold",
-    background: `linear-gradient(to right , ${theme.palette.secondary.dark}, ${theme.palette.secondary.light})`,
+    background: theme.palette.primary.main,
     color: theme.textOnPrimary,
     marginBottom: theme.spacing(1),
   },
   countryDropdown: {
-    minWidth: 80,
+    minWidth: 10,
     marginLeft: theme.spacing(1 / 2),
     "& .MuiInput-formControl": {
       margin: 0,
@@ -70,7 +69,7 @@ const ContactNumControl = ({ name, label, control, rules }) => {
   // Get mapping of countryCode with callingCode
   const callingCodes = countryCodesList.customList(
     "countryCode",
-    "{countryCode} +{countryCallingCode}"
+    "+{countryCallingCode}"
   );
 
   return (
@@ -90,8 +89,12 @@ const ContactNumControl = ({ name, label, control, rules }) => {
               label=" "
               placeholder="Code"
               styleProps={{ className: classes.countryDropdown }}
-              options={Object.values(callingCodes)}
+              options={Object.keys(callingCodes).map((key) => ({
+                val: callingCodes[key],
+                text: `${key} ${callingCodes[key]}`,
+              }))}
               value={code}
+              renderValue={(v) => v}
               onChange={(e) => onChange(`${e.target.value}-${num || ""}`)}
             />
           </InputAdornment>
@@ -155,11 +158,6 @@ export default function Signup({ title, loginPage }) {
 
   // handle on Submit
   const submit = async (data) => {
-    // update contact number
-    if (data.contact_no) {
-      data.contact_no = data.contact_no.split(" ")[1];
-    }
-
     // Check if all input valid and form is not loading
     if (!isLoading) {
       setLoading(true);

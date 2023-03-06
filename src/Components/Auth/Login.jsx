@@ -34,11 +34,11 @@ const useStyles = makeStyles((theme) => ({
 
   // Style to apply on login btn
   submitBtn: {
-    borderRadius: 3 * theme.shape.borderRadius,
+    borderRadius: 2 * theme.shape.borderRadius,
     width: "100%",
-    fontSize: theme.spacing(2.5),
+    fontSize: theme.spacing(2),
     fontWeight: "bold",
-    background: `linear-gradient(to right , ${theme.palette.secondary.dark}, ${theme.palette.secondary.light})`,
+    background: theme.palette.primary.main,
     color: theme.textOnPrimary,
   },
 }));

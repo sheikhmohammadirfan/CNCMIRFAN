@@ -1,4 +1,11 @@
-import { CssBaseline, ThemeProvider, createTheme, Box, makeStyles, responsiveFontSizes } from "@material-ui/core";
+import {
+  CssBaseline,
+  ThemeProvider,
+  createTheme,
+  Box,
+  makeStyles,
+  responsiveFontSizes,
+} from "@material-ui/core";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import { Flip, toast } from "react-toastify";
 import Header from "./Components/Header";
@@ -30,9 +37,9 @@ let theme = createTheme({
   textOnPrimary: "#ffffff",
   palette: {
     primary: {
-      main: "#00A19D",
-      dark: "#00A19D",
-      light: "#FFF8E5",
+      main: "#008374",
+      dark: "#008374",
+      light: "#55A598",
     },
     secondary: {
       main: "#22577A",
@@ -107,7 +114,11 @@ function App() {
                   <Sidebar isOpen={isSidebarOpen} toggleSidebar={setSidebar} />
                 </Box>
 
-                <Box flexGrow={1} className={`${classes.body} ${isSidebarOpen ? "open" : ""}`} data-test="body-wrapper">
+                <Box
+                  flexGrow={1}
+                  className={`${classes.body} ${isSidebarOpen ? "open" : ""}`}
+                  data-test="body-wrapper"
+                >
                   <Header scrollTarget={scrollTarget} />
                   <div className={classes.wrapper}>
                     <Route exact path="/">
@@ -133,7 +144,10 @@ function App() {
                 <Email title="EMAIL" />
               </ParamsRoutes>
 
-              <ParamsRoutes params={["createIssue", "rowIndex"]} removeParams={["createIssue"]}>
+              <ParamsRoutes
+                params={["createIssue", "rowIndex"]}
+                removeParams={["createIssue"]}
+              >
                 <CreateIssue title="Create Issue" />
               </ParamsRoutes>
 
