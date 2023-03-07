@@ -10,7 +10,8 @@ export default function Poam({ title }) {
   // subscribe to queryparam value: file change
   const { params, changeParams } = useParams("file");
   // Method to change file in POA&M
-  const selectFile = (val) => changeParams({ file: val });
+  const selectFile = (val, name) =>
+    changeParams({ file: val, "page-name": name });
 
   return params.file ? (
     <PoamTable fileID={params.file} />

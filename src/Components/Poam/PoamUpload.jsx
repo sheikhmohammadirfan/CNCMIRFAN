@@ -417,7 +417,7 @@ export default function PoamUpload({ selectFile }) {
               <PoamListItem
                 key={index}
                 text={poamList[val]}
-                onClick={() => selectFile(val)}
+                onClick={() => selectFile(val, poamList[val])}
                 onDownload={(e) => downloadPoam(e, val)}
               />
             ))

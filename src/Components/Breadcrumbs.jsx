@@ -5,6 +5,7 @@ import {
   Typography,
 } from "@material-ui/core";
 import { Link, withRouter } from "react-router-dom";
+import { BreadcrumbMapper } from "../assets/data/BreadcrumbMapper";
 
 /**
  * CSS class generator
@@ -38,28 +39,43 @@ const Text = ({ link, children, path }) => {
 /**
  * Breadcrumbs Component
  */
-const Breadcrumbs = ({ history, location: { pathname } }) => {
-  //filtering to get rid of empty string
-  const pathnames = pathname.split("/").filter((x) => x);
+const Breadcrumbs = ({ history, location: { pathname, search } }) => {
+  // Array of object with path details
+  const pathObject = pathname
+    .split("/")
+    .filter((x) => x)
+    .map((path) => ({
+      path,
+      text: BreadcrumbMapper[path] || "",
+      type: "location",
+    }));
+
+  // Append Query String
+  const pageName = new URLSearchParams(search).get("page-name");
+  if (pageName) {
+    pathObject.push({ path: search, text: pageName, type: "search" });
+  }
+
+  // Array of path string
+  const pathArray = pathObject.map((path) => path.path);
 
   return (
-    <MUIBreadcrumbs aria-label="breadcrumb" separator=">">
-      <Text
-        link={pathnames.length > 0}
-        path={"/"}
-        data-test="breadcrumbs-path-chip"
-      >
-        Home
-      </Text>
-
-      {pathnames.map((text, index) => (
+    <MUIBreadcrumbs aria-label="breadcrumb" separator="/">
+      {pathObject.map(({ path, text, type }, index) => (
         <Text
           key={index}
-          link={index < pathnames.length - 1}
-          path={`/${pathnames.slice(0, index + 1).join("/")}`}
+          link={index < pathObject.length - 1}
+          path={
+            type === "location"
+              ? `/${pathArray.slice(0, index + 1).join("/")}`
+              : `/${pathArray.join("/")}${path}`
+          }
           data-test="breadcrumbs-path-chip"
         >
-          {text}
+          {text
+            .split(" ")
+            .map((t) => t.slice(0, 1).toUpperCase() + t.slice(1))
+            .join(" ")}
         </Text>
       ))}
     </MUIBreadcrumbs>
