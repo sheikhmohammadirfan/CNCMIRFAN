@@ -13,6 +13,7 @@ import { Link } from "react-router-dom";
 import { SidebarData } from "../../assets/data/SidebarData";
 import { logout } from "../../Service/UserFactory";
 import SidebarItem from "./SidebarItem";
+import logo from "../../assets/img/logo.png";
 
 /** CSS Class Generator */
 const useStyles = makeStyles((theme) => {
@@ -49,7 +50,12 @@ const useStyles = makeStyles((theme) => {
     // Style for logobtn in sidebar
     logoBtn: {
       padding: `${theme.spacing(1)}px ${iconPadding}px`,
-      minHeight: 50,
+      height: 50,
+      "& .MuiListItemText-root, & .MuiListItemText-primary": {
+        height: "100%",
+        display: "flex",
+        alignItems: "center",
+      },
     },
 
     // Style for sidebar width toggler
@@ -87,9 +93,15 @@ export default function Sidebar({ isOpen, toggleSidebar }) {
       <SidebarItem
         className={classes.logoBtn}
         text={
-          <Typography noWrap variant="h5">
-            LOGO
-          </Typography>
+          <>
+            <img src={logo} alt="logo" height="100%" />
+            <Typography
+              variant="h6"
+              style={{ paddingLeft: 8, fontWeight: "bold" }}
+            >
+              Falcon
+            </Typography>
+          </>
         }
         sidebarOpen={isOpen}
         data-test="sidebar-logo"

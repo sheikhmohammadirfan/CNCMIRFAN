@@ -4,16 +4,25 @@ import { changeQueryParams } from "../../Components/Utils/Utils";
 /** Sidebar data to map */
 export const SidebarData = [
   {
+    icon: "insert_chart",
+    title: "Dashboard",
+    component: Link,
+    to: "/",
+  },
+  {
+    icon: "manage_accounts",
+    title: "Manage POA&M",
+    component: Link,
+    to: "/poam",
+  },
+  {
     icon: "description",
     title: "Document Compliance",
-    component: Link,
-    to: "/about-us",
     subMenu: [
       {
         title: "Policies",
         component: Link,
         to: "/services/services1",
-        icon: "",
       },
       {
         title: "Procedures",
@@ -69,16 +78,8 @@ export const SidebarData = [
     to: "/verify",
   },
   {
-    icon: "manage_accounts",
-    title: "Manage POA&M",
-    component: Link,
-    to: "/poam",
-  },
-  {
     icon: "category",
     title: "Security Control Mapping",
-    component: Link,
-    to: "/contact",
     subMenu: [
       {
         title: "FEDRAMP / FISMA",
@@ -103,12 +104,6 @@ export const SidebarData = [
     ],
   },
   {
-    icon: "task",
-    title: "My Audit Tasks",
-    component: Link,
-    to: "/events",
-  },
-  {
     icon: "repeat",
     title: "Continous Monitoring",
     component: Link,
@@ -121,17 +116,18 @@ export const SidebarData = [
     to: "/Integrated_Platforms",
   },
   {
-    title: "Utility",
-    icon: "more_horiz",
-    subMenu: [
-      {
-        title: "Email",
-        component: Link,
-        to: (obj) => ({
-          ...obj,
-          search: `?${changeQueryParams({ email: true })}`,
-        }),
-      },
-    ],
+    icon: "task",
+    title: "My Tasks",
+    component: Link,
+    to: "/events",
+  },
+  {
+    icon: "drafts",
+    title: "Email",
+    component: Link,
+    to: (obj) => ({
+      ...obj,
+      search: `?${changeQueryParams({ email: true })}`,
+    }),
   },
 ];
