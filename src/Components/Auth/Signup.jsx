@@ -2,7 +2,7 @@ import {
   Box,
   Button,
   CircularProgress,
-    InputAdornment,
+  InputAdornment,
   makeStyles,
 } from "@material-ui/core";
 import React, { useState } from "react";
@@ -29,6 +29,9 @@ const useStyles = makeStyles((theme) => ({
     background: theme.palette.primary.main,
     color: theme.textOnPrimary,
     marginBottom: theme.spacing(1),
+    "&:hover": {
+      background: theme.palette.primary.light,
+    },
   },
   countryDropdown: {
     minWidth: 10,

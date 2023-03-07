@@ -40,6 +40,9 @@ const useStyles = makeStyles((theme) => ({
     fontWeight: "bold",
     background: theme.palette.primary.main,
     color: theme.textOnPrimary,
+    "&:hover": {
+      background: theme.palette.primary.light,
+    },
   },
 }));
 
