@@ -3,6 +3,7 @@ import aws from "../img/integration/aws-2.svg";
 import googleCloud from "../img/integration/google-cloud-3.svg";
 import github from "../img/integration/github-icon-1.svg";
 import jira from "../img/integration/jira-1.svg";
+import teams from "../img/integration/teams.png";
 
 /** Dummy userData for charts */
 export const userData = [
@@ -27,6 +28,11 @@ export const integratedPlatforms = [
     onClick: (setter) => {
       setter("Jira");
     },
+  },
+  {
+    name: "Teams",
+    image: teams,
+    onClick: () => {},
   },
   {
     name: "Slack",

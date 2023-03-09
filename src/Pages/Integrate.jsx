@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Grid, Tooltip } from "@material-ui/core";
+import { Box, Grid, Tooltip } from "@material-ui/core";
 import { makeStyles } from "@material-ui/styles";
 import { integratedPlatforms } from "../assets/data/dummyData";
 import { getIntegratedPlatform } from "../Service/UserFactory";
@@ -12,9 +12,12 @@ const useStyles = makeStyles((theme) => ({
     cursor: "pointer",
     borderRadius: "6px",
     border: "1px solid #ccc",
-    margin: theme.spacing(1),
     textAlign: "center",
     height: "100px",
+    minWidth: "200px",
+    maxWidth: "300px",
+    margin: "auto",
+    padding: 8,
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
@@ -39,38 +42,36 @@ export default function Integrate({ title }) {
   const platforms = getIntegratedPlatform();
 
   return (
-    <Grid
-      container
-      style={{ flexGrow: "1", width: "100%", margin: "0" }}
-      spacing={4}
-    >
-      {integratedPlatforms.map((platform, index) => (
-        <Tooltip title={platform.name} key={index}>
-          <Grid
-            item
-            xs
-            key={index}
-            className={
-              platforms[platform.name.toLowerCase()] === true
-                ? `${classes.item}`
-                : `${classes.item} ${classes.itemWithHover}`
-            }
-          >
-            <img
-              onClick={
-                platforms[platform.name.toLowerCase()] === true
-                  ? () => {}
-                  : () => platform.onClick(setShow)
-              }
-              src={platform.image}
-              alt={platform.name}
-            />
-          </Grid>
-        </Tooltip>
-      ))}
-      {show === "Jira" && (
-        <LinkJira openJira={show === "Jira"} closeJira={() => setShow("")} />
-      )}
-    </Grid>
+    <Box p={3}>
+      <Grid container spacing={3}>
+        {integratedPlatforms.map((platform, index) => (
+          <Tooltip title={platform.name} key={index}>
+            <Grid item xs key={index}>
+              <Box
+                className={
+                  platforms[platform.name.toLowerCase()] === true
+                    ? `${classes.item}`
+                    : `${classes.item} ${classes.itemWithHover}`
+                }
+              >
+                <img
+                  onClick={
+                    platforms[platform.name.toLowerCase()] === true
+                      ? () => {}
+                      : () => platform.onClick(setShow)
+                  }
+                  src={platform.image}
+                  alt={platform.name}
+                  height="100%"
+                />
+              </Box>
+            </Grid>
+          </Tooltip>
+        ))}
+        {show === "Jira" && (
+          <LinkJira openJira={show === "Jira"} closeJira={() => setShow("")} />
+        )}
+      </Grid>
+    </Box>
   );
 }

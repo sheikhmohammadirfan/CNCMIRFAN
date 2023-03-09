@@ -134,31 +134,40 @@ const AddNewPoamDialog = ({
         valid: (val) => {
           if (!isCreate()) return true;
           if (!val) return "This field is required.";
-          if (val.length < 4)
-            return "File name should have atleast 4 characters.";
+          if (val.length < 4 || val.length > 20)
+            return "File name should have min 4 and max 20 characters.";
           return true;
         },
       },
     },
     csp: {
-      required: "This field is required.",
-      minLength: {
-        value: 4,
-        message: "CSP Name should have atleast 4 characters.",
+      validate: {
+        valid: (val) => {
+          if (!val) return "This field is required.";
+          if (val.length < 4 || val.length > 20)
+            return "CSP should have min 4 and max 20 characters.";
+          return true;
+        },
       },
     },
     system_name: {
-      required: "This field is required.",
-      minLength: {
-        value: 4,
-        message: "System name should have atleast 4 characters.",
+      validate: {
+        valid: (val) => {
+          if (!val) return "This field is required.";
+          if (val.length < 4 || val.length > 20)
+            return "System name should have min 4 and max 20 characters.";
+          return true;
+        },
       },
     },
     agency_name: {
-      required: "This field is required.",
-      minLength: {
-        value: 4,
-        message: "Agency name should have atleast 4 characters.",
+      validate: {
+        valid: (val) => {
+          if (!val) return "This field is required.";
+          if (val.length < 4 || val.length > 20)
+            return "Agency name should have min 4 and max 20 characters.";
+          return true;
+        },
       },
     },
   };
@@ -393,16 +402,16 @@ export default function PoamUpload({ selectFile }) {
           paddingY={1}
         >
           <Typography noWrap variant="h6" className={classes.titleStyle}>
-            List of POA&M files
+            List of POA&M Files
           </Typography>
 
           <ButtonGroup size="small" variant="contained">
             <Button id="add-file-btn" onClick={openUploadDialog}>
-              Add File
+              Add / Open File
             </Button>
 
             <Button id="create-file-btn" onClick={openCreateDialog}>
-              Create New
+              Create New File
             </Button>
           </ButtonGroup>
         </Box>

@@ -29,17 +29,17 @@ const Transition = forwardRef(function Transition(props, ref) {
 
 const useStyles = makeStyles((theme) => ({
   form: {
-    "& > *:not(:first-child)": {
+    "& > *": {
       margin: "0.4rem 0",
       backgroundColor: "rgba(218,250,211, 0.4)",
     },
   },
 
   heading: {
-    margin: "0 0 1.5rem",
+    margin: "1rem 0 !important",
     borderBottom: "1px solid #ccc",
     boxShadow: "0 8px 6px -6px rgba(0,0,0,0.3)",
-    paddingBottom: "1rem",
+    padding: "0 1rem 1rem 1rem",
   },
 
   headingText: {
@@ -91,9 +91,8 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     alignItems: "flex-start",
     flexWrap: "wrap",
-    minHeight: "3rem",
     width: "480px",
-    padding: "0 8px",
+    padding: "8px",
     border: "1px solid rgb(214, 216, 218)",
     borderRadius: "6px",
     "&:focus-within": {
@@ -155,10 +154,14 @@ const useStyles = makeStyles((theme) => ({
     "&::-webkit-scrollbar": {
       display: "none",
     },
+
+    height: 0,
+    "&.visible": {
+      height: "unset",
+    },
   },
 
   scrollBoxContainer: {
-    height: "auto",
     display: "inline-flex",
   },
 
@@ -204,12 +207,6 @@ const textfields = [
 
 function Email({ title, close }) {
   DocumentTitle(title);
-  const current = new Date();
-  const date = `${current.toLocaleString("en-us", {
-    month: "short",
-  })} ${current.getDate()} , ${current.toLocaleString("en-us", {
-    year: "numeric",
-  })}`;
   const classes = useStyles();
 
   const [mailAcknowledgement, setMailAcknowledgement] = useState(false);
@@ -346,27 +343,8 @@ function Email({ title, close }) {
           </Box>
         </DialogTitle>
         <DialogContent>
-          <DialogContentText>
-            Write Mails To Clients Effectively.
-          </DialogContentText>
+          <DialogContentText>Write Mails Effectively.</DialogContentText>
           <Box className={classes.form}>
-            <Box className={classes.heading}>
-              <TextField
-                autoFocus
-                style={{ fontWeight: "bold" }}
-                fullWidth
-                name="subject"
-                value={subject}
-                onChange={(e) => setSubject(e.target.value)}
-                label="Subject"
-                variant="standard"
-                InputProps={{
-                  className: classes.headingText,
-                }}
-              />
-              <div style={{ color: "#777", fontWeight: "550" }}>{date}</div>
-            </Box>
-
             {textfields.map((item, index) => (
               <div
                 key={index}
@@ -379,7 +357,11 @@ function Email({ title, close }) {
                 </span>
                 <div key={index} style={{ width: "calc(100% - 32px)" }}>
                   <div className={classes.scrollBox}>
-                    <div className={classes.scrollBoxWrapper}>
+                    <div
+                      className={`${classes.scrollBoxWrapper} ${
+                        tags[item.name].length > 0 ? "visible" : ""
+                      }`}
+                    >
                       <div className={classes.scrollBoxContainer} role="list">
                         {tags[item.name].map((tag, idx) => (
                           <Chip
@@ -388,6 +370,7 @@ function Email({ title, close }) {
                             key={idx}
                             label={tag}
                             variant="outlined"
+                            size="small"
                             deleteIcon={
                               <span className={classes.tagCloseIcon}>x</span>
                             }
@@ -404,6 +387,7 @@ function Email({ title, close }) {
                           ? addTags(event)
                           : null
                       }
+                      style={{ padding: 8, height: "2rem", margin: 0 }}
                       onBlur={addTags}
                       placeholder="example@example.com"
                     />
@@ -412,8 +396,24 @@ function Email({ title, close }) {
               </div>
             ))}
 
+            <Box className={classes.heading}>
+              <TextField
+                autoFocus
+                style={{ fontWeight: "bold" }}
+                fullWidth
+                name="subject"
+                value={subject}
+                onChange={(e) => setSubject(e.target.value)}
+                label="Subject"
+                variant="standard"
+                InputProps={{
+                  className: classes.headingText,
+                }}
+              />
+            </Box>
+
             <TextField
-              style={{ marginTop: "1.5rem", position: "relative" }}
+              style={{ position: "relative", background: "transparent" }}
               variant="outlined"
               fullWidth
               name="message"

@@ -391,7 +391,7 @@ function FormDialog({ poamID_data, rows, open, onClose, rowIndex, onSubmit }) {
           form="create-poam-form"
           type="submit"
         >
-          SUBMIT
+          {isCreateForm() ? "SAVE" : "UPDATE"}
         </Button>,
       ]}
       bottomSeperator={true}

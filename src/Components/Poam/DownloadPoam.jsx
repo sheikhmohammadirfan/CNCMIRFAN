@@ -1,4 +1,12 @@
-import { Box, Button, Checkbox, Grid, makeStyles, Tooltip, Typography } from "@material-ui/core";
+import {
+  Box,
+  Button,
+  Checkbox,
+  Grid,
+  makeStyles,
+  Tooltip,
+  Typography,
+} from "@material-ui/core";
 import React from "react";
 import { poam_header } from "../../assets/data/PoamData";
 import XLSX from "xlsx";
@@ -25,7 +33,13 @@ const useStyle = makeStyles((theme) => ({
 }));
 
 // Method to convert data into downladable excel or csv
-export default function DownloadPoam({ data, open, close, allColumns, hiddenColumns }) {
+export default function DownloadPoam({
+  data,
+  open,
+  close,
+  allColumns,
+  hiddenColumns,
+}) {
   const classes = useStyle();
 
   // State to save radio input
@@ -35,8 +49,15 @@ export default function DownloadPoam({ data, open, close, allColumns, hiddenColu
   const [checkList, setCheckList] = useState([]);
 
   // Get method to check collection of checkboxes
-  const { checkAtIndex, uncheckAtIndex, checkAll, uncheckAll, isCheckedAtIndex, isAllChecked, isSomeChecked } =
-    useCheck(checkList, setCheckList, allColumns.length);
+  const {
+    checkAtIndex,
+    uncheckAtIndex,
+    checkAll,
+    uncheckAll,
+    isCheckedAtIndex,
+    isAllChecked,
+    isSomeChecked,
+  } = useCheck(checkList, setCheckList, allColumns.length);
 
   // Map data into XLSX util object
   const mapData = (sheet) =>
@@ -112,7 +133,12 @@ export default function DownloadPoam({ data, open, close, allColumns, hiddenColu
         text={
           <span>
             Select Columns
-            <Tooltip arrow color="default" placement="right" title={isAllChecked() ? "Deselect all" : "Select all"}>
+            <Tooltip
+              arrow
+              color="default"
+              placement="right"
+              title={isAllChecked() ? "Deselect all" : "Select all"}
+            >
               <Checkbox
                 size="small"
                 style={{ padding: 0, paddingLeft: "8px" }}
@@ -140,7 +166,9 @@ export default function DownloadPoam({ data, open, close, allColumns, hiddenColu
                 className={classes.checkboxInput}
                 checked={isCheckedAtIndex(index)}
                 onChange={(e) => {
-                  e.target.checked ? checkAtIndex(index) : uncheckAtIndex(index);
+                  e.target.checked
+                    ? checkAtIndex(index)
+                    : uncheckAtIndex(index);
                 }}
               />
             </Grid>
@@ -163,11 +191,21 @@ export default function DownloadPoam({ data, open, close, allColumns, hiddenColu
     },
     {
       val: "Default Columns",
-      text: <OptionText text="Default Columns" caption="The file will include only FeDRMP specified columns." />,
+      text: (
+        <OptionText
+          text="Default Columns"
+          caption="The file will include only FeDRMP specified columns."
+        />
+      ),
     },
     {
       val: "Hidden Columns",
-      text: <OptionText text="Hidden Columns" caption="The file will include only additional columns." />,
+      text: (
+        <OptionText
+          text="Hidden Columns"
+          caption="The file will include only additional columns."
+        />
+      ),
     },
     { val: "Selected Columns", text: <SelectColumns /> },
   ];
@@ -191,17 +229,50 @@ export default function DownloadPoam({ data, open, close, allColumns, hiddenColu
         </Box>
       }
       actions={[
-        <Button variant="outlined" size="large" fullWidth color="primary" onClick={close}>
+        <Button
+          variant="outlined"
+          size="large"
+          fullWidth
+          color="primary"
+          onClick={close}
+        >
           CANCEL
         </Button>,
-        <Button variant="contained" size="large" fullWidth color="primary" onClick={exportAsXLS}>
+        <Button
+          variant="contained"
+          size="large"
+          fullWidth
+          color="primary"
+          onClick={exportAsXLS}
+        >
           .xls
         </Button>,
-        <Button variant="contained" size="large" fullWidth color="primary" onClick={exportAsXLSX}>
+        <Button
+          variant="contained"
+          size="large"
+          fullWidth
+          color="primary"
+          onClick={exportAsXLSX}
+        >
           .xlsx
         </Button>,
-        <Button variant="contained" size="large" fullWidth color="primary" onClick={exportAsXLSM}>
+        <Button
+          variant="contained"
+          size="large"
+          fullWidth
+          color="primary"
+          onClick={exportAsXLSM}
+        >
           .xlsm
+        </Button>,
+        <Button
+          variant="contained"
+          size="large"
+          fullWidth
+          color="primary"
+          onClick={exportAsXLSM}
+        >
+          OSCAL Format
         </Button>,
       ]}
     />

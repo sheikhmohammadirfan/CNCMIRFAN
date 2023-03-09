@@ -16,7 +16,10 @@ export const useStyle = makeStyles((theme) => ({
   // Set table style
   tableStyle: {
     // Make row cell background white
-    "& tbody td": { background: "#fafafa !important" },
+    "& tbody td": { background: "#fafafa" },
+
+    // Stop overflow
+    "& tbody td:not(:first-child)": { overflow: "hidden" },
 
     // Stick All checkbox in table to be sticky left
     "& [checkbox]": { position: "sticky !important", left: 0, zIndex: 2 },
@@ -35,7 +38,13 @@ export const useStyle = makeStyles((theme) => ({
     },
 
     // Change background color of selected row
-    "& tr.Mui-selected td": { background: "#d4e9e9 !important" },
+    "& tr.Mui-selected td": { background: "#8ef1f1 !important" },
+
+    // Update sticky col background
+    "& thead th:nth-child(1)": { background: "#aad8d3" },
+    "& thead th:nth-child(2)": { background: "#aad8d3" },
+    "& tbody td:nth-child(1)": { background: "#cef8f3" },
+    "& tbody td:nth-child(2)": { background: "#cef8f3" },
   },
 
   //Header cell style

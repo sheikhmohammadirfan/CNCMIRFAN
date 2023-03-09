@@ -104,6 +104,7 @@ export default function Sidebar({ isOpen, toggleSidebar }) {
           </>
         }
         sidebarOpen={isOpen}
+        tooltipProps={{ open: false }}
         data-test="sidebar-logo"
       />
 

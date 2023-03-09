@@ -183,11 +183,12 @@ function WithSubMenu({
 }
 
 /** Generate Item with no subMenu */
-function WithoutSubMenu({ sidebarOpen, text, icon, ...rest }) {
+function WithoutSubMenu({ sidebarOpen, text, icon, tooltipProps, ...rest }) {
   return (
     <CustomTooltip
       title={sidebarOpen ? "" : TooltipText(text.props.children)}
       placement="right"
+      {...tooltipProps}
     >
       <Item button {...rest}>
         {icon && (

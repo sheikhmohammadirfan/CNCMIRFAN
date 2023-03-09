@@ -3,6 +3,10 @@ import React from "react";
 import CloseButton from "../Utils/CloseButton";
 import DataTable from "../Utils/DataTable/DataTable";
 
+const Link = ({ text, href = "#" }) => <a href={href}>{text}</a>;
+const Seperator = () => <span>,&nbsp;</span>;
+const Span = ({ text }) => <span>{text}</span>;
+
 /* SECONDARY TALBE COMPONENT */
 function SecondaryTable({ data, columnsList, currentRow, closeTable }) {
   // Cell component
@@ -17,33 +21,59 @@ function SecondaryTable({ data, columnsList, currentRow, closeTable }) {
   );
 
   // Map header name and data to table row format
-  const mapDataToRow = () =>
-    columnsList.map((header) => ({
-      data: [
-        // Title
-        {
-          text: <Cell text={header} />,
-          css: {
-            width: "40%",
-            paddingTop: "6px",
-            paddingBottom: "6px",
-            background: "rgba(234, 234, 234, 0.3)",
-            verticalAlign: "top",
+  const mapDataToRow = () => {
+    const rowList = [...columnsList, "jira_issues"];
+
+    return rowList.map((header) => {
+      const isJiraCol = header === "jira_issues";
+      const title = isJiraCol ? "JIRA Issues" : header;
+      const text = (() => {
+        if (!isJiraCol) {
+          return data[header][currentRow];
+        }
+        const jiraDetails = data[header][currentRow];
+        let txt = [];
+        for (let jiraId in jiraDetails) {
+          txt.push(<Seperator />);
+          txt.push(
+            jiraDetails[jiraId] ? (
+              <Link text={jiraId} />
+            ) : (
+              <Span text={jiraId} />
+            )
+          );
+        }
+        return txt.slice(1);
+      })();
+
+      return {
+        data: [
+          // Title
+          {
+            text: <Cell text={title} />,
+            css: {
+              width: "40%",
+              paddingTop: "6px",
+              paddingBottom: "6px",
+              background: "rgba(234, 234, 234, 0.3)",
+              verticalAlign: "top",
+            },
           },
-        },
-        // Data
-        {
-          text: <Cell text={data[header][currentRow]} />,
-          css: {
-            width: "60%",
-            paddingTop: "6px",
-            paddingBottom: "6px",
-            verticalAlign: "top",
-            wordBreak: "break-all",
+          // Data
+          {
+            text: <Cell text={text} />,
+            css: {
+              width: "60%",
+              paddingTop: "6px",
+              paddingBottom: "6px",
+              verticalAlign: "top",
+              wordBreak: "break-all",
+            },
           },
-        },
-      ],
-    }));
+        ],
+      };
+    });
+  };
 
   // Create header of the table
   const header = () => ({
