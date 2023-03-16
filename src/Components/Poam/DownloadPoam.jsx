@@ -61,7 +61,7 @@ export default function DownloadPoam({
 
   // Map data into XLSX util object
   const mapData = (sheet) =>
-    Object.keys(sheet["POA&M ID"]).map((id) => {
+    Object.keys(sheet["POAM ID"]).map((id) => {
       const temp = {};
       let i = 0;
       for (let name of poam_header) {

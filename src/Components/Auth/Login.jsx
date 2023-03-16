@@ -35,7 +35,7 @@ const useStyles = makeStyles((theme) => ({
   // Style to apply on login btn
   submitBtn: {
     borderRadius: 2 * theme.shape.borderRadius,
-    width: "100%",
+    paddingInline: theme.spacing(6),
     fontSize: theme.spacing(2),
     fontWeight: "bold",
     background: theme.palette.primary.main,
@@ -124,20 +124,22 @@ function Login({ title, homePage }) {
           </Link>
         </Box>
 
-        <Button
-          className={classes.submitBtn}
-          type="submit"
-          data-test="login-submit-btn"
-        >
-          {isLoading ? <CircularProgress color="inherit" size={35} /> : "Go"}
-        </Button>
+        <Box display="flex" justifyContent="space-between" alignItems="center">
+          <CheckboxControl
+            color="primary"
+            name="remember"
+            label={<Typography variant="body2">Stay Logged in</Typography>}
+            noControls={true}
+          />
 
-        <CheckboxControl
-          color="primary"
-          name="remember"
-          label={<Typography variant="body2">Stay Logged in</Typography>}
-          noControls={true}
-        />
+          <Button
+            className={classes.submitBtn}
+            type="submit"
+            data-test="login-submit-btn"
+          >
+            {isLoading ? <CircularProgress color="inherit" size={35} /> : "Go"}
+          </Button>
+        </Box>
       </Form>
     </Box>
   );

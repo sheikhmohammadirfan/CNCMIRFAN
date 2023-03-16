@@ -41,10 +41,10 @@ export const useStyle = makeStyles((theme) => ({
     "& tr.Mui-selected td": { background: "#8ef1f1 !important" },
 
     // Update sticky col background
-    "& thead th:nth-child(1)": { background: "#aad8d3" },
-    "& thead th:nth-child(2)": { background: "#aad8d3" },
-    "& tbody td:nth-child(1)": { background: "#cef8f3" },
-    "& tbody td:nth-child(2)": { background: "#cef8f3" },
+    "& thead th:nth-child(1)": { background: "#c0e6e2" },
+    "& thead th:nth-child(2)": { background: "#c0e6e2" },
+    "& tbody td:nth-child(1)": { background: "#e0f8f5" },
+    "& tbody td:nth-child(2)": { background: "#e0f8f5" },
   },
 
   //Header cell style

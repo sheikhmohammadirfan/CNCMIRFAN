@@ -1,5 +1,5 @@
 export const BreadcrumbMapper = {
-  poam: "Poam",
+  poam: "POA&M",
   verify: "Verify",
   Integrated_Platforms: "Integrated Platforms",
   profile: "Setting",

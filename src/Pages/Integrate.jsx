@@ -14,9 +14,6 @@ const useStyles = makeStyles((theme) => ({
     border: "1px solid #ccc",
     textAlign: "center",
     height: "100px",
-    minWidth: "200px",
-    maxWidth: "300px",
-    margin: "auto",
     padding: 8,
     display: "flex",
     alignItems: "center",
@@ -46,7 +43,7 @@ export default function Integrate({ title }) {
       <Grid container spacing={3}>
         {integratedPlatforms.map((platform, index) => (
           <Tooltip title={platform.name} key={index}>
-            <Grid item xs key={index}>
+            <Grid item xs={6} md={4} lg={3} key={index}>
               <Box
                 className={
                   platforms[platform.name.toLowerCase()] === true

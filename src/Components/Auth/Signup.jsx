@@ -23,7 +23,7 @@ const useStyles = makeStyles((theme) => ({
   // Style to apply on login btn
   submitBtn: {
     borderRadius: 2 * theme.shape.borderRadius,
-    width: "100%",
+    paddingInline: theme.spacing(4),
     fontSize: theme.spacing(2),
     fontWeight: "bold",
     background: theme.palette.primary.main,

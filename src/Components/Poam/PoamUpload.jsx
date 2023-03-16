@@ -186,7 +186,8 @@ const AddNewPoamDialog = ({
       : uploadPoam(formData));
     if (!status) return stopLoading();
     close();
-    selectFile(data.file_id);
+    const fileName = isCreate() ? formData.file_name : formData.file.name;
+    selectFile(data.file_id, fileName);
     stopLoading();
   };
 

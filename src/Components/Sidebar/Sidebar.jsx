@@ -32,6 +32,7 @@ const useStyles = makeStyles((theme) => {
       display: "flex",
       flexDirection: "column",
       boxShadow: theme.shadows[1],
+      paddingTop: theme.spacing(1),
       transition: "width 0.2s linear",
       // Icon side bar, on minimize btn
       "&.close": {
@@ -90,26 +91,6 @@ export default function Sidebar({ isOpen, toggleSidebar }) {
       className={`${classes.sidebar} ${isOpen ? "" : "close"}`}
       data-test="sidebar-container"
     >
-      <SidebarItem
-        className={classes.logoBtn}
-        text={
-          <>
-            <img src={logo} alt="logo" height="100%" />
-            <Typography
-              variant="h6"
-              style={{ paddingLeft: 8, fontWeight: "bold" }}
-            >
-              Falcon
-            </Typography>
-          </>
-        }
-        sidebarOpen={isOpen}
-        tooltipProps={{ open: false }}
-        data-test="sidebar-logo"
-      />
-
-      <Divider />
-
       <List
         className={`${classes.navContainer} ${!isOpen ? "close-sidebar" : ""}`}
         disablePadding

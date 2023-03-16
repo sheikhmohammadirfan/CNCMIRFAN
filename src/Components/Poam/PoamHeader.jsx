@@ -308,7 +308,7 @@ export default function PoamHeader({
                     marginLeft: 8,
                   }}
                 >
-                  Create New
+                  Add New Poa&m
                 </Button>
               )}
             </Box>
