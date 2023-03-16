@@ -55,7 +55,7 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     position: "relative",
     overflow: "hidden",
-    borderRadius: 2 * theme.shape.borderRadius,
+    borderRadius: theme.shape.borderRadius,
     border: `1px solid ${theme.palette.grey[400]}`,
   },
 
@@ -77,7 +77,7 @@ const useStyles = makeStyles((theme) => ({
     height: "100%",
     width: "50%",
     position: "absolute",
-    borderRadius: 2 * theme.shape.borderRadius,
+    borderRadius: theme.shape.borderRadius,
     zIndex: 1,
     background: theme.palette.primary.main,
     transition: "transform .5s cubic-bezier(.63,-0.58,.63,1.58)",
@@ -152,7 +152,7 @@ export default function Auth({ title }) {
                   className={`${classes.tabBackgnd} ${loginIn ? "login" : ""}`}
                 ></Box>
                 <Typography
-                  variant="subtitle1"
+                  variant="subtitle2"
                   className={`${classes.headings} ${!loginIn ? "active" : ""}`}
                   onClick={signupUser}
                   data-test="signup-btn"
@@ -160,7 +160,7 @@ export default function Auth({ title }) {
                   Sign Up
                 </Typography>
                 <Typography
-                  variant="subtitle1"
+                  variant="subtitle2"
                   className={`${classes.headings} ${loginIn ? "active" : ""}`}
                   onClick={loginUser}
                   data-test="login-btn"

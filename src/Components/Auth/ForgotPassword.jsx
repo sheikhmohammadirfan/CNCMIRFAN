@@ -45,7 +45,7 @@ const useStyles = makeStyles((theme) => ({
 
   // Style for password submit btn
   submitBtn: {
-    background: `linear-gradient(to right , ${theme.palette.secondary.dark}, ${theme.palette.secondary.light})`,
+    background: theme.palette.primary.main,
     color: theme.textOnPrimary,
     fontWeight: "bold",
     letterSpacing: 2,

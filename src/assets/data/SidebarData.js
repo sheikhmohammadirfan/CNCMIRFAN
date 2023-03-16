@@ -79,7 +79,7 @@ export const SidebarData = [
   },
   {
     icon: "category",
-    title: "Security Control Mapping",
+    title: "Security Controls Mapping",
     subMenu: [
       {
         title: "FEDRAMP / FISMA",
@@ -98,6 +98,11 @@ export const SidebarData = [
       },
       {
         title: "ISO 27001",
+        component: Link,
+        to: "/services/services3",
+      },
+      {
+        title: "CMMC",
         component: Link,
         to: "/services/services3",
       },
