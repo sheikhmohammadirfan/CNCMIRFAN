@@ -255,8 +255,10 @@ export default function PoamTable({ fileID }) {
       }))
     );
     setTimeout(() => {
-      if (document.activeElement.tagName !== "INPUT") {
-        document.querySelector("td[data-searched='true']")?.focus();
+      const active = document.activeElement;
+      document.querySelector("td[data-searched='true']")?.focus();
+      if (active.tagName === "INPUT") {
+        active.focus();
       }
     }, 0);
   }, [searchSelected]);
