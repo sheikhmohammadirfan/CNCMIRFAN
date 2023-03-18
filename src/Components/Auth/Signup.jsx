@@ -96,7 +96,7 @@ const ContactNumControl = ({ name, label, control, rules }) => {
                 val: callingCodes[key],
                 text: `${key} ${callingCodes[key]}`,
               }))}
-              value={code || "+1"}
+              value={code}
               renderValue={(v) => v}
               onChange={(e) => onChange(`${e.target.value}-${num || ""}`)}
             />
@@ -157,7 +157,9 @@ export default function Signup({ title, loginPage }) {
   };
 
   // TODO: Reset is not working
-  const { handleSubmit, control, reset } = useForm();
+  const { handleSubmit, control, reset } = useForm({
+    defaultValues: { contact_no: "+1-" },
+  });
 
   // handle on Submit
   const submit = async (data) => {

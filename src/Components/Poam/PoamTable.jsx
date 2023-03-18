@@ -178,7 +178,8 @@ export default function PoamTable({ fileID }) {
       visibleColumns,
       selectedRow,
       secondaryOpen,
-      setSecondaryOpen
+      setSecondaryOpen,
+      matchedCell
     );
 
   // ? ----------> ROW MANUPULATION METHODS
@@ -242,6 +243,23 @@ export default function PoamTable({ fileID }) {
       updateIssue: true,
     });
 
+  // ? ----------> SEARCH
+
+  const [matchedCell, setMatched] = useState([]);
+  const [searchSelected, setSelected] = useState(-1);
+  useEffect(() => {
+    setMatched((prev) =>
+      prev.map((cell, idx) => ({
+        ...cell,
+        selected: searchSelected === idx,
+      }))
+    );
+    setTimeout(
+      () => document.querySelector("td[data-searched='true']")?.focus(),
+      0
+    );
+  }, [searchSelected]);
+
   // ? ----------> UI COMPONENTS
 
   return (
@@ -258,11 +276,17 @@ export default function PoamTable({ fileID }) {
           zoom={{ isZoomed, zoomIn, zoomOut }}
           details={{ fileID, ...poamDetails }}
           poamData={poamData}
-          cols={{ allColumns, secondaryColumns, hiddenColumns }}
+          cols={{ allColumns, secondaryColumns, hiddenColumns, visibleColumns }}
           manageCol={{ moveToPrimary, moveToSecondary }}
           manageRow={{ openEditFrom, openCreateForm, openJustify }}
           manageSheet={{ isOpenPoam, showOpenPoam, showClosePoam }}
           manageJira={{ containIssue, showCreateIssue, showUpdateIssue }}
+          search={{
+            matchedCell,
+            setMatched,
+            searchSelected,
+            setSelected,
+          }}
         />
 
         {isLoading() ? (

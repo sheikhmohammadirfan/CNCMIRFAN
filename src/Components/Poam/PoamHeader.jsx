@@ -7,6 +7,7 @@ import {
   Tooltip,
   InputAdornment,
   Typography,
+  IconButton,
 } from "@material-ui/core";
 import React, { useState } from "react";
 import ManageColumns from "./ManageColumns";
@@ -14,6 +15,7 @@ import ManageJira from "./ManageJira";
 import DownloadPoam from "./DownloadPoam";
 import { TextControl } from "../Utils/Control";
 import jira from "../../assets/img/jira-brands.svg";
+import { useEffect } from "react";
 
 // Style generator
 const useStyle = makeStyles((theme) => ({
@@ -75,6 +77,16 @@ const useStyle = makeStyles((theme) => ({
     borderRadius: theme.shape.borderRadius,
     maxWidth: 200,
   },
+
+  searchInput: {
+    height: 32,
+    width: 300,
+    "& .MuiOutlinedInput-adornedStart": {
+      paddingLeft: 8,
+      paddingRight: 8,
+    },
+    overflow: "hidden",
+  },
 }));
 
 /* POA&M HEADER COMPONENT */
@@ -83,11 +95,12 @@ export default function PoamHeader({
   zoom: { isZoomed, zoomIn, zoomOut },
   details: { fileID, fileName, cspName, systemName, agencyName },
   poamData,
-  cols: { allColumns, secondaryColumns, hiddenColumns },
+  cols: { allColumns, secondaryColumns, hiddenColumns, visibleColumns },
   manageCol: { moveToPrimary, moveToSecondary },
   manageRow: { openEditFrom, openCreateForm, openJustify },
   manageSheet: { isOpenPoam, showOpenPoam, showClosePoam },
   manageJira: { containIssue, showCreateIssue, showUpdateIssue },
+  search: { matchedCell, setMatched, searchSelected, setSelected },
 }) {
   const classes = useStyle();
 
@@ -105,6 +118,49 @@ export default function PoamHeader({
   const [isDownloadOpen, setIsDownloadOpen] = useState(false);
   const openDownload = () => setIsDownloadOpen(true);
   const closeDownload = () => setIsDownloadOpen(false);
+
+  const [searchValue, setSearch] = useState("");
+  const updateSearch = (e) => {
+    const searchedValue = e.target.value;
+    setSearch(searchedValue);
+  };
+  useEffect(() => {
+    setSearch("");
+  }, [poamData, isOpenPoam]);
+  useEffect(() => {
+    const matches = [];
+    if (searchValue) {
+      try {
+        const searchRegex = new RegExp(
+          searchValue
+            .replaceAll("(", "\\(")
+            .replaceAll(")", "\\)")
+            .replaceAll(".", "\\."),
+          "i"
+        );
+        const data = isOpenPoam ? poamData.open : poamData.close;
+        const length = Object.keys(data["POAM ID"] || {}).length;
+        const offset = isOpenPoam ? 2 : 0;
+
+        for (let i = offset; i < length; i++) {
+          for (let column of visibleColumns) {
+            if (data[column][i] && String(data[column][i]).match(searchRegex)) {
+              matches.push({ column, row: i, selected: false });
+            }
+          }
+        }
+      } catch (e) {
+        console.log(e);
+      }
+    }
+    if (matches.length) {
+      matches[0].selected = true;
+      setSelected(0);
+    } else {
+      setSelected(-1);
+    }
+    setMatched(matches);
+  }, [searchValue]);
 
   return (
     <>
@@ -285,16 +341,55 @@ export default function PoamHeader({
                 placeholder="Search here"
                 size="small"
                 gutter={false}
-                name=""
-                style={{ height: "24px", width: "300px" }}
+                label=" "
+                className={classes.searchInput}
                 inputProps={{ style: { paddingTop: 7, paddingBottom: 6 } }}
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <Icon>search</Icon>
+                      {searchValue ? (
+                        <IconButton
+                          size="small"
+                          color="inherit"
+                          onClick={() => {
+                            updateSearch({ target: { value: "" } });
+                          }}
+                        >
+                          <Icon>close</Icon>
+                        </IconButton>
+                      ) : (
+                        <Icon>search</Icon>
+                      )}
                     </InputAdornment>
                   ),
+                  endAdornment: searchValue ? (
+                    <InputAdornment position="end">
+                      <IconButton
+                        size="small"
+                        color="inherit"
+                        disabled={
+                          searchSelected === 0 || matchedCell.length <= 1
+                        }
+                        onClick={() => setSelected((prev) => prev - 1)}
+                      >
+                        <Icon>arrow_left</Icon>
+                      </IconButton>
+                      <IconButton
+                        size="small"
+                        color="inherit"
+                        disabled={
+                          searchSelected === matchedCell.length - 1 ||
+                          matchedCell.length <= 1
+                        }
+                        onClick={() => setSelected((prev) => prev + 1)}
+                      >
+                        <Icon>arrow_right</Icon>
+                      </IconButton>
+                    </InputAdornment>
+                  ) : null,
                 }}
+                value={searchValue}
+                onChange={updateSearch}
               />
               {isOpenPoam && (
                 <Button

@@ -45,6 +45,7 @@ export const useStyle = makeStyles((theme) => ({
     "& thead th:nth-child(2)": { background: "#c0e6e2" },
     "& tbody td:nth-child(1)": { background: "#e0f8f5" },
     "& tbody td:nth-child(2)": { background: "#e0f8f5" },
+    "& tbody td[data-searched='true']": { border: "2px solid" },
   },
 
   //Header cell style
@@ -98,10 +99,34 @@ export const mapDataToHeader = (visibleColumns) => ({
 });
 
 /* Method to map a POA&M data to row dictionary */
-const mapDataToRow = (data, columns, rowIndex) =>
+const mapDataToRow = (data, columns, rowIndex, matchedCell) =>
   columns.map((columnName, index) => ({
     text: data[columnName][rowIndex],
-    params: columnName === "POAM ID" ? { "poam-id": "" } : {},
+    params:
+      columnName === "POAM ID"
+        ? {
+            "poam-id": "",
+            "data-searched": Boolean(
+              matchedCell.find(
+                (cell) =>
+                  cell.column === columnName &&
+                  cell.row == rowIndex &&
+                  cell.selected === true
+              )
+            ),
+            tabindex: 0,
+          }
+        : {
+            "data-searched": Boolean(
+              matchedCell.find(
+                (cell) =>
+                  cell.column === columnName &&
+                  cell.row == rowIndex &&
+                  cell.selected === true
+              )
+            ),
+            tabindex: 0,
+          },
   }));
 
 /* Method to convert 2D row data into table body format */
@@ -111,7 +136,8 @@ export const generateRows = (
   columns,
   selectedList,
   secondaryOpen,
-  setSecondaryOpen
+  setSecondaryOpen,
+  matchedCell
 ) => {
   // count of number of rows
   const rowCount = Object.keys(data["POAM ID"] || {}).length;
@@ -123,7 +149,7 @@ export const generateRows = (
   // Generate row of POA&M table
   for (let i = offset; i < rowCount; i++)
     rowData.push({
-      data: mapDataToRow(data, columns, getRowIndex(data, i)),
+      data: mapDataToRow(data, columns, getRowIndex(data, i), matchedCell),
       props: {
         selected:
           selectedList.indexOf(i - offset) !== -1 || secondaryOpen === i,
