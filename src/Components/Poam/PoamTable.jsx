@@ -254,10 +254,11 @@ export default function PoamTable({ fileID }) {
         selected: searchSelected === idx,
       }))
     );
-    setTimeout(
-      () => document.querySelector("td[data-searched='true']")?.focus(),
-      0
-    );
+    setTimeout(() => {
+      if (document.activeElement.tagName !== "INPUT") {
+        document.querySelector("td[data-searched='true']")?.focus();
+      }
+    }, 0);
   }, [searchSelected]);
 
   // ? ----------> UI COMPONENTS
