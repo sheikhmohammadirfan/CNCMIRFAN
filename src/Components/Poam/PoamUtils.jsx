@@ -37,6 +37,30 @@ export const useStyle = makeStyles((theme) => ({
       "&[poam-id]": { zIndex: "2 !important" },
     },
 
+    // Add soting
+    "& thead th:not(:first-child)": {
+      "&::before, &::after": {
+        position: "absolute",
+        fontFamily: "Material Icons",
+        right: 0,
+        fontSize: 18,
+      },
+      "&::before": {
+        content: "'\\e5c7'",
+        top: 0,
+      },
+      "&::after": {
+        content: "'\\e5c5'",
+        top: 10,
+      },
+      "&.asc::before": {
+        content: "''",
+      },
+      "&.dsc::after": {
+        content: "''",
+      },
+    },
+
     // Change background color of selected row
     "& tr.Mui-selected td": { background: "#8ef1f1 !important" },
 
@@ -86,15 +110,27 @@ export const RowCell = ({ text }) => {
 };
 
 /* Method to map visible columns to header row */
-export const mapDataToHeader = (visibleColumns) => ({
+export const mapDataToHeader = (visibleColumns, sorting, updateSort) => ({
   data: visibleColumns.map((text) => ({
     text,
-    params: text === "POAM ID" ? { "poam-id": "", header: "" } : {},
+    params:
+      text === "POAM ID"
+        ? {
+            "poam-id": "",
+            header: "",
+            onClick: () => updateSort(text),
+            className: sorting && sorting.column === text ? sorting.order : "",
+          }
+        : {
+            onClick: () => updateSort(text),
+            className: sorting && sorting.column === text ? sorting.order : "",
+          },
   })),
   cellStyle: {
     fontWeight: "bold",
     paddingTop: "4px",
     paddingBottom: "4px",
+    cursor: "pointer",
   },
 });
 
@@ -137,7 +173,8 @@ export const generateRows = (
   selectedList,
   secondaryOpen,
   setSecondaryOpen,
-  matchedCell
+  matchedCell,
+  sortingMap
 ) => {
   // count of number of rows
   const rowCount = Object.keys(data["POAM ID"] || {}).length;
@@ -146,10 +183,18 @@ export const generateRows = (
   // Set initial offset for open sheet
   const offset = isOpen ? 2 : 0;
 
+  if (sortingMap) {
+  }
+
   // Generate row of POA&M table
   for (let i = offset; i < rowCount; i++)
     rowData.push({
-      data: mapDataToRow(data, columns, getRowIndex(data, i), matchedCell),
+      data: mapDataToRow(
+        data,
+        columns,
+        getRowIndex(data, i, sortingMap),
+        matchedCell
+      ),
       props: {
         selected:
           selectedList.indexOf(i - offset) !== -1 || secondaryOpen === i,
@@ -174,8 +219,11 @@ export const generateRows = (
 //! POA&M UTILITY --------------------------- START
 
 /* Method to get data row index from table index */
-export const getRowIndex = (data, index) =>
-  index === -1 ? -1 : Object.keys(data["POAM ID"])[index];
+export const getRowIndex = (data, index, sortingMap) => {
+  if (index === -1) return -1;
+  if (sortingMap) return Object.keys(data["POAM ID"])[sortingMap[index]];
+  return Object.keys(data["POAM ID"])[index];
+};
 
 /* Method to upload visible columns based on secondary columns */
 export const updateColumns = (allColumns, secondaryColumns) =>
@@ -276,6 +324,34 @@ export function validateID(val, prefix, maxValue) {
   if (Number(l[1]) <= maxValue)
     return `POA&M ID should be atleast ${maxValue + 1}`;
   return true;
+}
+
+export function getSortingMap(data, isOpen, sorting) {
+  if (!sorting) return null;
+
+  const offset = isOpen ? 2 : 0;
+  const colDataArray = [];
+  // const rowCount = Object.keys(data["POAM ID"]).length;
+
+  const values = Object.values(data[sorting.column]).slice(offset);
+  for (let i = 0; i < values.length; i++) {
+    colDataArray.push({ index: i + offset, value: values[i] });
+  }
+  colDataArray.sort((a, b) => {
+    if (a.value > b.value) {
+      return sorting.order === "asc" ? 1 : -1;
+    }
+    if (a.value < b.value) {
+      return sorting.order === "asc" ? -1 : 1;
+    }
+    return 0;
+  });
+
+  const map = {};
+  for (let i = 0; i < colDataArray.length; i++) {
+    map[colDataArray[i].index] = i + offset;
+  }
+  return map;
 }
 
 //! POAM UTILITY --------------------------- END

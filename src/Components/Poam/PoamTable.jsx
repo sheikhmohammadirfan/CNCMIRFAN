@@ -38,6 +38,7 @@ import {
   getRowData,
   movePoamRow,
   getPoamID_data,
+  getSortingMap,
 } from "./PoamUtils";
 
 /* POA&M TABLE COMPONENT */
@@ -119,6 +120,7 @@ export default function PoamTable({ fileID }) {
   const resetPageState = () => {
     setSecondaryOpen(-1);
     setSelectedRow([]);
+    setSorting(null);
   };
 
   // fetch data on mounting component
@@ -164,11 +166,12 @@ export default function PoamTable({ fileID }) {
     if (selectedRow.length === 0) return -1;
     // Else get rowindex by adding offset if it is open poam
     const offset = isOpenPoam ? 2 : 0;
-    return getRowIndex(getPoam(), selectedRow[0] + offset);
+    return getRowIndex(getPoam(), selectedRow[0] + offset, sortingMap);
   };
 
   // Map data to header
-  const mapTableHeader = () => mapDataToHeader(visibleColumns);
+  const mapTableHeader = () =>
+    mapDataToHeader(visibleColumns, sorting, updateSort);
 
   // Map data to body
   const mapTableBody = () =>
@@ -179,7 +182,8 @@ export default function PoamTable({ fileID }) {
       selectedRow,
       secondaryOpen,
       setSecondaryOpen,
-      matchedCell
+      matchedCell,
+      sortingMap
     );
 
   // ? ----------> ROW MANUPULATION METHODS
@@ -263,6 +267,33 @@ export default function PoamTable({ fileID }) {
     }, 0);
   }, [searchSelected]);
 
+  // ? ----------> Sorting
+
+  const [sorting, setSorting] = useState(null);
+  const updateSort = (colName) => {
+    let currSort = {};
+    if (sorting) {
+      currSort = { ...sorting };
+    }
+    if (currSort.column === colName) {
+      currSort.order = currSort.order === "asc" ? "dsc" : "asc";
+    } else {
+      currSort = {
+        column: colName,
+        order: "asc",
+      };
+    }
+    setSorting(currSort);
+  };
+  const [sortingMap, updateMap] = useState(null);
+  useEffect(() => {
+    if (sorting) {
+      updateMap(getSortingMap(getPoam(), isOpenPoam, sorting));
+    } else {
+      updateMap(null);
+    }
+  }, [sorting]);
+
   // ? ----------> UI COMPONENTS
 
   return (
@@ -324,7 +355,7 @@ export default function PoamTable({ fileID }) {
 
             <SecondaryTable
               data={getPoam()}
-              currentRow={getRowIndex(getPoam(), secondaryOpen)}
+              currentRow={getRowIndex(getPoam(), secondaryOpen, sortingMap)}
               columnsList={secondaryColumns.filter(
                 (name) => !hiddenColumns.includes(name)
               )}
