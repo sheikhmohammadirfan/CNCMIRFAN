@@ -23,12 +23,13 @@ const useStyles = makeStyles((theme) => ({
   // Style to apply on login btn
   submitBtn: {
     borderRadius: theme.shape.borderRadius,
-    paddingInline: theme.spacing(4),
+    paddingInline: theme.spacing(6),
     fontSize: theme.spacing(1.5),
     fontWeight: "bold",
     background: theme.palette.primary.main,
     color: theme.textOnPrimary,
-    marginBottom: theme.spacing(1),
+    display: "block",
+    margin: "auto",
     "&:hover": {
       background: theme.palette.primary.light,
     },
@@ -189,7 +190,7 @@ export default function Signup({ title, loginPage }) {
   const classes = useStyles();
 
   return (
-    <Box display="flex" flexDirection="column" width={1} paddingX={1}>
+    <Box display="flex" flexDirection="column" width={1}>
       <Form
         control={control}
         rules={validations}

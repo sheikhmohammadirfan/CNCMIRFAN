@@ -11,26 +11,61 @@ import ResetPassword from "../Components/Auth/ResetPassword";
 
 // CSS class generator
 const useStyles = makeStyles((theme) => ({
-  // Style for backgroud page
+  // // Style for backgroud page
+  // page: {
+  //   height: "100vh",
+  //   display: "flex",
+  //   justifyContent: "center",
+  //   alignItems: "center",
+  //   background: "rgb(200, 200, 255, 0.4)",
+  // },
+
+  // // Root grid container of page
+  // root: {
+  //   borderTop: "1px solid rgb(64, 86, 181, 0.2)",
+  //   borderBottom: "1px solid rgb(64, 86, 181, 0.2)",
+  //   width: "100vw",
+  //   padding: `0 ${theme.spacing(20)}px`,
+  //   background: "#fafaff",
+  //   justifyContent: "center",
+  //   alignItems: "center",
+  //   [theme.breakpoints.down("sm")]: { padding: `0 ${theme.spacing(10)}px` },
+  //   [theme.breakpoints.down("xs")]: { padding: "0" },
+  // },
+
+  // Page
   page: {
-    height: "100vh",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    background: "rgb(200, 200, 255, 0.4)",
+    width: "100%",
+    height: "100%",
+    background: "white",
+    paddingBlock: theme.spacing(2),
   },
 
-  // Root grid container of page
+  // Root container
   root: {
-    borderTop: "1px solid rgb(64, 86, 181, 0.2)",
-    borderBottom: "1px solid rgb(64, 86, 181, 0.2)",
-    width: "100vw",
-    padding: `0 ${theme.spacing(20)}px`,
-    background: "#fafaff",
-    justifyContent: "center",
+    width: "95%",
+    maxWidth: 350,
+    marginInline: `auto`,
+    borderRadius: theme.shape.borderRadius,
+    border: `2px solid ${theme.palette.grey[300]}`,
+    padding: `${theme.spacing(3)}px ${theme.spacing(2)}px`,
+    display: "flex",
+    flexDirection: "column",
     alignItems: "center",
-    [theme.breakpoints.down("sm")]: { padding: `0 ${theme.spacing(10)}px` },
-    [theme.breakpoints.down("xs")]: { padding: "0" },
+    [theme.breakpoints.down("xs")]: { padding: theme.spacing(1) },
+  },
+
+  title: {
+    margin: 0,
+    marginTop: theme.spacing(1),
+    marginBottom: theme.spacing(0.5),
+    color: theme.palette.grey[600],
+  },
+
+  subtitle: {
+    color: theme.palette.grey[500],
+    fontWeight: "bold",
+    fontStyle: "italic",
   },
 
   // Form Container
@@ -69,6 +104,7 @@ const useStyles = makeStyles((theme) => ({
     cursor: "pointer",
     zIndex: 2,
     transition: "all .5s  cubic-bezier(.63,-0.58,.63,1.58)",
+    color: theme.palette.primary.main,
     "&.active": { color: theme.textOnPrimary },
   },
 
@@ -131,65 +167,52 @@ export default function Auth({ title }) {
 
   return (
     <Box className={classes.page}>
-      <Grid container spacing={2} className={classes.root}>
-        <Grid item sm={12} md={6}>
-          <Box textAlign="center">
-            <img src={logo} alt="logo" width="100%" style={{ maxWidth: 225 }} />
-            <Typography variant="h4" color="inherit">
-              Welcome To Falcon
-            </Typography>
-            <Typography variant="h6" color="inherit">
-              No Hassle Compliance Experience
-            </Typography>
-          </Box>
-        </Grid>
-
-        <Grid item sm={12} md={6}>
-          <main className={classes.formContainer}>
-            <Box paddingTop={2} paddingBottom={3}>
-              <Box className={classes.formHeading}>
-                <Box
-                  className={`${classes.tabBackgnd} ${loginIn ? "login" : ""}`}
-                ></Box>
-                <Typography
-                  variant="subtitle2"
-                  className={`${classes.headings} ${!loginIn ? "active" : ""}`}
-                  onClick={signupUser}
-                  data-test="signup-btn"
-                >
-                  Sign Up
-                </Typography>
-                <Typography
-                  variant="subtitle2"
-                  className={`${classes.headings} ${loginIn ? "active" : ""}`}
-                  onClick={loginUser}
-                  data-test="login-btn"
-                >
-                  Login
-                </Typography>
-              </Box>
-            </Box>
-
-            <Box overflow="hidden">
+      <Box className={classes.root}>
+        <img src={logo} alt="logo" width="100%" style={{ maxWidth: 225 }} />
+        <h3 className={classes.title}>No Hassle Compliance Experience</h3>
+        <span className={classes.subtitle}>Repeatable - Agile - Automated</span>
+        <main className={classes.formContainer}>
+          <Box paddingTop={2} paddingBottom={3}>
+            <Box className={classes.formHeading}>
               <Box
-                className={`${classes.formBody} ${loginIn ? "login" : ""}`}
-                data-test="form-wrapper"
+                className={`${classes.tabBackgnd} ${loginIn ? "login" : ""}`}
+              ></Box>
+              <Typography
+                variant="subtitle2"
+                className={`${classes.headings} ${!loginIn ? "active" : ""}`}
+                onClick={signupUser}
+                data-test="signup-btn"
               >
-                <Signup title="SIGN UP" loginPage={loginUser} />
-                <Login title="LOGIN" homePage={homePage} />
-              </Box>
+                Sign Up
+              </Typography>
+              <Typography
+                variant="subtitle2"
+                className={`${classes.headings} ${loginIn ? "active" : ""}`}
+                onClick={loginUser}
+                data-test="login-btn"
+              >
+                Login
+              </Typography>
             </Box>
+          </Box>
 
-            {/* <SingleSignon /> */}
+          <Box overflow="hidden">
+            <Box
+              className={`${classes.formBody} ${loginIn ? "login" : ""}`}
+              data-test="form-wrapper"
+            >
+              <Signup title="SIGN UP" loginPage={loginUser} />
+              <Login title="LOGIN" homePage={homePage} />
+            </Box>
+          </Box>
 
-            <ForgotPassword
-              title="FORGOT PASSWORD"
-              show={loginIn === 2}
-              login={loginUser}
-            />
-          </main>
-        </Grid>
-      </Grid>
+          <ForgotPassword
+            title="FORGOT PASSWORD"
+            show={loginIn === 2}
+            login={loginUser}
+          />
+        </main>
+      </Box>
 
       {history.location.pathname.match(/resetpassword.*/) && (
         <ResetPassword

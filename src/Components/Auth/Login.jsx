@@ -23,19 +23,19 @@ import PropTypes from "prop-types";
 const useStyles = makeStyles((theme) => ({
   // Forgot password styles
   forgotPassword: {
-    textDecoration: "none",
     "& .MuiTypography-root": {
       color: theme.palette.primary.main,
-      letterSpacing: 1,
+      letterSpacing: 0.9,
       fontWeight: "bold",
-      paddingRight: theme.spacing(1),
     },
   },
 
   // Style to apply on login btn
   submitBtn: {
+    display: "block",
+    margin: "auto",
     borderRadius: theme.shape.borderRadius,
-    paddingInline: theme.spacing(6),
+    paddingInline: theme.spacing(8),
     fontSize: theme.spacing(1.5),
     fontWeight: "bold",
     background: theme.palette.primary.main,
@@ -89,7 +89,6 @@ function Login({ title, homePage }) {
       display="flex"
       flexDirection="column"
       width={1}
-      paddingX={1}
       data-test="login-container"
     >
       <Form
@@ -118,27 +117,18 @@ function Login({ title, homePage }) {
           data-test="login-password-field"
         />
 
-        <Box textAlign="right" marginBottom={2}>
+        <Button
+          className={classes.submitBtn}
+          type="submit"
+          data-test="login-submit-btn"
+        >
+          {isLoading ? <CircularProgress color="inherit" size={35} /> : "Go"}
+        </Button>
+
+        <Box textAlign="center" marginTop={2}>
           <Link to="/forgotpassword" className={classes.forgotPassword}>
-            <Typography variant="body2">Forgot password?</Typography>
+            <Typography variant="body2">Forgotten your password?</Typography>
           </Link>
-        </Box>
-
-        <Box display="flex" justifyContent="space-between" alignItems="center">
-          <CheckboxControl
-            color="primary"
-            name="remember"
-            label={<Typography variant="body2">Stay Logged in</Typography>}
-            noControls={true}
-          />
-
-          <Button
-            className={classes.submitBtn}
-            type="submit"
-            data-test="login-submit-btn"
-          >
-            {isLoading ? <CircularProgress color="inherit" size={35} /> : "Go"}
-          </Button>
         </Box>
       </Form>
     </Box>
