@@ -26,7 +26,7 @@ import React from "react";
 
 // Custom values
 const sidebarSmall = 50;
-const sidebarLarge = 280;
+const sidebarLarge = 285;
 const headerHeight = 40;
 
 /** Theme generator */
