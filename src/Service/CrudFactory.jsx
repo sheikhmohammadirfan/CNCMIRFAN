@@ -16,7 +16,7 @@ async function request(requestOptions) {
   let fullurl = url;
 
   // Set basic header
-  let headers = { Accept: "*/*" };
+  let headers = { Accept: "*/*", "Referrer-Policy": "no-referrer" };
   if (getToken()) headers["Authorization"] = `Bearer ${getToken()}`;
 
   // Get query params
