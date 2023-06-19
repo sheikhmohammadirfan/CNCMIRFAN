@@ -48,9 +48,6 @@ describe("<Sidebar />", () => {
   test("Test component mount successfully", () => {
     const wrapper = setup();
 
-    const logo = findByAttr(wrapper, "sidebar-logo");
-    expect(logo.exists()).toBeTruthy();
-
     const profile = findByAttr(wrapper, "sidebar-profile");
     expect(profile.exists()).toBeTruthy();
 

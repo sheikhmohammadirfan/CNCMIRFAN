@@ -3,7 +3,7 @@ import { getToken, logout } from "./UserFactory";
 import { notification } from "../Components/Utils/Utils";
 
 // Base url
-export const baseURL = "https://web-production-156f.up.railway.app";
+export const baseURL = "http://api.cncmllc.com";
 
 // Setup axios object
 export const axios = instance.create({ baseURL: baseURL + "/api" });

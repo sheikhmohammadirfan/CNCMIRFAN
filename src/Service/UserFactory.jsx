@@ -56,7 +56,9 @@ function deleteIntegratedPlatform() {
 /************ ROUTING *************/
 // Login user
 export async function login(details) {
-  const { data, status } = await post("/user/login", details);
+  const { data, status } = await post("/user/login", details, {
+    isUserAPI: true,
+  });
 
   // if success then set token
   if (status) {
@@ -70,7 +72,9 @@ export async function login(details) {
 
 // Signup user
 export async function signup(details) {
-  const { status } = await post("/user", details);
+  const { status } = await post("/user", details, {
+    isUserAPI: true,
+  });
   return status;
 }
 
@@ -107,7 +111,7 @@ export async function updateProfile(formData) {
 
   // Check if any data is change, then only send update request
   if (Object.keys(newData).length > 0)
-    return await patch(`/user/update/`, newData);
+    return await patch(`/user/update/`, newData, { isUserAPI: true });
 
   // Else return false value
   notification(
@@ -121,6 +125,7 @@ export async function updateProfile(formData) {
 export async function checkPasswordReset(data) {
   const { status } = await post("/user/reset-token-check/", data, {
     notify: false,
+    isUserAPI: true,
   });
   if (!status)
     notification(
@@ -132,11 +137,15 @@ export async function checkPasswordReset(data) {
 }
 
 export async function requestPasswordReset(email) {
-  const { status } = await post("/user/request-password-reset/", email);
+  const { status } = await post("/user/request-password-reset/", email, {
+    isUserAPI: true,
+  });
   return status;
 }
 
 export async function resetPassword(data) {
-  const { status } = await patch("/user/password-reset/", data);
+  const { status } = await patch("/user/password-reset/", data, {
+    isUserAPI: true,
+  });
   return status;
 }
