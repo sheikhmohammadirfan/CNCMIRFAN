@@ -3,7 +3,7 @@ import { getToken, logout } from "./UserFactory";
 import { notification } from "../Components/Utils/Utils";
 
 // Base url
-export const baseURL = "http://api.cncmllc.com";
+export const baseURL = "https://api.cncmllc.com";
 
 // Setup axios object
 export const axios = instance.create({ baseURL: baseURL + "/api" });
@@ -16,7 +16,7 @@ async function request(requestOptions) {
   let fullurl = url;
 
   // Set basic header
-  let headers = { Accept: "*/*", "Referrer-Policy": "no-referrer" };
+  let headers = { Accept: "*/*" };
   if (getToken()) headers["Authorization"] = `Bearer ${getToken()}`;
 
   // Get query params
