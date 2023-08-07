@@ -1,5 +1,6 @@
 import { post } from "./CrudFactory";
 import { Iterate } from "../Components/Utils/Iterate";
+import * as mocks from "../assets/mock";
 
 async function sendMail(subject, to, cc, bcc, message, files) {
   let formData = new FormData();
@@ -15,7 +16,7 @@ async function sendMail(subject, to, cc, bcc, message, files) {
   formData = Iterate(cc, "cc[]", formData);
   formData = Iterate(bcc, "bcc[]", formData);
   formData = Iterate(files, "file[]", formData);
-  return await post("/email/sendemail/", formData);
+  return await post("/email/sendemail/", formData, { mock: mocks.FAILURE });
 }
 
 export default sendMail;

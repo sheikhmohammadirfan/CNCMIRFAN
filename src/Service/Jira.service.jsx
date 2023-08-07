@@ -1,52 +1,69 @@
 import { post, get, patch } from "./CrudFactory";
+import * as mocks from "../assets/mock";
 
 /* Method to link JIRA to user */
 export async function linkWithJira(link, email, api_token) {
-  return await post("/jira/register/", {
-    link: link,
-    email: email,
-    api_token: api_token,
-  });
+  return await post(
+    "/jira/register/",
+    {
+      link: link,
+      email: email,
+      api_token: api_token,
+    },
+    {
+      mock: mocks.SUCCESS,
+    }
+  );
 }
 
 /* Method to fetch all projects of user */
 export async function fetchProjects() {
-  return await get("/jira/fetchprojects/");
+  return await get("/jira/fetchprojects/", null, { mock: mocks.fetchProjects });
 }
 
 /* Method to fetch issue type list */
 export async function fetchIssueTypes() {
-  return await get("/jira/fetchissuetype/");
+  return await get("/jira/fetchissuetype/", null, {
+    mock: mocks.fetchIssueTypes,
+  });
 }
 
 /* Method to fetch assignee list in project */
 export async function fetchAssignee(key) {
-  return await get(`/jira/fetchassignee/${key}`);
+  return await get(`/jira/fetchassignee/${key}`, null, {
+    mock: mocks.fetchAssignee,
+  });
 }
 
 /* Method to fetch priority list */
 export async function fetchPriority() {
-  return await get(`/jira/fetchpriorities`);
+  return await get(`/jira/fetchpriorities`, null, {
+    mock: mocks.fetchPriority,
+  });
 }
 
 /* Method to fetch list of the epic issues list */
 export async function fetchEpicLink() {
-  return await get(`/jira/fetchepiclink`);
+  return await get(`/jira/fetchepiclink`, null, { mock: mocks.fetchEpicLink });
 }
 
 /* Method to fetch component list in a particular project */
 export async function fetchComponents(key) {
-  return await get(`/jira/fetchcomponents/${key}`);
+  return await get(`/jira/fetchcomponents/${key}`, null, {
+    mock: mocks.fetchComponents,
+  });
 }
 
 /* Method to fetch list of sprint available */
 export async function fetchSprint() {
-  return await get(`/jira/fetchsprint`);
+  return await get(`/jira/fetchsprint`, null, { mock: mocks.fetchSprint });
 }
 
 /* Method to fetch issue details of the given issue */
 export async function fetchIssueDetails(key) {
-  return await get(`/jira/fetchissuedetails/${key}/`);
+  return await get(`/jira/fetchissuedetails/${key}/`, null, {
+    mock: mocks.fetchIssueDetails,
+  });
 }
 
 /* Method to create issue & link it to given POA&M row */
@@ -68,7 +85,10 @@ export async function createIssue(data, row_index, poamID) {
   // Check if any asignee is selected then, add it id
   if (data.assignee) formData.append("assignee", data.assignee.id);
 
-  return await post(`/jira/newissue/${poamID}/`, formData, { notify: false });
+  return await post(`/jira/newissue/${poamID}/`, formData, {
+    notify: false,
+    mock: mocks.createIssue,
+  });
 }
 
 /* Method to update issue with given details */
@@ -93,5 +113,8 @@ export async function updateIssue(data) {
   }
 
   // make update request
-  return await patch("/jira/updateissue/", formData, { notify: false });
+  return await patch("/jira/updateissue/", formData, {
+    notify: false,
+    mock: mocks.updateIssue,
+  });
 }

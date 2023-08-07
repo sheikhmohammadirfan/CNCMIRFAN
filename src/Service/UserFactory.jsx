@@ -1,5 +1,6 @@
 import { notification } from "../Components/Utils/Utils";
 import { patch, post } from "./CrudFactory";
+import * as mocks from "../assets/mock";
 
 /************ TOKEN *************/
 // Get User from storage
@@ -57,7 +58,7 @@ function deleteIntegratedPlatform() {
 // Login user
 export async function login(details) {
   const { data, status } = await post("/user/login", details, {
-    isUserAPI: true,
+    mock: mocks.login,
   });
 
   // if success then set token
@@ -72,9 +73,7 @@ export async function login(details) {
 
 // Signup user
 export async function signup(details) {
-  const { status } = await post("/user", details, {
-    isUserAPI: true,
-  });
+  const { status } = await post("/user", details, { mock: mocks.SUCCESS });
   return status;
 }
 
@@ -111,7 +110,9 @@ export async function updateProfile(formData) {
 
   // Check if any data is change, then only send update request
   if (Object.keys(newData).length > 0)
-    return await patch(`/user/update/`, newData, { isUserAPI: true });
+    return await patch(`/user/update/`, newData, {
+      mock: mocks.updateProfile(newData),
+    });
 
   // Else return false value
   notification(
@@ -124,8 +125,7 @@ export async function updateProfile(formData) {
 
 export async function checkPasswordReset(data) {
   const { status } = await post("/user/reset-token-check/", data, {
-    notify: false,
-    isUserAPI: true,
+    mock: mocks.SUCCESS,
   });
   if (!status)
     notification(
@@ -138,14 +138,14 @@ export async function checkPasswordReset(data) {
 
 export async function requestPasswordReset(email) {
   const { status } = await post("/user/request-password-reset/", email, {
-    isUserAPI: true,
+    mock: mocks.SUCCESS,
   });
   return status;
 }
 
 export async function resetPassword(data) {
   const { status } = await patch("/user/password-reset/", data, {
-    isUserAPI: true,
+    mock: mocks.SUCCESS,
   });
   return status;
 }
