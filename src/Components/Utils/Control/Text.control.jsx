@@ -5,7 +5,7 @@ import { Field } from "./Form";
 import PropTypes from "prop-types";
 
 // Get New text field with some default values
-const TextControl = withStyles({
+const TextControl = withStyles((theme) => ({
   root: {
     // Capitalize label text
     "& label": { textTransform: "capitalize" },
@@ -20,8 +20,12 @@ const TextControl = withStyles({
       opacity: 0,
       transition: "all .1s linear",
     },
+    // Add border radius to the input field
+    "& .MuiInputBase-root": {
+      borderRadius: "50px", // Use the theme's border radius value
+    },
   },
-})((props) => (
+}))((props) => (
   <Field
     {...props}
     field={({
@@ -41,6 +45,11 @@ const TextControl = withStyles({
         helperText={getError(error, controls?.fieldState.error, gutter)}
         {...controls?.field}
         {...others}
+        InputProps={{
+          style: {
+            fontSize: 15,
+          },
+        }}
       />
     )}
   />

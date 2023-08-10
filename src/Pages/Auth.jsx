@@ -44,9 +44,10 @@ const useStyles = makeStyles((theme) => ({
   // Root container
   root: {
     width: "95%",
-    maxWidth: 350,
+    height: "auto",
+    maxWidth: 400,
     marginInline: `auto`,
-    borderRadius: theme.shape.borderRadius,
+    borderRadius: theme.shape.borderRadius * 2,
     border: `2px solid ${theme.palette.grey[300]}`,
     padding: `${theme.spacing(3)}px ${theme.spacing(2)}px`,
     display: "flex",
@@ -55,17 +56,23 @@ const useStyles = makeStyles((theme) => ({
     [theme.breakpoints.down("xs")]: { padding: theme.spacing(1) },
   },
 
-  title: {
-    margin: 0,
-    marginTop: theme.spacing(1),
-    marginBottom: theme.spacing(0.5),
-    color: theme.palette.grey[600],
-  },
+  // title: {
+  //   margin: 0,
+  //   marginTop: theme.spacing(1),
+  //   marginBottom: theme.spacing(0.5),
+  //   color: theme.palette.grey[600],
+  // },
 
-  subtitle: {
-    color: theme.palette.grey[500],
-    fontWeight: "bold",
-    fontStyle: "italic",
+  // subtitle: {
+  //   color: theme.palette.grey[500],
+  //   fontWeight: "bold",
+  //   fontStyle: "italic",
+  // },
+
+  //Sign in
+  login: {
+    margin: "25px auto",
+    color: theme.palette.primary.main,
   },
 
   // Form Container
@@ -122,6 +129,7 @@ const useStyles = makeStyles((theme) => ({
 
   // Form fields container
   formBody: {
+    marginTop: "7px",
     display: "flex",
     width: "200%",
     transform: "translateX(0%)",
@@ -144,10 +152,10 @@ export default function Auth({ title }) {
     history.location.pathname === "/signup"
       ? 0
       : history.location.pathname === "/login"
-      ? 1
-      : !history.location.pathname.match(/resetpassword.*/)
-      ? 2
-      : 3
+        ? 1
+        : !history.location.pathname.match(/resetpassword.*/)
+          ? 2
+          : 3
   );
 
   // Method to login user
@@ -168,11 +176,12 @@ export default function Auth({ title }) {
   return (
     <Box className={classes.page}>
       <Box className={classes.root}>
-        <img src={logo} alt="logo" width="100%" style={{ maxWidth: 225 }} />
+        {/* <img src={logo} alt="logo" width="100%" style={{ maxWidth: 225 }} />
         <h3 className={classes.title}>No Hassle Compliance Experience</h3>
-        <span className={classes.subtitle}>Repeatable - Agile - Automated</span>
+        <span className={classes.subtitle}>Repeatable - Agile - Automated</span> */}
+        {/* <h2 className={classes.login}>Login</h2> */}
         <main className={classes.formContainer}>
-          <Box paddingTop={2} paddingBottom={3}>
+          {/* <Box paddingTop={2} paddingBottom={3}>
             <Box className={classes.formHeading}>
               <Box
                 className={`${classes.tabBackgnd} ${loginIn ? "login" : ""}`}
@@ -194,7 +203,7 @@ export default function Auth({ title }) {
                 Login
               </Typography>
             </Box>
-          </Box>
+          </Box> */}
 
           <Box overflow="hidden">
             <Box

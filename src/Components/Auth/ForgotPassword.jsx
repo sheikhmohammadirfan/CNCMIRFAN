@@ -12,6 +12,9 @@ import { requestPasswordReset } from "../../Service/UserFactory";
 import { useHistory } from "react-router-dom";
 import { useState } from "react";
 import { EMAIL_REGEX } from "../../assets/data/Other";
+import { ArrowBack } from '@material-ui/icons';
+import { IconButton } from '@material-ui/core';
+
 
 // Generate CSS classes
 const useStyles = makeStyles((theme) => ({
@@ -23,7 +26,7 @@ const useStyles = makeStyles((theme) => ({
     top: 0,
     zIndex: 3,
     width: "100%",
-    height: "100%",
+    height: "100vh",
     display: "flex",
     flexDirection: "column",
     overflow: "hidden",
@@ -38,9 +41,11 @@ const useStyles = makeStyles((theme) => ({
   // Styles for title
   title: {
     fontWeight: "bold",
-    textTransform: "uppercase",
-    letterSpacing: 2,
-    paddingRight: theme.spacing(1),
+    textAlign: "center",
+    // paddingRight: theme.spacing(1),
+    fontSize: 20,
+    margin: "17px auto",
+    color: theme.palette.primary.main,
   },
 
   // Style for password submit btn
@@ -49,6 +54,25 @@ const useStyles = makeStyles((theme) => ({
     color: theme.textOnPrimary,
     fontWeight: "bold",
     letterSpacing: 2,
+    width: "100%",
+    borderRadius: "10px",
+  },
+  //paragraph
+  para: {
+    color: "grey",
+    textAlign: "center",
+  },
+  //back to login button
+  login: {
+    width: "70%",
+    margin: "auto 18%",
+    color: "grey",
+    fontWeight: "bold",
+  },
+  //login button
+  loginBtn: {
+    color: "grey",
+    fontWeight: "bold",
   },
 }));
 
@@ -77,15 +101,16 @@ export default function ForgotPassword({ show, login }) {
 
   return (
     <Box className={`${classes.root} ${show ? "active" : ""}`}>
-      <Box display="flex" alignItems="center" justifyContent="space-between">
-        <Typography className={classes.title}>Forgot Password</Typography>
-        <CloseButton
+      <Box textAlign="center">
+        <Typography className={classes.title}>FORGOT PASSWORD ?</Typography>
+        {/* <CloseButton
           click={() => {
             reset({ email: "" });
             login();
           }}
-        />
+        /> */}
       </Box>
+      <Typography variant="p" className={classes.para}>No worries, we will send you reset instructions</Typography>
 
       <Box height={1} display="flex" flexDirection="column">
         <Form
@@ -110,7 +135,7 @@ export default function ForgotPassword({ show, login }) {
               variant="standard"
             />
           </Box>
-          <Box padding={1} display="flex" justifyContent="flex-end">
+          <Box padding={1}>
             <Button
               variant="contained"
               className={classes.submitBtn}
@@ -121,6 +146,12 @@ export default function ForgotPassword({ show, login }) {
             >
               Submit
             </Button>
+          </Box>
+          <Box className={classes.login}>
+            <Button variant="text" onClick={() => { reset({ email: "" }); login() }} className={classes.loginBtn}>
+              <IconButton>
+                <ArrowBack/>
+              </IconButton>Back to login</Button>
           </Box>
         </Form>
       </Box>

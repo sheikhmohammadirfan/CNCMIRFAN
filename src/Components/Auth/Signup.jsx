@@ -4,6 +4,9 @@ import {
   CircularProgress,
   InputAdornment,
   makeStyles,
+  Typography,
+  FormControlLabel,
+  Checkbox,
 } from "@material-ui/core";
 import React, { useState } from "react";
 import {
@@ -12,24 +15,27 @@ import {
   Form,
   SelectControl,
 } from "../Utils/Control";
-import { signup } from "../../Service/UserFactory";
+import { signup, login } from "../../Service/UserFactory";
 import { Controller, useForm } from "react-hook-form";
 import DocumentTitle from "../DocumentTitle";
 import { isPasswordValid } from "../Utils/Control/Controls.utils.js";
+import { Link } from "react-router-dom";
 import { EMAIL_REGEX } from "../../assets/data/Other";
 import countryCodesList from "country-codes-list";
 
 const useStyles = makeStyles((theme) => ({
   // Style to apply on login btn
   submitBtn: {
-    borderRadius: theme.shape.borderRadius,
+    width: "100%",
+    borderRadius: "50px",
     paddingInline: theme.spacing(6),
-    fontSize: theme.spacing(1.5),
+    fontSize: theme.spacing(1.6),
     fontWeight: "bold",
     background: theme.palette.primary.main,
     color: theme.textOnPrimary,
     display: "block",
-    margin: "auto",
+    // margin: "auto",
+    marginTop: "15px",
     "&:hover": {
       background: theme.palette.primary.light,
     },
@@ -58,14 +64,42 @@ const useStyles = makeStyles((theme) => ({
       overflow: "hidden",
     },
     "&:focus-within .MuiInputAdornment-root, & .MuiInputAdornment-root.valued":
-      {
-        width: "unset",
-        overflow: "visible",
-      },
+    {
+      width: "unset",
+      overflow: "visible",
+    },
   },
+  //sign up title
+  title: {
+    // margin: "60px 0",
+    marginTop: theme.spacing(0.7),
+    marginBottom: theme.spacing(3),
+    color: theme.palette.primary.main,
+    fontSize: "30px"
+  },
+  //sign in
+  signIn: {
+    textDecoration: "none",
+    color: theme.palette.primary.main,
+  },
+  // TERMS and conditions
+  checkboxStyle: {
+    color: theme.palette.primary.main,
+    fontSize: "14px",
+    "& .MuiTypography-root":{
+      fontSize: "14px"
+    }
+  },
+  linkStyle: {
+    textDecoration: "none", 
+    color: theme.palette.primary.main,
+    lineHeight: 2,
+  },
+  
+
 }));
 
-// Custom test input for countact number with country code dropdown selector
+// Custom test input for contact number with country code dropdown selector
 const ContactNumControl = ({ name, label, control, rules }) => {
   // Generate styles
   const classes = useStyles();
@@ -126,8 +160,11 @@ const ContactNumControl = ({ name, label, control, rules }) => {
 };
 
 // Signup Component
-export default function Signup({ title, loginPage }) {
+export default function Signup({ title }) {
   DocumentTitle(title);
+
+  // State to toggle between Sign In and Sign Up
+  const [isSignIn, setIsSignIn] = useState(false);
 
   // Apply validation on field
   const validations = {
@@ -164,21 +201,39 @@ export default function Signup({ title, loginPage }) {
 
   // handle on Submit
   const submit = async (data) => {
-    // Check if all input valid and form is not loading
-    if (!isLoading) {
-      setLoading(true);
-      // Call signup Service
-      const status = await signup(data);
-      setLoading(false);
-      // If success
-      if (status) {
-        loginPage();
-        reset({
-          first_name: "",
-          last_name: "",
-          email: "",
-          password: "",
-        });
+    // If it's a Sign Up form, handle signup
+    if (!isSignIn) {
+      // Check if all input valid and form is not loading
+      if (!isLoading) {
+        setLoading(true);
+        // Call signup Service
+        const status = await signup(data);
+        setLoading(false);
+        // If success
+        if (status) {
+          reset({
+            first_name: "",
+            last_name: "",
+            email: "",
+            password: "",
+            contact_no: "+1-", // Set the default country code again
+          });
+        }
+      }
+    } else {
+      // If it's a Sign In form, handle signin
+      // Check if all input valid and form is not loading
+      if (!isLoading) {
+        setLoading(true);
+        // Call login Service
+        const status = await login(data);
+        setLoading(false);
+        // If success
+        if (status) {
+          // Redirect to the dashboard or home page
+          // Replace this with your logic for navigating to the dashboard/home
+          console.log("Logged in successfully!");
+        }
       }
     }
   };
@@ -189,65 +244,137 @@ export default function Signup({ title, loginPage }) {
   // Get style
   const classes = useStyles();
 
+  const [checked, setChecked] = React.useState(false);
+
   return (
     <Box display="flex" flexDirection="column" width={1}>
-      <Form
-        control={control}
-        rules={validations}
-        onSubmit={handleSubmit(submit)}
-        autoComplete="off"
-      >
-        <Box display="flex">
-          <TextControl
-            name="first_name"
-            size="small"
-            fullWidth
-            variant="outlined"
-            label=" "
-            placeholder="First Name"
-          />
-          <Box width={20} />
-          <TextControl
-            name="last_name"
-            size="small"
-            fullWidth
-            variant="outlined"
-            label=" "
-            placeholder="Last Name"
-          />
+      {isSignIn ? (
+        // Show Sign In Form
+        <Box>
+          <Typography className={classes.title}>
+            Sign In
+          </Typography>
+          <Form
+            control={control}
+            rules={validations}
+            onSubmit={handleSubmit(submit)}
+            autoComplete="off"
+          >
+            <TextControl
+              type="email"
+              name="email"
+              size="small"
+              fullWidth
+              variant="outlined"
+              label=" "
+              placeholder="Email"
+            />
+            <PasswordControl
+              name="password"
+              size="small"
+              fullWidth
+              variant="outlined"
+              label=" "
+              placeholder="Password"
+            />
+            <Button className={classes.submitBtn} type="submit">
+              {isLoading ? (
+                <CircularProgress color="inherit" size={35} />
+              ) : (
+                "Sign In"
+              )}
+            </Button>
+          </Form>
+          <Button onClick={() => setIsSignIn(false)}>
+            Switch to Sign Up
+          </Button>
         </Box>
-        <ContactNumControl
-          control={control}
-          rules={validations}
-          label="contact no"
-          name="contact_no"
-        />
-        <TextControl
-          type="email"
-          name="email"
-          size="small"
-          fullWidth
-          variant="outlined"
-          label=" "
-          placeholder="Email"
-        />
-        <PasswordControl
-          name="password"
-          size="small"
-          fullWidth
-          variant="outlined"
-          label=" "
-          placeholder="Password"
-        />
+      ) : (
+        // Show Sign Up Form
+        <Box>
+          <Typography variant="h3" className={classes.title}>
+            Sign Up
+          </Typography>
+          <Form
+            control={control}
+            rules={validations}
+            onSubmit={handleSubmit(submit)}
+            autoComplete="off"
+          >
+            <Box sx={{ display: "flex" }}>
+              <TextControl
+                name="first_name"
+                size="small"
+                fullWidth
+                variant="outlined"
+                label=" "
+                placeholder="First Name"
+              />
+              <Box width={20} />
+              <TextControl
+                name="last_name"
+                size="small"
+                fullWidth
+                variant="outlined"
+                label=" "
+                placeholder="Last Name"
+              />
+            </Box>
+            <ContactNumControl
+              control={control}
+              rules={validations}
+              label="contact no"
+              name="contact_no"
+            />
+            <TextControl
+              type="email"
+              name="email"
+              size="small"
+              fullWidth
+              variant="outlined"
+              label=" "
+              placeholder="Email"
+            />
+            <PasswordControl
+              name="password"
+              size="small"
+              fullWidth
+              variant="outlined"
+              label=" "
+              placeholder="Password"
+            />
+            <PasswordControl
+              name="confirm_password"
+              size="small"
+              fullWidth
+              variant="outlined"
+              label=" "
+              placeholder="Confirm password"
+            />
+            <Box display="flex" alignItems="center" flexDirection="column">
+              <FormControlLabel
+              className={classes.checkboxStyle}
+                control={<Checkbox />}
+                label="By signing up you accept the terms of services"
+              />
+            </Box>
 
-        <Button className={classes.submitBtn} type="submit">
-          {isLoading ? (
-            <CircularProgress color="inherit" size={35} />
-          ) : (
-            "Create"
-          )}
-        </Button>
-      </Form>
+            <Button className={classes.submitBtn} type="submit" marginTop={5}>
+              {isLoading ? (
+                <CircularProgress color="inherit" size={35} />
+              ) : (
+                "Create"
+              )}
+            </Button>
+          </Form>
+          <Box textAlign="center" marginTop={7} sx={{ color: "grey" }}>
+            <b>Already have an account?</b>
+            <Link to="/login" className={classes.signIn}>
+              <Typography variant="p"> <b>Sign in</b></Typography>
+            </Link>
+          </Box>
+        </Box>
+      )}
     </Box>
   );
 }
