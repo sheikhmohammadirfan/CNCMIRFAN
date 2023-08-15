@@ -1,17 +1,6 @@
-import {
-  Box,
-  Button,
-  CircularProgress,
-  makeStyles,
-  Typography,
-} from "@material-ui/core";
+import { Box, Button, CircularProgress, makeStyles, Typography, Checkbox, FormControlLabel } from "@material-ui/core";
 import { useState } from "react";
-import {
-  TextControl,
-  PasswordControl,
-  CheckboxControl,
-  Form,
-} from "../Utils/Control";
+import { TextControl, PasswordControl, Form } from "../Utils/Control";
 import { login } from "../../Service/UserFactory";
 import { Link } from "react-router-dom";
 import DocumentTitle from "../DocumentTitle";
@@ -23,26 +12,61 @@ import PropTypes from "prop-types";
 const useStyles = makeStyles((theme) => ({
   // Forgot password styles
   forgotPassword: {
+    textDecoration: "none",
     "& .MuiTypography-root": {
       color: theme.palette.primary.main,
-      letterSpacing: 0.9,
-      fontWeight: "bold",
+      fontSize: "16px",
+      letterSpacing: 0,
+      // fontWeight: "bold",
+    },
+    "&:hover": {
+      color: theme.palette.secondary.dark,
     },
   },
-
+  //Remember me and forgot pass 
+  alignment: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: "20px",
+  },
+  //Remember me checkbox
+  Checkbox: {
+    color: theme.palette.secondary.light,
+    display: "flex",
+    justifyContent: "center",
+    color: theme.palette.primary.main,
+  },
   // Style to apply on login btn
   submitBtn: {
+    width: "100%",
     display: "block",
-    margin: "auto",
-    borderRadius: theme.shape.borderRadius,
+    marginTop: "30px",
+    marginBottom: "190px",
+    borderRadius: "70px",
+    // borderRadius: theme.shape.borderRadius,
     paddingInline: theme.spacing(8),
-    fontSize: theme.spacing(1.5),
+    fontSize: theme.spacing(1.6),
     fontWeight: "bold",
     background: theme.palette.primary.main,
     color: theme.textOnPrimary,
     "&:hover": {
       background: theme.palette.primary.light,
     },
+  },
+  //Create new account
+  newSign: {
+    textDecoration: "none",
+    color: theme.palette.primary.main,
+    marginBottom: 0,
+  },
+  //sign in title
+  title: {
+    marginTop: theme.spacing(1),
+    marginBottom: theme.spacing(3),
+    color: theme.palette.primary.main,
+    // fontWeight: "bold",
+    fontSize: "30px",
   },
 }));
 
@@ -91,6 +115,11 @@ function Login({ title, homePage }) {
       width={1}
       data-test="login-container"
     >
+      
+      <Typography className={classes.title}>
+        Sign In
+      </Typography>
+
       <Form
         control={control}
         rules={validation}
@@ -106,6 +135,7 @@ function Login({ title, homePage }) {
           placeholder="Email"
           fullWidth
           data-test="login-email-field"
+          sx={{ borderRadius: "20px" }}
         />
         <PasswordControl
           name="password"
@@ -116,7 +146,19 @@ function Login({ title, homePage }) {
           fullWidth
           data-test="login-password-field"
         />
-
+        <Box className={classes.alignment}>
+          <FormControlLabel
+            className={classes.Checkbox}
+            control={<Checkbox />}
+            label="Remember Me"
+            sx={{fontSize: "14px"}}
+          />
+          <Box>
+            <Link to="/forgotpassword" className={classes.forgotPassword}>
+              <Typography variant="body2">Forgot password?</Typography>
+            </Link>
+          </Box>
+        </Box>
         <Button
           className={classes.submitBtn}
           type="submit"
@@ -124,16 +166,17 @@ function Login({ title, homePage }) {
         >
           {isLoading ? <CircularProgress color="inherit" size={35} /> : "Go"}
         </Button>
-
-        <Box textAlign="center" marginTop={2}>
-          <Link to="/forgotpassword" className={classes.forgotPassword}>
-            <Typography variant="body2">Forgotten your password?</Typography>
-          </Link>
-        </Box>
       </Form>
+      <Box textAlign="center" sx={{ color: "grey"}}>
+        <b>Don't have an account?</b>
+        <Link to="/signup" className={classes.newSign}>
+          <Typography variant="p"> <b>Create new account</b></Typography>
+        </Link>
+      </Box>
     </Box>
   );
 }
+
 Login.propTypes = {
   title: PropTypes.string.isRequired,
   homePage: PropTypes.func.isRequired,
