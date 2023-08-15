@@ -13,6 +13,8 @@ import {
   DialogTitle,
   Slide,
   CircularProgress,
+  InputAdornment,
+  IconButton,
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/styles";
 import { toast } from "react-toastify";
@@ -20,38 +22,93 @@ import sendMail from "../Service/email.service";
 import DocumentTitle from "../Components/DocumentTitle";
 import { useLocation } from "react-router-dom";
 import { useEffect } from "react";
-import CloseButton from "../Components/Utils/CloseButton";
+import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import { EMAIL_REGEX } from "../assets/data/Other";
+import AttachFileIcon from '@mui/icons-material/AttachFile';
 
 const Transition = forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
 const useStyles = makeStyles((theme) => ({
+
+
   form: {
     "& > *": {
       margin: "0.4rem 0",
-      backgroundColor: "rgba(218,250,211, 0.4)",
+      padding:"0.2rem 0 0",
     },
   },
 
+  boxStyling:{
+    color:"white",
+backgroundColor: "#008375",
+fontSize:"1rem",
+fontWeight:"500",
+margin:"-0.5rem 0",
+width: "100%",
+  },
+
+  dialogTitleStyle:{
+  backgroundColor: "#008375",
+},
+
+closeIcon:{
+  padding:"0.1rem",
+  borderRadius:"50%",
+  border:"1px solid transparent",
+  "&:hover":{
+    
+    backgroundColor:"#00a997",
+    transition:"0.2s ease-in",
+    
+  }
+},
+
+carbonCopyStyles:{
+  fontSize:"small",
+  display:"flex",
+  alignItems:"center",
+  justifyContent:"space-between",
+  "& div":{
+    color:"black",
+    display:"flex",
+    gap:"0.3rem",
+    cursor: "pointer"
+  },
+},
+cc_bcc_Items:{
+  "&:hover":{
+   color:"#00a997"
+  }
+},
+
+
+inputStyles:{
+  // Adjust the maximum height as needed
+  maxHeight: "500px", 
+    transition: "max-height 0.3s ease",
+},
+
   heading: {
-    margin: "1rem 0 !important",
-    borderBottom: "1px solid #ccc",
-    boxShadow: "0 8px 6px -6px rgba(0,0,0,0.3)",
-    padding: "0 1rem 1rem 1rem",
+    margin: "0 0 !important",
+    padding: "0",
   },
 
   headingText: {
+   
     fontFamily: "inherit",
     fontWeight: "550",
     marginBottom: "4px",
   },
 
-  labelColor: {
-    color: theme.palette.primary.main,
-    fontWeight: "550",
-  },
+  // labelColor: {
+
+  //   color: "theme.palette.primary.main",
+  //   fontWeight: "550",
+  // },
+
+ 
 
   messageText: {
     minHeight: "4rem",
@@ -87,17 +144,13 @@ const useStyles = makeStyles((theme) => ({
     fontWeight: 600,
   },
 
+
   tagsInput: {
     display: "flex",
     alignItems: "flex-start",
     flexWrap: "wrap",
     width: "480px",
-    padding: "8px",
-    border: "1px solid rgb(214, 216, 218)",
-    borderRadius: "6px",
-    "&:focus-within": {
-      border: `2px solid ${theme.palette.primary.main}`,
-    },
+    borderBottom:"0.2px solid #989898",
     "& input": {
       flex: "1",
       marginBottom: "4px",
@@ -106,14 +159,14 @@ const useStyles = makeStyles((theme) => ({
       padding: "4px",
       background: "none",
       borderRadius: "6px",
-      backgroundColor: "rgba(218,250,211, 0.2)",
+      backgroundColor: "transparent",
       minWidth: "60%",
       width: "100%",
       fontSize: "14px",
-      // padding: '4px 0 0 0',
+      padding: '4px 0 0 0',
       "&:focus": {
         outline: "transparent",
-        backgroundColor: "rgba(218,250,211, 0.6)",
+        backgroundColor: "transparent",
       },
     },
     [theme.breakpoints.down("sm")]: {
@@ -150,6 +203,7 @@ const useStyles = makeStyles((theme) => ({
     overflowX: "scroll",
     overflowY: "hidden",
     overflow: "-moz-scrollbars-none",
+    
 
     "&::-webkit-scrollbar": {
       display: "none",
@@ -165,49 +219,64 @@ const useStyles = makeStyles((theme) => ({
     display: "inline-flex",
   },
 
-  gradientBtn: {
-    background: "linear-gradient(45deg, #44ea76 30%, #39fad7 90%)",
-    border: 0,
-    borderRadius: 3,
-    boxShadow: "0 3px 5px 2px rgba(100, 205, 100, .3)",
-    color: "white",
-    "&:hover": {
-      boxShadow: "0 3px 5px 2px rgba(100, 205, 100, .3)",
-    },
-    // outline: "none",
-    // border: "none",
-    // borderRadius: "6px",
-    // color: "#fff",
-    // textTransform: "uppercase",
-    // fontSize: "1rem",
-    // width: "100%",
-    // display: "flex",
-    // justifyContent: "center",
-    // alignItems: "center",
-    // background:
-    //   "linear-gradient(to right, #44ea76 0%, #39fad7 80%, #39fad7 100%)",
-    // boxShadow: "0 5px 10px #44ea76",
+
+  sendContainer:{
+   
+    borderTop: '1px solid #989898',
+    paddingTop:"0.2rem",
+    marginBottom:"0.2rem",
+    display:"flex",
+    gap:"0.5rem",
   },
+
+  sendButton:{
+    color:"white",
+    borderRadius:"50px",
+    backgroundColor:"#008375",
+    height:"2.2rem",
+    width:"5rem",
+    padding:"1rem",
+    "&:hover":{
+      backgroundColor:"#00a997"
+    }
+  }
+,
+
+attachIcon:{
+  height:"2.2rem",
+  width:"2.2rem",
+  padding:"0.8rem",
+  color:"#008375"
+},
+
+
+inputTextArea1:{
+// Adjust the height as needed
+height: "11rem", 
+overflow: "auto"
+},
+
+inputTextArea2:{
+ // Adjust the height as needed
+  height: "17rem", 
+  overflow: "auto"
+  },
+
+
 }));
 
-const textfields = [
-  {
-    name: "to",
-    type: "email",
-  },
-  {
-    name: "cc",
-    type: "email",
-  },
-  {
-    name: "bcc",
-    type: "email",
-  },
-];
+
+
+
+
 
 function Email({ title, close }) {
   DocumentTitle(title);
   const classes = useStyles();
+  const [showcc, setShowcc]= useState(false);
+  const [showbcc, setShowbcc]= useState(false);
+  
+
 
   const [mailAcknowledgement, setMailAcknowledgement] = useState(false);
   useEffect(() => {
@@ -220,7 +289,46 @@ function Email({ title, close }) {
   const [message, setMessage] = useState("");
   const [files, setFiles] = useState([]);
   const [tags, setTags] = useState({ to: [], cc: [], bcc: [] });
+ 
+  //adjusting the height of textField based on whether cc and bcc field are opened
+  const inputClassName = `${showcc && showbcc ? classes.inputTextArea1 : classes.inputTextArea2}`;
+  
 
+//showing cc and bcc fields on click with help of states
+  const handleClickCc=()=>{
+    console.log("Bhai tumhara function chal raha hai")
+    setShowcc((prevShowCc) => !prevShowCc);
+  }
+  const handleClickBcc=()=>{
+    console.log("Bhai tumhara function chal raha hai")
+    setShowbcc((prevShowBcc) => !prevShowBcc);
+  }
+
+
+
+
+  const textfields = [
+    {
+      name: "to",
+      type: "email",
+      visible: true,
+      
+    },
+    {
+      name: "cc",
+      type: "email",
+      visible: showcc,
+    },
+    {
+      name: "bcc",
+      type: "email",
+      visible: showbcc,
+    },
+  ];
+
+
+
+  
   const addTags = (event) => {
     const value = event.target.value.trim();
     if (value !== "" && emailValidation(value)) {
@@ -323,6 +431,7 @@ function Email({ title, close }) {
             flexDirection: "column",
             justifyContent: "center",
             alignItems: "center",
+          
           }}
         >
           <Icon style={{ fontSize: "60px" }} color="primary">
@@ -331,26 +440,33 @@ function Email({ title, close }) {
         </DialogContent>
       </Dialog>
 
-      <Dialog open={true} maxWidth="sm" fullWidth>
-        <DialogTitle>
+      <Dialog open={true} maxWidth="md" fullWidth>
+        <DialogTitle className={classes.dialogTitleStyle}>
           <Box
             display="flex"
             justifyContent="space-between"
             alignItems="center"
+            className={classes.boxStyling}
           >
             <span>Email</span>
-            <CloseButton click={handleClose} />
+            <CloseRoundedIcon click={handleClose} className={classes.closeIcon} />
           </Box>
         </DialogTitle>
         <DialogContent>
-          <DialogContentText>Write Mails Effectively.</DialogContentText>
-          <Box className={classes.form}>
+          <DialogContentText >
+            <Box className={classes.carbonCopyStyles}>
+            Write Mails Effectively.
+            <div >
+              <a onClick={handleClickCc} className={classes.cc_bcc_Items}>Cc</a>
+              <a onClick={handleClickBcc} className={classes.cc_bcc_Items}>Bcc</a>
+            </div>
+            </Box>
+           
+            </DialogContentText>
+          <Box className={`${classes.form} ${showcc? classes.inputStyles:""}`}>
             {textfields.map((item, index) => (
-              <div
-                key={index}
-                className={classes.tagsInput}
-                style={{ width: "100%" }}
-              >
+              item.visible ? ( // Use the ternary operator to conditionally render the input
+              <div key={index} className={classes.tagsInput} style={{ width: "100%" }}>
                 <span className={classes.fieldLabel}>
                   {item.name}
                   {index === 0 ? "*" : ""}
@@ -389,41 +505,54 @@ function Email({ title, close }) {
                       }
                       style={{ padding: 8, height: "2rem", margin: 0 }}
                       onBlur={addTags}
-                      placeholder="example@example.com"
+                      placeholder=""
+                     
+
                     />
+                 
                   </div>
                 </div>
               </div>
+              ):null
+
             ))}
+
+
+
 
             <Box className={classes.heading}>
               <TextField
-                autoFocus
-                style={{ fontWeight: "bold" }}
+
                 fullWidth
                 name="subject"
                 value={subject}
                 onChange={(e) => setSubject(e.target.value)}
-                label="Subject"
+                placeholder="Subject"
                 variant="standard"
                 InputProps={{
                   className: classes.headingText,
+                  disableUnderline: true,
                 }}
+               
               />
             </Box>
-
+                
             <TextField
-              style={{ position: "relative", background: "transparent" }}
-              variant="outlined"
+          // className={classes.inputTextArea}
+              style={{ position: "relative", background: "transparent", }}
+              variant="standard"
               fullWidth
               name="message"
               value={message}
               onChange={(e) => setMessage(e.target.value)}
-              placeholder="Enter the message here*"
+              // placeholder="Enter the message here*"
               InputProps={{
-                classes: { input: classes.messageText },
+                classes: { input: inputClassName },
+                disableUnderline: true,
+              
               }}
               multiline
+              rows={4}
             />
 
             {files.map((file, i) => (
@@ -438,50 +567,36 @@ function Email({ title, close }) {
                 onDelete={() => removeFile(i)}
               />
             ))}
-            <ButtonGroup
-              fullWidth
-              color="primary"
-              variant="outlined"
-              aria-label="outlined primary button group"
-            >
-              <Button
-                type="file"
-                component="label"
-                style={{
-                  background: "#fff",
-                  border: "1px solid #aaa",
-                }}
-              >
-                Choose file
-                <Icon
-                  style={{
-                    marginLeft: "4px",
-                    fontSize: "18px",
-                  }}
-                >
-                  attachment
-                </Icon>
-                <input multiple type="file" onChange={uploadFiles} hidden />
-              </Button>
-              <Button
-                type="submit"
-                variant="contained"
-                className={classes.gradientBtn}
-                onClick={handleSubmit}
-              >
-                Send
-                {loader ? (
+
+
+              <Box className={classes.sendContainer} >
+                
+                  <Button 
+                  type="submit"
+                  onClick={handleSubmit}
+                  className={classes.sendButton}>
+                    Send
+                    {loader ? (
                   <CircularProgress
                     size={20}
                     style={{ color: "#fff", marginLeft: "6px" }}
                   />
-                ) : (
-                  <Icon style={{ marginLeft: "4px", fontSize: "18px" }}>
-                    send
-                  </Icon>
-                )}
-              </Button>
-            </ButtonGroup>
+                ) : null
+                // (
+                //   <Icon style={{ marginLeft: "4px", fontSize: "18px" }}>
+                //     send
+                //   </Icon>
+                // )
+              }
+                    </Button>
+                  <IconButton className={classes.attachIcon}
+                  type="file"
+                  component="label"
+                  ><AttachFileIcon></AttachFileIcon>
+                  <input multiple type="file" onChange={uploadFiles} hidden /></IconButton>
+                
+              </Box>
+
           </Box>
         </DialogContent>
       </Dialog>
