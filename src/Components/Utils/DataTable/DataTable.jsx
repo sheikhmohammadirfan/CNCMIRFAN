@@ -19,12 +19,16 @@ import useHeightResize from "./useHeightResize";
 const useStyles = makeStyles((theme) => ({
   // Root table style
   root: {
-    border: `2px solid ${theme.palette.grey[400]}`,
+    border: `1px solid #d9d9d9`,
+    borderTop: 0,
     borderRadius: theme.shape.borderRadius,
     maxHeight: "100%",
     overflow: "auto",
     "& > table": { borderCollapse: "separate" },
-    "&, & td, & th": { borderColor: theme.palette.grey[400] },
+    // "&, & td, & th": { borderColor: theme.palette.grey[400] },
+    "& tr:last-child td": {
+      borderBottom: 'none'
+    }
   },
 
   // Table style
@@ -67,7 +71,7 @@ const useStyles = makeStyles((theme) => ({
 
   // Highlight headr backgroud
   headerStyle: {
-    "& th": { background: theme.palette.grey[200] },
+    "& th": { background: '#e6f6f4', borderColor: '#d9d9d9', borderBottom: 0 },
     "&.sticky th": {
       position: "sticky",
       top: 0,
@@ -84,7 +88,7 @@ const useStyles = makeStyles((theme) => ({
   // Vertical border for table
   border: {
     "& tr > td:not(:last-child), & tr > th:not(:last-child)": {
-      borderRight: `${theme.spacing(1 / 8)}px solid ${theme.palette.grey[400]}`,
+      borderRight: `${theme.spacing(1 / 8)}px solid ${theme.palette.grey[200]}`,
     },
   },
 }));
@@ -155,8 +159,8 @@ function DataTable({
               e.stopPropagation();
             }}
             data-test="datatable-header-checkbox"
-            // disableRipple
-            // style={{ padding: 0, margin: "0 9px" }}
+          // disableRipple
+          // style={{ padding: 0, margin: "0 9px" }}
           />
         ),
         params: { checkbox: "", header: "" },
@@ -183,8 +187,8 @@ function DataTable({
             onChange={(e) => toggleRow(startIndex + index, e.target.checked)}
             onClick={(e) => e.stopPropagation()}
             data-test="datatable-row-checkbox"
-            // disableRipple
-            // style={{ padding: 0, margin: "0 9px" }}
+          // disableRipple
+          // style={{ padding: 0, margin: "0 9px" }}
           />
         ),
         params: { checkbox: "", row: "" },
@@ -230,9 +234,7 @@ function DataTable({
 
   return (
     <TableContainer
-      className={`${classes.root} ${
-        verticalBorder && classes.border
-      } ${className}`}
+      className={`${classes.root} ${verticalBorder && classes.border} ${className}`}
       {...rest}
     >
       <Table
@@ -240,11 +242,11 @@ function DataTable({
         style={
           resizeTable
             ? {
-                gridTemplateColumns: generateColumns(),
-                gridTemplateRows: Array(rowData.length + 1)
-                  .fill("50px")
-                  .join(" "),
-              }
+              gridTemplateColumns: generateColumns(),
+              gridTemplateRows: Array(rowData.length + 1)
+                .fill("50px")
+                .join(" "),
+            }
             : {}
         }
         ref={tableRef}
@@ -297,7 +299,7 @@ function DataTable({
                       data-test="datatable-row-cell"
                     >
                       {rowWrapper(text)}
-                      {resizeTable && colIndex == 0 && (
+                      {resizeTable && colIndex === 0 && (
                         <HeightResizer index={rowIndex + 1} />
                       )}
                     </TableCell>

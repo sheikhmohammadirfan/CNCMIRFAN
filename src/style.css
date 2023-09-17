@@ -1,20 +1,22 @@
 /* CUSTOM SCROLLBAR */
 ::-webkit-scrollbar {
   width: 10px;
+  height: 13px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #d6d5cf;
+  background: #ededed;
+  border: 1px solid #e6e6e6;
+  border-radius: 0 0 5px 5px;
 }
 
 ::-webkit-scrollbar-thumb {
-  border: 2px solid #fff8e5;
-  background: #00a19d;
+  background: #cbcbcb;
   border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #00a19d;
+  background: #c5c5c5;
 }
 
 .close-sidebar::-webkit-scrollbar {

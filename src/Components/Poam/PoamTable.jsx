@@ -1,4 +1,4 @@
-import { Box, Grid, makeStyles, Typography } from "@material-ui/core";
+import { Box, Button, Grid, Icon, makeStyles, Typography } from "@material-ui/core";
 import React, { useEffect, useState } from "react";
 import { FullScreen, useFullScreenHandle } from "react-full-screen";
 import {
@@ -40,6 +40,8 @@ import {
   getPoamID_data,
   getSortingMap,
 } from "./PoamUtils";
+import jira from "../../assets/img/jira-brands.svg";
+
 
 /* POA&M TABLE COMPONENT */
 export default function PoamTable({ fileID }) {
@@ -333,9 +335,7 @@ export default function PoamTable({ fileID }) {
           >
             <Grid item xs={secondaryOpen !== -1 ? 9 : 12}>
               <DataTable
-                className={`poam-table ${classes.tableStyle} ${
-                  isOpenPoam ? "o" : ""
-                }`}
+                className={`poam-table ${classes.tableStyle} ${isOpenPoam ? "o" : ""}`}
                 verticalBorder={true}
                 header={mapTableHeader()}
                 rowList={mapTableBody()}
@@ -346,7 +346,7 @@ export default function PoamTable({ fileID }) {
                 setSelectedRows={setSelectedRow}
                 headerWrapper={(text) => <HeaderCell text={text} />}
                 rowWrapper={(text) => <RowCell text={text} />}
-                style={{ borderRadius: 0 }}
+                style={{ borderRadius: 5, borderTopLeftRadius: 0, borderTopRightRadius: 0 }}
                 minCellWidth={visibleColumns.map(
                   (name) => columns_width[allColumns.indexOf(name)]
                 )}
@@ -379,6 +379,8 @@ export default function PoamTable({ fileID }) {
         onClose={closeJustify}
         onSubmit={moveRowData}
       />
+
+      {/* <Box sx={{ height: '1000px' }}></Box> */}
     </FullScreen>
   );
 }
