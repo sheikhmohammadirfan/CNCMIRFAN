@@ -24,6 +24,8 @@ import { EMAIL_REGEX } from "../../assets/data/Other";
 import countryCodesList from "country-codes-list";
 
 const useStyles = makeStyles((theme) => ({
+
+
   // Style to apply on login btn
   submitBtn: {
     width: "100%",
@@ -34,8 +36,7 @@ const useStyles = makeStyles((theme) => ({
     background: theme.palette.primary.main,
     color: theme.textOnPrimary,
     display: "block",
-    // margin: "auto",
-    marginTop: "15px",
+    marginTop: "20px",
     "&:hover": {
       background: theme.palette.primary.light,
     },
@@ -71,32 +72,23 @@ const useStyles = makeStyles((theme) => ({
   },
   //sign up title
   title: {
-    // margin: "60px 0",
-    marginTop: theme.spacing(0.7),
-    marginBottom: theme.spacing(3),
+    marginTop: theme.spacing(0.4),
+    marginBottom: theme.spacing(2),
     color: theme.palette.primary.main,
     fontSize: "30px"
   },
-  //sign in
-  signIn: {
+  //Back to sign in page link
+  signInLinkStyle: {
     textDecoration: "none",
     color: theme.palette.primary.main,
   },
-  // TERMS and conditions
-  checkboxStyle: {
+  // Terms and conditions checkbox text
+  termsAndConditions: {
     color: theme.palette.primary.main,
-    fontSize: "14px",
     "& .MuiTypography-root":{
       fontSize: "14px"
     }
   },
-  linkStyle: {
-    textDecoration: "none", 
-    color: theme.palette.primary.main,
-    lineHeight: 2,
-  },
-  
-
 }));
 
 // Custom test input for contact number with country code dropdown selector
@@ -244,10 +236,8 @@ export default function Signup({ title }) {
   // Get style
   const classes = useStyles();
 
-  const [checked, setChecked] = React.useState(false);
-
   return (
-    <Box display="flex" flexDirection="column" width={1}>
+    <Box display="flex" flexDirection="column" width={1} className={classes.root}>
       {isSignIn ? (
         // Show Sign In Form
         <Box>
@@ -292,7 +282,7 @@ export default function Signup({ title }) {
       ) : (
         // Show Sign Up Form
         <Box>
-          <Typography variant="h3" className={classes.title}>
+          <Typography variant="h5" className={classes.title}>
             Sign Up
           </Typography>
           <Form
@@ -343,23 +333,16 @@ export default function Signup({ title }) {
               label=" "
               placeholder="Password"
             />
-            <PasswordControl
-              name="confirm_password"
-              size="small"
-              fullWidth
-              variant="outlined"
-              label=" "
-              placeholder="Confirm password"
-            />
-            <Box display="flex" alignItems="center" flexDirection="column">
+            <Box>
               <FormControlLabel
-              className={classes.checkboxStyle}
+              className={classes.termsAndConditions}
                 control={<Checkbox />}
                 label="By signing up you accept the terms of services"
+                size="small"
               />
             </Box>
 
-            <Button className={classes.submitBtn} type="submit" marginTop={5}>
+            <Button className={classes.submitBtn} type="submit">
               {isLoading ? (
                 <CircularProgress color="inherit" size={35} />
               ) : (
@@ -367,9 +350,9 @@ export default function Signup({ title }) {
               )}
             </Button>
           </Form>
-          <Box textAlign="center" marginTop={7} sx={{ color: "grey" }}>
+          <Box textAlign="center" marginTop={5} sx={{ color: "grey" }}>
             <b>Already have an account?</b>
-            <Link to="/login" className={classes.signIn}>
+            <Link to="/login" className={classes.signInLinkStyle}>
               <Typography variant="p"> <b>Sign in</b></Typography>
             </Link>
           </Box>

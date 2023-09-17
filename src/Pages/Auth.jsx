@@ -5,33 +5,12 @@ import Login from "../Components/Auth/Login";
 import Signup from "../Components/Auth/Signup";
 import ForgotPassword from "../Components/Auth/ForgotPassword";
 import DocumentTitle from "../Components/DocumentTitle";
-import logo from "../assets/img/company_logo.png";
-import ParamsRoutes from "../Components/Utils/Routers/ParamsRoutes";
+// import logo from "../assets/img/company_logo.png";
+// import ParamsRoutes from "../Components/Utils/Routers/ParamsRoutes";
 import ResetPassword from "../Components/Auth/ResetPassword";
 
 // CSS class generator
 const useStyles = makeStyles((theme) => ({
-  // // Style for backgroud page
-  // page: {
-  //   height: "100vh",
-  //   display: "flex",
-  //   justifyContent: "center",
-  //   alignItems: "center",
-  //   background: "rgb(200, 200, 255, 0.4)",
-  // },
-
-  // // Root grid container of page
-  // root: {
-  //   borderTop: "1px solid rgb(64, 86, 181, 0.2)",
-  //   borderBottom: "1px solid rgb(64, 86, 181, 0.2)",
-  //   width: "100vw",
-  //   padding: `0 ${theme.spacing(20)}px`,
-  //   background: "#fafaff",
-  //   justifyContent: "center",
-  //   alignItems: "center",
-  //   [theme.breakpoints.down("sm")]: { padding: `0 ${theme.spacing(10)}px` },
-  //   [theme.breakpoints.down("xs")]: { padding: "0" },
-  // },
 
   // Page
   page: {
@@ -44,7 +23,7 @@ const useStyles = makeStyles((theme) => ({
   // Root container
   root: {
     width: "95%",
-    height: "auto",
+    height: "90%",
     maxWidth: 400,
     marginInline: `auto`,
     borderRadius: theme.shape.borderRadius * 2,
@@ -54,21 +33,8 @@ const useStyles = makeStyles((theme) => ({
     flexDirection: "column",
     alignItems: "center",
     [theme.breakpoints.down("xs")]: { padding: theme.spacing(1) },
+    marginTop: "27px"
   },
-
-  // title: {
-  //   margin: 0,
-  //   marginTop: theme.spacing(1),
-  //   marginBottom: theme.spacing(0.5),
-  //   color: theme.palette.grey[600],
-  // },
-
-  // subtitle: {
-  //   color: theme.palette.grey[500],
-  //   fontWeight: "bold",
-  //   fontStyle: "italic",
-  // },
-
   //Sign in
   login: {
     margin: "25px auto",
@@ -176,34 +142,7 @@ export default function Auth({ title }) {
   return (
     <Box className={classes.page}>
       <Box className={classes.root}>
-        {/* <img src={logo} alt="logo" width="100%" style={{ maxWidth: 225 }} />
-        <h3 className={classes.title}>No Hassle Compliance Experience</h3>
-        <span className={classes.subtitle}>Repeatable - Agile - Automated</span> */}
-        {/* <h2 className={classes.login}>Login</h2> */}
         <main className={classes.formContainer}>
-          {/* <Box paddingTop={2} paddingBottom={3}>
-            <Box className={classes.formHeading}>
-              <Box
-                className={`${classes.tabBackgnd} ${loginIn ? "login" : ""}`}
-              ></Box>
-              <Typography
-                variant="subtitle2"
-                className={`${classes.headings} ${!loginIn ? "active" : ""}`}
-                onClick={signupUser}
-                data-test="signup-btn"
-              >
-                Sign Up
-              </Typography>
-              <Typography
-                variant="subtitle2"
-                className={`${classes.headings} ${loginIn ? "active" : ""}`}
-                onClick={loginUser}
-                data-test="login-btn"
-              >
-                Login
-              </Typography>
-            </Box>
-          </Box> */}
 
           <Box overflow="hidden">
             <Box
@@ -222,7 +161,6 @@ export default function Auth({ title }) {
           />
         </main>
       </Box>
-
       {history.location.pathname.match(/resetpassword.*/) && (
         <ResetPassword
           path={history.location.pathname}

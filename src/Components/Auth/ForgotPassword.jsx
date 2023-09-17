@@ -6,18 +6,16 @@ import {
   Typography,
 } from "@material-ui/core";
 import { Form, TextControl } from "../Utils/Control";
-import CloseButton from "../Utils/CloseButton";
+import { Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { requestPasswordReset } from "../../Service/UserFactory";
 import { useHistory } from "react-router-dom";
 import { useState } from "react";
 import { EMAIL_REGEX } from "../../assets/data/Other";
-import { ArrowBack } from '@material-ui/icons';
-import { IconButton } from '@material-ui/core';
-
 
 // Generate CSS classes
 const useStyles = makeStyles((theme) => ({
+
   // Root container responsble to show/hide section
   root: {
     background: theme.palette.background.paper,
@@ -41,10 +39,9 @@ const useStyles = makeStyles((theme) => ({
   // Styles for title
   title: {
     fontWeight: "bold",
-    textAlign: "center",
-    // paddingRight: theme.spacing(1),
-    fontSize: 20,
-    margin: "17px auto",
+    fontSize: 22,
+    marginTop: "25px",
+    marginBottom: "17px",
     color: theme.palette.primary.main,
   },
 
@@ -52,28 +49,41 @@ const useStyles = makeStyles((theme) => ({
   submitBtn: {
     background: theme.palette.primary.main,
     color: theme.textOnPrimary,
-    fontWeight: "bold",
-    letterSpacing: 2,
-    width: "100%",
     borderRadius: "10px",
+    marginLeft: 8,
+    width: 70,
+    padding: "5px 40px",
+    textTransform: "lowercase",
+    "&:hover": {
+      background: theme.palette.primary.light,
+    },
   },
-  //paragraph
-  para: {
+
+  //description
+  subText: {
     color: "grey",
-    textAlign: "center",
+    fontSize: 15.4,
+    marginBottom: 30,
   },
-  //back to login button
-  login: {
+
+  //Return back to login
+  backToLogin: {
     width: "70%",
-    margin: "auto 18%",
+    margin: "20px auto",
     color: "grey",
-    fontWeight: "bold",
+    fontSize: 16,
   },
-  //login button
-  loginBtn: {
-    color: "grey",
-    fontWeight: "bold",
+  //Textfield and button alignment
+  fieldAndButton: {
+    display: "flex",
+    marginTop: 14,
   },
+  //Back to sign in page link
+  signInLinkStyle: {
+    textDecoration: "none",
+    color: theme.palette.primary.main,
+  },
+
 }));
 
 /** FORGOT PASSWORD COMPONENT */
@@ -101,16 +111,10 @@ export default function ForgotPassword({ show, login }) {
 
   return (
     <Box className={`${classes.root} ${show ? "active" : ""}`}>
-      <Box textAlign="center">
-        <Typography className={classes.title}>FORGOT PASSWORD ?</Typography>
-        {/* <CloseButton
-          click={() => {
-            reset({ email: "" });
-            login();
-          }}
-        /> */}
+      <Box>
+        <Typography className={classes.title}>FORGOT PASSWORD</Typography>
       </Box>
-      <Typography variant="p" className={classes.para}>No worries, we will send you reset instructions</Typography>
+      <Typography variant="p" className={classes.subText}>Enter the email address associated with your account and we will send you an email to reset your password</Typography>
 
       <Box height={1} display="flex" flexDirection="column">
         <Form
@@ -127,31 +131,35 @@ export default function ForgotPassword({ show, login }) {
           }}
           onSubmit={handleSubmit(onSubmit)}
         >
-          <Box padding={1} flexGrow={1}>
+          <Box className={classes.fieldAndButton}>
             <TextControl
-              fullWidth
-              label="Email id"
+              type="email"
               name="email"
-              variant="standard"
+              size="small"
+              variant="outlined"
+              label="Email Id"
+              data-test="login-email-field"
+              fullWidth id="fullWidth"
+              sx={{ borderRadius: "20px" }}
             />
+            <Box>
+              <Button
+                variant="contained"
+                className={classes.submitBtn}
+                type="submit"
+                endIcon={
+                  loading ? <CircularProgress size={20} color="inherit" /> : null
+                }
+              >
+                Submit
+              </Button>
+            </Box>
           </Box>
-          <Box padding={1}>
-            <Button
-              variant="contained"
-              className={classes.submitBtn}
-              type="submit"
-              endIcon={
-                loading ? <CircularProgress size={20} color="inherit" /> : null
-              }
-            >
-              Submit
-            </Button>
-          </Box>
-          <Box className={classes.login}>
-            <Button variant="text" onClick={() => { reset({ email: "" }); login() }} className={classes.loginBtn}>
-              <IconButton>
-                <ArrowBack/>
-              </IconButton>Back to login</Button>
+          <Box className={classes.backToLogin}>
+            <b>Want to login again?</b>
+            <Link to="/login" className={classes.signInLinkStyle} onClick={() => { reset({ email: "" }); login() }}>
+              <Typography variant="p"> <b>Sign in</b></Typography>
+            </Link>
           </Box>
         </Form>
       </Box>
