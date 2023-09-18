@@ -5,7 +5,7 @@ import { Field } from "./Form";
 import PropTypes from "prop-types";
 
 // Get New text field with some default values
-const TextControl = withStyles((theme) => ({
+const TextControl = withStyles(() => ({
   root: {
     // Capitalize label text
     "& label": { textTransform: "capitalize" },
@@ -48,6 +48,7 @@ const TextControl = withStyles((theme) => ({
         InputProps={{
           style: {
             fontSize: 15,
+            // margin: "1",
           },
         }}
       />

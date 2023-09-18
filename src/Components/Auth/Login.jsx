@@ -10,42 +10,46 @@ import PropTypes from "prop-types";
 
 // CSS class generator
 const useStyles = makeStyles((theme) => ({
+
   // Forgot password styles
   forgotPassword: {
     textDecoration: "none",
     "& .MuiTypography-root": {
       color: theme.palette.primary.main,
-      fontSize: "16px",
+      fontSize: "15.5px",
       letterSpacing: 0,
-      // fontWeight: "bold",
     },
     "&:hover": {
       color: theme.palette.secondary.dark,
     },
   },
-  //Remember me and forgot pass 
-  alignment: {
+
+  //Remember me and forgot pass alignment
+  rememberMeContainer: {
     display: "flex",
     alignItems: "center",
     justifyContent: "space-between",
     marginBottom: "20px",
+    marginTop: "8px",
   },
-  //Remember me checkbox
-  Checkbox: {
+  // Styling for the "Remember Me" checkbox
+  rememberMe: {
     color: theme.palette.secondary.light,
     display: "flex",
     justifyContent: "center",
     color: theme.palette.primary.main,
+    "& .MuiTypography-root": {
+      fontSize: "15.5px",
+    }
   },
   // Style to apply on login btn
   submitBtn: {
     width: "100%",
     display: "block",
-    marginTop: "30px",
-    marginBottom: "190px",
+    marginTop: "35px",
+    marginBottom: "70px",
     borderRadius: "70px",
-    // borderRadius: theme.shape.borderRadius,
-    paddingInline: theme.spacing(8),
+    paddingInline: theme.spacing(6),
     fontSize: theme.spacing(1.6),
     fontWeight: "bold",
     background: theme.palette.primary.main,
@@ -54,19 +58,17 @@ const useStyles = makeStyles((theme) => ({
       background: theme.palette.primary.light,
     },
   },
-  //Create new account
-  newSign: {
+  // Styling for the "Create new account" link
+  createAccountLink: {
     textDecoration: "none",
     color: theme.palette.primary.main,
     marginBottom: 0,
   },
   //sign in title
   title: {
-    marginTop: theme.spacing(1),
-    marginBottom: theme.spacing(3),
+    marginTop: theme.spacing(3),
+    marginBottom: theme.spacing(4),
     color: theme.palette.primary.main,
-    // fontWeight: "bold",
-    fontSize: "30px",
   },
 }));
 
@@ -114,9 +116,10 @@ function Login({ title, homePage }) {
       flexDirection="column"
       width={1}
       data-test="login-container"
+      className={classes.root}
     >
-      
-      <Typography className={classes.title}>
+
+      <Typography className={classes.title} variant="h4">
         Sign In
       </Typography>
 
@@ -146,12 +149,12 @@ function Login({ title, homePage }) {
           fullWidth
           data-test="login-password-field"
         />
-        <Box className={classes.alignment}>
+        <Box className={classes.rememberMeContainer}>
           <FormControlLabel
-            className={classes.Checkbox}
+            className={classes.rememberMe}
             control={<Checkbox />}
             label="Remember Me"
-            sx={{fontSize: "14px"}}
+            sx={{ fontSize: "14px" }}
           />
           <Box>
             <Link to="/forgotpassword" className={classes.forgotPassword}>
@@ -167,9 +170,9 @@ function Login({ title, homePage }) {
           {isLoading ? <CircularProgress color="inherit" size={35} /> : "Go"}
         </Button>
       </Form>
-      <Box textAlign="center" sx={{ color: "grey"}}>
+      <Box textAlign="center" sx={{ color: "grey", fontSize: "13.5px" }} >
         <b>Don't have an account?</b>
-        <Link to="/signup" className={classes.newSign}>
+        <Link to="/signup" className={classes.createAccountLink}>
           <Typography variant="p"> <b>Create new account</b></Typography>
         </Link>
       </Box>
