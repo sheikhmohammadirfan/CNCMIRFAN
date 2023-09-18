@@ -62,7 +62,9 @@ const useStyles = makeStyles((theme) => ({
   wrapper: {
     minHeight: `calc(100vh - ${headerHeight}px)`,
     overflow: "auto",
+    position: 'relative',
     [theme.breakpoints.down("xs")]: { paddingLeft: sidebarSmall },
+    backgroundColor: '#F4F4F4'
   },
 }));
 

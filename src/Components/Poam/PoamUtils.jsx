@@ -9,14 +9,14 @@ export const useStyle = makeStyles((theme) => ({
   poamContainer: {
     maxHeight: `calc(100vh - ${theme.headerHeight}px)`,
     overflow: "hidden",
-    padding: theme.spacing(1),
+    padding: theme.spacing(2),
     "&.zoomed": { padding: theme.spacing(3) },
   },
 
   // Set table style
   tableStyle: {
     // Make row cell background white
-    "& tbody td": { background: "#fafafa" },
+    "& tbody td": { background: "#fff" },
 
     // Stop overflow
     "& tbody td:not(:first-child)": { overflow: "hidden" },
@@ -44,36 +44,59 @@ export const useStyle = makeStyles((theme) => ({
         fontFamily: "Material Icons",
         right: 0,
         fontSize: 18,
+        width: 10
       },
       "&::before": {
-        content: "'\\e5c7'",
-        top: 0,
+        content: "'\\2193'",
+        color: theme.palette.grey[400],
+        display: 'flex',
+        top: 8,
+        right: 3
       },
       "&::after": {
-        content: "'\\e5c5'",
-        top: 10,
+        content: "'\\2191'",
+        color: theme.palette.grey[400],
+        top: 8,
+        right: 10
       },
       "&.asc::before": {
-        content: "''",
+        content: "'\\2193'",
+        color: '#008374'
       },
       "&.dsc::after": {
-        content: "''",
+        content: "'\\2191'",
+        color: '#008374'
       },
     },
 
-    // Change background color of selected row
-    "& tr.Mui-selected td": { background: "#8ef1f1 !important" },
+    // Giving box shadow on left side to First cell on select
+    "& tr.Mui-selected td:nth-child(1)": {
+      boxShadow: 'inset 4px 0 0 0 #008374',
+    },
+
+    // Change background color of selected row CELLS
+    "& tr.Mui-selected td": {
+      // background: "#8ef1f1 !important",
+      background: "#e6f6f4 !important",
+    },
 
     // Update sticky col background
-    "& thead th:nth-child(1)": { background: "#c0e6e2" },
-    "& thead th:nth-child(2)": { background: "#c0e6e2" },
-    "& tbody td:nth-child(1)": { background: "#e0f8f5" },
-    "& tbody td:nth-child(2)": { background: "#e0f8f5" },
-    "& tbody td[data-searched='true']": { border: "2px solid" },
+    // "& thead th:nth-child(1)": { background: "#cce6e3" },
+    "& thead th:nth-child(2)": { borderRight: `1px solid #d9d9d9` },
+    // "& tbody td:nth-child(1)": { borderRight: `1px solid #d9d9d9` },
+    "& tbody td:nth-child(2)": { borderRight: `1px solid ${theme.palette.grey[300]}` },
+
+    // searched data cell style
+    "& tbody td[data-searched='true']": { border: "2px solid #008374" },
   },
 
   //Header cell style
-  headerCell: { fontWeight: "bold" },
+  headerCell: {
+    color: theme.palette.primary.main,
+    fontSize: 12,
+    textTransform: "uppercase",
+    fontWeight: 'bold'
+  },
 
   // Style to make all cell height of 3 line
   tableCell: {
@@ -116,21 +139,21 @@ export const mapDataToHeader = (visibleColumns, sorting, updateSort) => ({
     params:
       text === "POAM ID"
         ? {
-            "poam-id": "",
-            header: "",
-            onClick: () => updateSort(text),
-            className: sorting && sorting.column === text ? sorting.order : "",
-          }
+          "poam-id": "",
+          header: "",
+          onClick: () => updateSort(text),
+          className: sorting && sorting.column === text ? sorting.order : "",
+        }
         : {
-            onClick: () => updateSort(text),
-            className: sorting && sorting.column === text ? sorting.order : "",
-          },
+          onClick: () => updateSort(text),
+          className: sorting && sorting.column === text ? sorting.order : "",
+        },
   })),
   cellStyle: {
     fontWeight: "bold",
-    paddingTop: "4px",
-    paddingBottom: "4px",
     cursor: "pointer",
+    display: 'flex',
+    alignItems: 'center',
   },
 });
 
@@ -141,28 +164,28 @@ const mapDataToRow = (data, columns, rowIndex, matchedCell) =>
     params:
       columnName === "POAM ID"
         ? {
-            "poam-id": "",
-            "data-searched": Boolean(
-              matchedCell.find(
-                (cell) =>
-                  cell.column === columnName &&
-                  cell.row == rowIndex &&
-                  cell.selected === true
-              )
-            ),
-            tabindex: 0,
-          }
+          "poam-id": "",
+          "data-searched": Boolean(
+            matchedCell.find(
+              (cell) =>
+                cell.column === columnName &&
+                cell.row == rowIndex &&
+                cell.selected === true
+            )
+          ),
+          tabindex: 0,
+        }
         : {
-            "data-searched": Boolean(
-              matchedCell.find(
-                (cell) =>
-                  cell.column === columnName &&
-                  cell.row == rowIndex &&
-                  cell.selected === true
-              )
-            ),
-            tabindex: 0,
-          },
+          "data-searched": Boolean(
+            matchedCell.find(
+              (cell) =>
+                cell.column === columnName &&
+                cell.row == rowIndex &&
+                cell.selected === true
+            )
+          ),
+          tabindex: 0,
+        },
   }));
 
 /* Method to convert 2D row data into table body format */
@@ -206,9 +229,8 @@ export const generateRows = (
     rowData,
     rowStyle: { cursor: "pointer" },
     cellStyle: {
-      paddingTop: "6px",
-      paddingBottom: "4px",
-      verticalAlign: "top",
+      display: 'flex',
+      alignItems: 'center',
       position: "relative",
     },
   };
