@@ -40,6 +40,7 @@ let theme = createTheme({
       main: "#008374",
       dark: "#008374",
       light: "#449487",
+      light_grey:"#989898",
     },
     secondary: {
       main: "#22577A",

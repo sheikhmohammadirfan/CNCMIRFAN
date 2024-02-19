@@ -22,73 +22,61 @@ import sendMail from "../Service/email.service";
 import DocumentTitle from "../Components/DocumentTitle";
 import { useLocation } from "react-router-dom";
 import { useEffect } from "react";
-import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
+import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import { EMAIL_REGEX } from "../assets/data/Other";
-import AttachFileIcon from '@mui/icons-material/AttachFile';
+import AttachFileIcon from "@mui/icons-material/AttachFile";
 
 const Transition = forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
 const useStyles = makeStyles((theme) => ({
-
-
   form: {
     "& > *": {
       margin: "0.4rem 0",
-      padding:"0.2rem 0 0",
+      padding: "0.2rem 0 0",
     },
   },
 
-  boxStyling:{
-    color:"white",
-backgroundColor: "#008375",
-fontSize:"1rem",
-fontWeight:"500",
-margin:"-0.5rem 0",
-width: "100%",
+  boxStyling: {
+    color: "white",
+    fontSize: "1rem",
+    fontWeight: "500",
+    margin: "-0.5rem 0",
+    width: "100%",
   },
 
-  dialogTitleStyle:{
-  backgroundColor: "#008375",
-},
-
-closeIcon:{
-  padding:"0.1rem",
-  borderRadius:"50%",
-  border:"1px solid transparent",
-  "&:hover":{
-    
-    backgroundColor:"#00a997",
-    transition:"0.2s ease-in",
-    
-  }
-},
-
-carbonCopyStyles:{
-  fontSize:"small",
-  display:"flex",
-  alignItems:"center",
-  justifyContent:"space-between",
-  "& div":{
-    color:"black",
-    display:"flex",
-    gap:"0.3rem",
-    cursor: "pointer"
+  dialogTitleStyle: {
+    backgroundColor: theme.palette.primary.main,
   },
-},
-cc_bcc_Items:{
-  "&:hover":{
-   color:"#00a997"
-  }
-},
 
+  closeIcon: {
+    padding: "0.1rem",
+    borderRadius: "50%",
+    border: "1px solid transparent",
+    "&:hover": {
+      backgroundColor: theme.palette.primary.light,
+      transition: "0.2s ease-in",
+    },
+  },
 
-inputStyles:{
-  // Adjust the maximum height as needed
-  maxHeight: "500px", 
-    transition: "max-height 0.3s ease",
-},
+  carbonCopyStyles: {
+    fontSize: "small",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    "& div": {
+      color: "black",
+      display: "flex",
+      gap: "0.3rem",
+      cursor: "pointer",
+    },
+  },
+  cc_bcc_Items: {
+    "&:hover": {
+      color: theme.palette.primary.main,
+    },
+  },
 
   heading: {
     margin: "0 0 !important",
@@ -96,19 +84,10 @@ inputStyles:{
   },
 
   headingText: {
-   
     fontFamily: "inherit",
     fontWeight: "550",
     marginBottom: "4px",
   },
-
-  // labelColor: {
-
-  //   color: "theme.palette.primary.main",
-  //   fontWeight: "550",
-  // },
-
- 
 
   messageText: {
     minHeight: "4rem",
@@ -144,13 +123,12 @@ inputStyles:{
     fontWeight: 600,
   },
 
-
   tagsInput: {
     display: "flex",
     alignItems: "flex-start",
     flexWrap: "wrap",
     width: "480px",
-    borderBottom:"0.2px solid #989898",
+    borderBottom: `0.2px solid ${theme.palette.primary.light_grey}`,
     "& input": {
       flex: "1",
       marginBottom: "4px",
@@ -163,7 +141,7 @@ inputStyles:{
       minWidth: "60%",
       width: "100%",
       fontSize: "14px",
-      padding: '4px 0 0 0',
+      padding: "4px 0 0 0",
       "&:focus": {
         outline: "transparent",
         backgroundColor: "transparent",
@@ -187,8 +165,16 @@ inputStyles:{
   },
 
   fileList: {
-    "&:not(:last-of-type)": {
-      marginRight: 4,
+    display: "block",
+    borderRadius: "5px",
+    padding: "5px",
+    margin: "5px 0",
+    fontWeight: "bold",
+    position: "relative",
+    "& .MuiChip-deleteIcon": {
+      position: "absolute",
+      right: "0",
+      fontWeight: "normal",
     },
   },
 
@@ -203,8 +189,6 @@ inputStyles:{
     overflowX: "scroll",
     overflowY: "hidden",
     overflow: "-moz-scrollbars-none",
-    
-
     "&::-webkit-scrollbar": {
       display: "none",
     },
@@ -219,65 +203,67 @@ inputStyles:{
     display: "inline-flex",
   },
 
-
-  sendContainer:{
-   
-    borderTop: '1px solid #989898',
-    paddingTop:"0.2rem",
-    marginBottom:"0.2rem",
-    display:"flex",
-    gap:"0.5rem",
+  scrollBoxContainer2: {
+    display: "flex",
+    flexWrap: "wrap",
+  },
+  sendContainer: {
+    borderTop: `1px solid ${theme.palette.primary.light_grey}`,
+    paddingTop: "0.2rem",
+    marginBottom: "0.2rem",
+    display: "flex",
+    gap: "0.5rem",
   },
 
-  sendButton:{
-    color:"white",
-    borderRadius:"50px",
-    backgroundColor:"#008375",
-    height:"2.2rem",
-    width:"5rem",
-    padding:"1rem",
-    "&:hover":{
-      backgroundColor:"#00a997"
-    }
-  }
-,
-
-attachIcon:{
-  height:"2.2rem",
-  width:"2.2rem",
-  padding:"0.8rem",
-  color:"#008375"
-},
-
-
-inputTextArea1:{
-// Adjust the height as needed
-height: "11rem", 
-overflow: "auto"
-},
-
-inputTextArea2:{
- // Adjust the height as needed
-  height: "17rem", 
-  overflow: "auto"
+  sendButton: {
+    color: "white",
+    borderRadius: "50px",
+    backgroundColor: theme.palette.primary.main,
+    height: "2.2rem",
+    width: "5rem",
+    padding: "1rem",
+    "&:hover": {
+      backgroundColor: theme.palette.secondary.light,
+    },
+  },
+  attachIcon: {
+    height: "2.2rem",
+    width: "2.2rem",
+    padding: "0.8rem",
+    color: theme.palette.primary.main,
   },
 
+  chipcontainer: {
+    display: "flex",
+    flexDirection: "column",
+    backgroundColor: "red",
+  },
+  dialogwidth: {
+    "& .MuiDialog-paperFullWidth": {
+      width: "calc(50rem - 64px)",
+    },
+  },
+  footerDialog: {
+    padding: "0 24px",
+  },
 
+  dialogContent: {
+    "& .MuiDialogContent-root": {
+      height: "500px",
+    },
+  },
+  textArea: {
+    "& .MuiInputBase-inputMultiline": {
+      height: "370px",
+    },
+  },
 }));
-
-
-
-
-
 
 function Email({ title, close }) {
   DocumentTitle(title);
   const classes = useStyles();
-  const [showcc, setShowcc]= useState(false);
-  const [showbcc, setShowbcc]= useState(false);
-  
-
-
+  const [showcc, setShowcc] = useState(false);
+  const [showbcc, setShowbcc] = useState(false);
   const [mailAcknowledgement, setMailAcknowledgement] = useState(false);
   useEffect(() => {
     if (mailAcknowledgement)
@@ -289,30 +275,28 @@ function Email({ title, close }) {
   const [message, setMessage] = useState("");
   const [files, setFiles] = useState([]);
   const [tags, setTags] = useState({ to: [], cc: [], bcc: [] });
- 
-  //adjusting the height of textField based on whether cc and bcc field are opened
-  const inputClassName = `${showcc && showbcc ? classes.inputTextArea1 : classes.inputTextArea2}`;
-  
+  const [isInputFocused, setIsInputFocused] = useState(false);
 
-//showing cc and bcc fields on click with help of states
-  const handleClickCc=()=>{
-    console.log("Bhai tumhara function chal raha hai")
+  const handleClickCc = () => {
     setShowcc((prevShowCc) => !prevShowCc);
-  }
-  const handleClickBcc=()=>{
-    console.log("Bhai tumhara function chal raha hai")
+  };
+  const handleClickBcc = () => {
     setShowbcc((prevShowBcc) => !prevShowBcc);
-  }
+  };
 
+  const handleIsFocused = () => {
+    setIsInputFocused(true);
+  };
 
-
+  const handleIsBlurr = () => {
+    setIsInputFocused(false);
+  };
 
   const textfields = [
     {
       name: "to",
       type: "email",
       visible: true,
-      
     },
     {
       name: "cc",
@@ -326,9 +310,6 @@ function Email({ title, close }) {
     },
   ];
 
-
-
-  
   const addTags = (event) => {
     const value = event.target.value.trim();
     if (value !== "" && emailValidation(value)) {
@@ -431,7 +412,6 @@ function Email({ title, close }) {
             flexDirection: "column",
             justifyContent: "center",
             alignItems: "center",
-          
           }}
         >
           <Icon style={{ fontSize: "60px" }} color="primary">
@@ -440,7 +420,12 @@ function Email({ title, close }) {
         </DialogContent>
       </Dialog>
 
-      <Dialog open={true} maxWidth="md" fullWidth>
+      <Dialog
+        open={true}
+        maxWidth=""
+        fullWidth
+        className={`${classes.dialogwidth} ${classes.dialogContent} ${classes.textArea} ${classes.footerDialog}`}
+      >
         <DialogTitle className={classes.dialogTitleStyle}>
           <Box
             display="flex"
@@ -449,80 +434,97 @@ function Email({ title, close }) {
             className={classes.boxStyling}
           >
             <span>Email</span>
-            <CloseRoundedIcon click={handleClose} className={classes.closeIcon} />
+            <CloseRoundedIcon
+              onClick={handleClose}
+              className={classes.closeIcon}
+            />
           </Box>
         </DialogTitle>
-        <DialogContent>
-          <DialogContentText >
+        <DialogContent className={classes.dialogContent}>
+          <DialogContentText>
             <Box className={classes.carbonCopyStyles}>
-            Write Mails Effectively.
-            <div >
-              <a onClick={handleClickCc} className={classes.cc_bcc_Items}>Cc</a>
-              <a onClick={handleClickBcc} className={classes.cc_bcc_Items}>Bcc</a>
-            </div>
+              Write Mails Effectively.
+              <div>
+                <a onClick={handleClickCc} className={classes.cc_bcc_Items}>
+                  Cc
+                </a>
+                <a onClick={handleClickBcc} className={classes.cc_bcc_Items}>
+                  Bcc
+                </a>
+              </div>
             </Box>
-           
-            </DialogContentText>
-          <Box className={`${classes.form} ${showcc? classes.inputStyles:""}`}>
-            {textfields.map((item, index) => (
-              item.visible ? ( // Use the ternary operator to conditionally render the input
-              <div key={index} className={classes.tagsInput} style={{ width: "100%" }}>
-                <span className={classes.fieldLabel}>
-                  {item.name}
-                  {index === 0 ? "*" : ""}
-                </span>
-                <div key={index} style={{ width: "calc(100% - 32px)" }}>
-                  <div className={classes.scrollBox}>
-                    <div
-                      className={`${classes.scrollBoxWrapper} ${
-                        tags[item.name].length > 0 ? "visible" : ""
-                      }`}
-                    >
-                      <div className={classes.scrollBoxContainer} role="list">
-                        {tags[item.name].map((tag, idx) => (
-                          <Chip
-                            style={{ overflow: "hidden", margin: "2px" }}
-                            color="primary"
-                            key={idx}
-                            label={tag}
-                            variant="outlined"
-                            size="small"
-                            deleteIcon={
-                              <span className={classes.tagCloseIcon}>x</span>
-                            }
-                            onDelete={() => removeTags(idx, item.name)}
-                          />
-                        ))}
+          </DialogContentText>
+          <Box>
+            {textfields.map((item, index) =>
+              item.visible ? (
+                <div
+                  key={index}
+                  className={classes.tagsInput}
+                  style={{ width: "100%" }}
+                >
+                  <span className={classes.fieldLabel}>
+                    {item.name}
+                    {index === 0 ? "*" : ""}
+                  </span>
+                  <div key={index} style={{ width: "calc(100% - 32px)" }}>
+                    <div className={classes.scrollBox}>
+                      <div
+                        className={`${classes.scrollBoxWrapper} ${
+                          tags[item.name].length > 0 ? "visible" : ""
+                        }`}
+                      >
+                        <div
+                          className={`${
+                            isInputFocused
+                              ? classes.scrollBoxContainer2
+                              : classes.scrollBoxContainer
+                          }`}
+                          role="list"
+                        >
+                          {tags[item.name].map((tag, idx) => (
+                            <div>
+                              <Chip
+                                style={{ overflow: "hidden", margin: "2px" }}
+                                color="primary"
+                                key={idx}
+                                label={tag}
+                                variant="outlined"
+                                size="small"
+                                deleteIcon={
+                                  <span className={classes.tagCloseIcon}>
+                                    x
+                                  </span>
+                                }
+                                onDelete={() => removeTags(idx, item.name)}
+                              />
+                            </div>
+                          ))}
+                        </div>
                       </div>
+                      <input
+                        onFocus={handleIsFocused}
+                        name={item.name}
+                        type="text"
+                        onKeyUp={(event) =>
+                          event.key === "Enter" || event.key === " "
+                            ? addTags(event)
+                            : null
+                        }
+                        style={{ padding: 8, height: "2rem", margin: 0 }}
+                        onBlur={(event) => {
+                          addTags(event);
+                          handleIsBlurr();
+                        }}
+                        placeholder=""
+                      />
                     </div>
-                    <input
-                      name={item.name}
-                      type="text"
-                      onKeyUp={(event) =>
-                        event.key === "Enter" || event.key === " "
-                          ? addTags(event)
-                          : null
-                      }
-                      style={{ padding: 8, height: "2rem", margin: 0 }}
-                      onBlur={addTags}
-                      placeholder=""
-                     
-
-                    />
-                 
                   </div>
                 </div>
-              </div>
-              ):null
-
-            ))}
-
-
-
+              ) : null
+            )}
 
             <Box className={classes.heading}>
               <TextField
-
                 fullWidth
                 name="subject"
                 value={subject}
@@ -533,23 +535,18 @@ function Email({ title, close }) {
                   className: classes.headingText,
                   disableUnderline: true,
                 }}
-               
               />
             </Box>
-                
+
             <TextField
-          // className={classes.inputTextArea}
-              style={{ position: "relative", background: "transparent", }}
+              style={{ position: "relative", background: "transparent" }}
               variant="standard"
               fullWidth
               name="message"
               value={message}
               onChange={(e) => setMessage(e.target.value)}
-              // placeholder="Enter the message here*"
               InputProps={{
-                classes: { input: inputClassName },
                 disableUnderline: true,
-              
               }}
               multiline
               rows={4}
@@ -567,38 +564,34 @@ function Email({ title, close }) {
                 onDelete={() => removeFile(i)}
               />
             ))}
-
-
-              <Box className={classes.sendContainer} >
-                
-                  <Button 
-                  type="submit"
-                  onClick={handleSubmit}
-                  className={classes.sendButton}>
-                    Send
-                    {loader ? (
-                  <CircularProgress
-                    size={20}
-                    style={{ color: "#fff", marginLeft: "6px" }}
-                  />
-                ) : null
-                // (
-                //   <Icon style={{ marginLeft: "4px", fontSize: "18px" }}>
-                //     send
-                //   </Icon>
-                // )
-              }
-                    </Button>
-                  <IconButton className={classes.attachIcon}
-                  type="file"
-                  component="label"
-                  ><AttachFileIcon></AttachFileIcon>
-                  <input multiple type="file" onChange={uploadFiles} hidden /></IconButton>
-                
-              </Box>
-
           </Box>
         </DialogContent>
+
+        <DialogTitle className={classes.footerDialog}>
+          <Box className={classes.sendContainer}>
+            <Button
+              type="submit"
+              onClick={handleSubmit}
+              className={classes.sendButton}
+            >
+              Send
+              {loader ? (
+                <CircularProgress
+                  size={20}
+                  style={{ color: "#fff", marginLeft: "6px" }}
+                />
+              ) : null}
+            </Button>
+            <IconButton
+              className={classes.attachIcon}
+              type="file"
+              component="label"
+            >
+              <AttachFileIcon></AttachFileIcon>
+              <input multiple type="file" onChange={uploadFiles} hidden />
+            </IconButton>
+          </Box>
+        </DialogTitle>
       </Dialog>
     </>
   );
