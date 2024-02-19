@@ -3,7 +3,7 @@ import { getToken, logout } from "./UserFactory";
 import { notification } from "../Components/Utils/Utils";
 
 // Base url
-export const baseURL = "https://api.cncmllc.com";
+export const baseURL = "https://falcon-backend-48ya.onrender.com/";
 
 // Setup axios object
 export const axios = instance.create({ baseURL: baseURL + "/api" });
@@ -22,8 +22,7 @@ async function request(requestOptions) {
   // Get query params
   if (method === "GET") fullurl += `?${new URLSearchParams(data)}`;
   // Set content type
-  else if (!(data instanceof FormData))
-    headers["Content-Type"] = "application/json";
+  else if (!(data instanceof FormData)) headers["Content-Type"] = "application/json";
 
   // Setup response template
   let res = { data: [], message: "", status: false };
@@ -43,8 +42,7 @@ async function request(requestOptions) {
     res.data = response.data.data;
 
     // Notify user
-    if (method !== "GET" && notify)
-      notification("api-toast", res.message, "success");
+    if (method !== "GET" && notify) notification("api-toast", res.message, "success");
   } catch (e) {
     // If unauthorize then logout user
     if (e?.response?.status === 401) {
