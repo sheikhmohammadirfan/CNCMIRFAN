@@ -3,6 +3,7 @@ import {
   Breadcrumbs as MUIBreadcrumbs,
   makeStyles,
   Typography,
+  Box,
 } from "@material-ui/core";
 import { Link, withRouter } from "react-router-dom";
 import { BreadcrumbMapper } from "../assets/data/BreadcrumbMapper";
@@ -20,10 +21,17 @@ const useStyles = makeStyles({
     textDecoration: "none",
     "&:hover": { cursor: "pointer", color: "#333" },
   },
+
+  poamLink: {
+    color: '#008374',
+    fontSize: 12,
+    alignSelf: 'flex-end',
+    marginBottom: 2
+  }
 });
 
 /** Compoent to return Link / typography based on data */
-const Text = ({ link, children, path }) => {
+const Text = ({ link, children, path, isPoamFileOpen, showPoamDetails }) => {
   // Get styles
   const classes = useStyles();
 
@@ -32,14 +40,27 @@ const Text = ({ link, children, path }) => {
       {children}
     </Link>
   ) : (
-    <Typography className={classes.typo}>{children}</Typography>
+    // is the section poam? if yes, displaying link to show poam file details
+    (isPoamFileOpen
+      ?
+      <Box display={'flex'}>
+        <Typography style={{marginRight: 2}}>
+          {children}
+        </Typography>
+        <Link className={classes.poamLink} onMouseOver={showPoamDetails}>
+          (More details)
+        </Link>
+      </Box>
+      :
+      <Typography className={classes.typo}>{children}</Typography>
+    )
   );
 };
 
 /**
  * Breadcrumbs Component
  */
-const Breadcrumbs = ({ history, location: { pathname, search } }) => {
+const Breadcrumbs = ({ history, location: { pathname, search }, isPoamPage, showPoamDetails }) => {
   // Array of object with path details
   const pathObject = pathname
     .split("/")
@@ -71,6 +92,10 @@ const Breadcrumbs = ({ history, location: { pathname, search } }) => {
               : `/${pathArray.join("/")}${path}`
           }
           data-test="breadcrumbs-path-chip"
+          // boolean to check if file is open
+          isPoamFileOpen={isPoamPage}
+          // function to show popover component
+          showPoamDetails={showPoamDetails}
         >
           {text
             .split(" ")

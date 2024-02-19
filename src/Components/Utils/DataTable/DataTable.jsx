@@ -71,7 +71,7 @@ const useStyles = makeStyles((theme) => ({
 
   // Highlight headr backgroud
   headerStyle: {
-    "& th": { background: '#e6f6f4', borderColor: '#d9d9d9', borderBottom: 0 },
+    "& th": { background: '#e6f6f4', borderColor: '#d9d9d9', border: '1px solid', borderLeft: 0 },
     "&.sticky th": {
       position: "sticky",
       top: 0,

@@ -55,7 +55,7 @@ function SecondaryTable({ data, columnsList, currentRow, closeTable }) {
               width: "40%",
               paddingTop: "6px",
               paddingBottom: "6px",
-              background: "rgba(234, 234, 234, 0.3)",
+              background: "white",
               verticalAlign: "top",
             },
           },
@@ -68,6 +68,7 @@ function SecondaryTable({ data, columnsList, currentRow, closeTable }) {
               paddingBottom: "6px",
               verticalAlign: "top",
               wordBreak: "break-all",
+              background: 'white'
             },
           },
         ],

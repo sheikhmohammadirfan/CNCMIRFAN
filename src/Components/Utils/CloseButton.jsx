@@ -6,7 +6,7 @@ import PropTypes from "prop-types";
 function CloseButton({ click, type = "contained", ...rest }) {
   return (
     <IconButton onClick={click} {...rest}>
-      <Icon>{type === "text" ? "close" : "cancel"}</Icon>
+      <Icon style={{color: '#008374'}}>{type === "text" ? "close" : "cancel"}</Icon>
     </IconButton>
   );
 }

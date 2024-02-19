@@ -10,6 +10,8 @@ import {
   IconButton,
   Zoom,
   Popover,
+  useMediaQuery,
+  useTheme,
 } from "@material-ui/core";
 import React, { useState } from "react";
 import ManageColumns from "./ManageColumns";
@@ -68,47 +70,14 @@ const useStyle = makeStyles((theme) => ({
     },
   },
 
-  chip_container: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: 'space-between',
-    padding: `${theme.spacing(0.6)}px ${theme.spacing(1.5)}px`,
-    // padding: `7px`,
-    // background: theme.palette.grey[300],
-    background: '#fff',
-    borderRadius: 2 * theme.shape.borderRadius,
-    // border: `1px solid ${theme.palette.grey[400]}`,
-    border: `1px solid #c0e6e2`,
-    // border: `1px solid #449487`,
-    cursor: "default",
-  },
-
-  chip_label: {
-    fontSize: 14,
-    fontWeight: "bold",
-    marginRight: theme.spacing(1.5),
-    textTransform: "uppercase",
-  },
-
-  chip_data: {
-    fontSize: 14,
-    padding: `${theme.spacing(0)}px ${theme.spacing(1)}px`,
-    color: '#008374',
-    // background: "#fafafa",
-    // background: "#c0e6e2",
-    // paddingInline: 10,
-    // paddingBlock: 3,
-    opacity: 0.9,
-    borderRadius: theme.shape.borderRadius,
-    // maxWidth: 200,
-  },
-
   searchInput: {
     width: 300,
+    '@media (max-width: 960px)': {
+      flexGrow: 1,
+    },
     backgroundColor: 'white',
     borderRadius: 7,
     borderRight: 0,
-    // flexGrow: 1,
     "& .MuiOutlinedInput-adornedStart": {
       paddingLeft: 8,
       paddingRight: 8,
@@ -127,8 +96,20 @@ const useStyle = makeStyles((theme) => ({
       border: 'none'
     },
     border: 'none',
+    borderRadius: 5,
     color: theme.palette.primary.main,
     textTransform: 'none',
+    '&.MuiButton-root': {
+      '@media (max-width: 960px)': {
+        minWidth: '50px',
+      }
+    },
+    '& .MuiButton-endIcon': {
+      '@media (max-width: 960px)': {
+        marginLeft: 0,
+        marginRight: 0,
+      }
+    }
   }
 }));
 
@@ -136,7 +117,7 @@ const useStyle = makeStyles((theme) => ({
 export default function PoamHeader({
   selectedRow,
   zoom: { isZoomed, zoomIn, zoomOut },
-  details: { fileID, fileName, cspName, systemName, agencyName },
+  details: { fileID },
   poamData,
   cols: { allColumns, secondaryColumns, hiddenColumns, visibleColumns },
   manageCol: { moveToPrimary, moveToSecondary },
@@ -206,143 +187,24 @@ export default function PoamHeader({
     setMatched(matches);
   }, [searchValue]);
 
-  // hook to manage open / close details popup of header
-  const [anchorEl, setAnchorEl] = useState(null);
-  const handleClick = (event) => setAnchorEl(event.currentTarget);
-  const handleClose = () => setAnchorEl(null);
-  const open = Boolean(anchorEl)
+  // State to manage md breakpoint
+  const theme = useTheme();
+  const aboveMd = useMediaQuery(theme.breakpoints.up('md'));
 
   return (
     <>
       {'poamData' && (
         <>
-          {/* 1st Box */}
-          {/* <Box
-            display="flex"
-            // flexGrow={1}
-            alignItems="center"
-            justifyContent="space-between"
-            marginY={0.5}
-          >
-            <Box className={`${classes.chip_container} title`}>
-              <Box display={'flex'}>
-                <Typography className={classes.chip_label}>File Name : </Typography>
-                <Typography noWrap className={classes.chip_data}>
-                  {'fileName'}2023-POA&M
-                </Typography>
-
-              </Box>
-              <IconButton style={{ padding: 0, color: '#008374' }} onMouseOver={handleClick}>
-                <Icon>info</Icon>
-              </IconButton>
-              <Popover
-                // anchorReference="anchorPosition"
-                // anchorPosition={{ top: 52, left: 320 }}
-                open={open}
-                anchorEl={anchorEl}
-                onClose={handleClose}
-                anchorOrigin={{
-                  vertical: 'top',
-                  horizontal: 'right',
-                }}
-                transformOrigin={{
-                  vertical: 'top',
-                  horizontal: 'left',
-                }}
-              >
-                <Box style={{ padding: 10, width: 300 }}>
-                  <Box display={'flex'} position={'relative'}>
-                    <Typography className={classes.chip_label}>CSP Name : </Typography>
-
-                    <Typography noWrap className={classes.chip_data} style={{
-                      position: 'absolute',
-                      left: 120
-                    }}>
-                      {'cspName'}
-                      CloudSecure Pro
-                    </Typography>
-
-                  </Box>
-                  <Box width={24} />
-                  <Box display={'flex'} position={'relative'}>
-                    <Typography className={classes.chip_label}>System Name : </Typography>
-
-                    <Typography className={classes.chip_data} style={{
-                      position: 'absolute',
-                      left: 120
-                    }}>
-                      {'systemName'}
-                      SecureCloudApp
-                    </Typography>
-                  </Box>
-                  <Box width={24} />
-                  <Box display={'flex'} position={'relative'}>
-                    <Typography className={classes.chip_label}>Agency Name : </Typography>
-                    <Typography noWrap className={classes.chip_data} style={{
-                      position: 'absolute',
-                      left: 120
-                    }}>
-                      {'agencyName'}
-                      CyberAgencies Inc.
-                    </Typography>
-                  </Box>
-                </Box>
-              </Popover>
-              <Box width={24} />
-            </Box>
-
-            <Box
-              display='flex'
-              justifyContent='center'
-            >
-              <Tooltip
-                arrow
-                title="Zoom in"
-                PopperProps={{
-                  container: () =>
-                    document.getElementById(localStorage.getItem("fullScreen")),
-                }}
-              >
-                <Button
-                  // disableRipple
-                  id="poam-zoom-btn"
-                  onClick={isZoomed() ? zoomOut : zoomIn}
-                  startIcon={<Icon>{isZoomed() ? "zoom_in_map" : "zoom_out_map"}</Icon>}
-                  variant="outlined"
-                  style={{ borderColor: '#c0e6e2', background: 'white', color: '#008374' }}
-                  sx={{ fontWeight: 'bold' }}
-                >
-                  {isZoomed() ? "Zoom Out" : "Zoom In"}
-                </Button>
-              </Tooltip>
-
-              <Tooltip
-                arrow
-                title="Download File"
-              >
-                <Button
-                  id="download-file-btn"
-                  onClick={openDownload}
-                  startIcon={<Icon>file_download</Icon>}
-                  style={{
-                    marginLeft: 5,
-                    backgroundColor: '#008374',
-                    color: 'white',
-                    borer: '1px solid #008374',
-                  }}
-                >
-                  Download
-                </Button>
-              </Tooltip>
-            </Box>
-          </Box> */}
+          {/* 1st Box: Had poam file details and Zoom/Download buttons (Removed) */}
 
           {/* 2nd Box: Tab buttons & search, Add POA&M Button */}
           <Box
             display="flex"
-            alignItems="flex-end"
+            alignItems={aboveMd && "flex-end"}
             justifyContent="space-between"
             mt={0}
+            flexDirection={!aboveMd && 'column'}
+            gridGap={!aboveMd && 10}
           >
             <Box>
               <ButtonGroup className={classes.tabButtonGroup}>
@@ -371,8 +233,6 @@ export default function PoamHeader({
               display="flex"
               alignItems="flex-end"
               justifyContent="space-between"
-            // marginY={1}
-            // paddingBottom={Number(!isOpenPoam)}
             >
               <TextControl
                 variant="outlined"
@@ -436,8 +296,6 @@ export default function PoamHeader({
               <ButtonGroup
                 disableElevation
                 disableFocusRipple
-                // disableRipple
-                // color="primary"
                 aria-label="outlined primary button group"
               >
                 {isOpenPoam && (
@@ -477,127 +335,95 @@ export default function PoamHeader({
               borderBottomLeftRadius: 0,
               borderBottomRightRadius: 0,
               backgroundColor: '#fff',
-              borderBottom: 'none'
-            }}
-            style={{
-              borderColor: '#d9d9d9',
+              borderBottom: 'none',
+              '& .MuiButton-startIcon': {
+                marginRight: !aboveMd && 0,
+                marginLeft: !aboveMd && 0
+              },
+              '& .MuiButton-root': {
+                padding: aboveMd && '6px 16px',
+              },
+              borderColor: '#d9d9d9'
             }}
           >
             <Box marginY={'auto'}>
-              <ButtonGroup>
 
-                <ManageJira
-                  isOpen={isJiraOpen}
-                  closeMenu={closeJira}
-                  checkIssue={containIssue}
-                  createDialog={showCreateIssue}
-                  updateDialog={showUpdateIssue}
+              <ManageJira
+                isOpen={isJiraOpen}
+                closeMenu={closeJira}
+                checkIssue={containIssue}
+                createDialog={showCreateIssue}
+                updateDialog={showUpdateIssue}
+              >
+                <Button
+                  className={classes.actionButton}
+                  disabled={!(isOpenPoam && selectedRow.length === 1)}
+                  onClick={openJira}
                 >
-                  <Button
-                    className={classes.actionButton}
-                    disabled={!(isOpenPoam && selectedRow.length === 1)}
-                    onClick={openJira}
-                  >
-                    <img
-                      src={jira}
-                      alt="JIRA"
-                      style={{
-                        height: "20px",
-                        marginRight: 8,
-                        opacity: !(isOpenPoam && selectedRow.length === 1) ? 0.4 : 1,
-                      }}
-                    />
-                    Jira
-                  </Button>
-                </ManageJira>
+                  <img
+                    src={jira}
+                    alt="JIRA"
+                    style={{
+                      height: "20px",
+                      marginRight: aboveMd ? 8 : 0,
+                      opacity: !(isOpenPoam && selectedRow.length === 1) ? 0.4 : 1,
+                    }}
+                  />
+                  {aboveMd && 'Jira'}
+                </Button>
+              </ManageJira>
 
-                <Tooltip
-                  arrow
-                  title={isOpenPoam ? "Move to close" : "Move to open  "}
-                  PopperProps={{
-                    container: () =>
-                      document.getElementById(localStorage.getItem("fullScreen")),
-                  }}
-                >
-                  <Button
-                    id="move-row-btn"
-                    className={classes.actionButton}
-                    disabled={selectedRow.length !== 1}
-                    onClick={openJustify}
-                  >
-                    {isOpenPoam ? (
-                      <img
-                        alt="move-close"
-                        src="https://img.icons8.com/ios-filled/24/000000/move-right.png"
-                        style={{ opacity: selectedRow.length !== 1 ? 0.4 : 1, marginRight: 8, color: 'white' }}
-                      />
-                    ) : (
-                      <img
-                        alt="move-open"
-                        src="https://img.icons8.com/ios-filled/24/000000/move-left.png"
-                        style={{ opacity: selectedRow.length !== 1 ? 0.4 : 1, marginRight: 8, color: 'white' }}
-                      />
-                    )}
-                    {(isOpenPoam) ? 'Move to Close' : 'Move to Open'}
-                  </Button>
-                </Tooltip>
+              <Button
+                id="move-row-btn"
+                className={classes.actionButton}
+                disabled={selectedRow.length !== 1}
+                onClick={openJustify}
+              >
+                {isOpenPoam ? (
+                  <img
+                    alt="move-close"
+                    src="https://img.icons8.com/ios-filled/24/000000/move-right.png"
+                    style={{ opacity: selectedRow.length !== 1 ? 0.4 : 1, marginRight: aboveMd ? 8 : 0, color: 'white' }}
+                  />
+                ) : (
+                  <img
+                    alt="move-open"
+                    src="https://img.icons8.com/ios-filled/24/000000/move-left.png"
+                    style={{ opacity: selectedRow.length !== 1 ? 0.4 : 1, marginRight: aboveMd ? 8 : 0, color: 'white' }}
+                  />
+                )}
+                {aboveMd && ((isOpenPoam) ? 'Move to Close' : 'Move to Open')}
+              </Button>
 
-                <Tooltip
-                  arrow
-                  title="Edit row"
-                  PopperProps={{
-                    container: () =>
-                      document.getElementById(
-                        localStorage.getItem("fullScreen")
-                      ),
-                  }}
-                >
-                  <Button
-                    id="edit-row-btn"
-                    className={classes.actionButton}
-                    disabled={selectedRow.length !== 1}
-                    onClick={openEditFrom}
-                    startIcon={<Icon>edit</Icon>}
-                  >
-                    Edit
-                  </Button>
-                </Tooltip>
+              <Button
+                id="edit-row-btn"
+                className={classes.actionButton}
+                disabled={selectedRow.length !== 1}
+                onClick={openEditFrom}
+                startIcon={<Icon>edit</Icon>}
+              >
+                {aboveMd && 'Edit'}
+              </Button>
 
-                <Tooltip
-                  arrow
-                  title="Zoom in"
-                  PopperProps={{
-                    container: () =>
-                      document.getElementById(localStorage.getItem("fullScreen")),
-                  }}
-                >
-                  <Button
-                    // disableRipple
-                    id="poam-zoom-btn"
-                    className={classes.actionButton}
-                    onClick={isZoomed() ? zoomOut : zoomIn}
-                    startIcon={<Icon>{isZoomed() ? "zoom_in_map" : "zoom_out_map"}</Icon>}
-                    variant="outlined"
-                    sx={{ fontWeight: 'bold' }}
-                  >
-                    {isZoomed() ? "Zoom Out" : "Zoom In"}
-                  </Button>
-                </Tooltip>
+              <Button
+                // disableRipple
+                id="poam-zoom-btn"
+                className={classes.actionButton}
+                onClick={isZoomed() ? zoomOut : zoomIn}
+                startIcon={<Icon>{isZoomed() ? "zoom_in_map" : "zoom_out_map"}</Icon>}
+              >
+                {aboveMd && (isZoomed() ? "Zoom Out" : "Zoom In")}
+              </Button>
 
-                <Tooltip
-                  arrow
-                  title="Download File"
-                >
-                  <Button
-                    id="download-file-btn"
-                    className={classes.actionButton}
-                    onClick={openDownload}
-                    startIcon={<Icon>file_download</Icon>}
-                  >
-                    Download
-                  </Button>
-                </Tooltip>
-              </ButtonGroup>
+              <Button
+                id="download-file-btn"
+                className={classes.actionButton}
+                onClick={openDownload}
+                startIcon={<Icon>file_download</Icon>}
+              >
+                {aboveMd && 'Download'}
+              </Button>
+
             </Box>
             <Box>
               <ManageColumns
@@ -610,16 +436,17 @@ export default function PoamHeader({
                 <Button
                   onClick={openManage}
                   endIcon=<Icon>tune</Icon>
+                  className={classes.actionButton}
                   style={{
                     color: '#008374',
                     textTransform: 'none',
                     backgroundColor: '#F0F8F7',
-                    // backgroundColor: '#d6e8e6',
                     borderRadius: 10,
-                    paddingInline: 15
+                    paddingInline: 15,
+                    width: !aboveMd && 50,
                   }}
                 >
-                  Show Columns
+                  {aboveMd && 'Show Columns'}
                 </Button>
               </ManageColumns>
             </Box>
