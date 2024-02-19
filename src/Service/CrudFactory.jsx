@@ -59,44 +59,22 @@ async function request(requestOptions) {
   return res;
 }
 
-export const delay = () => new Promise((resolve) => setTimeout(resolve, 1000));
-
 export async function get(url, data, requestOptions) {
-  if (requestOptions?.mock) {
-    await delay();
-    return requestOptions.mock;
-  }
   return request({ method: "GET", url, data, ...requestOptions });
 }
 
 export async function post(url, data, requestOptions) {
-  if (requestOptions?.mock) {
-    await delay();
-    return requestOptions.mock;
-  }
   return request({ method: "POST", url, data, ...requestOptions });
 }
 
 export async function put(url, data, requestOptions) {
-  if (requestOptions?.mock) {
-    await delay();
-    return requestOptions.mock;
-  }
   return request({ method: "PUT", url, data, ...requestOptions });
 }
 
 export async function patch(url, data, requestOptions) {
-  if (requestOptions?.mock) {
-    await delay();
-    return requestOptions.mock;
-  }
   return request({ method: "PATCH", url, data, ...requestOptions });
 }
 
 export async function deletes(url, data, requestOptions) {
-  if (requestOptions?.mock) {
-    await delay();
-    return requestOptions.mock;
-  }
   return request({ method: "DELETE", url, data, ...requestOptions });
 }
