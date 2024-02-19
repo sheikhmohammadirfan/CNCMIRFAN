@@ -45,6 +45,7 @@ const useStyles = makeStyles((theme) => ({
   // Style to apply on login btn
   submitBtn: {
     width: "100%",
+    height: "40px", 
     display: "block",
     marginTop: "35px",
     marginBottom: "70px",
@@ -69,6 +70,32 @@ const useStyles = makeStyles((theme) => ({
     marginTop: theme.spacing(3),
     marginBottom: theme.spacing(4),
     color: theme.palette.primary.main,
+  },
+
+  //Media Query
+  "@media (max-width: 315px)": {
+    rememberMe: {
+      "& .MuiTypography-root": {
+        fontSize: "13.5px",
+      }
+    },
+    forgotPassword:{
+      "& .MuiTypography-root":{
+        fontSize: "13.5px",
+      },
+    }
+  },
+  "@media (min-width: 316px) and (max-width: 328px)": {
+    rememberMe: {
+      "& .MuiTypography-root": {
+        fontSize: "14.5px",
+      }
+    },
+    forgotPassword:{
+      "& .MuiTypography-root":{
+        fontSize: "14.5px",
+      },
+    }
   },
 }));
 

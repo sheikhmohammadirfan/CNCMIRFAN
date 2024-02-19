@@ -56,6 +56,9 @@ const useStyles = makeStyles((theme) => ({
       padding: `0 ${theme.spacing(1)}px`,
       margin: "auto",
     },
+    "& .MuiOutlinedInput-root":{
+      borderRadius: "50px",
+    },
   },
 
   // formHeading to contains tab toggler

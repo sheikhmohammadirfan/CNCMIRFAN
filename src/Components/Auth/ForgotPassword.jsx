@@ -84,6 +84,13 @@ const useStyles = makeStyles((theme) => ({
     color: theme.palette.primary.main,
   },
 
+    //Media Query
+    "@media (max-width: 400px)":{
+      backToLogin:{
+        textAlign: "center",
+      }
+    },
+
 }));
 
 /** FORGOT PASSWORD COMPONENT */

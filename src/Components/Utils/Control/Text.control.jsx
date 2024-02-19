@@ -20,10 +20,6 @@ const TextControl = withStyles(() => ({
       opacity: 0,
       transition: "all .1s linear",
     },
-    // Add border radius to the input field
-    "& .MuiInputBase-root": {
-      borderRadius: "50px", // Use the theme's border radius value
-    },
   },
 }))((props) => (
   <Field

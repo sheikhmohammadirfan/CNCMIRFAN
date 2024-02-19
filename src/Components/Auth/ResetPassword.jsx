@@ -34,6 +34,9 @@ const useStyles = makeStyles((theme) => ({
     "&  .MuiTypography-h6":{
       margin: "10px 10px",
     },
+    "& .MuiInputBase-root":{
+      borderRadius: "50px",
+    }
   },
   formPara: {
     color: "grey",
