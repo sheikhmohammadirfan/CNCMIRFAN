@@ -1,4 +1,5 @@
 import { get, post, put } from "./CrudFactory";
+import { poam_header_response_map } from "../assets/data/PoamData";
 
 /* Method to create new POA&M */
 export async function createPoam(data) {
@@ -20,7 +21,35 @@ export async function getCSP() {
 
 /* Method to get POA&M data from Open or close sheet */
 export async function getData(id) {
-  return await get(`/poam/fetchexcel/${id}`);
+
+  const res = await get(`/poam/fetchexcel/${id}`)
+
+  // Mapping new response format to old
+  const mapped_data = { "open_data": {}, "closed_data": {} };
+
+  Object.values(poam_header_response_map).map((val, index) => {
+    mapped_data.open_data[val] = {}
+    mapped_data.closed_data[val] = {}
+  })
+
+  res.data.open_data.map((row, index) => {
+    Object.keys(row).map((col, colIndex) => {
+      mapped_data.open_data[poam_header_response_map[col]][index] = row[col];
+    })
+  })
+
+  res.data.closed_data.map((row, index) => {
+    Object.keys(row).map((col, colIndex) => {
+      mapped_data.closed_data[poam_header_response_map[col]][index] = row[col];
+    })
+  })
+
+  mapped_data["file_name"] = res.data.file_name;
+  mapped_data["csp"] = res.data.csp;
+  mapped_data["systemName"] = res.data.system_name;
+  mapped_data["agencyName"] = res.data.agency_name;
+
+  return { data: mapped_data, status: res.status };
 }
 
 /* Method to get list of uploaded poams */
@@ -30,9 +59,14 @@ export async function getPoamList() {
 
 /* Method to add new row in OPEN sheet, based on row_index */
 export async function addRow(fileID, data, size) {
-  return await put(`/poam/addrow/${fileID}/`, {
-    new_row: data,
-    row_index: Number(size),
+
+  // Jira issues not required in payload
+  delete data.jira_issues;
+  // Will always be true
+  data["is_open"] = true;
+  return await put(`/poam/addnewrow/${fileID}/`, {
+    new_row: { ...data, poam_file: fileID },
+    // row_index: Number(size),
   });
 }
 
@@ -40,7 +74,7 @@ export async function addRow(fileID, data, size) {
 export async function updateRow(fileID, data, rowIndex) {
   return await put(`/poam/updaterow/${fileID}/`, {
     update_row: data,
-    row_index: Number(rowIndex),
+    // row_index: Number(rowIndex),
   });
 }
 
@@ -62,7 +96,12 @@ async function moveToOpen(fileID, data, rowIndex, newIndex) {
 }
 /* Method to move data */
 export async function moveRow(fileID, data, isOpen, rowIndex, newIndex) {
-  return await (isOpen
-    ? moveToClose(fileID, data, rowIndex, newIndex)
-    : moveToOpen(fileID, data, rowIndex, newIndex));
+
+  return await put(`/poam/moveto/${fileID}`, {
+    id: data.id
+  });
+
+  // return await (isOpen
+  //   ? moveToClose(fileID, data, rowIndex, newIndex)
+  //   : moveToOpen(fileID, data, rowIndex, newIndex));
 }

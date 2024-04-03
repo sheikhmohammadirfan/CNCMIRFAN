@@ -345,7 +345,7 @@ export default function PoamUpload({ selectFile }) {
 
   // State to save api data
   const [cspName, setCspName] = useState("");
-  const [poamList, setPoamList] = useState({});
+  const [poamList, setPoamList] = useState([]);
 
   // State to save download props
   const [downloadPoamProps, setDownloadPoamProps] = useState();
@@ -420,15 +420,15 @@ export default function PoamUpload({ selectFile }) {
         <List disablePadding className={classes.listContainer}>
           {isLoading("load") ? (
             <PoamListItem text="Loading..." loading={true} disabled />
-          ) : Object.values(poamList).length === 0 ? (
+          ) : poamList.length === 0 ? (
             <PoamListItem text="NO POA&M FILE" disabled />
           ) : (
-            Object.keys(poamList).map((val, index) => (
+            poamList.map((poamFileDetails, index) => (
               <PoamListItem
                 key={index}
-                text={poamList[val]}
-                onClick={() => selectFile(val, poamList[val])}
-                onDownload={(e) => downloadPoam(e, val)}
+                text={poamFileDetails.file_name}
+                onClick={() => selectFile(poamFileDetails.id, poamFileDetails.file_name)}
+                onDownload={(e) => downloadPoam(e, poamFileDetails.id)}
               />
             ))
           )}

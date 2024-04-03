@@ -5,6 +5,7 @@ import {
   columns_width,
   hidden_columns,
   poam_header,
+  poam_header_response_map,
   secondary_columns,
 } from "../../assets/data/PoamData";
 import FormDialog from "./FormDialog";
@@ -182,14 +183,43 @@ export default function PoamTable({ fileID }) {
   const createNewRow = async (newRow) => {
     let newIndex = getLastIndex(getPoam()) + 1;
     const { data, status } = await addRow(fileID, newRow, newIndex);
-    if (status) updatePoamRow(setPoamData, getPoam, data, newIndex);
+
+    // Creating mapping for response format from new to old
+    const mappedDataNewToOld = {};
+    Object.values(poam_header_response_map).map((val, index) => {
+      mappedDataNewToOld[val] = {}
+    })
+    data.map((row, index) => {
+      Object.keys(row).map((col, colIndex) => {
+        mappedDataNewToOld[poam_header_response_map[col]][newIndex] = row[col];
+      })
+    })
+
+    // Passing the mappedData to updatePoamRow method
+    if (status) updatePoamRow(setPoamData, getPoam, mappedDataNewToOld, newIndex);
   };
 
   // Method to edit existing row
   const updateRowData = async (newRow) => {
     const rowIndex = getCurrentIndex();
+
+    const rowData = getRowData(getPoam(), rowIndex);
+    // Adding fields id and poam_file in the payload
+    newRow.id = rowData.id;
+    newRow.poam_file = rowData.poam_file;
+
     const { data, status } = await updateRow(fileID, newRow, rowIndex);
-    if (status) updatePoamRow(setPoamData, getPoam, data, rowIndex);
+
+    // newData is in new format. mappedDataNewToOld will convert it to old format which is expeced for current logic
+    const mappedDataNewToOld = {};
+    Object.keys(data).map((colName, colIndex) => {
+      mappedDataNewToOld[poam_header_response_map[colName]] = {
+        [rowIndex]: data[colName]
+      }
+    })
+
+    // passing mapped data to updatePoamRow method instead of data which is in new format
+    if (status) updatePoamRow(setPoamData, getPoam, mappedDataNewToOld, rowIndex);
   };
 
   // Method to call on submiting form

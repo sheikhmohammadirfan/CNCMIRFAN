@@ -3,7 +3,7 @@ import { getToken, logout } from "./UserFactory";
 import { notification } from "../Components/Utils/Utils";
 
 // Base url
-export const baseURL = "https://falcon-backend-48ya.onrender.com/";
+export const baseURL = "https://falcon-backend-48ya.onrender.com";
 
 // Setup axios object
 export const axios = instance.create({ baseURL: baseURL + "/api" });

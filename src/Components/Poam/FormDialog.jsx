@@ -99,8 +99,22 @@ function FormDialog({ poamID_data, rows, open, onClose, rowIndex, onSubmit }) {
   // Push data onsubmit
   const submitForm = async (data) => {
     setisLoading(true);
+
+    // setting columns names to lower cases
+    const newFormatData = {}
+    Object.keys(data).map((colName, index) => {
+      let newColNameFormat = "";
+      if (colName === "Last Vendor Check-in Date") {
+        newColNameFormat = "last_vendor_checkin_date";
+      }
+      else {
+        newColNameFormat = colName.toLowerCase().replaceAll(" ", "_").replaceAll("-", "_");
+      }
+      newFormatData[newColNameFormat] = data[colName];
+    })
+
     // Push jira_issues column in datatable
-    await onSubmit({ ...data, jira_issues: rows.jira_issues[rowIndex] || {} });
+    await onSubmit({ ...newFormatData, jira_issues: rows.jira_issues[rowIndex] || {} });
     setisLoading(false);
   };
 
