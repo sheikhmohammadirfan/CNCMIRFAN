@@ -1,8 +1,7 @@
-import React, { useState, useRef } from "react";
-import { withStyles, Chip, Icon } from "@material-ui/core";
+import React, { useState } from "react";
+import { withStyles, Chip, Icon, TextField } from "@material-ui/core";
 import { Autocomplete } from "@material-ui/lab";
 import { Controller } from "react-hook-form";
-import { TextControl } from "../Utils/Control";
 
 // Custom Chip to show label
 const TagChip = withStyles((theme) => ({
@@ -33,32 +32,6 @@ const tagsList = (lst, propsLst) =>
     />
   ));
 
-// Custom input field
-const TextInput = ({ label, params, onChange }) => {
-  // Select input on space press
-  params.inputProps.onKeyDown = (e) => {
-    if (e.key === " " && e.target.value) onChange(e.target.value);
-  };
-  // Select input on going outside of input field
-  params.inputProps.onBlur = (e) => {
-    if (e.target.value) onChange(e.target.value);
-  };
-  // Trim input to remove extra spaces
-  params.inputProps.value = params.inputProps.value?.trim();
-
-  return (
-    <TextControl
-      {...params}
-      variant="outlined"
-      size="small"
-      label={label}
-      noControls={true}
-      gutter={false}
-      defaultValue="hello"
-    />
-  );
-};
-
 // Main assignee text field
 export default function SelectLabels({ name, label, control, rules, ...rest }) {
   // State to save option to show in dropdown
@@ -82,16 +55,9 @@ export default function SelectLabels({ name, label, control, rules, ...rest }) {
           onChange(val);
         };
 
-        // Method to change text input
-        const setTextcontrol = (newVal) => {
-          let valLst = [];
-          if (value?.length > 0) valLst = [...value];
-          if (!valLst.includes(newVal)) valLst.push(newVal);
-          setAutocomplete(valLst);
-        };
-
         return (
           <Autocomplete
+            size="small"
             freeSolo
             multiple
             value={value}
@@ -99,9 +65,10 @@ export default function SelectLabels({ name, label, control, rules, ...rest }) {
             options={optionList}
             getOptionLabel={(option) => option}
             filterSelectedOptions
+            disableClearable
             renderTags={tagsList}
             renderInput={(params) => (
-              <TextInput label={label} params={params} onChange={setTextcontrol} />
+              <TextField variant="outlined" label={label} {...params} />
             )}
             {...rest}
           />
