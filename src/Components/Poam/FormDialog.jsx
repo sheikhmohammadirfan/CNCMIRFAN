@@ -100,6 +100,7 @@ function FormDialog({ poamID_data, rows, open, onClose, rowIndex, onSubmit }) {
   const submitForm = async (data) => {
     setisLoading(true);
 
+    // Backend requires column names that are lower-case with underscores. So, formatting that data here from uppercase to lowercase
     // setting columns names to lower cases
     const newFormatData = {}
     Object.keys(data).map((colName, index) => {

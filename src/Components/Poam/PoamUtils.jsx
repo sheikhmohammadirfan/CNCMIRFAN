@@ -256,7 +256,12 @@ export const putIssueInData = (setter, getSheet, index, issueID) => {
   if (index !== -1)
     setter((prevData) => {
       const temp = copyObject(prevData);
-      getSheet(temp).jira_issues[index][issueID] = true;
+      let sheet = getSheet(temp);
+      // Making empty object for Jira issue on the index of the row, and setting the issueId to true for that row
+      if (!sheet.jira_issues[index]) sheet.jira_issues[index] = {};
+      sheet.jira_issues[index] = {
+        [issueID]: true
+      }
       return temp;
     });
 };

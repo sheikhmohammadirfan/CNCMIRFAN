@@ -5,7 +5,8 @@ export const CreateIssue = {
   summary: "",
   description: "",
   issuetype: "",
-  assignee: "",
+  // Empty string on assignee was resulting in the Select dropdown having a default empty value. So set to null here to prevent that
+  assignee: null,
   labels: [],
   file: [],
 };

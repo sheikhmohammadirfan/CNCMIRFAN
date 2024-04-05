@@ -257,8 +257,11 @@ export default function PoamTable({ fileID }) {
   };
 
   // Method to set rowindex in param and show createIssue dialog
-  const showCreateIssue = () =>
-    changeParams({ rowIndex: getCurrentIndex(), createIssue: true });
+  const showCreateIssue = () => {
+    // Adding rowId in params, so that it can be accessed by CreateIssue component, to send it to backend.
+    const rowIndex = getCurrentIndex();
+    return changeParams({ rowIndex: getCurrentIndex(), createIssue: true, rowId: getPoam()["id"][rowIndex] });
+  }
 
   // Method to set issue details in param and show updateIssue dialog
   const showUpdateIssue = () =>

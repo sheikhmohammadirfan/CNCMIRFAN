@@ -62,6 +62,18 @@ export default function SelectLabels({ name, label, control, rules, ...rest }) {
             multiple
             value={value}
             onChange={(e, newVal) => setAutocomplete(newVal)}
+            // Spaces between labels is not allowed by Jira, so we're making it such that on space click, the typed input becomes a chip
+            onKeyDown={(e) => {
+              if (e.key === " " || e.code === "Space") {
+                e.preventDefault();
+                // If typed input is not a space (" ") character
+                if (e.target.value.length > 0) {
+                  // If typed input is not in "value" array, add it in "value" array, else clear input
+                  if (!value.includes(e.target.value)) setAutocomplete([...value, e.target.value])
+                  else e.target.value = "";
+                }
+              }
+            }}
             options={optionList}
             getOptionLabel={(option) => option}
             filterSelectedOptions

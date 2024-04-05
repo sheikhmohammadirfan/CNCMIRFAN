@@ -3,7 +3,12 @@ import { poam_header_response_map } from "../assets/data/PoamData";
 
 /* Method to create new POA&M */
 export async function createPoam(data) {
-  return await post("/poam/createnew/", data);
+
+  // As backend is accepting formData instead of JSON, we're making formData
+  const formData = new FormData();
+  for (let key of Object.keys(data)) formData.append(key, data[key]);
+
+  return await post("/poam/createnew/", formData);
 }
 
 /* Method to upload a POA&M file */
@@ -97,6 +102,7 @@ async function moveToOpen(fileID, data, rowIndex, newIndex) {
 /* Method to move data */
 export async function moveRow(fileID, data, isOpen, rowIndex, newIndex) {
 
+  // The endpoint for movetoopen and movetoclose has merged on backend, so sending request from here only as this is common function for both operations
   return await put(`/poam/moveto/${fileID}`, {
     id: data.id
   });

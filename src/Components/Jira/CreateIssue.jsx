@@ -33,18 +33,19 @@ const LoadingStatus = (loading) => ({
       {loading("project")
         ? "Loading Project..."
         : loading("issuetype")
-        ? "Loading Issue type..."
-        : loading("assignee")
-        ? "Loading Assignees..."
-        : loading("submit")
-        ? "Submiting data..."
-        : ""}
+          ? "Loading Issue type..."
+          : loading("assignee")
+            ? "Loading Assignees..."
+            : loading("submit")
+              ? "Submiting data..."
+              : ""}
     </Typography>
   ),
 });
 
 /* CREATE ISSUE */
-function CreateIssue({ title, poamID, close, rowIndex }) {
+// Added rowId in params and destructuring it here. It is done to send it in /createissue payload
+function CreateIssue({ title, poamID, close, rowIndex, rowId }) {
   DocumentTitle(title);
 
   // State to update option list
@@ -108,7 +109,6 @@ function CreateIssue({ title, poamID, close, rowIndex }) {
         const { data, status } = await fetchAssignee(projectWatcher);
         if (!status) return stopLoading();
         setAssignee(data);
-        setValue("assignee", "");
         stopLoading("assignee");
       })();
     }
@@ -116,11 +116,23 @@ function CreateIssue({ title, poamID, close, rowIndex }) {
 
   // Method to submit data to create an issue
   const onSubmit = async (formDetails) => {
+
+    const labels = formDetails.labels.join(",")
+    const payload = {
+      project: formDetails.project,
+      row_id: rowId,
+      summary: formDetails.summary,
+      description: formDetails.description,
+      issuetype: formDetails.issuetype,
+      assignee: formDetails.assignee.id,
+      labels: labels,
+    };
+
     startLoading("submit");
     const { message, status } = await createIssue(
-      formDetails,
-      rowIndex,
-      poamID
+      payload,
+      // rowIndex,
+      // poamID
     );
     notification(
       "jira-issue",
@@ -146,7 +158,11 @@ function CreateIssue({ title, poamID, close, rowIndex }) {
       }
       contentProp={{ style: { padding: 16 } }}
       content={
-        <Form control={control} rules={validation}>
+        <Form
+          // preventDefault to prevent form from submitting on any Enter presses
+          onSubmit={(e) => e.preventDefault()}
+          control={control}
+          rules={validation}>
           <Grid container spacing={2}>
             <Grid item xs={6}>
               <SelectControl
@@ -280,6 +296,7 @@ export default function CreateIssueWrapper({ title, queryParams, close }) {
       title={title}
       poamID={getParams().file}
       rowIndex={queryParams.rowIndex}
+      rowId={queryParams.rowId}
       close={handleClose}
     />
   );

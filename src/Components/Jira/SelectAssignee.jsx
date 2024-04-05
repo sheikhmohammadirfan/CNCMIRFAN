@@ -6,6 +6,8 @@ import {
   withStyles,
   Badge,
   Box,
+  TextField,
+  FormHelperText
 } from "@material-ui/core";
 import { Autocomplete } from "@material-ui/lab";
 import { Controller } from "react-hook-form";
@@ -82,6 +84,7 @@ export default function SelectAssignee({
   control,
   multiple,
   rules,
+  options,
   ...rest
 }) {
   return (
@@ -90,29 +93,30 @@ export default function SelectAssignee({
       control={control}
       rules={rules[name]}
       render={({ field: { value, onChange }, fieldState: { error } }) => (
-        <Autocomplete
-          value={value}
-          onChange={(e, newVal) => onChange(newVal)}
-          multiple={multiple}
-          filterSelectedOptions
-          getOptionSelected={(option, test) => option.id === test?.id}
-          getOptionLabel={(option) => option.displayName || ""}
-          renderOption={(option) => RenderLabel(option)}
-          renderTags={(value, props) => RenderTagList(value, props)}
-          renderInput={(params) => (
-            <TextControl
-              {...params}
-              variant="outlined"
-              size="small"
-              label={label}
-              error={Boolean(error)}
-              helperText={error ? error.message : ""}
-              noControls={true}
-              style={{ maxWidth: "max-content", minWidth: 250 }}
-            />
-          )}
-          {...rest}
-        />
+        <>
+          <Autocomplete
+            value={value}
+            onChange={(e, newVal) => onChange(newVal)}
+            options={options}
+            multiple={multiple}
+            filterSelectedOptions
+            getOptionSelected={(option, test) => option.id === test?.id}
+            getOptionLabel={(option) => option.displayName || ""}
+            renderOption={(option) => RenderLabel(option)}
+            renderTags={(value, props) => RenderTagList(value, props)}
+            renderInput={(params) => (
+              // Added error prop here. This results in border becoming red if there's some error
+              <TextField error={error ? true : false} variant="outlined" label={label} {...params} />
+            )}
+            {...rest}
+          />
+          {/* If error, show the error message */}
+          {error &&
+            <FormHelperText style={{ marginLeft: '14px' }} error={Boolean(error)}>
+              {error.message}
+            </FormHelperText>
+          }
+        </>
       )}
     />
   );

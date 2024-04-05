@@ -148,7 +148,8 @@ function App() {
               </ParamsRoutes>
 
               <ParamsRoutes
-                params={["createIssue", "rowIndex"]}
+              // Add rowId in params array, so when it is in the params, the CreateIssue component will mount.
+                params={["createIssue", "rowIndex", "rowId"]}
                 removeParams={["createIssue"]}
               >
                 <CreateIssue title="Create Issue" />

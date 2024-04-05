@@ -43,6 +43,7 @@ export const columns_width = [
   200, 240, 300, 200, 200, 170, 150, 230, 400, 400, 300, 150, 300,
 ];
 
+// Mapping of names that come in response from backend, to names that are required by frontend to populate data
 export const poam_header_response_map = {
   "id": "id",
   "is_open": "is_open",
