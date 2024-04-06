@@ -43,7 +43,10 @@ export default function useHeightResize(
     (e) => {
       const gridRows = colsHeight.map((col, i) => {
         if (i === activeIndex) {
-          let height = e.clientY - col.top - tableRef?.current.offsetTop;
+          let height =
+            e.clientY -
+            col.top -
+            tableRef.current.parentNode.getBoundingClientRect().y;
           if (i > 0) height += tableRef?.current.parentNode.scrollTop;
 
           if (Array.isArray(minHeight))

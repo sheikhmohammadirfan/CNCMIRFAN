@@ -27,8 +27,8 @@ const useStyles = makeStyles((theme) => ({
     "& > table": { borderCollapse: "separate" },
     // "&, & td, & th": { borderColor: theme.palette.grey[400] },
     "& tr:last-child td": {
-      borderBottom: 'none'
-    }
+      borderBottom: "none",
+    },
   },
 
   // Table style
@@ -71,7 +71,13 @@ const useStyles = makeStyles((theme) => ({
 
   // Highlight headr backgroud
   headerStyle: {
-    "& th": { background: '#e6f6f4', borderColor: '#d9d9d9', border: '1px solid', borderLeft: 0 },
+    "& th": {
+      background: "#e6f6f4",
+      borderColor: "#d9d9d9",
+      border: "1px solid",
+      borderLeft: 0,
+      userSelect: "none",
+    },
     "&.sticky th": {
       position: "sticky",
       top: 0,
@@ -159,8 +165,8 @@ function DataTable({
               e.stopPropagation();
             }}
             data-test="datatable-header-checkbox"
-          // disableRipple
-          // style={{ padding: 0, margin: "0 9px" }}
+            // disableRipple
+            // style={{ padding: 0, margin: "0 9px" }}
           />
         ),
         params: { checkbox: "", header: "" },
@@ -187,8 +193,8 @@ function DataTable({
             onChange={(e) => toggleRow(startIndex + index, e.target.checked)}
             onClick={(e) => e.stopPropagation()}
             data-test="datatable-row-checkbox"
-          // disableRipple
-          // style={{ padding: 0, margin: "0 9px" }}
+            // disableRipple
+            // style={{ padding: 0, margin: "0 9px" }}
           />
         ),
         params: { checkbox: "", row: "" },
@@ -234,7 +240,9 @@ function DataTable({
 
   return (
     <TableContainer
-      className={`${classes.root} ${verticalBorder && classes.border} ${className}`}
+      className={`${classes.root} ${
+        verticalBorder && classes.border
+      } ${className}`}
       {...rest}
     >
       <Table
@@ -242,11 +250,11 @@ function DataTable({
         style={
           resizeTable
             ? {
-              gridTemplateColumns: generateColumns(),
-              gridTemplateRows: Array(rowData.length + 1)
-                .fill("50px")
-                .join(" "),
-            }
+                gridTemplateColumns: generateColumns(),
+                gridTemplateRows: Array(rowData.length + 1)
+                  .fill("50px")
+                  .join(" "),
+              }
             : {}
         }
         ref={tableRef}

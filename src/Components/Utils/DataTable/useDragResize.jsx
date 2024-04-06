@@ -56,7 +56,10 @@ export default function useDragResize(
       const gridColumns = colsWidth.map((col, i) => {
         if (i === activeIndex) {
           // Calculate the column width
-          let width = e.clientX - col.left - tableRef.current.offsetLeft;
+          let width =
+            e.clientX -
+            col.left -
+            tableRef.current.parentNode.getBoundingClientRect().x;
           if (i > 1) width += tableRef.current.parentNode.scrollLeft;
 
           if (i === 0)
