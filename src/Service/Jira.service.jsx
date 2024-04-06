@@ -52,24 +52,24 @@ export async function fetchIssueDetails(key) {
 /* Method to create issue & link it to given POA&M row */
 export async function createIssue(data, row_index, poamID) {
   // create formData obj
-  // const formData = new FormData();
+  const formData = new FormData();
 
   // Add row_index
   // formData.append("row_index", row_index);
 
   // Add all value except assignee & file
-  // for (let key of Object.keys(data))
-  //   if (!["file", "assignee"].includes(key)) formData.append(key, data[key]);
+  for (let key of Object.keys(data))
+    if (key !== "file") formData.append(key, data[key]);
 
   // Check if any file is attached, then add for formData
-  // if (data.file?.length > 0)
-  //   for (let file of data.file) formData.append("file[]", file);
+  if (data.file?.length > 0)
+    for (let file of data.file) formData.append("file[]", file);
 
   // Check if any asignee is selected then, add it id
   // if (data.assignee) formData.append("assignee", data.assignee.id);
 
   // in new endpoint, poamID is not required. Also they're accepting json payload instead of formData, so we're directly sending json data instead of formData
-  return await post(`/jira/newissue/`, data, { notify: false });
+  return await post(`/jira/newissue/`, formData, { notify: false });
 }
 
 /* Method to update issue with given details */
