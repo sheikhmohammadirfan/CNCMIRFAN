@@ -111,8 +111,8 @@ function FormDialog({ poamID_data, rows, open, onClose, rowIndex, onSubmit }) {
       else {
         newColNameFormat = colName.toLowerCase().replaceAll(" ", "_").replaceAll("-", "_");
       }
-      newFormatData[newColNameFormat] = data[colName];
-    })
+      newFormatData[newColNameFormat] = data[colName] || "";
+    });
 
     // Push jira_issues column in datatable
     await onSubmit({ ...newFormatData, jira_issues: rows.jira_issues[rowIndex] || {} });

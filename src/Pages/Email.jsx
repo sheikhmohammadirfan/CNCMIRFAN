@@ -81,7 +81,7 @@ const useStyles = makeStyles((theme) => ({
   heading: {
     margin: "0 0 !important",
     padding: "0",
-    borderBottom: `0.2px solid ${theme.palette.primary.light_grey}`
+    borderBottom: `0.2px solid ${theme.palette.primary.light_grey}`,
   },
 
   headingText: {
@@ -576,13 +576,17 @@ function Email({ title, close }) {
               onClick={handleSubmit}
               className={classes.sendButton}
             >
-              Send
-              {loader ? (
+              <span style={{ display: "flex", alignItems: "center" }}>
+                Send
                 <CircularProgress
                   size={20}
-                  style={{ color: "#fff", marginLeft: "6px" }}
+                  style={{
+                    color: "#fff",
+                    marginLeft: "6px",
+                    width: loader ? 20 : 0,
+                  }}
                 />
-              ) : null}
+              </span>
             </Button>
             <IconButton
               className={classes.attachIcon}

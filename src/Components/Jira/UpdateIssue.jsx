@@ -170,7 +170,7 @@ function UpdateIssue({ title, close, issues }) {
     updateLoading({ customfield_10020: true, components: false });
     const { data: sprintData, status: sprintStatus } = await fetchSprint();
     if (!sprintStatus) return stopLoading();
-    setSprintList(sprintData.map((val) => ({ val: val.id, text: val.name })));
+    setSprintList(sprintData.map((val) => ({ val: String(val.id), text: val.name })));
     stopLoading();
 
     return assigneeData;
