@@ -46,6 +46,7 @@ const TextControl = withStyles(() => ({
             fontSize: 15,
             // margin: "1",
           },
+          ...others.InputProps
         }}
       />
     )}

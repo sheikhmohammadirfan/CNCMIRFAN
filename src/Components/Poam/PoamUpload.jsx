@@ -14,6 +14,7 @@ import {
   CircularProgress,
   Chip,
   FormHelperText,
+  InputAdornment
 } from "@material-ui/core";
 import React from "react";
 import {
@@ -116,6 +117,7 @@ const AddNewPoamDialog = ({
   loading: { isLoading, startLoading, stopLoading },
   selectFile,
   cspName,
+  cspLoading
 }) => {
   const classes = useStyle();
 
@@ -178,6 +180,11 @@ const AddNewPoamDialog = ({
   });
   const watchFile = watch("file");
 
+  // set csp input field's value to what we received from backend
+  if (cspName) {
+    setValue("csp", cspName)
+  }
+
   // Make create api call with onsubmitting form
   const onSubmit = async (formData) => {
     startLoading();
@@ -228,8 +235,15 @@ const AddNewPoamDialog = ({
                   label="CSP Name"
                   size="small"
                   fullWidth
-                  disabled={Boolean(cspName)}
+                  disabled={cspLoading || Boolean(cspName)}
                   gutter={false}
+                  InputProps={cspLoading && {
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <CircularProgress size={20} color="inherit" />
+                      </InputAdornment>
+                    )
+                  }}
                 />
               </Grid>
 
@@ -297,6 +311,7 @@ const AddNewPoamDialog = ({
         <Button
           variant="contained"
           color="secondary"
+          disabled={cspLoading}
           onClick={handleSubmit(onSubmit)}
         >
           {isCreate() ? "Create" : "Add"}
@@ -345,6 +360,7 @@ export default function PoamUpload({ selectFile }) {
 
   // State to save api data
   const [cspName, setCspName] = useState("");
+  const [cspLoading, setCspLoading] = useState(false);
   const [poamList, setPoamList] = useState([]);
 
   // State to save download props
@@ -364,12 +380,15 @@ export default function PoamUpload({ selectFile }) {
       const { data, status } = await getPoamList();
       if (!status) return stopLoading("load");
       if (data) setPoamList(data);
+      stopLoading("load");
+    })();
 
+    (async () => {
+      setCspLoading(true);
       const res = await getCSP();
       if (!res.status) return;
       if (res.data.csp) setCspName(res.data.csp);
-
-      stopLoading("load");
+      setCspLoading(false);
     })();
   }, []);
 
@@ -461,6 +480,7 @@ export default function PoamUpload({ selectFile }) {
           }}
           selectFile={selectFile}
           cspName={cspName}
+          cspLoading={cspLoading}
         />
       )}
     </Box>

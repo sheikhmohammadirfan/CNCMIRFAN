@@ -81,6 +81,7 @@ const useStyles = makeStyles((theme) => ({
   heading: {
     margin: "0 0 !important",
     padding: "0",
+    borderBottom: `0.2px solid ${theme.palette.primary.light_grey}`
   },
 
   headingText: {
@@ -545,6 +546,7 @@ function Email({ title, close }) {
               name="message"
               value={message}
               onChange={(e) => setMessage(e.target.value)}
+              placeholder="Body"
               InputProps={{
                 disableUnderline: true,
               }}
