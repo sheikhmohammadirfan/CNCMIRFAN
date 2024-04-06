@@ -51,8 +51,9 @@ export async function getData(id) {
 
   mapped_data["file_name"] = res.data.file_name;
   mapped_data["csp"] = res.data.csp;
-  mapped_data["systemName"] = res.data.system_name;
-  mapped_data["agencyName"] = res.data.agency_name;
+  // changed from camelCase to snake_case because the file details popup in header expects snake_case
+  mapped_data["system_name"] = res.data.system_name;
+  mapped_data["agency_name"] = res.data.agency_name;
 
   return { data: mapped_data, status: res.status };
 }

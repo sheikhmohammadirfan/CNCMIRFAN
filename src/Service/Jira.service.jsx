@@ -1,4 +1,4 @@
-import { post, get, patch } from "./CrudFactory";
+import { post, get, put } from "./CrudFactory";
 
 /* Method to link JIRA to user */
 export async function linkWithJira(link, email, api_token) {
@@ -74,7 +74,7 @@ export async function createIssue(data, row_index, poamID) {
 
 /* Method to update issue with given details */
 export async function updateIssue(data) {
-  let formData = new FormData();
+  const jsonData = {};
 
   // Append data to formdata
   for (let key of Object.keys(data)) {
@@ -82,17 +82,21 @@ export async function updateIssue(data) {
     if (key !== "issuetype") {
       // Check if any value is passed
       if (data[key]) {
+        // Check if key is label, then make that array as a string of comma separated values
+        if(key === "labels") {
+          jsonData[key] = data[key].join(",")
+        }
         // Check if it is assignee or repoeter, then push their ids
-        if (key === "assignee" || key === "reporter")
-          formData.append(key, data[key].id);
+        else if (key === "assignee" || key === "reporter")
+          jsonData[key] = data[key].id
         // else if key is dueDate, the convert it into same format
         else if (key === "duedate")
-          formData.append(key, data[key]?.format("YYYY-MM-DD"));
-        else formData.append(key, data[key]);
+          jsonData[key] = data[key]?.format("YYYY-MM-DD");
+        else jsonData[key] = data[key]
       }
     }
   }
 
   // make update request
-  return await patch("/jira/updateissue/", formData, { notify: false });
+  return await put("/jira/updateissue/", jsonData, { notify: false });
 }

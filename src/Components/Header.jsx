@@ -170,8 +170,7 @@ function Header({ scrollTarget }) {
                 position: 'absolute',
                 left: 120
               }}>
-                {'cspName'}
-                CloudSecure Pro
+                {poamDetails.cspName}
               </Typography>
 
             </Box>
@@ -182,8 +181,7 @@ function Header({ scrollTarget }) {
                 position: 'absolute',
                 left: 120
               }}>
-                {'systemName'}
-                SecureCloudApp
+                {poamDetails.systemName}
               </Typography>
             </Box>
             <Box display={'flex'} position={'relative'} mt={1}>
@@ -192,8 +190,7 @@ function Header({ scrollTarget }) {
                 position: 'absolute',
                 left: 120
               }}>
-                {'agencyName'}
-                CyberAgencies Inc.
+                {poamDetails.agencyName}
               </Typography>
             </Box>
           </Box>

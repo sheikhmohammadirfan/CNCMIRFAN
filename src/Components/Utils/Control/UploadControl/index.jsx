@@ -1,4 +1,4 @@
-import React, { useState, forwardRef, useEffect } from "react";
+import React, { useState, forwardRef, useEffect, useRef } from "react";
 import { Field } from "../Form";
 import { RenderChildren } from "./RenderChildren";
 import { RenderDragNDrop } from "./RenderDragNDrop";
@@ -21,10 +21,11 @@ const UploadControl = forwardRef((props, ref) => {
   // List of selected files to populate on next select
   const [selectedFiles, setSelectedFiles] = React.useState([]);
   // Create template for input change method, to passed in useEffect
-  let changeInput = () => {};
+  // Added this function in useRef to prevent func from changing on re-render
+  let changeInput = useRef(() => {});
   // Update input field, on state change
   useEffect(() => {
-    if (props.multiple) changeInput(selectedFiles);
+    if (props.multiple) changeInput.current(selectedFiles);
   }, [selectedFiles]);
 
   // method to trigger input file selection dialog
@@ -53,7 +54,7 @@ const UploadControl = forwardRef((props, ref) => {
         ...others
       }) => {
         // Populate onChange, with onChange listener
-        changeInput = controls?.field.onChange || onChange;
+        changeInput.current = controls?.field.onChange || onChange;
 
         return (
           <>
@@ -70,7 +71,7 @@ const UploadControl = forwardRef((props, ref) => {
                 addFiles(
                   multiple,
                   e.target.files,
-                  changeInput,
+                  changeInput.current,
                   setSelectedFiles
                 )
               }

@@ -126,6 +126,7 @@ function CreateIssue({ title, poamID, close, rowIndex, rowId }) {
       issuetype: formDetails.issuetype,
       assignee: formDetails.assignee.id,
       labels: labels,
+      file: formDetails.file
     };
 
     startLoading("submit");
@@ -238,7 +239,7 @@ function CreateIssue({ title, poamID, close, rowIndex, rowId }) {
             </Grid>
 
             <Grid item xs={12}>
-              <UploadControl name="file" />
+              <UploadControl name="file" multiple />
             </Grid>
           </Grid>
         </Form>

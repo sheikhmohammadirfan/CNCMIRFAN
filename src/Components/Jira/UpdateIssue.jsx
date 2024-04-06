@@ -41,20 +41,20 @@ const LoadingStatus = (loading) => ({
       {loading("fetchingIssue")
         ? "Fetching Issue..."
         : loading("issueType")
-        ? "Loading Issue type..."
-        : loading("assignee")
-        ? "Loading Assignee..."
-        : loading("priority")
-        ? "Loading Priority..."
-        : loading("customfield_10014")
-        ? "Loading Epic Link..."
-        : loading("components")
-        ? "Loading Components..."
-        : loading("customfield_10020")
-        ? "Loading Sprint..."
-        : loading("submit")
-        ? "Submiting data..."
-        : ""}
+          ? "Loading Issue type..."
+          : loading("assignee")
+            ? "Loading Assignee..."
+            : loading("priority")
+              ? "Loading Priority..."
+              : loading("customfield_10014")
+                ? "Loading Epic Link..."
+                : loading("components")
+                  ? "Loading Components..."
+                  : loading("customfield_10020")
+                    ? "Loading Sprint..."
+                    : loading("submit")
+                      ? "Submiting data..."
+                      : ""}
     </Typography>
   ),
 });
@@ -228,7 +228,11 @@ function UpdateIssue({ title, close, issues }) {
       }
       contentProp={{ style: { padding: 16 } }}
       content={
-        <Form control={control} rules={validation}>
+        <Form
+          // preventDefault to prevent form from submitting on any Enter presses
+          onSubmit={(e) => e.preventDefault()}
+          control={control}
+          rules={validation}>
           <Grid container spacing={2}>
             {issueIDs.length > 1 && (
               <Grid item xs={7}>
