@@ -61,17 +61,17 @@ export const useStyle = makeStyles((theme) => ({
       },
       "&.asc::before": {
         content: "'\\2193'",
-        color: '#008374'
+        color: '#4477CE'
       },
       "&.dsc::after": {
         content: "'\\2191'",
-        color: '#008374'
+        color: '#4477CE'
       },
     },
 
     // Giving box shadow on left side to First cell on select
     "& tr.Mui-selected td:nth-child(1)": {
-      boxShadow: 'inset 4px 0 0 0 #008374',
+      boxShadow: 'inset 4px 0 0 0 #4477CE',
     },
 
     // Change background color of selected row CELLS
@@ -87,7 +87,7 @@ export const useStyle = makeStyles((theme) => ({
     "& tbody td:nth-child(2)": { borderRight: `1px solid ${theme.palette.grey[300]}` },
 
     // searched data cell style
-    "& tbody td[data-searched='true']": { border: "2px solid #008374" },
+    "& tbody td[data-searched='true']": { border: "2px solid #4477CE" },
   },
 
   //Header cell style

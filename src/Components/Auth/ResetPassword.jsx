@@ -14,44 +14,74 @@ const useStyles = makeStyles((theme) => ({
   title: {
     fontSize: 25,
     color: theme.palette.primary.main,
-    marginBottom: 0,
+    textAlign:"center",
   },
+
   subText: {
-    color: "#808080",
+    color:theme.palette.primary.light,
     fontSize: 14,
   },
+
   dialogBox: {
+    "& .MuiTypography-h6 ":{
+      padding: "12px 30px",
+    },
+
+    "& .MuiGrid-spacing-xs-1 > .MuiGrid-item":{
+      padding:"0",
+    },
+
+    "& .MuiGrid-spacing-xs-1":{
+      margin:"0",
+    },
+
     "& .MuiDivider-root": {
       border: "none",
       height: "0",
     },
     "& .MuiDialog-paperWidthXs": {
       maxWidth: "350px",
+      
     },
-    "& .MuiInputBase-root": {
-      marginBottom: 0,
+
+    "& .MuiGrid-justify-content-xs-flex-end":{
+      display:"flex",
+      width:"100%",
+      justifyContent:"normal"
     },
-    "&  .MuiTypography-h6":{
-      margin: "10px 10px",
+
+    "& .MuiDialogActions-root":{
+      padding:"12px 30px 30px"
     },
-    "& .MuiInputBase-root":{
-      borderRadius: "50px",
+
+    "& .MuiGrid-spacing-xs-1 > .MuiGrid-item ":{
+      width:"100% !important"
+    },
+
+    "& .MuiDialogContent-root":{
+      padding:"12px 30px"
     }
+
   },
+
   formPara: {
-    color: "grey",
+    color:theme.palette.primary.light,
   },
+
   resetBtn: {
-    marginRight: 8, 
-    textTransform: "lowercase", 
+    width:"100%",
     backgroundColor: theme.palette.primary.main,
     color: "white",
-    borderRadius: 10,
-    marginBottom: 15,
+    borderRadius: 1 * theme.shape.borderRadius,
     "&:hover": {
       background: theme.palette.primary.light,
     },
-  }
+  },
+  
+  progress: {
+    // Define any additional styles for the CircularProgress component
+    color: theme.palette.primary.main, // Set the color using the primary color from the theme
+  },
 
 }));
 
@@ -68,9 +98,8 @@ function ResetPassword({ path, onClose }) {
   });
 
   const [checking, setChecking] = useState(true);
-
   const [loading, setLoading] = useState(false);
-
+ 
   const onSubmit = async (data) => {
     if (!loading) {
       setLoading(true);
@@ -110,19 +139,19 @@ function ResetPassword({ path, onClose }) {
       title={
         <>
           <Box className={classes.title}>
-            <span>Create new password</span>
+            <span>Reset Password</span>
           </Box>
           <Box className={classes.subText}>
             <p>Your new password should be different from previous used password.</p>
           </Box>
         </>
       }
-      titleProp={{ style: { padding: "8px 16px" } }}
+      titleProp={{ style: { padding: "0" } }}
       content={
         <Box>
           {checking ? (
-            <Typography variant="h6">
-              Verifing Link ... <CircularProgress size={25} color="inherit" />
+            <Typography variant="h6" className={classes.progress}>
+              Verifing Link ... <CircularProgress size={25} className={classes.progress} />
             </Typography>
           ) : (
             <Form
@@ -145,20 +174,20 @@ function ResetPassword({ path, onClose }) {
               <PasswordControl
                 name="password"
                 size="small"
-                variant="outlined"
+                variant="standard"
                 label="New password"
-                style={{ width: "90%" }}
+                style={{ width: "100%" }}
               />
               <PasswordControl
                 name="confirm_password"
                 size="small"
-                variant="outlined"
+                variant="standard"
                 label="Confirm password"
-                style={{ width: "90%" }}
+                style={{ width: "100%" }}
                 forceHidden={true}
               />
               <Typography variant="body2" className={classes.formPara}>
-                <i>Both passwords must match</i>
+                Passwords must match
               </Typography>
             </Form>
           )}
@@ -172,7 +201,7 @@ function ResetPassword({ path, onClose }) {
             loading ? <CircularProgress size={20} color="inherit" /> : null
           }
         >
-          Reset password
+          Reset Password
         </Button>,
       ]}
     />

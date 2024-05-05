@@ -30,16 +30,17 @@ const useStyles = makeStyles((theme) => ({
     overflow: "hidden",
     opacity: 0,
     pointerEvents: "none",
-    transition: "opacity 0.3s linear",
-    padding: `${theme.spacing(1)}px ${theme.spacing(2)}px`,
+    transition: "opacity 0.1s linear",
+    padding: `0 ${theme.spacing(5.5)}px`,
     [theme.breakpoints.down("sm")]: { padding: theme.spacing(1) },
     "&.active": { opacity: 1, pointerEvents: "all" },
   },
 
   // Styles for title
   title: {
-    fontWeight: "bold",
-    fontSize: 22,
+    textTransform: 'none',
+    textAlign:"center",
+    fontSize: "30px",
     marginTop: "25px",
     marginBottom: "17px",
     color: theme.palette.primary.main,
@@ -49,11 +50,11 @@ const useStyles = makeStyles((theme) => ({
   submitBtn: {
     background: theme.palette.primary.main,
     color: theme.textOnPrimary,
-    borderRadius: "10px",
-    marginLeft: 8,
-    width: 70,
+    borderRadius: 1 * theme.shape.borderRadius,
+    width: "100%",
     padding: "5px 40px",
-    textTransform: "lowercase",
+    margin:"10px 0 50px 0",
+    textTransform: "none",
     "&:hover": {
       background: theme.palette.primary.light,
     },
@@ -63,7 +64,9 @@ const useStyles = makeStyles((theme) => ({
   subText: {
     color: "grey",
     fontSize: 15.4,
-    marginBottom: 30,
+    marginBottom: 50,
+    marginTop:20,
+    color:theme.palette.primary.light,
   },
 
   //Return back to login
@@ -76,12 +79,13 @@ const useStyles = makeStyles((theme) => ({
   //Textfield and button alignment
   fieldAndButton: {
     display: "flex",
+    flexDirection:"column",
     marginTop: 14,
   },
   //Back to sign in page link
   signInLinkStyle: {
     textDecoration: "none",
-    color: theme.palette.primary.main,
+    color: theme.palette.primary.light,
   },
 
     //Media Query
@@ -119,9 +123,9 @@ export default function ForgotPassword({ show, login }) {
   return (
     <Box className={`${classes.root} ${show ? "active" : ""}`}>
       <Box>
-        <Typography className={classes.title}>FORGOT PASSWORD</Typography>
+        <Typography className={classes.title}>Forgot Password</Typography>
       </Box>
-      <Typography variant="p" className={classes.subText}>Enter the email address associated with your account and we will send you an email to reset your password</Typography>
+      <Typography variant="p" className={classes.subText}>You will get a link to reset your password on your email</Typography>
 
       <Box height={1} display="flex" flexDirection="column">
         <Form
@@ -143,7 +147,7 @@ export default function ForgotPassword({ show, login }) {
               type="email"
               name="email"
               size="small"
-              variant="outlined"
+              variant="standard"
               label="Email Id"
               data-test="login-email-field"
               fullWidth id="fullWidth"
@@ -158,7 +162,7 @@ export default function ForgotPassword({ show, login }) {
                   loading ? <CircularProgress size={20} color="inherit" /> : null
                 }
               >
-                Submit
+                Get Link
               </Button>
             </Box>
           </Box>

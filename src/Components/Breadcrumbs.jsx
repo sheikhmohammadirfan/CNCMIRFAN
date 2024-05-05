@@ -23,7 +23,7 @@ const useStyles = makeStyles({
   },
 
   poamLink: {
-    color: '#008374',
+    color: '#4477CE',
     fontSize: 12,
     alignSelf: 'flex-end',
     marginBottom: 2

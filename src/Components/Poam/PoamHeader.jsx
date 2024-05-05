@@ -37,7 +37,7 @@ const useStyle = makeStyles((theme) => ({
       borderBottom: '3px solid #d9d9d9',
       "&:nth-child(1)": { borderRadius: "4px 0 0 0" },
       "&:nth-child(2)": { borderRadius: "0 4px 0 0" },
-      "&:disabled": { color: '#008374', borderColor: '#008374' },
+      "&:disabled": { color: '#4477CE', borderColor: theme.palette.primary.main },
     },
   },
 
@@ -247,16 +247,16 @@ export default function PoamHeader({
                       {searchValue ? (
                         <IconButton
                           size="small"
-                          color="#008374"
+                          color="#4477CE"
                           onClick={() => {
                             updateSearch({ target: { value: "" } });
                           }}
-                          style={{ color: "#008374" }}
+                          style={{ color: "#4477CE" }}
                         >
                           <Icon>close</Icon>
                         </IconButton>
                       ) : (
-                        <Icon style={{ color: "#008374" }}>search</Icon>
+                        <Icon style={{ color: "#4477CE" }}>search</Icon>
                       )}
                     </InputAdornment>
                   ),
@@ -305,10 +305,10 @@ export default function PoamHeader({
                     onClick={openCreateForm}
                     startIcon={<Icon>add</Icon>}
                     style={{
-                      background: "#008374",
+                      background: "#4477CE",
                       color: "white",
                       borderRadius: 7,
-                      borderColor: '#008374',
+                      borderColor: '#4477CE',
                       height: 36,
                       marginLeft: 10,
                       paddingInline: 15
@@ -438,7 +438,7 @@ export default function PoamHeader({
                   endIcon=<Icon>tune</Icon>
                   className={classes.actionButton}
                   style={{
-                    color: '#008374',
+                    color: '#4477CE',
                     textTransform: 'none',
                     backgroundColor: '#F0F8F7',
                     borderRadius: 10,

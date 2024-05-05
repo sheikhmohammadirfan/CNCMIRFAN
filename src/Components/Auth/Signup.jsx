@@ -30,7 +30,7 @@ const useStyles = makeStyles((theme) => ({
   submitBtn: {
     width: "100%",
     height: "40px",
-    borderRadius: "50px",
+    borderRadius: 1 * theme.shape.borderRadius,
     paddingInline: theme.spacing(6),
     fontSize: theme.spacing(1.6),
     fontWeight: "bold",
@@ -39,7 +39,7 @@ const useStyles = makeStyles((theme) => ({
     display: "block",
     marginTop: "20px",
     "&:hover": {
-      background: theme.palette.primary.light,
+      background: theme.palette.primary.main,
     },
   },
   countryDropdown: {
@@ -58,6 +58,7 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   countryInput: {
+
     "& .MuiOutlinedInput-adornedStart": {
       paddingLeft: 4,
     },
@@ -76,7 +77,9 @@ const useStyles = makeStyles((theme) => ({
     marginTop: theme.spacing(0.4),
     marginBottom: theme.spacing(2),
     color: theme.palette.primary.main,
-    fontSize: "30px"
+    fontSize: "30px",
+    display:"grid",
+    placeItems:"center",
   },
   //Back to sign in page link
   signInLinkStyle: {
@@ -85,7 +88,7 @@ const useStyles = makeStyles((theme) => ({
   },
   // Terms and conditions checkbox text
   termsAndConditions: {
-    color: theme.palette.primary.main,
+    color: theme.palette.primary.light,
     "& .MuiTypography-root":{
       fontSize: "14px"
     }
@@ -136,14 +139,14 @@ const ContactNumControl = ({ name, label, control, rules }) => {
             name={name}
             error={error?.message}
             noControls={true}
-            variant="outlined"
+            variant="standard"
             label=" "
             placeholder="Contact No."
             size="small"
             fullWidth
             value={num === undefined ? "" : num}
             onChange={(e) => onChange(`${code}-${e.target.value}`)}
-            InputProps={{ startAdornment: <Adornment /> }}
+            // InputProps={{ startAdornment: <Adornment /> }}
             className={classes.countryInput}
           />
         );
@@ -256,7 +259,7 @@ export default function Signup({ title }) {
               name="email"
               size="small"
               fullWidth
-              variant="outlined"
+              variant="standard"
               label=" "
               placeholder="Email"
             />
@@ -264,7 +267,7 @@ export default function Signup({ title }) {
               name="password"
               size="small"
               fullWidth
-              variant="outlined"
+              variant="standard"
               label=" "
               placeholder="Password"
             />
@@ -297,7 +300,7 @@ export default function Signup({ title }) {
                 name="first_name"
                 size="small"
                 fullWidth
-                variant="outlined"
+                variant="standard"
                 label=" "
                 placeholder="First Name"
               />
@@ -306,7 +309,7 @@ export default function Signup({ title }) {
                 name="last_name"
                 size="small"
                 fullWidth
-                variant="outlined"
+                variant="standard"
                 label=" "
                 placeholder="Last Name"
               />
@@ -322,7 +325,7 @@ export default function Signup({ title }) {
               name="email"
               size="small"
               fullWidth
-              variant="outlined"
+              variant="standard"
               label=" "
               placeholder="Email"
             />
@@ -330,7 +333,7 @@ export default function Signup({ title }) {
               name="password"
               size="small"
               fullWidth
-              variant="outlined"
+              variant="standard"
               label=" "
               placeholder="Password"
             />

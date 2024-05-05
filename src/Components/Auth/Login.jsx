@@ -15,12 +15,12 @@ const useStyles = makeStyles((theme) => ({
   forgotPassword: {
     textDecoration: "none",
     "& .MuiTypography-root": {
-      color: theme.palette.primary.main,
+      color:theme.palette.primary.main,
       fontSize: "15.5px",
       letterSpacing: 0,
     },
     "&:hover": {
-      color: theme.palette.secondary.dark,
+      color: theme.palette.primary.light,
     },
   },
 
@@ -34,10 +34,9 @@ const useStyles = makeStyles((theme) => ({
   },
   // Styling for the "Remember Me" checkbox
   rememberMe: {
-    color: theme.palette.secondary.light,
+    color:theme.palette.primary.main,
     display: "flex",
     justifyContent: "center",
-    color: theme.palette.primary.main,
     "& .MuiTypography-root": {
       fontSize: "15.5px",
     }
@@ -49,14 +48,14 @@ const useStyles = makeStyles((theme) => ({
     display: "block",
     marginTop: "35px",
     marginBottom: "70px",
-    borderRadius: "70px",
+    borderRadius: 1 * theme.shape.borderRadius,
     paddingInline: theme.spacing(6),
     fontSize: theme.spacing(1.6),
     fontWeight: "bold",
-    background: theme.palette.primary.main,
+    backgroundColor:theme.palette.primary.main,
     color: theme.textOnPrimary,
     "&:hover": {
-      background: theme.palette.primary.light,
+      background:theme.palette.primary.light,
     },
   },
   // Styling for the "Create new account" link
@@ -70,6 +69,8 @@ const useStyles = makeStyles((theme) => ({
     marginTop: theme.spacing(3),
     marginBottom: theme.spacing(4),
     color: theme.palette.primary.main,
+    display:"grid",
+    placeItems:"center",
   },
 
   //Media Query
@@ -160,17 +161,17 @@ function Login({ title, homePage }) {
           type="email"
           name="email"
           size="small"
-          variant="outlined"
+          variant="standard"
           label=" "
           placeholder="Email"
           fullWidth
           data-test="login-email-field"
-          sx={{ borderRadius: "20px" }}
         />
+  
         <PasswordControl
           name="password"
           size="small"
-          variant="outlined"
+          variant="standard"
           label=" "
           placeholder="Password"
           fullWidth

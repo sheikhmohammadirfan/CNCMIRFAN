@@ -138,7 +138,7 @@ function Header({ scrollTarget }) {
               marginX: 1,
               position: "relative",
               "&::before": {
-                backgroundColor: "#008374",
+                backgroundColor: "#4477CE",
                 content: '""',
                 display: "block",
                 position: "absolute",
@@ -159,7 +159,7 @@ function Header({ scrollTarget }) {
             style={{
               padding: 10,
               width: 360,
-              background: '#008374',
+              background: '#4477CE',
               borderRadius: 6,
             }}
           >

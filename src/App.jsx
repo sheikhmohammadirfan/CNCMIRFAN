@@ -24,6 +24,8 @@ import Integrate from "./Pages/Integrate";
 import ParamsRoutes from "./Components/Utils/Routers/ParamsRoutes";
 import React from "react";
 
+
+
 // Custom values
 const sidebarSmall = 50;
 const sidebarLarge = 285;
@@ -37,9 +39,10 @@ let theme = createTheme({
   textOnPrimary: "#ffffff",
   palette: {
     primary: {
-      main: "#008374",
-      dark: "#008374",
-      light: "#449487",
+      // main: "#008374",
+      main: "#4477CE",
+      dark: "#4477CE",
+      light: "#2a96b5",
       light_grey:"#989898",
     },
     secondary: {
@@ -91,6 +94,9 @@ function App() {
 
   // State to save scrollbar open/close status
   const [isSidebarOpen, setSidebar] = React.useState(false);
+
+
+
 
   return (
     <ThemeProvider theme={theme}>

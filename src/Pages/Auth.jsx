@@ -5,6 +5,7 @@ import Login from "../Components/Auth/Login";
 import Signup from "../Components/Auth/Signup";
 import ForgotPassword from "../Components/Auth/ForgotPassword";
 import DocumentTitle from "../Components/DocumentTitle";
+import dummyImg from "../assets/img/heroImg2.png";
 // import logo from "../assets/img/company_logo.png";
 // import ParamsRoutes from "../Components/Utils/Routers/ParamsRoutes";
 import ResetPassword from "../Components/Auth/ResetPassword";
@@ -14,26 +15,47 @@ const useStyles = makeStyles((theme) => ({
 
   // Page
   page: {
+    overflow:"hidden",
+    position:"relative",
     width: "100%",
-    height: "100%",
-    background: "white",
-    paddingBlock: theme.spacing(2),
+    height: "100vh",
+    display:"flex",
   },
 
+  page_elmnt_1:{
+    backgroundColor:theme.palette.primary.main,
+    width:"50%",
+    height:"100%",
+    padding:"3rem 2rem",
+  },
+
+  listItemsContainer:{
+    display:"flex",
+    padding:"0",
+    margin:"0.8rem 0 0 0",
+    listStyle:"none",
+    gap:"1rem",
+    justifyContent:"flex-start",
+    alignItems:"flex-start",
+    
+  },
+
+listItems:{
+  color: theme.palette.primary.main,
+  height:"max-content",
+  padding:"0.5rem",
+  width:"max-content",
+  backgroundColor:"white",
+  border:"none",
+  borderRadius: 1 * theme.shape.borderRadius,
+}
+,
   // Root container
   root: {
-    width: "95%",
-    height: "90%",
-    maxWidth: 400,
-    marginInline: `auto`,
-    borderRadius: theme.shape.borderRadius * 2,
-    border: `2px solid ${theme.palette.grey[300]}`,
-    padding: `${theme.spacing(3)}px ${theme.spacing(2)}px`,
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    [theme.breakpoints.down("xs")]: { padding: theme.spacing(1) },
-    marginTop: "27px"
+    position: "relative",
+    width: "50%",
+    display:"grid",
+    placeItems:"center",
   },
   //Sign in
   login: {
@@ -43,22 +65,25 @@ const useStyles = makeStyles((theme) => ({
 
   // Form Container
   formContainer: {
-    position: "relative",
+    position: "absolute",
     overflow: "hidden",
-    width: "100%",
-    maxWidth: 350,
-    marginRight: "auto",
-    padding: `0 ${theme.spacing(2.5)}px`,
+    maxWidth: 450,
+    padding: `0 ${theme.spacing(5.5)}px`,
     paddingBottom: theme.spacing(1),
-    borderRadius: 4 * theme.shape.borderRadius,
+    borderRadius: 1 * theme.shape.borderRadius,
     [theme.breakpoints.down("md")]: { padding: `0 ${theme.spacing(2)}px` },
     [theme.breakpoints.down("sm")]: {
       padding: `0 ${theme.spacing(1)}px`,
       margin: "auto",
     },
     "& .MuiOutlinedInput-root":{
-      borderRadius: "50px",
+      border:"none"
     },
+    backgroundColor:"white",
+    boxShadow:`
+    7.8px 2.1px 10px rgba(0, 0, 0, 0.07),
+    62px 17px 80px rgba(0, 0, 0, 0.035)
+  `
   },
 
   // formHeading to contains tab toggler
@@ -68,6 +93,10 @@ const useStyles = makeStyles((theme) => ({
     overflow: "hidden",
     borderRadius: theme.shape.borderRadius,
     border: `1px solid ${theme.palette.grey[400]}`,
+    "& .makeStyles-title-44":{
+      display:"grid",
+      placeItems:"center",
+    }
   },
 
   // Heading TAB style
@@ -100,9 +129,9 @@ const useStyles = makeStyles((theme) => ({
   formBody: {
     marginTop: "7px",
     display: "flex",
+    gap:"20px",
     width: "200%",
     transform: "translateX(0%)",
-    transition: "transform .5s cubic-bezier(.63,-0.58,.63,1.58)",
     "&.login": { transform: "translateX(-50%)" },
   },
 }));
@@ -144,6 +173,21 @@ export default function Auth({ title }) {
 
   return (
     <Box className={classes.page}>
+      <Box className={classes.page_elmnt_1}>
+        <Box style={{fontSize:"20px", fontWeight:"bolder", color:"white"}}>FALCON</Box>
+        <Box style={{fontSize:"35px", color:"white", display:"flex", flexDirection:"column", margin:"2.5rem 0 0 0"}}>Automate Your <span style={{fontSize:"35px", fontWeight:"bolder", color:"white"}}>Compliance Processes <span style={{fontSize:"20px", fontWeight:"lighter"}}>in</span> </span> </Box>
+        <Box> 
+          <ul className={classes.listItemsContainer}>
+            <li className={classes.listItems}>SOC 2</li>
+            <li className={classes.listItems}>FISMA</li>
+            <li className={classes.listItems}>CMMC</li>
+            <li className={classes.listItems}>ISO 27001</li>
+            <li className={classes.listItems}>PSS DSS</li>
+          </ul> 
+          </Box>
+          <Box style={{height:"max-content", width:"100%", display:"grid", placeItems:"center"}}><img src={dummyImg} style={{marginTop:"3rem",height:"400px", width:"400px"}}/></Box>
+          
+      </Box>
       <Box className={classes.root}>
         <main className={classes.formContainer}>
 
