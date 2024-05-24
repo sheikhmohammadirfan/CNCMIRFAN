@@ -22,6 +22,7 @@ import UpdateIssue from "./Components/Jira/UpdateIssue";
 import Profile from "./Pages/Profile";
 import Integrate from "./Pages/Integrate";
 import ParamsRoutes from "./Components/Utils/Routers/ParamsRoutes";
+import RiskManagement from "./Pages/RiskManagement";
 import React from "react";
 
 
@@ -43,7 +44,7 @@ let theme = createTheme({
       main: "#4477CE",
       dark: "#4477CE",
       light: "#2a96b5",
-      light_grey:"#989898",
+      light_grey: "#989898",
     },
     secondary: {
       main: "#22577A",
@@ -145,6 +146,9 @@ function App() {
                     <Route exact path="/Integrated_Platforms">
                       <Integrate title="Integrated Platforms" />
                     </Route>
+                    <Route exact path="/risk_management">
+                      <RiskManagement title="Integrated Platforms" />
+                    </Route>
                   </div>
                 </Box>
               </Box>
@@ -154,7 +158,7 @@ function App() {
               </ParamsRoutes>
 
               <ParamsRoutes
-              // Add rowId in params array, so when it is in the params, the CreateIssue component will mount.
+                // Add rowId in params array, so when it is in the params, the CreateIssue component will mount.
                 params={["createIssue", "rowIndex", "rowId"]}
                 removeParams={["createIssue"]}
               >
