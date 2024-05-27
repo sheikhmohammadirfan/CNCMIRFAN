@@ -41,8 +41,8 @@ import {
   getPoamID_data,
   getSortingMap,
 } from "./PoamUtils";
+import PoamDetails from "./PoamDetails";
 import jira from "../../assets/img/jira-brands.svg";
-
 
 /* POA&M TABLE COMPONENT */
 export default function PoamTable({ fileID }) {
@@ -69,6 +69,13 @@ export default function PoamTable({ fileID }) {
     let obj = data || poamData;
     return obj ? (isOpenPoam ? obj?.open : obj?.close) : {};
   };
+
+  // State for details
+  const [poamDetails, setPoamDetails] = useState({
+    cspName: "",
+    systemName: "",
+    agencyName: "",
+  });
 
   // React State to save table name (removed since now details are being displayed from main header component)
 
@@ -129,6 +136,11 @@ export default function PoamTable({ fileID }) {
       if (!status) return stopLoading();
       // Update state
       setPoamData({ open: data.open_data, close: data.closed_data });
+      setPoamDetails({
+        cspName: data.csp,
+        systemName: data.system_name,
+        agencyName: data.agency_name,
+      });
       stopLoading();
     })();
   }, []);
@@ -196,7 +208,8 @@ export default function PoamTable({ fileID }) {
     })
 
     // Passing the mappedData to updatePoamRow method
-    if (status) updatePoamRow(setPoamData, getPoam, mappedDataNewToOld, newIndex);
+    if (status)
+      updatePoamRow(setPoamData, getPoam, mappedDataNewToOld, newIndex);
   };
 
   // Method to edit existing row
@@ -214,9 +227,9 @@ export default function PoamTable({ fileID }) {
     const mappedDataNewToOld = {};
     Object.keys(data).map((colName, colIndex) => {
       mappedDataNewToOld[poam_header_response_map[colName]] = {
-        [rowIndex]: data[colName]
-      }
-    })
+        [rowIndex]: data[colName],
+      };
+    });
 
     // passing mapped data to updatePoamRow method instead of data which is in new format
     if (status) updatePoamRow(setPoamData, getPoam, mappedDataNewToOld, rowIndex);
@@ -344,6 +357,11 @@ export default function PoamTable({ fileID }) {
             searchSelected,
             setSelected,
           }}
+        />
+
+        <PoamDetails
+          poamDetails={poamDetails}
+          loading={isLoading()}
         />
 
         {isLoading() ? (
