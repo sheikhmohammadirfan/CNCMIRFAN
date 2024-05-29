@@ -296,7 +296,10 @@ export default function PoamTable({ fileID }) {
     );
     setTimeout(() => {
       const active = document.activeElement;
-      document.querySelector("td[data-searched='true']")?.focus();
+      document.querySelector("td[data-searched='true']")?.scrollIntoView({
+        block: 'center',    // Ensures vertical centering of the cell
+        inline: 'center'    // Ensures horizontal centering of the cell
+      })?.focus();
       if (active.tagName === "INPUT") {
         active.focus();
       }

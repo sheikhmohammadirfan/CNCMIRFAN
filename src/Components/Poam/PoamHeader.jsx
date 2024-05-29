@@ -178,12 +178,12 @@ export default function PoamHeader({
         console.log(e);
       }
     }
-    if (matches.length) {
-      matches[0].selected = true;
-      setSelected(0);
-    } else {
-      setSelected(-1);
-    }
+    setSelected(-1);       // Temporary reset to trigger useEffect in PoamTable every time searchValue gets changed
+    setTimeout(() => {     // To make sure setSelected(-1) above gets recognized
+      if (matches.length) {
+        setSelected(0);    // Set back to first match if there is a match
+      }
+    }, 0);
     setMatched(matches);
   }, [searchValue]);
 
