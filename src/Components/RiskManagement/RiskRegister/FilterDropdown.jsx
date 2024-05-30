@@ -6,10 +6,12 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: "white",
     border: "1px solid rgba(0, 0, 0, 0.1)",
     marginTop: "6px",
-    padding: "4px 0",
+    padding: "4px 0 0",
     "& .MuiListItem-root": {
       padding: 0
-    }
+    },
+    minWidth: 200,
+    maxWidth: "none",
   },
   customList: {
     fontSize: "0.8rem",
@@ -35,7 +37,7 @@ const useStyles = makeStyles((theme) => ({
       fontSize: "0.8rem",
     },
     "& input": {
-
+      // Tried to style checkbox. didn't work :\
     }
   },
   clearButton: {
@@ -50,12 +52,21 @@ const useStyles = makeStyles((theme) => ({
   }
 }))
 
-const FilterDropdown = ({ children }) => {
+const FilterDropdown = ({ filterName, buttonText, filterOptions, activeFilters, changeFilters, clearFilters }) => {
 
   const classes = useStyles();
 
   const [open, setOpen] = useState(false);
   const handleClose = () => setOpen(false);
+
+  // Handling checkbox clicks and changing filters
+  const handleCheckboxClick = (filterItem_id) => {
+    changeFilters(filterName, filterItem_id)
+  }
+
+  // Checking if filters are active, if yes then how many?
+  let isFiltersActive = activeFilters.length !== 0;
+  let activeFiltersCount = activeFilters.length
 
   return (
     <Tooltip
@@ -71,23 +82,26 @@ const FilterDropdown = ({ children }) => {
                 disablePadding
                 className={classes.customList}
               >
-                {Array(10).fill(null).map(() => (
-                  <ListItem style={{ padding: "0 0 0 8px" }}>
-                    <FormControlLabel
-                      className={classes.checkboxLabel}
-                      control={
-                        <Checkbox
-                          size='small'
-                          // defaultChecked
-                          style={{
-                            color: "#4477CE"
-                          }}
-                        />
-                      }
-                      label={"Label Label Label Label"}
-                    />
-                  </ListItem>
-                ))}
+                {filterOptions
+                  .sort((a, b) => (a.order - b.order))
+                  .map((filterItem, index) => (
+                    <ListItem key={index} style={{ padding: "0 0 0 8px" }}>
+                      <FormControlLabel
+                        className={classes.checkboxLabel}
+                        control={
+                          <Checkbox
+                            size='small'
+                            checked={activeFilters.includes(filterItem.id)}
+                            onChange={() => handleCheckboxClick(filterItem.id)}
+                            style={{
+                              color: "#4477CE"
+                            }}
+                          />
+                        }
+                        label={filterItem.text}
+                      />
+                    </ListItem>
+                  ))}
               </List>
               <Divider />
               <Box
@@ -100,6 +114,7 @@ const FilterDropdown = ({ children }) => {
                 <Button
                   size='small'
                   className={classes.clearButton}
+                  onClick={() => clearFilters(filterName)}
                 >
                   Clear
                 </Button>
@@ -116,12 +131,12 @@ const FilterDropdown = ({ children }) => {
           backgroundColor: "rgba(0, 0, 0, 0.05)",
           textTransform: "none",
           paddingInline: 10,
-          color: '#4477CE'
+          color: isFiltersActive ? '#4477CE' : "rgba(0, 0, 0, 0.75)"
         }}
         onClick={() => setOpen(true)}
       >
-        {"Categories"}
-        {"(1)"}
+        {buttonText}
+        {isFiltersActive ? ` (${activeFiltersCount})` : ""}
       </Button>
     </Tooltip>
   )

@@ -4,6 +4,9 @@ import { TextControl } from '../../Utils/Control';
 import OptionDropdown from './OptionDropdown';
 import FilterDropdown from './FilterDropdown';
 import jira from "../../../assets/img/jira-brands.svg"
+import RiskRegisterFilters from '../../../assets/data/RiskRegisterFilters';
+import { risk_register_columns } from '../../../assets/data/RiskRegisterColumns';
+import ManageRegisterColumns from './ManageRegisterColumns';
 
 // Generate Styles
 const useStyle = makeStyles((theme) => ({
@@ -49,7 +52,11 @@ const useStyle = makeStyles((theme) => ({
 const RiskRegisterHeader = ({
   moreOptionsHandlers,
   shareOptionsHandlers,
-  addScenarioOptionsHandlers
+  addScenarioOptionsHandlers,
+  activeFilters,
+  changeFilters,
+  clearFilters,
+  cols: { allColumns }
 }) => {
 
   const classes = useStyle();
@@ -120,6 +127,11 @@ const RiskRegisterHeader = ({
     }
   ]
 
+  // State to toggle Manage Columns dropdown
+  const [ismanageColsOpen, setManageColsOpen] = useState(false);
+  const openManageColsDropdown = () => setManageColsOpen(true);
+  const closeManageColsDropdown = () => setManageColsOpen(false);
+
   // State to manage md breakpoint
   const theme = useTheme();
   const aboveMd = useMediaQuery(theme.breakpoints.up('md'));
@@ -133,7 +145,7 @@ const RiskRegisterHeader = ({
         justifyContent="space-between"
         alignItems="center"
       >
-        {/* Contains Add scenario button, and Edit Button */}
+        {/* Contains Add scenario button, and Edit Button, and Jira Button */}
         <Box
           display={"flex"}
           alignItems={"center"}
@@ -332,44 +344,47 @@ const RiskRegisterHeader = ({
           display={"flex"}
           gridColumnGap={8}
         >
-          <FilterDropdown
-            options={[]}
-          >
-            <Button
-              size='small'
-              endIcon={<Icon style={{ rotate: '90deg', fontSize: '0.8rem' }}>arrow_forward_ios</Icon>}
-              style={{
-                backgroundColor: "rgba(0, 0, 0, 0.05)",
-                textTransform: "none",
-                paddingInline: 10,
-              }}
-            >
-              Owner
-            </Button>
-          </FilterDropdown>
-
-          <FilterDropdown
-            options={[]}
-          >
-            <Button
-              size='small'
-              endIcon={<Icon style={{ rotate: '90deg', fontSize: '0.8rem' }}>arrow_forward_ios</Icon>}
-              style={{
-                backgroundColor: "rgba(0, 0, 0, 0.05)",
-                textTransform: "none",
-                paddingInline: 10,
-                color: '#4477CE'
-              }}
-            >
-              Categories
-              {"(1)"}
-            </Button>
-          </FilterDropdown>
+          {RiskRegisterFilters
+            .sort((a, b) => (a.order - b.order))
+            .map((filter, index) => (
+              <FilterDropdown
+                key={index}
+                filterName={filter.name}
+                buttonText={filter.text}
+                filterOptions={filter.options}
+                activeFilters={activeFilters[filter.name]}
+                changeFilters={changeFilters}
+                clearFilters={clearFilters}
+              />
+            ))}
         </Box>
 
         {/* Dropdown to show and hide columns */}
         <Box>
-
+          <ManageRegisterColumns
+            open={ismanageColsOpen}
+            handleClose={closeManageColsDropdown}
+            cols={{ allColumns }}
+          // addColumns={moveToSecondary}
+          // removeColums={moveToPrimary}
+          >
+            <Button
+              onClick={openManageColsDropdown}
+              endIcon=<Icon>tune</Icon>
+              className={classes.actionButton}
+              style={{
+                // color: '#4477CE',
+                // textTransform: 'none',
+                // backgroundColor: '#F0F8F7',
+                // borderRadius: 10,
+                // paddingInline: 15,
+                width: !aboveMd && 50,
+                fontSize: "0.8rem"
+              }}
+            >
+              {aboveMd && 'Columns'}
+            </Button>
+          </ManageRegisterColumns>
         </Box>
       </Box>
     </>
