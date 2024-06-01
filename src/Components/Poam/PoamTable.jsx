@@ -157,7 +157,7 @@ export default function PoamTable({ fileID }) {
   // Check if issueId is passed, after creating issue, then update the poam data
   useEffect(() => {
     if (params.issueId) {
-      putIssueInData(setPoamData, getPoam, getCurrentIndex(), params.issueId);
+      putIssueInData(setPoamData, getPoam, getCurrentIndexes(), params.issueId);
       deleteParams("issueId");
     }
   }, [params]);
@@ -170,6 +170,14 @@ export default function PoamTable({ fileID }) {
     // Else get rowindex by adding offset if it is open poam
     const offset = isOpenPoam ? 2 : 0;
     return getRowIndex(getPoam(), selectedRow[0] + offset, sortingMap);
+  };
+
+
+  //Method to get multiple Rows Index 
+  const getCurrentIndexes = () => {
+    if (selectedRow.length === 0) return [];
+    const offset = isOpenPoam ? 2 : 0;
+    return selectedRow.map(row => getRowIndex(getPoam(), row + offset, sortingMap));
   };
 
   // Map data to header
@@ -265,15 +273,20 @@ export default function PoamTable({ fileID }) {
 
   // Method to check if row contains any issue
   const containIssue = () => {
-    const rowIndex = getCurrentIndex();
+    const rowIndexes = getCurrentIndexes();
+    if (rowIndexes && rowIndexes.length > 1) return false;
+    const rowIndex = rowIndexes[0];
     return rowIndex !== -1 && !isEmpty(getPoam()["jira_issues"][rowIndex]);
   };
 
   // Method to set rowindex in param and show createIssue dialog
   const showCreateIssue = () => {
-    // Adding rowId in params, so that it can be accessed by CreateIssue component, to send it to backend.
-    const rowIndex = getCurrentIndex();
-    return changeParams({ rowIndex: getCurrentIndex(), createIssue: true, rowId: getPoam()["id"][rowIndex] });
+    // Adding multiple selected rowIds in params, so that it can be accessed by CreateIssue component, to send it to backend.
+    const rowIndexes = getCurrentIndexes();
+    if (rowIndexes.length > 0) {
+      const rowIds = rowIndexes.map(index => getPoam()["id"][index]).join(",");
+      return changeParams({ rowIndex: rowIndexes, createIssue: true, rowId: rowIds });
+    }
   }
 
   // Method to set issue details in param and show updateIssue dialog

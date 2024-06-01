@@ -75,7 +75,6 @@ export default function ManageJira({
                   Create Issue
                 </Typography>
               </ListItem>
-
               {checkIssue() && (
                 <ListItem
                   dense

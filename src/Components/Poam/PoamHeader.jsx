@@ -357,7 +357,7 @@ export default function PoamHeader({
               >
                 <Button
                   className={classes.actionButton}
-                  disabled={!(isOpenPoam && selectedRow.length === 1)}
+                  disabled={!(isOpenPoam && selectedRow.length >= 1)}
                   onClick={openJira}
                 >
                   <img
@@ -366,7 +366,7 @@ export default function PoamHeader({
                     style={{
                       height: "20px",
                       marginRight: aboveMd ? 8 : 0,
-                      opacity: !(isOpenPoam && selectedRow.length === 1) ? 0.4 : 1,
+                      opacity: !(isOpenPoam && selectedRow.length >= 1) ? 0.4 : 1,
                     }}
                   />
                   {aboveMd && 'Jira'}
