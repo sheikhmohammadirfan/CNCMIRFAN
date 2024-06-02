@@ -124,7 +124,7 @@ export default function PoamHeader({
   manageRow: { openEditFrom, openCreateForm, openJustify },
   manageSheet: { isOpenPoam, showOpenPoam, showClosePoam },
   manageJira: { containIssue, showCreateIssue, showUpdateIssue },
-  search: { matchedCell, setMatched, searchSelected, setSelected },
+  search: { matchedCell, setMatched, searchSelected, setSelected, setSearchTerm },
 }) {
 
   const classes = useStyle();
@@ -185,6 +185,7 @@ export default function PoamHeader({
       }
     }, 0);
     setMatched(matches);
+    setSearchTerm(searchValue); // Update the search term in PoamTable
   }, [searchValue]);
 
   // State to manage md breakpoint

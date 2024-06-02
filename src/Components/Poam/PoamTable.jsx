@@ -194,7 +194,8 @@ export default function PoamTable({ fileID }) {
       secondaryOpen,
       setSecondaryOpen,
       matchedCell,
-      sortingMap
+      sortingMap,
+      searchTerm,
     );
 
   // ? ----------> ROW MANUPULATION METHODS
@@ -300,6 +301,7 @@ export default function PoamTable({ fileID }) {
 
   const [matchedCell, setMatched] = useState([]);
   const [searchSelected, setSelected] = useState(-1);
+  const [searchTerm, setSearchTerm] = useState("");
   useEffect(() => {
     setMatched((prev) =>
       prev.map((cell, idx) => ({
@@ -372,6 +374,7 @@ export default function PoamTable({ fileID }) {
             setMatched,
             searchSelected,
             setSelected,
+            setSearchTerm,
           }}
         />
 
@@ -405,6 +408,7 @@ export default function PoamTable({ fileID }) {
                 minCellWidth={visibleColumns.map(
                   (name) => columns_width[allColumns.indexOf(name)]
                 )}
+                searchTerm={searchTerm}
               />
             </Grid>
 

@@ -97,6 +97,13 @@ const useStyles = makeStyles((theme) => ({
       borderRight: `${theme.spacing(1 / 8)}px solid ${theme.palette.grey[200]}`,
     },
   },
+
+  // Style for highlighting searched word
+  searchHighlight: {
+    backgroundColor: 'yellow',
+    display: 'inline-block',
+  },
+
 }));
 
 /** Main DataTable Component */
@@ -125,6 +132,7 @@ function DataTable({
   minCellWidth = 200,
   minCheckboxWidth = 50,
   className = "",
+  searchTerm = "",
   ...rest
 }) {
   const classes = useStyles();
@@ -238,6 +246,15 @@ function DataTable({
     rowData
   );
 
+  // Function to highlight search term in text
+  const highlightSearchTerm = (text) => {
+    if (!searchTerm || typeof text !== 'string') return text;
+    const parts = text.split(new RegExp(`(${searchTerm})`, 'gi'));
+    return parts.map((part, index) => (
+      part.toLowerCase() === searchTerm.toLowerCase() ? <span className={classes.searchHighlight}>{part}</span> : part
+    ));
+  };
+
   return (
     <TableContainer
       className={`${classes.root} ${
@@ -306,7 +323,7 @@ function DataTable({
                       }
                       data-test="datatable-row-cell"
                     >
-                      {rowWrapper(text)}
+                      {rowWrapper(highlightSearchTerm(text))}
                       {resizeTable && colIndex === 0 && (
                         <HeightResizer index={rowIndex + 1} />
                       )}
@@ -386,6 +403,7 @@ DataTable.propTypes = {
   minCheckboxWidth: (...params) =>
     propsRequiredIF(...params, "checkbox", "number"),
   className: PropTypes.string,
+  searchTerm: PropTypes.string,
 };
 
 export default DataTable;
