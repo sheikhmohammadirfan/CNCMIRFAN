@@ -22,7 +22,7 @@ import { isPasswordValid } from "../Utils/Control/Controls.utils.js";
 import { Link } from "react-router-dom";
 import { EMAIL_REGEX } from "../../assets/data/Other";
 import countryCodesList from "country-codes-list";
-
+import CountrySelect from "./CountrySelect.jsx";
 const useStyles = makeStyles((theme) => ({
 
 
@@ -90,11 +90,19 @@ const useStyles = makeStyles((theme) => ({
   termsAndConditions: {
     color: theme.palette.primary.light,
     "& .MuiTypography-root":{
-      fontSize: "14px"
-    }
+      fontSize: "14px",
+    },
   },
+  contactBox: {
+    display: "flex",
+    alignItems: "flex-start",
+    flexDirection: "row",
+  },
+  contact_no: {
+    marginLeft:9, 
+    minWidth: "16.25rem"
+  }
 }));
-
 // Custom test input for contact number with country code dropdown selector
 const ContactNumControl = ({ name, label, control, rules }) => {
   // Generate styles
@@ -166,6 +174,7 @@ export default function Signup({ title }) {
   const validations = {
     first_name: { required: "First Name is required." },
     last_name: { required: "Last Name is required." },
+    contact_no: { required: "Contact Number is required." },
     email: {
       pattern: {
         value: EMAIL_REGEX,
@@ -178,21 +187,16 @@ export default function Signup({ title }) {
       validate: { invalid: (val) => val === "" || isPasswordValid(val) },
     },
     contact_no: {
-      required: "Number is required.",
+      required: "Contact Number is required",
       validate: {
-        invalid: (val) => {
-          const [code, num] = val.split("-");
-          if (!num?.match(/^\d{10}$/)) return "Contact no. invalid.";
-          if (code === "") return "Select Country code.";
-          return true;
-        },
-      },
-    },
+        invalid: (val) => val === ""
+      }
+    }
   };
 
   // TODO: Reset is not working
   const { handleSubmit, control, reset } = useForm({
-    defaultValues: { contact_no: "+1-" },
+    defaultValues: { contact_no: "" },
   });
 
   // handle on Submit
@@ -314,12 +318,32 @@ export default function Signup({ title }) {
                 placeholder="Last Name"
               />
             </Box>
-            <ContactNumControl
-              control={control}
-              rules={validations}
-              label="contact no"
-              name="contact_no"
-            />
+            <Box
+              className={classes.contactBox}
+            >
+              <Controller
+                name="country_code"
+                control={control}
+                render={({ field }) => (
+                  <CountrySelect
+                    value={field.value}
+                    onChange={field.onChange}
+                    onBlur={field.onBlur}
+                  />
+                )}
+              />
+              <Box className={classes.contact_no}>
+                <TextControl
+                  type="number"
+                  name="contact_no"
+                  size="small"
+                  fullWidth
+                  variant="standard"
+                  label=" "
+                  placeholder="Contact Number"
+                />
+              </Box>
+            </Box>
             <TextControl
               type="email"
               name="email"

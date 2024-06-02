@@ -20,6 +20,15 @@ const TextControl = withStyles(() => ({
       opacity: 0,
       transition: "all .1s linear",
     },
+
+    // Disable up and down spinners for numberic field
+    '& input[type="number"]::-webkit-outer-spin-button, & input[type="number"]::-webkit-inner-spin-button': {
+      '-webkit-appearance': 'none',
+      margin: 0,
+    },
+    '& input[type="number"]': {
+      '-moz-appearance': 'textfield',
+    },
   },
 }))((props) => (
   <Field
