@@ -3,4 +3,5 @@ export const BreadcrumbMapper = {
   verify: "Verify",
   Integrated_Platforms: "Integrated Platforms",
   profile: "Setting",
+  risk_management: "Risk"
 };

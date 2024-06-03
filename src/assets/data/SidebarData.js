@@ -135,4 +135,10 @@ export const SidebarData = [
       search: `?${changeQueryParams({ email: true })}`,
     }),
   },
+  {
+    icon: "warning",
+    title: "Risk Management",
+    component: Link,
+    to: "/risk_management"
+  }
 ];

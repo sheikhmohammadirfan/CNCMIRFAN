@@ -72,7 +72,7 @@ const useStyles = makeStyles((theme) => ({
   // Highlight headr backgroud
   headerStyle: {
     "& th": {
-      background: "#e6f6f4",
+      background: "#f1f1f1",
       borderColor: "#d9d9d9",
       border: "1px solid",
       borderLeft: 0,
@@ -323,7 +323,7 @@ function DataTable({
                       }
                       data-test="datatable-row-cell"
                     >
-                      {rowWrapper(highlightSearchTerm(text))}
+                      {rowWrapper(highlightSearchTerm(text), params.colName)}
                       {resizeTable && colIndex === 0 && (
                         <HeightResizer index={rowIndex + 1} />
                       )}
