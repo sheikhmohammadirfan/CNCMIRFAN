@@ -252,15 +252,19 @@ export const updateColumns = (allColumns, secondaryColumns) =>
   allColumns.filter((columnName) => !secondaryColumns.includes(columnName));
 
 /* Method to put issue in the current POA&M sheet */
-export const putIssueInData = (setter, getSheet, index, issueID) => {
-  if (index !== -1)
+export const putIssueInData = (setter, getSheet, indexes, issueID) => {
+
+  if (indexes && indexes.length)
     setter((prevData) => {
       const temp = copyObject(prevData);
       let sheet = getSheet(temp);
       // Making empty object for Jira issue on the index of the row, and setting the issueId to true for that row
-      if (!sheet.jira_issues[index]) sheet.jira_issues[index] = {};
-      sheet.jira_issues[index][issueID] = true;
+      indexes.forEach(row=>{
+        if (!sheet.jira_issues[row]) sheet.jira_issues[row] = {};
+        sheet.jira_issues[row][issueID] = true;
+      })
       return temp;
+      
     });
 };
 

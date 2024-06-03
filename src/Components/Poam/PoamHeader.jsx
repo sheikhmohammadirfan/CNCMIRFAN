@@ -124,7 +124,7 @@ export default function PoamHeader({
   manageRow: { openEditFrom, openCreateForm, openJustify },
   manageSheet: { isOpenPoam, showOpenPoam, showClosePoam },
   manageJira: { containIssue, showCreateIssue, showUpdateIssue },
-  search: { matchedCell, setMatched, searchSelected, setSelected },
+  search: { matchedCell, setMatched, searchSelected, setSelected, setSearchTerm },
 }) {
 
   const classes = useStyle();
@@ -178,13 +178,14 @@ export default function PoamHeader({
         console.log(e);
       }
     }
-    if (matches.length) {
-      matches[0].selected = true;
-      setSelected(0);
-    } else {
-      setSelected(-1);
-    }
+    setSelected(-1);       // Temporary reset to trigger useEffect in PoamTable every time searchValue gets changed
+    setTimeout(() => {     // To make sure setSelected(-1) above gets recognized
+      if (matches.length) {
+        setSelected(0);    // Set back to first match if there is a match
+      }
+    }, 0);
     setMatched(matches);
+    setSearchTerm(searchValue); // Update the search term in PoamTable
   }, [searchValue]);
 
   // State to manage md breakpoint
@@ -357,7 +358,7 @@ export default function PoamHeader({
               >
                 <Button
                   className={classes.actionButton}
-                  disabled={!(isOpenPoam && selectedRow.length === 1)}
+                  disabled={!(isOpenPoam && selectedRow.length >= 1)}
                   onClick={openJira}
                 >
                   <img
@@ -366,7 +367,7 @@ export default function PoamHeader({
                     style={{
                       height: "20px",
                       marginRight: aboveMd ? 8 : 0,
-                      opacity: !(isOpenPoam && selectedRow.length === 1) ? 0.4 : 1,
+                      opacity: !(isOpenPoam && selectedRow.length >= 1) ? 0.4 : 1,
                     }}
                   />
                   {aboveMd && 'Jira'}

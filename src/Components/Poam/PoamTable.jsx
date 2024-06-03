@@ -41,8 +41,8 @@ import {
   getPoamID_data,
   getSortingMap,
 } from "./PoamUtils";
+import PoamDetails from "./PoamDetails";
 import jira from "../../assets/img/jira-brands.svg";
-
 
 /* POA&M TABLE COMPONENT */
 export default function PoamTable({ fileID }) {
@@ -69,6 +69,13 @@ export default function PoamTable({ fileID }) {
     let obj = data || poamData;
     return obj ? (isOpenPoam ? obj?.open : obj?.close) : {};
   };
+
+  // State for details
+  const [poamDetails, setPoamDetails] = useState({
+    cspName: "",
+    systemName: "",
+    agencyName: "",
+  });
 
   // React State to save table name (removed since now details are being displayed from main header component)
 
@@ -129,6 +136,11 @@ export default function PoamTable({ fileID }) {
       if (!status) return stopLoading();
       // Update state
       setPoamData({ open: data.open_data, close: data.closed_data });
+      setPoamDetails({
+        cspName: data.csp,
+        systemName: data.system_name,
+        agencyName: data.agency_name,
+      });
       stopLoading();
     })();
   }, []);
@@ -145,7 +157,7 @@ export default function PoamTable({ fileID }) {
   // Check if issueId is passed, after creating issue, then update the poam data
   useEffect(() => {
     if (params.issueId) {
-      putIssueInData(setPoamData, getPoam, getCurrentIndex(), params.issueId);
+      putIssueInData(setPoamData, getPoam, getCurrentIndexes(), params.issueId);
       deleteParams("issueId");
     }
   }, [params]);
@@ -158,6 +170,14 @@ export default function PoamTable({ fileID }) {
     // Else get rowindex by adding offset if it is open poam
     const offset = isOpenPoam ? 2 : 0;
     return getRowIndex(getPoam(), selectedRow[0] + offset, sortingMap);
+  };
+
+
+  //Method to get multiple Rows Index 
+  const getCurrentIndexes = () => {
+    if (selectedRow.length === 0) return [];
+    const offset = isOpenPoam ? 2 : 0;
+    return selectedRow.map(row => getRowIndex(getPoam(), row + offset, sortingMap));
   };
 
   // Map data to header
@@ -174,7 +194,8 @@ export default function PoamTable({ fileID }) {
       secondaryOpen,
       setSecondaryOpen,
       matchedCell,
-      sortingMap
+      sortingMap,
+      searchTerm,
     );
 
   // ? ----------> ROW MANUPULATION METHODS
@@ -196,7 +217,8 @@ export default function PoamTable({ fileID }) {
     })
 
     // Passing the mappedData to updatePoamRow method
-    if (status) updatePoamRow(setPoamData, getPoam, mappedDataNewToOld, newIndex);
+    if (status)
+      updatePoamRow(setPoamData, getPoam, mappedDataNewToOld, newIndex);
   };
 
   // Method to edit existing row
@@ -214,9 +236,9 @@ export default function PoamTable({ fileID }) {
     const mappedDataNewToOld = {};
     Object.keys(data).map((colName, colIndex) => {
       mappedDataNewToOld[poam_header_response_map[colName]] = {
-        [rowIndex]: data[colName]
-      }
-    })
+        [rowIndex]: data[colName],
+      };
+    });
 
     // passing mapped data to updatePoamRow method instead of data which is in new format
     if (status) updatePoamRow(setPoamData, getPoam, mappedDataNewToOld, rowIndex);
@@ -252,15 +274,20 @@ export default function PoamTable({ fileID }) {
 
   // Method to check if row contains any issue
   const containIssue = () => {
-    const rowIndex = getCurrentIndex();
+    const rowIndexes = getCurrentIndexes();
+    if (rowIndexes && rowIndexes.length > 1) return false;
+    const rowIndex = rowIndexes[0];
     return rowIndex !== -1 && !isEmpty(getPoam()["jira_issues"][rowIndex]);
   };
 
   // Method to set rowindex in param and show createIssue dialog
   const showCreateIssue = () => {
-    // Adding rowId in params, so that it can be accessed by CreateIssue component, to send it to backend.
-    const rowIndex = getCurrentIndex();
-    return changeParams({ rowIndex: getCurrentIndex(), createIssue: true, rowId: getPoam()["id"][rowIndex] });
+    // Adding multiple selected rowIds in params, so that it can be accessed by CreateIssue component, to send it to backend.
+    const rowIndexes = getCurrentIndexes();
+    if (rowIndexes.length > 0) {
+      const rowIds = rowIndexes.map(index => getPoam()["id"][index]).join(",");
+      return changeParams({ rowIndex: rowIndexes, createIssue: true, rowId: rowIds });
+    }
   }
 
   // Method to set issue details in param and show updateIssue dialog
@@ -274,6 +301,7 @@ export default function PoamTable({ fileID }) {
 
   const [matchedCell, setMatched] = useState([]);
   const [searchSelected, setSelected] = useState(-1);
+  const [searchTerm, setSearchTerm] = useState("");
   useEffect(() => {
     setMatched((prev) =>
       prev.map((cell, idx) => ({
@@ -283,7 +311,10 @@ export default function PoamTable({ fileID }) {
     );
     setTimeout(() => {
       const active = document.activeElement;
-      document.querySelector("td[data-searched='true']")?.focus();
+      document.querySelector("td[data-searched='true']")?.scrollIntoView({
+        block: 'center',    // Ensures vertical centering of the cell
+        inline: 'center'    // Ensures horizontal centering of the cell
+      })?.focus();
       if (active.tagName === "INPUT") {
         active.focus();
       }
@@ -343,7 +374,13 @@ export default function PoamTable({ fileID }) {
             setMatched,
             searchSelected,
             setSelected,
+            setSearchTerm,
           }}
+        />
+
+        <PoamDetails
+          poamDetails={poamDetails}
+          loading={isLoading()}
         />
 
         {isLoading() ? (
@@ -371,6 +408,7 @@ export default function PoamTable({ fileID }) {
                 minCellWidth={visibleColumns.map(
                   (name) => columns_width[allColumns.indexOf(name)]
                 )}
+                searchTerm={searchTerm}
               />
             </Grid>
 

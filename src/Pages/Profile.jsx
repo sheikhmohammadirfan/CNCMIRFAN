@@ -22,9 +22,11 @@ import { Controller, useForm } from "react-hook-form";
 import { isPasswordValid } from "../Components/Utils/Control/Controls.utils.js";
 import { updateProfile } from "../Service/UserFactory";
 import { Profile as defaultValues } from "../assets/data/DefaultValue";
+import { useEffect } from 'react';
 import countryCodes from "country-codes-list";
 import useLoading from "../Components/Utils/Hooks/useLoading";
 import { stringToMoment } from "../Components/Utils/Utils";
+import CountrySelect from "../Components/Auth/CountrySelect"
 
 /* GENERATE STYLES */
 const useStyles = makeStyles((theme) => ({
@@ -55,80 +57,22 @@ const useStyles = makeStyles((theme) => ({
     "& label": { display: "none" },
     "& legend": { display: "none" },
   },
+  contact_no: {
+    display:"flex", 
+    flexDirection:"row", 
+    alignItems:"center",
+  },
+  countryCode_box: {
+    maxHeight:20, 
+    minWidth:110, 
+    maxWidth:110, 
+    display:"flex",
+  },
+  contact_no_textControl: {
+    minWidth:282,
+    marginLeft:8,
+  }
 }));
-
-// Custom test input for countact number with country code dropdown selector
-const ContactNumControl = ({ name, label, control, rules }) => {
-  // Generate styles
-  const classes = useStyles();
-
-  // Get mapping of countryCode with callingCode
-  const callingCodes = countryCodes.customList(
-    "countryCode",
-    "+{countryCallingCode}"
-  );
-
-  // Map countryCode to options
-  const options = Object.entries(callingCodes).map(([val, text]) => ({
-    val,
-    text: `${val} ${text}`,
-  }));
-
-  return (
-    <Controller
-      name={name}
-      control={control}
-      rules={rules[name]}
-      render={({ field: { value, onChange }, fieldState: { error } }) => {
-        // Extract callingcode & number
-        const [code, num] = value.split("-");
-
-        // Extract countryCode from callingCode to populate Select input
-        const getCountryCode = () => {
-          if (!code) return "";
-          for (let countryCode in callingCodes)
-            if (callingCodes[countryCode] === code) return countryCode;
-          return "";
-        };
-
-        // Country code selection input
-        const Adornment = () => (
-          <InputAdornment position="start">
-            <SelectControl
-              name="option"
-              label=" "
-              styleProps={{ className: classes.countryDropdown }}
-              options={options}
-              value={getCountryCode()}
-              onChange={(e) =>
-                onChange(`${callingCodes[e.target.value]}-${num || ""}`)
-              }
-            />
-          </InputAdornment>
-        );
-
-        return (
-          <TextControl
-            name={name}
-            label={label}
-            error={error?.message}
-            noControls={true}
-            variant="outlined"
-            size="small"
-            gutter={false}
-            fullWidth
-            value={num === undefined ? "" : num}
-            onChange={(e) => onChange(`${code}-${e.target.value}`)}
-            InputProps={{ startAdornment: <Adornment /> }}
-            className={classes.contact_input}
-            style={{ maxWidth: 400 }}
-          />
-        );
-      }}
-    />
-  );
-};
-
 /* PROFILE COMPONENT */
 export default function Profile({ title }) {
   DocumentTitle(title);
@@ -144,11 +88,7 @@ export default function Profile({ title }) {
     contact_no: {
       validate: {
         invalid: (val) => {
-          if (val === "") return true;
-          const [code, num] = val.split("-");
-          if (!num?.match(/^\d{10}$/)) return "Contact no. invalid.";
-          if (code === "") return "Select Country code.";
-          return true;
+          if (val === "") return "Contact no. invalid.";
         },
       },
     },
@@ -182,6 +122,20 @@ export default function Profile({ title }) {
       stopLoading();
     }
   };
+
+  useEffect(() => {
+    const fetchUserData = () => {
+      const userData = getUser();
+      if (userData) {
+        reset({
+          ...getValues(), // Preserve other form values
+          country_code: userData.country_code, // Update country_code with fetched data
+        });
+      }
+    };
+  
+    fetchUserData();
+  }, [reset, getValues]);
 
   return (
     <Box>
@@ -236,12 +190,34 @@ export default function Profile({ title }) {
                   <Typography>Contact No:</Typography>
                 </Grid>
                 <Grid item xs={9}>
-                  <ContactNumControl
-                    name="contact_no"
-                    label="Contact No."
-                    control={control}
-                    rules={validation}
-                  />
+                  <Box className={classes.contact_no}>
+                    <Box className={classes.countryCode_box}>
+                      <Controller
+                        name="country_code"
+                        control={control}
+                        render={({ field }) => (
+                          <CountrySelect
+                            variant={"outlined"}
+                            value={field.value}
+                            onChange={field.onChange}
+                            onBlur={field.onBlur}
+                          />
+                        )}
+                      />
+                    </Box>
+                    <Box
+                    className={classes.contact_no_textControl}
+                    >
+                      <TextControl
+                        variant="outlined"
+                        size="small"
+                        name="contact_no"
+                        label=" "
+                        gutter={false}
+                        fullWidth
+                      />
+                    </Box>
+                  </Box>
                 </Grid>
 
                 <Grid item xs={3}>
