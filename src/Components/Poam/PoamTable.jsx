@@ -277,7 +277,7 @@ export default function PoamTable({ fileID }) {
     const rowIndexes = getCurrentIndexes();
     if (rowIndexes && rowIndexes.length > 1) return false;
     const rowIndex = rowIndexes[0];
-    return rowIndex !== -1 && !isEmpty(getPoam()["jira_issues"][rowIndex]);
+    return rowIndex !== -1 && !isEmpty(getPoam()?.["jira_issues"]?.[rowIndex]);
   };
 
   // Method to set rowindex in param and show createIssue dialog
