@@ -7,7 +7,7 @@ import {
   poam_header,
   poam_header_response_map,
   secondary_columns,
-} from "../../assets/data/PoamData";fgetPoam()?.["jira_issues"]?.[rowIndex]
+} from "../../assets/data/PoamData";
 import FormDialog from "./FormDialog";
 import JustificationDialog from "./JustificationDialog";
 import PoamHeader from "./PoamHeader";
