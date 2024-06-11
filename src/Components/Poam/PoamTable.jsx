@@ -7,7 +7,7 @@ import {
   poam_header,
   poam_header_response_map,
   secondary_columns,
-} from "../../assets/data/PoamData";
+} from "../../assets/data/PoamData";fgetPoam()?.["jira_issues"]?.[rowIndex]
 import FormDialog from "./FormDialog";
 import JustificationDialog from "./JustificationDialog";
 import PoamHeader from "./PoamHeader";
@@ -277,7 +277,7 @@ export default function PoamTable({ fileID }) {
     const rowIndexes = getCurrentIndexes();
     if (rowIndexes && rowIndexes.length > 1) return false;
     const rowIndex = rowIndexes[0];
-    return rowIndex !== -1 && !isEmpty(getPoam()["jira_issues"][rowIndex]);
+    return rowIndex !== -1 && !isEmpty(getPoam()?.["jira_issues"]?.[rowIndex]);
   };
 
   // Method to set rowindex in param and show createIssue dialog
