@@ -7,9 +7,6 @@ const useStyles = makeStyles((theme) => ({
     border: "1px solid rgba(0, 0, 0, 0.1)",
     marginTop: "6px",
     padding: "4px 0 0",
-    "& .MuiListItem-root": {
-      padding: 0
-    },
     minWidth: 200,
     maxWidth: "none",
   },
@@ -30,6 +27,9 @@ const useStyles = makeStyles((theme) => ({
       backgroundColor: "#cbcbcb",
     }
   },
+  listItem: {
+    padding: "0 0 0 8px"
+  },
   checkboxLabel: {
     width: "100%",
     color: "rgba(0, 0, 0, 0.87)",
@@ -40,8 +40,14 @@ const useStyles = makeStyles((theme) => ({
       // Tried to style checkbox. didn't work :\
     }
   },
+  checkbox: {
+    color: theme.palette.primary.main,
+    "&.Mui-checked": {
+      color: theme.palette.primary.main,
+    }
+  },
   clearButton: {
-    backgroundColor: "#4477CE",
+    backgroundColor: theme.palette.primary.main,
     color: "white",
     textTransform: "none",
     height: 25,
@@ -49,7 +55,20 @@ const useStyles = makeStyles((theme) => ({
     "&:hover": {
       backgroundColor: "rgba(68, 119, 206, 0.85)"
     }
-  }
+  },
+  filterButtonIcon: {
+    rotate: '90deg',
+    fontSize: '0.8rem !important',
+  },
+  filterButton: {
+    backgroundColor: "rgba(0, 0, 0, 0.05)",
+    textTransform: "none",
+    paddingInline: 10,
+    color: "rgba(0, 0, 0, 0.75)",
+    "&[data-active='true']": {
+      color: theme.palette.primary.main
+    }
+  },
 }))
 
 const FilterDropdown = ({ filterName, buttonText, filterOptions, activeFilters, changeFilters, clearFilters }) => {
@@ -83,9 +102,8 @@ const FilterDropdown = ({ filterName, buttonText, filterOptions, activeFilters, 
                 className={classes.customList}
               >
                 {filterOptions
-                  .sort((a, b) => (a.order - b.order))
                   .map((filterItem, index) => (
-                    <ListItem key={index} style={{ padding: "0 0 0 8px" }}>
+                    <ListItem key={index} className={classes.listItem}>
                       <FormControlLabel
                         className={classes.checkboxLabel}
                         control={
@@ -93,9 +111,7 @@ const FilterDropdown = ({ filterName, buttonText, filterOptions, activeFilters, 
                             size='small'
                             checked={activeFilters.includes(filterItem.id)}
                             onChange={() => handleCheckboxClick(filterItem.id)}
-                            style={{
-                              color: "#4477CE"
-                            }}
+                            className={classes.checkbox}
                           />
                         }
                         label={filterItem.text}
@@ -126,14 +142,10 @@ const FilterDropdown = ({ filterName, buttonText, filterOptions, activeFilters, 
     >
       <Button
         size='small'
-        endIcon={<Icon style={{ rotate: '90deg', fontSize: '0.8rem' }}>arrow_forward_ios</Icon>}
-        style={{
-          backgroundColor: "rgba(0, 0, 0, 0.05)",
-          textTransform: "none",
-          paddingInline: 10,
-          color: isFiltersActive ? '#4477CE' : "rgba(0, 0, 0, 0.75)"
-        }}
+        endIcon={<Icon className={classes.filterButtonIcon}>arrow_forward_ios</Icon>}
+        className={classes.filterButton}
         onClick={() => setOpen(true)}
+        data-active={isFiltersActive ? "true" : "false"}
       >
         {buttonText}
         {isFiltersActive ? ` (${activeFiltersCount})` : ""}

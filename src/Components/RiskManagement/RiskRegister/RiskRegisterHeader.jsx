@@ -4,8 +4,8 @@ import { TextControl } from '../../Utils/Control';
 import OptionDropdown from './OptionDropdown';
 import FilterDropdown from './FilterDropdown';
 import jira from "../../../assets/img/jira-brands.svg"
-import RiskRegisterFilters from '../../../assets/data/RiskRegisterFilters';
-import { risk_register_columns } from '../../../assets/data/RiskRegisterColumns';
+import RiskRegisterFilters from '../../../assets/data/RiskManagement/RiskRegisterFilters';
+import { risk_register_columns } from '../../../assets/data/RiskManagement/RiskRegisterColumns';
 import ManageRegisterColumns from './ManageRegisterColumns';
 
 // Generate Styles
@@ -53,9 +53,12 @@ const RiskRegisterHeader = ({
   moreOptionsHandlers,
   shareOptionsHandlers,
   addScenarioOptionsHandlers,
+  tableFilters,
   activeFilters,
   changeFilters,
   clearFilters,
+  selectedRows,
+  editHandler,
   cols: { allColumns }
 }) => {
 
@@ -81,17 +84,26 @@ const RiskRegisterHeader = ({
     {
       startIcon: "visibility",
       text: "View Archived",
-      clickHandler: moreOptionsHandlers.viewArchived
+      clickHandler: () => {
+        setMoreOpen(false);
+        moreOptionsHandlers.viewArchived()
+      } 
     },
     {
       startIcon: "visibility_off",
       text: "Hide Getting Started Guide",
-      clickHandler: moreOptionsHandlers.hideGuide
+      clickHandler: () => {
+        setMoreOpen(false);
+        moreOptionsHandlers.hideGuide()
+      }
     },
     {
       startIcon: "arrow_downward",
       text: "Export all risk scenarios",
-      clickHandler: moreOptionsHandlers.exportAllScenarios
+      clickHandler: () => {
+        setMoreOpen(false);
+        moreOptionsHandlers.exportAllScenarios()
+      } 
     }
   ]
 
@@ -99,15 +111,24 @@ const RiskRegisterHeader = ({
   const shareOptions = [
     {
       text: "Create Snapshot",
-      clickHandler: shareOptionsHandlers.createSnapshot
+      clickHandler: () => {
+        setShareOpen(false);
+        shareOptionsHandlers.createSnapshot();
+      }
     },
     {
       text: "Generate Assessment Reoprt",
-      clickHandler: shareOptionsHandlers.generateAssessmentReport
+      clickHandler: () => {
+        setShareOpen(false);
+        shareOptionsHandlers.generateAssessmentReport();
+      }
     },
     {
       text: "Configure Auditor View",
-      clickHandler: shareOptionsHandlers.configAuditorView
+      clickHandler: () => {
+        setShareOpen(false);
+        shareOptionsHandlers.configAuditorView();
+      }
     }
   ]
 
@@ -115,15 +136,24 @@ const RiskRegisterHeader = ({
   const addScenarioOptions = [
     {
       text: "Manually",
-      clickHandler: addScenarioOptionsHandlers.addManualScenario
+      clickHandler: () => {
+        setIsAddScenarioOpen(false)
+        addScenarioOptionsHandlers.addManualScenario();
+      }
     },
     {
       text: "Via Library",
-      clickHandler: addScenarioOptionsHandlers.addScenarioViaLibrary
+      clickHandler: () => {
+        setIsAddScenarioOpen(false)
+        addScenarioOptionsHandlers.addScenarioViaLibrary();
+      }
     },
     {
       text: "Via Import (.csv, .xlsx)",
-      clickHandler: addScenarioOptionsHandlers.addScenarioViaImport
+      clickHandler: () => {
+        setIsAddScenarioOpen(false)
+        addScenarioOptionsHandlers.addScenarioViaImport();
+      }
     }
   ]
 
@@ -145,10 +175,10 @@ const RiskRegisterHeader = ({
         justifyContent="space-between"
         alignItems="center"
       >
-        {/* Contains Add scenario button, and Edit Button, and Jira Button */}
+        {/* Contains Add scenario button, and Edit Button, and Add to Action Button */}
         <Box
-          display={"flex"}
-          alignItems={"center"}
+          display="flex"
+          alignItems="center"
           gridColumnGap={10}
           justifyContent="space-between"
         >
@@ -180,7 +210,8 @@ const RiskRegisterHeader = ({
             // size='small'
             startIcon={<Icon style={{ fontSize: '1rem' }}>edit</Icon>}
             className={classes.actionButton}
-            disabled
+            disabled={selectedRows.length !== 1}
+            onClick={editHandler}
           >
             Edit
           </Button>
@@ -188,18 +219,11 @@ const RiskRegisterHeader = ({
           {/* Jira Button */}
           <Button
             // size='small'
+            startIcon={<Icon style={{ fontSize: '1rem' }}>add</Icon>}
             className={classes.actionButton}
-            disabled
+            disabled={selectedRows.length !== 1}
           >
-            <img
-              src={jira}
-              alt="JIRA"
-              style={{
-                height: "15px",
-                marginRight: aboveMd ? 8 : 0,
-              }}
-            />
-            {aboveMd && 'Jira'}
+            Add Task
           </Button>
         </Box>
 
@@ -344,7 +368,7 @@ const RiskRegisterHeader = ({
           display={"flex"}
           gridColumnGap={8}
         >
-          {RiskRegisterFilters
+          {Object.values(tableFilters)
             .sort((a, b) => (a.order - b.order))
             .map((filter, index) => (
               <FilterDropdown

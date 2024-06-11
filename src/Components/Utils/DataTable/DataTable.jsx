@@ -323,7 +323,7 @@ function DataTable({
                       }
                       data-test="datatable-row-cell"
                     >
-                      {rowWrapper(highlightSearchTerm(text), params.colName)}
+                      {rowWrapper(highlightSearchTerm(text), params.colname)}
                       {resizeTable && colIndex === 0 && (
                         <HeightResizer index={rowIndex + 1} />
                       )}

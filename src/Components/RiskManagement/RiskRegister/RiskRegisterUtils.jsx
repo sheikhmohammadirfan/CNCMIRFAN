@@ -79,7 +79,7 @@ export const useStyle = makeStyles(theme => ({
     // Change background color of selected row CELLS
     "& tr.Mui-selected td": {
       // background: "#8ef1f1 !important",
-      background: "#e6f6f4 !important",
+      background: "rgba(68, 119, 206, 0.1) !important",
     },
 
     // Update sticky col background
@@ -94,7 +94,7 @@ export const useStyle = makeStyles(theme => ({
 
   //Header cell style
   headerCell: {
-    color: theme.palette.primary.main,
+    color: "#797979",
     fontSize: 12,
     textTransform: "uppercase",
     fontWeight: 'bold'
@@ -154,6 +154,143 @@ export const useStyle = makeStyles(theme => ({
     display: "flex",
     alignItems: "center",
     gap: "5px"
+  },
+
+  // Risk Create/Edit form Container
+  formContainer: {
+    "& .MuiDialogContent-root": {
+      padding: "24px"
+    }
+  },
+
+  // REGISTER FORM STYLES
+
+  // Mui autocomplete styles
+  customAutocomplete: {
+    "& .MuiAutocomplete-input": {
+      // to bring autocomplete input's label in center. it was off by some pixels
+      paddingTop: "10px !important",
+    }
+  },
+
+  // Accordion styles
+  customAccordion: {
+    border: "1px solid rgba(0, 0, 0, 0.25)",
+    "&.Mui-expanded": {
+      // borderWidth: 2,
+      // borderColor: theme.palette.primary.main,
+      borderColor: "rgba(0, 0, 0, 0.4)"
+    },
+    "& .MuiAccordionSummary-content": {
+      margin: "16px 0",
+    },
+    "& .MuiAccordionSummary-content.Mui-expanded": {
+      margin: "16px 0",
+    }
+  },
+
+  // Cia categories label for checkboxes
+  ciaLabel: {
+    "& .MuiFormControlLabel-label": {
+      color: "rgba(0, 0, 0, 0.8)",
+      fontSize: "0.9rem",
+    }
+  },
+
+  // CIA Checkboxes in risk create and edit form
+  ciaCheckbox: {
+    color: "rgba(0, 0, 0, 0.3)",
+    "&.Mui-checked": {
+      color: theme.palette.primary.main,
+    }
+  },
+
+  // subtitle in accordion
+  accordionSubTitle: {
+    // fontSize: "0.8rem",
+    color: "rgba(0, 0, 0, 0.7)",
+    margin: "0 0 5px 5px",
+    "&:nth-of-type(2)": {
+      marginTop: "10px"
+    }
+  },
+
+  // Risk scoring slider container
+  sliderContainer: {
+    width: "100%",
+    padding: "20px",
+    // backgroundColor: "rgba(68, 119, 206, 0.1)",
+    backgroundColor: "rgba(0, 0, 0, 0.05)",
+    borderRadius: "5px",
+  },
+
+  // Custom slider
+  customSlider: {
+    // marginRight: "auto",
+    color: theme.palette.primary.main,
+    "& .MuiSlider-rail": {
+      height: "4px",
+      opacity: 0.15,
+    },
+    "& .MuiSlider-track": {
+      height: "4px"
+    },
+    "& .MuiSlider-thumb": {
+      marginTop: "-4px",
+      // borderRadius: "0",
+    },
+    "& .MuiSlider-mark": {
+      opacity: 0.15
+    },
+    "& .MuiSlider-markActive": {
+      backgroundColor: theme.palette.primary.main
+    }
+  },
+
+  // Horizontal divider after slider
+  sliderDivider: {
+    // backgroundColor: theme.palette.primary.main
+  },
+  
+  sliderValueCaption: {
+    opacity: 0.8,
+    display: "flex",
+    flexDirection: "column",
+    gap: "4px 0",
+    "&>*": {
+      margin: "auto",
+      fontSize: "0.9rem",
+      textAlign: "center"
+    }
+  },
+
+  // Radio Button title
+  labelTitle: {
+    fontSize: "0.9rem",
+  },
+
+  // Radio Button Caption
+  labelCaption: {
+    fontSize: "0.8rem",
+  },
+
+  // Radio buttons form control in register form
+  radioControl: {
+    // backgroundColor: "rgba(68, 119, 206, 0.1)",
+    backgroundColor: "rgba(0, 0, 0, 0.03)",
+    width: "100%",
+    padding: "20px 10px 10px",
+    borderRadius: "5px",
+    "& .MuiFormLabel-root": {
+      marginBottom: "10px",
+    },
+    "& .MuiRadio-root": {
+      margin: "15px 10px 15px 10px",
+      padding: 0,
+      "&.Mui-checked": {
+        color: theme.palette.primary.main
+      }
+    },
   }
 }))
 
@@ -170,8 +307,8 @@ export const HeaderCell = ({ text }) => {
 /* Row cell component */
 export const RowCell = ({ text, column }) => {
   const classes = useStyle();
-  // is the text an array ?
-  let cellData = column === "Categories" || column === "CIA"
+  // making cellData with styling, based on what column it is
+  let cellData = column === "Categories" || column === "cia"
     ?
     <Box display="flex" gridColumnGap={5}>
       {text.map((element, elementIndex) => (
@@ -179,36 +316,36 @@ export const RowCell = ({ text, column }) => {
       ))}
     </Box>
     :
-    (column === "Treatment")
+    (column === "treatment")
       ?
       <Box display="flex" flexDirection="column" gridRowGap={5}>
         <Typography variant="body2" noWrap className={classes.treatmentAction}>
-          {JSON.parse(text).treatmentAction}
+          {JSON.parse(text).type === 1 ? "Mitigate" : "Avoid"}
         </Typography>
         <Typography variant="body2" noWrap className={classes.treatmentStatus}>
           {/* Displaying icon based on treatment status */}
-          {JSON.parse(text).treatmentStatus === "Incomplete"
+          {JSON.parse(text).status === 0
             ? <Icon style={{ color: "rgba(0, 0, 0, 0.5)", fontSize: "1rem", marginRight: "5px" }}>error</Icon>
             : <Icon style={{ color: "rgba(0, 0, 0, 0.5)", fontSize: "1rem", marginRight: "5px" }}>check_circle</Icon>
           }
-          {JSON.parse(text).treatmentStatus}
+          {JSON.parse(text).status === 0 ? "Incomplete" : "OK"}
         </Typography>
       </Box>
       :
-      (column === "Inherent Risk" || column === "Residual Risk")
+      (column === "inherent_risk_score" || column === "residual_risk_score")
         ?
         <Typography
           variant="body2"
           noWrap
           className={classes.riskScore}
           style={{
-            backgroundColor: text <= 9 ? "#81c784" : (text > 9 && text < 15 ? "#ffd54f" : "#e57373") 
+            backgroundColor: text <= 9 ? "#81c784" : (text > 9 && text < 15 ? "#ffd54f" : "#e57373")
           }}
-          >
+        >
           {text}
         </Typography>
         :
-        (column === "Status")
+        (column === "is_approved")
           ?
           <Typography variant="body2" noWrap className={classes.statusCell}>
             <span style={{
@@ -216,10 +353,10 @@ export const RowCell = ({ text, column }) => {
               minWidth: "10px",
               borderRadius: "50%",
               display: "inline-block",
-              backgroundColor: text === "Approved" ? "#4caf50" : "#ffd54f"
+              backgroundColor: text === true ? "#4caf50" : "#ffd54f"
             }}>
             </span>
-            {text}
+            {text === true ? "Approved" : "Pending"}
           </Typography>
           :
           <Typography variant="body2" noWrap className={classes.tableCell}>
@@ -235,9 +372,9 @@ export const mapDataToHeader = (visibleColumns, sorting, updateSort) => ({
   data: visibleColumns.map((text) => ({
     text,
     params:
-      text === "POAM ID"
+      text === "id"
         ? {
-          "poam-id": "",
+          "id": "",
           header: "",
           onClick: () => updateSort(text),
           className: sorting && sorting.column === text ? sorting.order : "",
@@ -256,37 +393,38 @@ export const mapDataToHeader = (visibleColumns, sorting, updateSort) => ({
 });
 
 /* Method to map a POA&M data to row dictionary */
-const mapDataToRow = (data, columns, rowIndex, matchedCell) =>
-  columns.map((columnName, index) => ({
-    text: data[columnName][rowIndex],
-    params:
-      columnName === "Id"
-        ? {
-          "id": "",
-          "data-searched": Boolean(
-            matchedCell.find(
-              (cell) =>
-                cell.column === columnName &&
-                cell.row === rowIndex &&
-                cell.selected === true
-            )
-          ),
-          tabIndex: 0,
-        }
-        : {
-          "data-searched": Boolean(
-            matchedCell.find(
-              (cell) =>
-                cell.column === columnName &&
-                cell.row === rowIndex &&
-                cell.selected === true
-            )
-          ),
-          tabIndex: 0,
-          colName: columnName
-        },
-  }));
-
+const mapDataToRow = (row, rowIndex, matchedCell) =>
+  Object.keys(row).map((colName, index) => {
+    return {
+      text: row[colName],
+      params:
+        colName === "Id"
+          ? {
+            "id": "",
+            "data-searched": Boolean(
+              matchedCell.find(
+                (cell) =>
+                  cell.column === colName &&
+                  cell.row === rowIndex &&
+                  cell.selected === true
+              )
+            ),
+            tabIndex: 0,
+          }
+          : {
+            "data-searched": Boolean(
+              matchedCell.find(
+                (cell) =>
+                  cell.column === colName &&
+                  cell.row === rowIndex &&
+                  cell.selected === true
+              )
+            ),
+            tabIndex: 0,
+            colname: colName
+          },
+    }
+  })
 
 /* Method to convert 2D row data into table body format */
 export const generateRows = (
@@ -297,7 +435,7 @@ export const generateRows = (
   sortingMap
 ) => {
   // count of number of rows
-  const rowCount = Object.keys(data["Id"] || {}).length;
+  const rowCount = data.length;
   // output 2D list
   const rowData = [];
 
@@ -308,9 +446,8 @@ export const generateRows = (
   for (let i = 0; i < rowCount; i++)
     rowData.push({
       data: mapDataToRow(
-        data,
-        columns,
-        getRowIndex(data, i),
+        data[i],
+        i,
         matchedCell
       ),
       props: {
@@ -318,6 +455,7 @@ export const generateRows = (
       },
     });
 
+  // console.log(rowData);
   return {
     rowData,
     rowStyle: { cursor: "pointer" },
