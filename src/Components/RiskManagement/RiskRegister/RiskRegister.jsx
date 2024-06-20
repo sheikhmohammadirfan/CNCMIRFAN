@@ -8,7 +8,7 @@ import { getRegister, getInherentRisks, getOwners, getResidualRisks } from '../.
 import useLoading from '../../Utils/Hooks/useLoading'
 import SkeletonBox from '../../Utils/SkeletonBox'
 import RiskManagementContext from '../RiskManagementContext'
-import RiskRegisterFilters, { cia_categories } from '../../../assets/data/RiskManagement/RiskRegisterFilters'
+import RiskRegisterFilters, { cia_categories, treatmentTypes } from '../../../assets/data/RiskManagement/RiskRegisterFilters'
 import RegisterDialog from './RegisterDialog'
 import { dummy_row } from '../../../assets/data/RiskManagement/RiskRegisterMockData'
 
@@ -63,7 +63,6 @@ const RiskRegister = () => {
   }, [])
 
   useEffect(() => {
-    console.log(scores);
     fetchandSetRegister(owners, scores);
   }, [owners, scores])
 
@@ -162,37 +161,88 @@ const RiskRegister = () => {
   // All column names into a state
   const [allColumns, setAllColumns] = useState(risk_register_columns);
 
-  const getRiskScore = (val) => {
+  // Get score from a value between 0-100
+  const getRiskScore = (val, isLikelihoodScore) => {
     let min = 0;
     let max = 100;
     let newMin = 1;
-    let newMax = scores.likelihoodScores.length;
+    let newMax = isLikelihoodScore ? scores.likelihoodScores.length : scores.impactScores.length;
     // Applying linear interpolation formula, to convert a value from 0-100 to an actual risk score
     let scaledValue = ((val - min) / (max - min)) * (newMax - newMin) + newMin;
     return scaledValue;
   }
 
   const onRegisterFormSubmit = async (val) => {
-    const newRow = {
-      ...dummy_row,
-      id: register.length + 1,
-      scenario: JSON.stringify({
-        id: 0,
-        description: val.scenario,
+    // is new row
+    if (getCurrentIndex() === -1) {
+      const payload = {
+        scenario: val.scenario,
         categories_id: val.categories.map(category => category.id),
-        source_type: "CUSTOM"
-      }),
-      cia: cia_categories.filter(category => Boolean(val[category.name])).map(category => category.text),
-      custom_id: val.customId,
-      inherent_risk_score: getRiskScore(val.inherent_likelihood) * getRiskScore(val.inherent_impact),
-      notes: val.notes,
-    }
+        likelihood_id: scores.likelihoodScores.find(score => score.score === getRiskScore(val.inherent_likelihood, true)).id,
+        impact_id: scores.impactScores.find(score => score.score === getRiskScore(val.inherent_impact, false)).id,
+        notes: val.notes,
+        cia: cia_categories.filter(cia => Boolean(val[cia.name])).map(cia => cia.id),
+      }
 
-    const localRegister = JSON.parse(localStorage.getItem("risk-register"))
-    localRegister.push(newRow);
-    localStorage.setItem("risk-register", JSON.stringify(localRegister));
-    closeScenarioDialog();
-    return fetchandSetRegister(owners, scores);
+      const newRow = {
+        ...dummy_row,
+        id: register.length + 1,
+        scenario: JSON.stringify({
+          id: 0,
+          description: val.scenario,
+          categories_id: val.categories.map(category => category.id),
+          source_type: "CUSTOM"
+        }),
+        cia: cia_categories.filter(category => Boolean(val[category.name])).map(category => category.text),
+        custom_id: val.customId,
+        inherent_risk_likelihood_id: scores.likelihoodScores.find(score => score.score === getRiskScore(val.inherent_likelihood)).id,
+        inherent_risk_impact_id: scores.impactScores.find(score => score.score === getRiskScore(val.inherent_impact)).id,
+        notes: val.notes,
+      }
+
+      const localRegister = JSON.parse(localStorage.getItem("risk-register"))
+      localRegister.push(newRow);
+      localStorage.setItem("risk-register", JSON.stringify(localRegister));
+      closeScenarioDialog();
+      return fetchandSetRegister(owners, scores);
+    }
+    else {
+      // is edit row
+      const payload = {
+        scenario: {
+          id: 0,
+          description: val.scenario,
+          categories_id: val.categories.map(category => category.id),
+          source_type: val.source || "SYSTEM" || "CUSTOM"
+        },
+        owner: val.owner || "",
+        identified_date: val.identified_date,
+        modified_date: val.modified_date,
+        cia: cia_categories.filter(cia => Boolean(val[cia.name])).map(cia => cia.id),
+        custom_id: val.customId,
+        inherent_risk_likelihood_id: scores.likelihoodScores.find(score => score.score === getRiskScore(val.inherent_likelihood)).id,
+        inherent_risk_impact_id: scores.impactScores.find(score => score.score === getRiskScore(val.inherent_impact)).id,
+        residual_risk_likelihood_id: val.residual_likelihood ? scores.likelihoodScores.find(score => score.score === getRiskScore(val.residual_likelihood)).id : null,
+        residual_risk_impact_id: val.residual_impact ? scores.likelihoodScores.find(score => score.score === getRiskScore(val.residual_impact)).id : null,
+        notes: val.notes,
+        treatment_type: treatmentTypes.find(type => type.text === val.treatment_plan).id,
+        treatment_controls: [],
+        is_approved: false,
+        is_archived: false,
+      }
+      console.log(payload);
+    }
+  }
+
+  // Get a value between 0-100 from a small number
+  const getSliderValue = (num, isLikelihoodScore) => {
+    let min = 1;
+    let max = isLikelihoodScore ? scores.likelihoodScores.length : scores.impactScores.length;
+    let newMin = 0;
+    let newMax = 100;
+    // Applying linear interpolation formula, to convert a small value from 0-5/10 to a value between 0-100
+    let sliderValue = ((num - min) / (max - min)) * (newMax - newMin) + newMin;
+    return sliderValue;
   }
 
   // Map data to header
@@ -206,6 +256,8 @@ const RiskRegister = () => {
       allColumns,
       selectedRow,
       matchedCell,
+      owners,
+      scores,
       // sortingMap
     );
 
@@ -261,7 +313,7 @@ const RiskRegister = () => {
                 selectedRows={selectedRow}
                 setSelectedRows={setSelectedRow}
                 headerWrapper={(text) => <HeaderCell text={text} />}
-                rowWrapper={(text, colName) => <RowCell text={text} column={colName} />}
+                // rowWrapper={(text, colName) => <RowCell text={text} column={colName} />}
                 style={{ borderRadius: 5, borderTopLeftRadius: 0, borderTopRightRadius: 0 }}
                 minCellWidth={allColumns.map(
                   (name) => risk_register_columns_width[allColumns.indexOf(name)]
@@ -285,7 +337,10 @@ const RiskRegister = () => {
         open={scenarioDialog}
         closeHandler={closeScenarioDialog}
         rowIndex={getCurrentIndex()}
+        row={register[getCurrentIndex()]}
         autocompleteOptions={{ categories, owners: filterDropdowns.owners.options }}
+        getSliderValue={getSliderValue}
+        scores={scores}
         onFormSubmit={onRegisterFormSubmit}
       />
     </Box>

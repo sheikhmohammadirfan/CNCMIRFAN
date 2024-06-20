@@ -1,5 +1,7 @@
 import { Box, Icon, Typography, makeStyles } from "@material-ui/core";
 import { green, amber, red } from "@material-ui/core/colors";
+import columnToCellMap from "../../../assets/data/RiskManagement/RegisterColCellMap";
+import { risk_register_table_cols } from "../../../assets/data/RiskManagement/RiskRegisterColumns";
 
 export const useStyle = makeStyles(theme => ({
 
@@ -80,6 +82,7 @@ export const useStyle = makeStyles(theme => ({
     "& tr.Mui-selected td": {
       // background: "#8ef1f1 !important",
       background: "rgba(68, 119, 206, 0.1) !important",
+      background: "rgba(68, 119, 206, 0.1) !important",
     },
 
     // Update sticky col background
@@ -94,6 +97,7 @@ export const useStyle = makeStyles(theme => ({
 
   //Header cell style
   headerCell: {
+    color: "#797979",
     color: "#797979",
     fontSize: 12,
     textTransform: "uppercase",
@@ -179,7 +183,7 @@ export const useStyle = makeStyles(theme => ({
     "&.Mui-expanded": {
       // borderWidth: 2,
       // borderColor: theme.palette.primary.main,
-      borderColor: "rgba(0, 0, 0, 0.4)"
+      // borderColor: "rgba(0, 0, 0, 0.4)"
     },
     "& .MuiAccordionSummary-content": {
       margin: "16px 0",
@@ -251,17 +255,38 @@ export const useStyle = makeStyles(theme => ({
   sliderDivider: {
     // backgroundColor: theme.palette.primary.main
   },
-  
-  sliderValueCaption: {
-    opacity: 0.8,
+
+  // slider value's title
+  sliderValueTitle: {
     display: "flex",
-    flexDirection: "column",
-    gap: "4px 0",
-    "&>*": {
-      margin: "auto",
-      fontSize: "0.9rem",
-      textAlign: "center"
+    gap: "0 5px",
+  },
+
+  // Label of title. Eg 1,2,3 etc
+  sliderTitleLabel: {
+    display: "flex",
+    gap: "0 5px",
+    "& span:nth-child(2)": {
+      color: "rgba(68, 119, 206, 0.8)",
+      margin: "auto 0",
+    },
+    justifyContent: "center",
+    "& .MuiIcon-root": {
+      fontSize: "1rem",
     }
+  },
+
+  // Tooltip for slider description
+  sliderDescTooltip: {
+    backgroundColor: theme.palette.primary.main,
+    fontSize: "0.8rem",
+    padding: "10px",
+  },
+
+  // description of value selected in slider
+  sliderValueDesc: {
+    marginTop: "10px",
+    color: "#808080"
   },
 
   // Radio Button title
@@ -305,66 +330,13 @@ export const HeaderCell = ({ text }) => {
 };
 
 /* Row cell component */
-export const RowCell = ({ text, column }) => {
+export const RowCell = ({ text }) => {
   const classes = useStyle();
-  // making cellData with styling, based on what column it is
-  let cellData = column === "Categories" || column === "cia"
-    ?
-    <Box display="flex" gridColumnGap={5}>
-      {text.map((element, elementIndex) => (
-        <Typography key={elementIndex} variant="body1" noWrap className={classes.cellLabel}>{element}</Typography>
-      ))}
-    </Box>
-    :
-    (column === "treatment")
-      ?
-      <Box display="flex" flexDirection="column" gridRowGap={5}>
-        <Typography variant="body2" noWrap className={classes.treatmentAction}>
-          {JSON.parse(text).type === 1 ? "Mitigate" : "Avoid"}
-        </Typography>
-        <Typography variant="body2" noWrap className={classes.treatmentStatus}>
-          {/* Displaying icon based on treatment status */}
-          {JSON.parse(text).status === 0
-            ? <Icon style={{ color: "rgba(0, 0, 0, 0.5)", fontSize: "1rem", marginRight: "5px" }}>error</Icon>
-            : <Icon style={{ color: "rgba(0, 0, 0, 0.5)", fontSize: "1rem", marginRight: "5px" }}>check_circle</Icon>
-          }
-          {JSON.parse(text).status === 0 ? "Incomplete" : "OK"}
-        </Typography>
-      </Box>
-      :
-      (column === "inherent_risk_score" || column === "residual_risk_score")
-        ?
-        <Typography
-          variant="body2"
-          noWrap
-          className={classes.riskScore}
-          style={{
-            backgroundColor: text <= 9 ? "#81c784" : (text > 9 && text < 15 ? "#ffd54f" : "#e57373")
-          }}
-        >
-          {text}
-        </Typography>
-        :
-        (column === "is_approved")
-          ?
-          <Typography variant="body2" noWrap className={classes.statusCell}>
-            <span style={{
-              minHeight: "10px",
-              minWidth: "10px",
-              borderRadius: "50%",
-              display: "inline-block",
-              backgroundColor: text === true ? "#4caf50" : "#ffd54f"
-            }}>
-            </span>
-            {text === true ? "Approved" : "Pending"}
-          </Typography>
-          :
-          <Typography variant="body2" noWrap className={classes.tableCell}>
-            {text}
-          </Typography>
-  // console.log(text);
-
-  return cellData;
+  return (
+    <Typography variant="body2" noWrap className={classes.tableCell}>
+      {text}
+    </Typography>
+  )
 };
 
 /* Method to map visible columns to header row */
@@ -392,13 +364,15 @@ export const mapDataToHeader = (visibleColumns, sorting, updateSort) => ({
   },
 });
 
-/* Method to map a POA&M data to row dictionary */
-const mapDataToRow = (row, rowIndex, matchedCell) =>
-  Object.keys(row).map((colName, index) => {
+/* Method to map data to row dictionary */
+const mapDataToRow = (row, rowIndex, matchedCell, owners, scores) => (
+  risk_register_table_cols.map(colName => {
+    let CellComponent = colName in columnToCellMap && columnToCellMap[colName]
+    let cellValue = getCellValue(row, colName, owners, scores);
     return {
-      text: row[colName],
+      text: colName in columnToCellMap ? <CellComponent cellValue={cellValue} /> : <RowCell text={cellValue} />,
       params:
-        colName === "Id"
+        colName === "id"
           ? {
             "id": "",
             "data-searched": Boolean(
@@ -425,6 +399,7 @@ const mapDataToRow = (row, rowIndex, matchedCell) =>
           },
     }
   })
+)
 
 /* Method to convert 2D row data into table body format */
 export const generateRows = (
@@ -432,7 +407,9 @@ export const generateRows = (
   columns,
   selectedList,
   matchedCell,
-  sortingMap
+  owners,
+  scores,
+  sortingMap,
 ) => {
   // count of number of rows
   const rowCount = data.length;
@@ -448,13 +425,16 @@ export const generateRows = (
       data: mapDataToRow(
         data[i],
         i,
-        matchedCell
+        matchedCell,
+        owners,
+        scores,
       ),
       props: {
         selected: selectedList.indexOf(i) !== -1,
       },
     });
 
+  // console.log(rowData);
   // console.log(rowData);
   return {
     rowData,
@@ -466,6 +446,27 @@ export const generateRows = (
     },
   };
 };
+
+const getCellValue = (row, colName, owners, scores) => {
+  if (colName === "owner") {
+    return owners.find(owner => owner.id === row["owner"])?.name || ""
+  }
+  else if (colName === "inherent_risk_score") {
+    return (
+      scores.likelihoodScores.find(score => score.id === row["inherent_risk_likelihood_id"]).score
+      *
+      scores.impactScores.find(score => score.id === row["inherent_risk_impact_id"]).score
+    )
+  }
+  else if (colName === "residual_risk_score") {
+    return (
+      scores.likelihoodScores.find(score => score.id === row["residual_risk_likelihood_id"])?.score || null
+      *
+      scores.impactScores.find(score => score.id === row["residual_risk_impact_id"])?.score || null
+    )
+  }
+  else return row[colName]
+}
 
 /* Method to get data row index from table index */
 export const getRowIndex = (data, index, sortingMap) => {

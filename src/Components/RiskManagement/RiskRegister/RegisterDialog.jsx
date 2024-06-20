@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import DialogBox from '../../Utils/DialogBox'
 import { Box, Button, Checkbox, Divider, FormControlLabel, FormGroup, Grid, Slider, TextField, Typography } from '@material-ui/core'
 import { DateControl, Form, RadioControl, SelectControl, TextControl } from '../../Utils/Control';
@@ -35,7 +35,10 @@ const RegisterDialog = ({
   open,
   closeHandler,
   rowIndex,
+  row,
   autocompleteOptions: { categories, owners },
+  getSliderValue,
+  scores,
   onFormSubmit
 }) => {
 
@@ -47,12 +50,36 @@ const RegisterDialog = ({
   // state to handle inherent risk selector accordion open and close;
   const [inherentAccordion, setInherentAccordion] = useState(false)
 
-  let defaultValues = {};
+  let formValues = row ? {
+    scenario: JSON.parse(row.scenario).description,
+    categories: categories.filter(category => JSON.parse(row.scenario).categories_id.includes(category.id)),
+    confidentiality: row.cia.includes("Confidentiality"),
+    integrity: row.cia.includes("Integrity"),
+    availability: row.cia.includes("Confidentiality"),
+    uncategorized: row.cia.includes("Uncategorized"),
+    // getting slider values (0-100) from actual scores. 
+    // Boolean flag is to check if score is of likelihood or impact
+    inherent_likelihood: getSliderValue(
+      scores.likelihoodScores.find(score => score.id === row["inherent_risk_likelihood_id"]).score,
+      true
+    ),
+    inherent_impact: getSliderValue(
+      scores.impactScores.find(score => score.id === row["inherent_risk_impact_id"]).score,
+      false
+    ),
+    notes: row.notes,
+    customId: row.custom_id,
+  } : {}
 
   // Get useForm Methods
-  const { handleSubmit, getValues, setValue, control } = useForm({
-    defaultValues,
+  const { handleSubmit, getValues, setValue, control, reset } = useForm({
+    defaultValues: formValues,
   });
+
+  // reset form fields whenever a row changes. reset is required as hook form caches default values. it won't change on its own
+  useEffect(() => {
+    reset(formValues)
+  }, [row]);
 
   const validation = {
     scenario: { required: "This field is required." },
@@ -72,33 +99,20 @@ const RegisterDialog = ({
 
   const classes = useStyle();
 
-  const marks = [
-    {
-      value: 0,
-      label: '1',
-      name: "Very Low"
-    },
-    {
-      value: 25,
-      label: '2',
-      name: "Low"
-    },
-    {
-      value: 50,
-      label: '3',
-      name: "Moderate"
-    },
-    {
-      value: 75,
-      label: '4',
-      name: "High"
-    },
-    {
-      value: 100,
-      label: '5',
-      name: "Severe"
-    },
-  ];
+  const getSliderMarks = (isLikelihoodRisk) => (
+    isLikelihoodRisk ? scores.likelihoodScores.map(score => ({
+      value: getSliderValue(score.score, true),
+      label: score.score,
+      name: score.name,
+      desc: score.description
+    })) :
+      scores.impactScores.map(score => ({
+        value: getSliderValue(score.score, false),
+        label: score.score,
+        name: score.name,
+        desc: score.description
+      }))
+  )
 
   // Create component to show text & caption
   const OptionText = ({ text, caption }) => (
@@ -257,15 +271,6 @@ const RegisterDialog = ({
                   name="cia_categories"
                   summary={<TitleWrapper text="CIA Categories" />}
                   details={
-                    // <Controller
-                    //   name="cia_categories"
-                    //   control={control}
-                    //   render={({ field: {value, onChange} }) => {
-                    //     console.log(value)
-                    //     return (
-                    //     )
-                    //   }}
-                    // />
                     <Box width="100%" display="flex" justifyContent="space-between">
                       {cia_categories.map((category, index) => (
                         <FormControlLabel
@@ -328,9 +333,11 @@ const RegisterDialog = ({
                           name="inherent_likelihood"
                           control={control}
                           rules={validation}
-                          marks={marks}
+                          // Boolean flag is to check if score is of likelihood or impact
+                          marks={getSliderMarks(true)}
                           classes={classes}
                           handleError={handleSliderError}
+                          isCreateForm={isCreateForm()}
                         />
                       </Box>
                       <Typography className={classes.accordionSubTitle}>Impact</Typography>
@@ -339,9 +346,11 @@ const RegisterDialog = ({
                           name="inherent_impact"
                           control={control}
                           rules={validation}
-                          marks={marks}
+                          // Boolean flag is to check if score is of likelihood or impact
+                          marks={getSliderMarks(false)}
                           classes={classes}
                           handleError={handleSliderError}
+                          isCreateForm={isCreateForm()}
                         />
                       </Box>
                     </Box>
@@ -363,8 +372,9 @@ const RegisterDialog = ({
                           <SliderControl
                             name="residual_likelihood"
                             control={control}
-                            marks={marks}
+                            marks={getSliderMarks(true)}
                             classes={classes}
+                            isCreateForm={isCreateForm()}
                           />
                         </Box>
                         <Typography className={classes.accordionSubTitle}>Impact</Typography>
@@ -372,8 +382,9 @@ const RegisterDialog = ({
                           <SliderControl
                             name="residual_impact"
                             control={control}
-                            marks={marks}
+                            marks={getSliderMarks(false)}
                             classes={classes}
+                            isCreateForm={isCreateForm()}
                           />
                         </Box>
                       </Box>
@@ -397,7 +408,7 @@ const RegisterDialog = ({
                       <Box sx={{ width: "100%", }}>
                         <Box>
                           <RadioControl
-                            name="Treatment Plan"
+                            name="treatment_plan"
                             direction="column"
                             options={treatmentOptions}
                             styleProps={{ className: classes.radioControl }}

@@ -22,19 +22,21 @@ export const risk_register_columns_width = [
   60, 200, 150, 250, 150, 150, 150, 250, 150, 150, 150, 150, 150, 150, 150, 250, 150
 ];
 
-// Mapping from backend key names to what is to be shown on Frontend
-// **Not being used currently**
-export const risk_register_cols_map = {
-  "id": "Id",
-  "scenario": "Scenario",
-  "owner": "Owner",
-  "categories": "Categories",
-  "identified": "Identified",
-  "modified": "Modified",
-  "source": "Source",
-  "cia": "CIA",
-  "inherentRisk": "Inherent Risk",
-  "treatment": "Treatment",
-  "residualRisk": "Residual Risk",
-  "status": "Status",
-}
+// Used to map specific columns to table, and leave out some fields from backend api response
+export const risk_register_table_cols = [
+  "id",
+  "scenario",
+  "owner",
+  "identified_date",
+  "modified_date",
+  "cia",
+  "custom_id",
+  "inherent_risk_score",
+  "residual_risk_score",
+  "notes",
+  "treatment",
+  "task_ids",
+  "is_approved",
+  "is_archived",
+  "vendors"
+]
