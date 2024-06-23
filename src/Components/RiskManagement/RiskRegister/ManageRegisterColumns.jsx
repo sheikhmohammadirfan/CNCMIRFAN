@@ -21,7 +21,7 @@ const useStyle = makeStyles((theme) => ({
 const ManageRegisterColumns = ({
   open,
   handleClose,
-  cols: { allColumns },
+  cols: { allColumns, visibleColumns, hideColumn, showColumn },
   children
 }) => {
 
@@ -51,33 +51,35 @@ const ManageRegisterColumns = ({
                 )
                 .map((headerName, index) => (
                 ))} */}
-              {allColumns.map((colName, index) => (
-                <ListItem key={index} disableGutters dense>
-                  <Box
-                    display="flex"
-                    alignItems="center"
-                    justifyContent="space-between"
-                    width={1}
-                    sx={{color: "rgba(0, 0, 0, 0.8)"}}
-                  >
-                    <Typography variant="caption" noWrap>
-                      {colName}
-                    </Typography>
-                    <Switch
-                      name={colName}
-                      size="small"
-                      inputProps={{ "aria-label": "secondary checkbox" }}
-                      color='primary'
-                    // checked={!secondaryColumns.includes(headerName)}
-                    // onChange={(e) =>
-                    //   !e.target.checked
-                    //     ? addColumns(headerName)
-                    //     : removeColums(headerName)
-                    // }
-                    />
-                  </Box>
-                </ListItem>
-              ))}
+              {allColumns
+                .filter(col => (col !== "Custom Id" && col !== "Scenario"))
+                .map((colName, index) => (
+                  <ListItem key={index} disableGutters dense>
+                    <Box
+                      display="flex"
+                      alignItems="center"
+                      justifyContent="space-between"
+                      width={1}
+                      sx={{ color: "rgba(0, 0, 0, 0.8)" }}
+                    >
+                      <Typography variant="caption" noWrap>
+                        {colName}
+                      </Typography>
+                      <Switch
+                        name={colName}
+                        size="small"
+                        inputProps={{ "aria-label": "secondary checkbox" }}
+                        color='primary'
+                        checked={visibleColumns.includes(colName)}
+                        onChange={(e) =>
+                          !e.target.checked
+                            ? hideColumn(colName)
+                            : showColumn(colName)
+                        }
+                      />
+                    </Box>
+                  </ListItem>
+                ))}
 
               <ListItem divider disableGutters dense>
                 <Typography variant="button" style={{ fontWeight: "bold", textTransform: "none", }}>

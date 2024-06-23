@@ -50,36 +50,61 @@ const RegisterDialog = ({
   // state to handle inherent risk selector accordion open and close;
   const [inherentAccordion, setInherentAccordion] = useState(false)
 
-  let formValues = row ? {
-    scenario: JSON.parse(row.scenario).description,
-    categories: categories.filter(category => JSON.parse(row.scenario).categories_id.includes(category.id)),
-    confidentiality: row.cia.includes("Confidentiality"),
-    integrity: row.cia.includes("Integrity"),
-    availability: row.cia.includes("Confidentiality"),
-    uncategorized: row.cia.includes("Uncategorized"),
-    // getting slider values (0-100) from actual scores. 
-    // Boolean flag is to check if score is of likelihood or impact
-    inherent_likelihood: getSliderValue(
-      scores.likelihoodScores.find(score => score.id === row["inherent_risk_likelihood_id"]).score,
-      true
-    ),
-    inherent_impact: getSliderValue(
-      scores.impactScores.find(score => score.id === row["inherent_risk_impact_id"]).score,
-      false
-    ),
-    notes: row.notes,
-    customId: row.custom_id,
-  } : {}
+  let formValues = row
+    ? {
+      scenario: JSON.parse(row["Scenario"]).description,
+      categories: categories.filter(category => JSON.parse(row["Scenario"]).categories_id.includes(category.id)),
+      // Get id for a single cia category, and check if it is in the row data that is selected.
+      confidentiality: row["CIA"].includes(cia_categories.find(cat => cat.name === "confidentiality").id),
+      integrity: row["CIA"].includes(cia_categories.find(cat => cat.name === "integrity").id),
+      availability: row["CIA"].includes(cia_categories.find(cat => cat.name === "availability").id),
+      uncategorized: row["CIA"].includes(cia_categories.find(cat => cat.name === "uncategorized").id),
+      // getting slider values (0-100) from actual scores. 
+      // Boolean flag is to check if score is of likelihood or impact
+      inherent_likelihood: getSliderValue(
+        scores.likelihoodScores.find(score => score.id === row["Inherent Risk Likelihood Id"]).score,
+        true
+      ),
+      inherent_impact: getSliderValue(
+        scores.impactScores.find(score => score.id === row["Inherent Risk Impact Id"]).score,
+        false
+      ),
+      // Setting default slider values of residual risk scores to 1 (One) 
+      // Here it is assumed first score object is the lowest score
+      residual_likelihood: getSliderValue(
+        scores.likelihoodScores.length > 0 && scores.likelihoodScores[0].score,
+        true
+      ),
+      residual_impact: getSliderValue(
+        scores.impactScores.length > 0 && scores.impactScores[0].score,
+        false
+      ),
+      notes: row["Notes"],
+      customId: row["Custom Id"],
+    }
+    : {
+      // Setting default slider values to 1 (One) 
+      // Here it is assumed first score object is the lowest score
+      inherent_likelihood: getSliderValue(
+        scores.likelihoodScores.length > 0 && scores.likelihoodScores[0].score,
+        true
+      ),
+      inherent_impact: getSliderValue(
+        scores.impactScores.length > 0 && scores.impactScores[0].score,
+        false
+      )
+    }
 
   // Get useForm Methods
   const { handleSubmit, getValues, setValue, control, reset } = useForm({
     defaultValues: formValues,
   });
 
-  // reset form fields whenever a row changes. reset is required as hook form caches default values. it won't change on its own
+  // reset form fields whenever a row changes. 
+  // reset is required as hook form caches default values. it won't change on its own
   useEffect(() => {
     reset(formValues)
-  }, [row]);
+  }, [row, scores]);
 
   const validation = {
     scenario: { required: "This field is required." },
@@ -267,129 +292,115 @@ const RegisterDialog = ({
                 </>
               )}
               <Grid item xs={12}>
-                <CustomAccordion
-                  name="cia_categories"
-                  summary={<TitleWrapper text="CIA Categories" />}
-                  details={
-                    <Box width="100%" display="flex" justifyContent="space-between">
-                      {cia_categories.map((category, index) => (
-                        <FormControlLabel
-                          key={index}
-                          label={category.text}
-                          className={classes.ciaLabel}
-                          control={
-                            <Controller
-                              name={category.name}
-                              control={control}
-                              render={({ field: { value, onChange } }) => {
-                                const handleChange = (e, value) => {
-                                  // CONTROLLING "UNCATEGORIZED" CHECKBOX
-                                  // getting id of category who's value was changed
-                                  let dataId = parseInt(e.target.getAttribute("data-id"));
-                                  // If "Uncategorized" was checked to true, set all other cia categories to unchecked (false)
-                                  if (dataId === 0 && value === true) {
-                                    setValue("confidentiality", false);
-                                    setValue("integrity", false);
-                                    setValue("availability", false);
-                                  }
-                                  // if some other checkbox was checked to true, uncheck "Uncategorized"
-                                  else if (dataId !== 0 && value === true) setValue("uncategorized", false)
-                                  onChange(value);
+                <Box className={classes.subInputsContainer}>
+                  <Typography className={classes.inputSubtitle}>CIA Categories</Typography>
+                  <Divider />
+                  <Box padding="16px" width="100%" display="flex" justifyContent="space-between">
+                    {cia_categories.map((category, index) => (
+                      <FormControlLabel
+                        key={index}
+                        label={category.text}
+                        className={classes.ciaLabel}
+                        control={
+                          <Controller
+                            name={category.name}
+                            control={control}
+                            render={({ field: { value, onChange } }) => {
+                              const handleChange = (e, value) => {
+                                // CONTROLLING "UNCATEGORIZED" CHECKBOX
+                                // getting id of category who's value was changed
+                                let dataId = parseInt(e.target.getAttribute("data-id"));
+                                // If "Uncategorized" was checked to true, set all other cia categories to unchecked (false)
+                                if (dataId === 0 && value === true) {
+                                  setValue("confidentiality", false);
+                                  setValue("integrity", false);
+                                  setValue("availability", false);
                                 }
-                                return (
-                                  <Checkbox
-                                    checked={value || false}
-                                    onChange={(e, newVal) => handleChange(e, newVal)}
-                                    className={classes.ciaCheckbox}
-                                    inputProps={{
-                                      'data-id': category.id
-                                    }}
-                                  />
-                                )
-                              }}
-                            />
-                          }
-                        />
-                      ))}
-                    </Box>
-                  }
-                  className={classes.customAccordion}
-                  elevation={0}
-                />
+                                // if some other checkbox was checked to true, uncheck "Uncategorized"
+                                else if (dataId !== 0 && value === true) setValue("uncategorized", false)
+                                onChange(value);
+                              }
+                              return (
+                                <Checkbox
+                                  checked={value || false}
+                                  onChange={(e, newVal) => handleChange(e, newVal)}
+                                  className={classes.ciaCheckbox}
+                                  inputProps={{
+                                    'data-id': category.id
+                                  }}
+                                />
+                              )
+                            }}
+                          />
+                        }
+                      />
+                    ))}
+                  </Box>
+                </Box>
               </Grid>
               <Grid item xs={12}>
-                <CustomAccordion
-                  name="inherent_risk"
-                  summary={<TitleWrapper text="Inherent Risk" />}
-                  className={classes.customAccordion}
-                  elevation={0}
-                  expanded={inherentAccordion}
-                  onChange={(e, val) => setInherentAccordion(val)}
-                  details={
-                    <Box sx={{ width: "100%", }}>
-                      <Typography className={classes.accordionSubTitle}>Likelihood</Typography>
-                      <Box className={classes.sliderContainer}>
-                        <SliderControl
-                          name="inherent_likelihood"
-                          control={control}
-                          rules={validation}
-                          // Boolean flag is to check if score is of likelihood or impact
-                          marks={getSliderMarks(true)}
-                          classes={classes}
-                          handleError={handleSliderError}
-                          isCreateForm={isCreateForm()}
-                        />
-                      </Box>
-                      <Typography className={classes.accordionSubTitle}>Impact</Typography>
-                      <Box className={classes.sliderContainer}>
-                        <SliderControl
-                          name="inherent_impact"
-                          control={control}
-                          rules={validation}
-                          // Boolean flag is to check if score is of likelihood or impact
-                          marks={getSliderMarks(false)}
-                          classes={classes}
-                          handleError={handleSliderError}
-                          isCreateForm={isCreateForm()}
-                        />
-                      </Box>
+                <Box className={classes.subInputsContainer}>
+                  <Typography className={classes.inputSubtitle}>Inherent Risk</Typography>
+                  <Divider />
+                  <Box className={classes.riskSliderContainer}>
+                    <Typography className={classes.subInputSubtitle}>Likelihood Score</Typography>
+                    <Box className={classes.sliderContainer}>
+                      <SliderControl
+                        name="inherent_likelihood"
+                        control={control}
+                        rules={validation}
+                        // Boolean flag is to check if score is of likelihood or impact
+                        marks={getSliderMarks(true)}
+                        classes={classes}
+                        handleError={handleSliderError}
+                        isCreateForm={isCreateForm()}
+                      />
                     </Box>
-                  }
-                />
+                    <Typography className={classes.subInputSubtitle}>Impact Score</Typography>
+                    <Box className={classes.sliderContainer}>
+                      <SliderControl
+                        name="inherent_impact"
+                        control={control}
+                        rules={validation}
+                        // Boolean flag is to check if score is of likelihood or impact
+                        marks={getSliderMarks(false)}
+                        classes={classes}
+                        handleError={handleSliderError}
+                        isCreateForm={isCreateForm()}
+                      />
+                    </Box>
+                  </Box>
+                </Box>
               </Grid>
               {/* Not showing residual risk field if it is not create form */}
               {!isCreateForm() &&
                 <Grid item xs={12}>
-                  <CustomAccordion
-                    name="residual_risk"
-                    summary={<TitleWrapper text="Residual Risk" />}
-                    className={classes.customAccordion}
-                    elevation={0}
-                    details={
-                      <Box sx={{ width: "100%", }}>
-                        <Typography className={classes.accordionSubTitle}>Likelihood</Typography>
-                        <Box className={classes.sliderContainer}>
-                          <SliderControl
-                            name="residual_likelihood"
-                            control={control}
-                            marks={getSliderMarks(true)}
-                            classes={classes}
-                            isCreateForm={isCreateForm()}
-                          />
-                        </Box>
-                        <Typography className={classes.accordionSubTitle}>Impact</Typography>
-                        <Box className={classes.sliderContainer}>
-                          <SliderControl
-                            name="residual_impact"
-                            control={control}
-                            marks={getSliderMarks(false)}
-                            classes={classes}
-                            isCreateForm={isCreateForm()}
-                          />
-                        </Box>
+                  <Box className={classes.subInputsContainer}>
+                    <Typography className={classes.inputSubtitle}>Residual Risk</Typography>
+                    <Divider />
+                    <Box className={classes.riskSliderContainer}>
+                      <Typography className={classes.subInputSubtitle}>Likelihood</Typography>
+                      <Box className={classes.sliderContainer}>
+                        <SliderControl
+                          name="residual_likelihood"
+                          control={control}
+                          marks={getSliderMarks(true)}
+                          classes={classes}
+                          isCreateForm={isCreateForm()}
+                        />
                       </Box>
-                    }
-                  />
+                      <Typography className={classes.subInputSubtitle}>Impact</Typography>
+                      <Box className={classes.sliderContainer}>
+                        <SliderControl
+                          name="residual_impact"
+                          control={control}
+                          marks={getSliderMarks(false)}
+                          classes={classes}
+                          isCreateForm={isCreateForm()}
+                        />
+                      </Box>
+                    </Box>
+                  </Box>
                 </Grid>
               }
               <Grid item xs={12}>
@@ -399,28 +410,22 @@ const RegisterDialog = ({
               </Grid>
               {!isCreateForm() &&
                 <Grid item xs={12}>
-                  <CustomAccordion
-                    name="treatment_plan"
-                    summary={<TitleWrapper text="Treatment Plan" />}
-                    className={classes.customAccordion}
-                    elevation={0}
-                    details={
-                      <Box sx={{ width: "100%", }}>
-                        <Box>
-                          <RadioControl
-                            name="treatment_plan"
-                            direction="column"
-                            options={treatmentOptions}
-                            styleProps={{ className: classes.radioControl }}
-                          />
-                        </Box>
-                        <Typography style={{ marginTop: "10px" }} className={classes.accordionSubTitle}>Controls</Typography>
-                        <Box>
+                  <Box className={classes.subInputsContainer}>
+                    <Typography className={classes.inputSubtitle}>Treatment Plan</Typography>
+                    <Box className={classes.treatmentInputContainer}>
+                      <RadioControl
+                        name="treatment_plan"
+                        hideLabel={true}
+                        direction="column"
+                        options={treatmentOptions}
+                        styleProps={{ className: classes.radioControl }}
+                      />
+                    </Box>
+                    <Typography className={classes.inputSubtitle}>Controls</Typography>
+                    <Box>
 
-                        </Box>
-                      </Box>
-                    }
-                  />
+                    </Box>
+                  </Box>
                 </Grid>
               }
               <Grid item xs={12}>

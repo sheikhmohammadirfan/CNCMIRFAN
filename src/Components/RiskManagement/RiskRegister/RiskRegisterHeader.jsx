@@ -59,7 +59,7 @@ const RiskRegisterHeader = ({
   clearFilters,
   selectedRows,
   editHandler,
-  cols: { allColumns }
+  cols: { allColumns, visibleColumns, hideColumn, showColumn }
 }) => {
 
   const classes = useStyle();
@@ -87,7 +87,7 @@ const RiskRegisterHeader = ({
       clickHandler: () => {
         setMoreOpen(false);
         moreOptionsHandlers.viewArchived()
-      } 
+      }
     },
     {
       startIcon: "visibility_off",
@@ -103,7 +103,7 @@ const RiskRegisterHeader = ({
       clickHandler: () => {
         setMoreOpen(false);
         moreOptionsHandlers.exportAllScenarios()
-      } 
+      }
     }
   ]
 
@@ -388,7 +388,7 @@ const RiskRegisterHeader = ({
           <ManageRegisterColumns
             open={ismanageColsOpen}
             handleClose={closeManageColsDropdown}
-            cols={{ allColumns }}
+            cols={{ allColumns, visibleColumns, hideColumn, showColumn }}
           // addColumns={moveToSecondary}
           // removeColums={moveToPrimary}
           >

@@ -160,6 +160,21 @@ const RiskRegister = () => {
 
   // All column names into a state
   const [allColumns, setAllColumns] = useState(risk_register_columns);
+  const [visibleColumns, setVisibleColumns] = useState(risk_register_columns);
+
+  // Functions for hide and show columns
+  const hideColumn = (col) => {
+    setVisibleColumns(prev => {
+      return prev.filter(colName => colName !== col)
+    })
+  }
+  const showColumn = (col) => {
+    // Filtering using allColumns state (bcs it is sorted). and removing cols which are not in visibleCols
+    // add one more condition to accept new col
+    let visibleCols = allColumns.filter(
+      colName => (visibleColumns.includes(colName) || colName === col))
+    setVisibleColumns(visibleCols)
+  }
 
   // Get score from a value between 0-100
   const getRiskScore = (val, isLikelihoodScore) => {
@@ -247,15 +262,16 @@ const RiskRegister = () => {
 
   // Map data to header
   const mapTableHeader = () =>
-    mapDataToHeader(allColumns);
+    mapDataToHeader(visibleColumns);
 
   // Map data to body
   const mapTableBody = () =>
     generateRows(
       register,
-      allColumns,
+      visibleColumns,
       selectedRow,
       matchedCell,
+      categories,
       owners,
       scores,
       // sortingMap
@@ -285,7 +301,7 @@ const RiskRegister = () => {
           selectedRows={selectedRow}
           // Edit button click handler
           editHandler={openEditForm}
-          cols={{ allColumns }}
+          cols={{ allColumns, visibleColumns, hideColumn, showColumn }}
         />
 
         {isLoading()
@@ -315,7 +331,7 @@ const RiskRegister = () => {
                 headerWrapper={(text) => <HeaderCell text={text} />}
                 // rowWrapper={(text, colName) => <RowCell text={text} column={colName} />}
                 style={{ borderRadius: 5, borderTopLeftRadius: 0, borderTopRightRadius: 0 }}
-                minCellWidth={allColumns.map(
+                minCellWidth={visibleColumns.map(
                   (name) => risk_register_columns_width[allColumns.indexOf(name)]
                 )}
               />

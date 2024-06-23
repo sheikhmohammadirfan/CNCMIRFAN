@@ -29,16 +29,20 @@ export const useStyle = makeStyles(theme => ({
     "& [checkbox]": { position: "sticky !important", left: 0, zIndex: 2 },
 
     // Make POA&M ID column to sticky left with offset of 50px
-    "& [poam-id]": {
+    "& [sticky]": {
       position: "sticky !important",
       left: 50,
       zIndex: 1,
     },
 
+    "& [sticky][scenario=true]": {
+      left: 200,
+    },
+
     // Increase z-index of header
     "& [header]": {
       zIndex: "3 !important",
-      "&[poam-id]": { zIndex: "2 !important" },
+      "&[sticky]": { zIndex: "2 !important" },
     },
 
     // Add soting
@@ -81,8 +85,7 @@ export const useStyle = makeStyles(theme => ({
     // Change background color of selected row CELLS
     "& tr.Mui-selected td": {
       // background: "#8ef1f1 !important",
-      background: "rgba(68, 119, 206, 0.1) !important",
-      background: "rgba(68, 119, 206, 0.1) !important",
+      background: "#e2e7f0 !important",
     },
 
     // Update sticky col background
@@ -193,6 +196,19 @@ export const useStyle = makeStyles(theme => ({
     }
   },
 
+  // Sub inputs container (container which contains 2 or more inputs)
+  subInputsContainer: {
+    border: "1px solid #c5c5c5",
+    borderRadius: "4px",
+  },
+
+  // subtitle in inputs
+  inputSubtitle: {
+    color: "rgba(0, 0, 0, 0.8)",
+    padding: "16px",
+    fontSize: "1rem",
+  },
+
   // Cia categories label for checkboxes
   ciaLabel: {
     "& .MuiFormControlLabel-label": {
@@ -209,11 +225,20 @@ export const useStyle = makeStyles(theme => ({
     }
   },
 
-  // subtitle in accordion
-  accordionSubTitle: {
+  // Risk Sliders Container
+  riskSliderContainer: {
+    padding: "16px",
+  },
+
+  // Container for treatment inputs
+  treatmentInputContainer: {
+    padding: "0 16px 0",
+  },
+
+  subInputSubtitle: {
     // fontSize: "0.8rem",
-    color: "rgba(0, 0, 0, 0.7)",
-    margin: "0 0 5px 5px",
+    color: "rgba(0, 0, 0, 0.6)",
+    margin: "0 0 10px 5px",
     "&:nth-of-type(2)": {
       marginTop: "10px"
     }
@@ -344,10 +369,11 @@ export const mapDataToHeader = (visibleColumns, sorting, updateSort) => ({
   data: visibleColumns.map((text) => ({
     text,
     params:
-      text === "id"
+      text === "Custom Id" || text === "Scenario"
         ? {
-          "id": "",
-          header: "",
+          "sticky": "",
+          "scenario": text === "Scenario" && "true",
+          "header": "",
           onClick: () => updateSort(text),
           className: sorting && sorting.column === text ? sorting.order : "",
         }
@@ -365,16 +391,17 @@ export const mapDataToHeader = (visibleColumns, sorting, updateSort) => ({
 });
 
 /* Method to map data to row dictionary */
-const mapDataToRow = (row, rowIndex, matchedCell, owners, scores) => (
-  risk_register_table_cols.map(colName => {
+const mapDataToRow = (row, rowIndex, columns, matchedCell, categories, owners, scores) => (
+  columns.map(colName => {
     let CellComponent = colName in columnToCellMap && columnToCellMap[colName]
-    let cellValue = getCellValue(row, colName, owners, scores);
+    let cellValue = getCellValue(row, colName, categories, owners, scores);
     return {
       text: colName in columnToCellMap ? <CellComponent cellValue={cellValue} /> : <RowCell text={cellValue} />,
       params:
-        colName === "id"
+        colName === "Custom Id" || colName === "Scenario"
           ? {
-            "id": "",
+            "sticky": "",
+            "scenario": colName === "Scenario" && "true",
             "data-searched": Boolean(
               matchedCell.find(
                 (cell) =>
@@ -395,7 +422,6 @@ const mapDataToRow = (row, rowIndex, matchedCell, owners, scores) => (
               )
             ),
             tabIndex: 0,
-            colname: colName
           },
     }
   })
@@ -407,6 +433,7 @@ export const generateRows = (
   columns,
   selectedList,
   matchedCell,
+  categories,
   owners,
   scores,
   sortingMap,
@@ -425,7 +452,9 @@ export const generateRows = (
       data: mapDataToRow(
         data[i],
         i,
+        columns,
         matchedCell,
+        categories,
         owners,
         scores,
       ),
@@ -447,22 +476,33 @@ export const generateRows = (
   };
 };
 
-const getCellValue = (row, colName, owners, scores) => {
-  if (colName === "owner") {
-    return owners.find(owner => owner.id === row["owner"])?.name || ""
+const getCellValue = (row, colName, categories, owners, scores) => {
+  if (colName === "Scenario") {
+    return JSON.parse(row["Scenario"]).description;
   }
-  else if (colName === "inherent_risk_score") {
+  else if (colName === "Source") {
+    let sourceType = JSON.parse(row["Scenario"]).source_type;
+    return sourceType.charAt(0) + sourceType.slice(1).toLowerCase();
+  }
+  else if (colName === "Categories") {
+    let catsId = JSON.parse(row["Scenario"]).categories_id;
+    return categories.filter((cat, id) => catsId.includes(cat.id))
+  }
+  else if (colName === "Owner") {
+    return owners.find(owner => owner.id === row["Owner"])?.name || ""
+  }
+  else if (colName === "Inherent Risk") {
     return (
-      scores.likelihoodScores.find(score => score.id === row["inherent_risk_likelihood_id"]).score
+      (scores.likelihoodScores.find(score => score.id === row["Inherent Risk Likelihood Id"]).score)
       *
-      scores.impactScores.find(score => score.id === row["inherent_risk_impact_id"]).score
+      (scores.impactScores.find(score => score.id === row["Inherent Risk Impact Id"]).score)
     )
   }
-  else if (colName === "residual_risk_score") {
+  else if (colName === "Residual Risk") {
     return (
-      scores.likelihoodScores.find(score => score.id === row["residual_risk_likelihood_id"])?.score || null
+      (scores.likelihoodScores.find(score => score.id === row["Residual Risk Likelihood Id"])?.score || null)
       *
-      scores.impactScores.find(score => score.id === row["residual_risk_impact_id"])?.score || null
+      (scores.impactScores.find(score => score.id === row["Residual Risk Impact Id"])?.score || null)
     )
   }
   else return row[colName]

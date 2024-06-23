@@ -2,6 +2,17 @@ import { Box, Icon, Typography } from "@material-ui/core";
 import { useStyle } from "../../../Components/RiskManagement/RiskRegister/RiskRegisterUtils";
 import { cia_categories } from "./RiskRegisterFilters";
 
+const CategoriesCell = ({ cellValue }) => {
+  const classes = useStyle();
+  return (
+    <Box display="flex" gridColumnGap={5}>
+      {cellValue.map((val, index) => (
+        <Typography key={index} variant="body1" noWrap className={classes.cellLabel}>{val.text}</Typography>
+      ))}
+    </Box>
+  )
+}
+
 const CategoriesCiaCell = ({ cellValue }) => {
   const classes = useStyle();
   return (
@@ -69,12 +80,12 @@ const IsApprovedCell = ({ cellValue }) => {
 }
 
 const columnToCellMap = {
-  categories: CategoriesCiaCell,
-  cia: CategoriesCiaCell,
-  treatment: TreatmentCell,
-  inherent_risk_score: RiskScoreCell,
-  residual_risk_score: RiskScoreCell,
-  is_approved: IsApprovedCell,
+  Categories: CategoriesCell,
+  CIA: CategoriesCiaCell,
+  Treatment: TreatmentCell,
+  "Inherent Risk": RiskScoreCell,
+  "Residual Risk": RiskScoreCell,
+  Approved: IsApprovedCell,
 }
 
 export default columnToCellMap;
