@@ -1,12 +1,13 @@
 import { Box, Icon, Typography } from "@material-ui/core";
 import { useStyle } from "../../../Components/RiskManagement/RiskRegister/RiskRegisterUtils";
-import { cia_categories } from "./RiskRegisterFilters";
+import { cia_categories } from "./RiskRegister/RiskRegisterFilters";
+import colorShader from "../../../Components/Utils/ColorShader";
 
 const CategoriesCell = ({ cellValue }) => {
   const classes = useStyle();
   return (
     <Box display="flex" gridColumnGap={5}>
-      {cellValue.map((val, index) => (
+      {cellValue.length > 0 && cellValue.map((val, index) => (
         <Typography key={index} variant="body1" noWrap className={classes.cellLabel}>{val.text}</Typography>
       ))}
     </Box>
@@ -37,8 +38,8 @@ const TreatmentCell = ({ cellValue }) => {
       <Typography variant="body2" noWrap className={classes.treatmentStatus}>
         {/* Displaying icon based on treatment status */}
         {JSON.parse(cellValue).status === 0
-          ? <Icon style={{ color: "rgba(0, 0, 0, 0.5)", fontSize: "1rem", marginRight: "5px" }}>error</Icon>
-          : <Icon style={{ color: "rgba(0, 0, 0, 0.5)", fontSize: "1rem", marginRight: "5px" }}>check_circle</Icon>
+          ? <Icon style={{ color: colorShader("#000000", 0.5), fontSize: "1rem", marginRight: "5px" }}>error</Icon>
+          : <Icon style={{ color: colorShader("#000000", 0.5), fontSize: "1rem", marginRight: "5px" }}>check_circle</Icon>
         }
         {JSON.parse(cellValue).status === 0 ? "Incomplete" : "OK"}
       </Typography>
@@ -79,6 +80,13 @@ const IsApprovedCell = ({ cellValue }) => {
   )
 }
 
+const SourceCell = ({cellValue}) => {
+  const classes = useStyle();
+  return (
+    <Typography className={classes.cellLabel}>{cellValue}</Typography>
+  )
+}
+
 const columnToCellMap = {
   Categories: CategoriesCell,
   CIA: CategoriesCiaCell,
@@ -86,6 +94,7 @@ const columnToCellMap = {
   "Inherent Risk": RiskScoreCell,
   "Residual Risk": RiskScoreCell,
   Approved: IsApprovedCell,
+  Source: SourceCell
 }
 
 export default columnToCellMap;

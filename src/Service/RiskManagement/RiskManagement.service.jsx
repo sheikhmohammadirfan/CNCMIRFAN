@@ -1,6 +1,6 @@
-import { mock_categories } from "../assets/data/RiskManagement/CategoriesMock";
-import { impact_scores, likelihood_scores } from "../assets/data/RiskManagement/RiskScoresMock";
-import { mock_users } from "../assets/data/RiskManagement/UsersMock";
+import { mock_categories } from "../../assets/data/RiskManagement/CategoriesMock";
+import { impact_scores, likelihood_scores } from "../../assets/data/RiskManagement/RiskScoresMock";
+import { mock_users } from "../../assets/data/RiskManagement/UsersMock";
 
 export async function getCategories() {
   return new Promise(res => {

@@ -1,0 +1,150 @@
+import { Box, Icon, IconButton, InputAdornment, makeStyles, useMediaQuery, useTheme } from '@material-ui/core'
+import React, { useState } from 'react'
+import { TextControl } from '../../Utils/Control';
+import FilterDropdown from '../../Utils/DataTable/FilterDropdown';
+
+// Generate Styles
+const useStyle = makeStyles((theme) => ({
+  searchInput: {
+    width: 300,
+    '@media (max-width: 960px)': {
+      flexGrow: 1,
+    },
+    backgroundColor: 'white',
+    borderRadius: 7,
+    borderRight: 0,
+    "& .MuiOutlinedInput-adornedStart": {
+      paddingLeft: 8,
+      paddingRight: 8,
+    },
+    "& .MuiOutlinedInput-root": {
+      borderRadius: 7,
+      // borderTopRightRadius: 0,
+      // borderBottomRightRadius: 0,
+      height: 35
+    },
+    // overflow: "hidden"
+  },
+}))
+
+const RiskLibraryHeader = ({
+  tableFilters,
+  filters: { filters, changeFilters, clearFilters }
+}) => {
+
+  const classes = useStyle();
+
+  const [searchValue, setSearchValue] = useState(null);
+  const updateSearch = (e) => {
+    const searchedValue = e.target.value;
+    setSearchValue(searchedValue);
+  };
+
+  // State to manage md breakpoint
+  const theme = useTheme();
+  const aboveMd = useMediaQuery(theme.breakpoints.up('md'));
+
+  return (
+    <Box
+      mt={2}
+      display="flex"
+      justifyContent="space-between"
+      paddingY={1}
+      paddingX={1}
+      padding={1}
+      border={1}
+      sx={{
+        borderRadius: 10,
+        borderBottomLeftRadius: 0,
+        borderBottomRightRadius: 0,
+        backgroundColor: '#fff',
+        borderBottom: 'none',
+        '& .MuiButton-startIcon': {
+          marginRight: !aboveMd && 0,
+          marginLeft: !aboveMd && 0
+        },
+        '& .MuiButton-root': {
+          padding: aboveMd && '6px 16px',
+        },
+        borderColor: '#d9d9d9'
+      }}
+    >
+      <Box
+        display="flex"
+        gridColumnGap={8}>
+        {Object.values(tableFilters)
+          .sort((a, b) => (a.order - b.order))
+          .map((filter, index) => (
+            <FilterDropdown
+              key={index}
+              filterName={filter.name}
+              buttonText={filter.text}
+              filterOptions={filter.options}
+              activeFilters={filters[filter.name]}
+              changeFilters={changeFilters}
+              clearFilters={clearFilters}
+            />
+          ))}
+      </Box>
+      <Box>
+        {/* Search field */}
+        <TextControl
+          variant="outlined"
+          placeholder="Search here"
+          size="small"
+          gutter={false}
+          label=" "
+          className={classes.searchInput}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                {searchValue ? (
+                  <IconButton
+                    size="small"
+                    color="#4477CE"
+                    onClick={() => {
+                      updateSearch({ target: { value: "" } });
+                    }}
+                    style={{ color: "#4477CE" }}
+                  >
+                    <Icon>close</Icon>
+                  </IconButton>
+                ) : (
+                  <Icon style={{ color: "#4477CE" }}>search</Icon>
+                )}
+              </InputAdornment>
+            ),
+            endAdornment: (
+              <InputAdornment position="absolute" style={{ position: 'absolute', right: -6 }}>
+                {searchValue && (
+                  <>
+                    <IconButton
+                      size="small"
+                      color="inherit"
+                      disabled={false}
+                    // onClick={() => setSelected((prev) => prev - 1)}
+                    >
+                      <Icon>arrow_left</Icon>
+                    </IconButton>
+                    <IconButton
+                      size="small"
+                      color="inherit"
+                      disabled={false}
+                    // onClick={() => setSelected((prev) => prev + 1)}
+                    >
+                      <Icon>arrow_right</Icon>
+                    </IconButton>
+                  </>
+                )}
+              </InputAdornment>
+            ),
+          }}
+        // value={}
+        // onChange={}
+        />
+      </Box>
+    </Box>
+  )
+}
+
+export default RiskLibraryHeader

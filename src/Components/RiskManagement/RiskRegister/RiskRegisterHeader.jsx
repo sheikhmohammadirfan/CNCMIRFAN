@@ -2,10 +2,7 @@ import { Box, Button, Icon, IconButton, InputAdornment, Tooltip, makeStyles, use
 import React, { useState } from 'react'
 import { TextControl } from '../../Utils/Control';
 import OptionDropdown from './OptionDropdown';
-import FilterDropdown from './FilterDropdown';
-import jira from "../../../assets/img/jira-brands.svg"
-import RiskRegisterFilters from '../../../assets/data/RiskManagement/RiskRegisterFilters';
-import { risk_register_columns } from '../../../assets/data/RiskManagement/RiskRegisterColumns';
+import FilterDropdown from '../../Utils/DataTable/FilterDropdown';
 import ManageRegisterColumns from './ManageRegisterColumns';
 
 // Generate Styles

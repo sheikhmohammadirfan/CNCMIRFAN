@@ -1,7 +1,5 @@
-import { Box, Icon, Typography, makeStyles } from "@material-ui/core";
-import { green, amber, red } from "@material-ui/core/colors";
-import columnToCellMap from "../../../assets/data/RiskManagement/RegisterColCellMap";
-import { risk_register_table_cols } from "../../../assets/data/RiskManagement/RiskRegisterColumns";
+import { Typography, makeStyles } from "@material-ui/core";
+import columnToCellMap from "../../../assets/data/RiskManagement/TableColCellMap";
 
 export const useStyle = makeStyles(theme => ({
 
@@ -100,7 +98,6 @@ export const useStyle = makeStyles(theme => ({
 
   //Header cell style
   headerCell: {
-    color: "#797979",
     color: "#797979",
     fontSize: 12,
     textTransform: "uppercase",

@@ -95,7 +95,7 @@ export default function Sidebar({ isOpen, toggleSidebar }) {
         className={`${classes.navContainer} ${!isOpen ? "close-sidebar" : ""}`}
         disablePadding
       >
-        {SidebarData.map(({ title, icon, subMenu, ...rest }, index) => (
+        {SidebarData.map(({ title, icon, subMenu, collapseMenu, ...rest }, index) => (
           <SidebarItem
             key={index}
             sidebarOpen={isOpen}
@@ -107,6 +107,7 @@ export default function Sidebar({ isOpen, toggleSidebar }) {
             }
             icon={icon ? <Icon>{icon}</Icon> : null}
             subMenu={subMenu}
+            collapseMenu={collapseMenu}
             {...rest}
             data-test="sidebar-menu-item"
           />

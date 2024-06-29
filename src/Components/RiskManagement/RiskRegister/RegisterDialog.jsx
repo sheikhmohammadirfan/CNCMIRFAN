@@ -6,9 +6,9 @@ import { Controller, useForm } from 'react-hook-form';
 import CustomAccordion from '../../Utils/CustomAccordion';
 import { useStyle } from './RiskRegisterUtils';
 import { Autocomplete } from '@mui/material';
-import { source_options } from '../../../assets/data/RiskManagement/RiskRegisterFilters';
+import { source_options } from '../../../assets/data/RiskManagement/RiskRegister/RiskRegisterFilters';
 import SelectCategories from './SelectCategories';
-import { cia_categories } from '../../../assets/data/RiskManagement/RiskRegisterFilters';
+import { cia_categories } from '../../../assets/data/RiskManagement/RiskRegister/RiskRegisterFilters';
 import SliderControl from './SliderControl';
 
 // Custom input compoent

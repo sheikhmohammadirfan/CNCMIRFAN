@@ -10,7 +10,10 @@ import {
   Typography,
   Tooltip,
   withStyles,
+  Collapse,
 } from "@material-ui/core";
+import { StarBorder } from "@material-ui/icons";
+import { ListItemButton } from "@mui/material";
 import React, { useState, useEffect } from "react";
 
 /** Custom ListItem to act as Sidebar Item */
@@ -202,6 +205,44 @@ function WithoutSubMenu({ sidebarOpen, text, icon, tooltipProps, ...rest }) {
   );
 }
 
+function WithCollapsibleManu({ sidebarOpen, text, icon, collapseMenu, ...rest }) {
+
+  const [subMenu, setSubMenu] = useState(false)
+
+  return (
+    <CustomTooltip
+      title={sidebarOpen ? "" : TooltipText(text.props.children)}
+      placement="right"
+    >
+      <List disablePadding style={{ background: !subMenu && "none" }}>
+        <Item button {...rest} style={{ paddingBlock: "8px" }} onClick={() => setSubMenu(prev => !prev)}>
+          <ListItemIcon>
+            <Icon>{icon}</Icon>
+          </ListItemIcon>
+          <ListItemText data-test="sidebaritem-with-text">
+            {text}
+          </ListItemText>
+          {subMenu ? <Icon>keyboard_arrow_up</Icon> : <Icon>keyboard_arrow_down</Icon>}
+        </Item>
+        <Collapse in={subMenu && sidebarOpen} timeout="auto" unmountOnExit>
+          <List disablePadding>
+            {collapseMenu.map(({ title, icon, ...rest }, index) => (
+              <Item key={index} button {...rest} style={{ paddingLeft: 50, paddingBlock: "10px" }}>
+                <ListItemIcon color="inherit" data-test="sidebaritem-without-icon">
+                  <Icon>{icon}</Icon>
+                </ListItemIcon>
+                <ListItemText data-test="sidebaritem-with-text">
+                  {title}
+                </ListItemText>
+              </Item>
+            ))}
+          </List>
+        </Collapse>
+      </List>
+    </CustomTooltip>
+  )
+}
+
 /** Generate Sidebar Item */
 export default function SidebarItem({
   sidebarOpen,
@@ -209,9 +250,10 @@ export default function SidebarItem({
   text,
   icon,
   subMenu,
+  collapseMenu,
   ...rest
 }) {
-  return subMenu ? (
+  if (subMenu) return (
     <WithSubMenu
       sidebarOpen={sidebarOpen}
       xs={xs}
@@ -220,12 +262,40 @@ export default function SidebarItem({
       subMenu={subMenu}
       {...rest}
     />
-  ) : (
+  )
+  else if (collapseMenu) return (
+    <WithCollapsibleManu
+      sidebarOpen={sidebarOpen}
+      xs={xs}
+      text={text}
+      icon={icon}
+      collapseMenu={collapseMenu}
+      {...rest}
+    />
+  )
+  else return (
     <WithoutSubMenu
       sidebarOpen={sidebarOpen}
       text={text}
       icon={icon}
       {...rest}
     />
-  );
+  )
+  // return subMenu ? (
+  //   <WithSubMenu
+  //     sidebarOpen={sidebarOpen}
+  //     xs={xs}
+  //     text={text}
+  //     icon={icon}
+  //     subMenu={subMenu}
+  //     {...rest}
+  //   />
+  // ) : (
+  //   <WithoutSubMenu
+  //     sidebarOpen={sidebarOpen}
+  //     text={text}
+  //     icon={icon}
+  //     {...rest}
+  //   />
+  // );
 }

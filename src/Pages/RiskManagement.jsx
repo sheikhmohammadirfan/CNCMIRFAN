@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react'
 import { Box, makeStyles } from '@material-ui/core'
 import RiskRegister from '../Components/RiskManagement/RiskRegister/RiskRegister'
+import RiskLibrary from '../Components/RiskManagement/RiskLibrary/RiskLibrary'
 import RiskManagementContext from '../Components/RiskManagement/RiskManagementContext'
-import { getCategories, getImpactScores, getLikelihoodScores, getOwners } from '../Service/RiskManagement.service'
+import { getCategories, getImpactScores, getLikelihoodScores, getOwners } from '../Service/RiskManagement/RiskManagement.service'
+import { Route, Switch } from 'react-router-dom/cjs/react-router-dom.min'
 
 const useStyle = makeStyles((theme) => ({
   riskManagementContainer: {
@@ -62,7 +64,21 @@ const RiskManagement = () => {
       className={classes.riskManagementContainer}
     >
       <RiskManagementContext.Provider value={contextValues}>
-        <RiskRegister />
+        <Switch>
+          <Route exact path="/risk-management/risk-library">
+            <RiskLibrary
+              categories={{ categories, setCategories }}
+              owners={{ owners, getOwners }}
+              scores={{ likelihoodScores, setLikelihoodScores, impactScores, setImpactScores }}
+            />
+          </Route>
+          <Route exact path="/risk-management/risk-register">
+            <RiskRegister />
+          </Route>
+          <Route exact path="/risk-management/action-tracker">
+            <RiskRegister />
+          </Route>
+        </Switch>
       </RiskManagementContext.Provider>
     </Box>
   )

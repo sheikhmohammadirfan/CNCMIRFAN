@@ -2,15 +2,15 @@ import React, { useCallback, useContext, useEffect, useLayoutEffect, useRef, use
 import { Box, Grid } from '@material-ui/core'
 import RiskRegisterHeader from './RiskRegisterHeader'
 import DataTable from '../../Utils/DataTable/DataTable'
-import { HeaderCell, RowCell, generateRows, mapDataToHeader, useStyle } from './RiskRegisterUtils'
-import { risk_register_columns, risk_register_columns_width } from '../../../assets/data/RiskManagement/RiskRegisterColumns'
-import { getRegister, getInherentRisks, getOwners, getResidualRisks } from '../../../Service/RiskRegister.service'
+import { HeaderCell, generateRows, mapDataToHeader, useStyle } from './RiskRegisterUtils'
+import { risk_register_columns, risk_register_columns_width } from '../../../assets/data/RiskManagement/RiskRegister/RiskRegisterColumns'
+import { getRegister, getInherentRisks, getOwners, getResidualRisks } from '../../../Service/RiskManagement/RiskRegister.service'
 import useLoading from '../../Utils/Hooks/useLoading'
 import SkeletonBox from '../../Utils/SkeletonBox'
 import RiskManagementContext from '../RiskManagementContext'
-import RiskRegisterFilters, { cia_categories, treatmentTypes } from '../../../assets/data/RiskManagement/RiskRegisterFilters'
+import RiskRegisterFilters, { cia_categories, treatmentTypes } from '../../../assets/data/RiskManagement/RiskRegister/RiskRegisterFilters'
 import RegisterDialog from './RegisterDialog'
-import { dummy_row } from '../../../assets/data/RiskManagement/RiskRegisterMockData'
+import { dummy_row } from '../../../assets/data/RiskManagement/RiskRegister/RiskRegisterMockData'
 
 const RiskRegister = () => {
 

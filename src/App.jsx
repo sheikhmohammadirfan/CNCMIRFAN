@@ -24,6 +24,7 @@ import Integrate from "./Pages/Integrate";
 import ParamsRoutes from "./Components/Utils/Routers/ParamsRoutes";
 import RiskManagement from "./Pages/RiskManagement";
 import React from "react";
+import RiskLibrary from "./Components/RiskManagement/RiskLibrary/RiskLibrary";
 
 
 
@@ -146,8 +147,8 @@ function App() {
                     <Route exact path="/Integrated_Platforms">
                       <Integrate title="Integrated Platforms" />
                     </Route>
-                    <Route exact path="/risk_management">
-                      <RiskManagement title="Integrated Platforms" />
+                    <Route path="/risk-management">
+                      <RiskManagement title="Risk Management" />
                     </Route>
                   </div>
                 </Box>

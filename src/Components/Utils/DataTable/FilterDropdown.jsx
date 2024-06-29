@@ -1,10 +1,11 @@
 import { Box, Button, Checkbox, ClickAwayListener, Divider, FormControlLabel, Icon, List, ListItem, Tooltip, makeStyles } from '@material-ui/core'
 import React, { useState } from 'react'
+import colorShader from '../ColorShader';
 
 const useStyles = makeStyles((theme) => ({
   customTooltip: {
     backgroundColor: "white",
-    border: "1px solid rgba(0, 0, 0, 0.1)",
+    border: `1px solid ${colorShader('#000000', 0.1)}`,
     marginTop: "6px",
     padding: "4px 0 0",
     minWidth: 200,
@@ -32,7 +33,7 @@ const useStyles = makeStyles((theme) => ({
   },
   checkboxLabel: {
     width: "100%",
-    color: "rgba(0, 0, 0, 0.87)",
+    color: colorShader('#000000', 0.87),
     "&>.MuiFormControlLabel-label": {
       fontSize: "0.8rem",
     },
@@ -53,7 +54,7 @@ const useStyles = makeStyles((theme) => ({
     height: 25,
     width: "100%",
     "&:hover": {
-      backgroundColor: "rgba(68, 119, 206, 0.85)"
+      backgroundColor: colorShader(theme.palette.primary.main, 0.85)
     }
   },
   filterButtonIcon: {
@@ -61,17 +62,30 @@ const useStyles = makeStyles((theme) => ({
     fontSize: '0.8rem !important',
   },
   filterButton: {
-    backgroundColor: "rgba(0, 0, 0, 0.05)",
+    backgroundColor: colorShader('#000000', 0.05),
     textTransform: "none",
     paddingInline: 10,
-    color: "rgba(0, 0, 0, 0.75)",
+    color: colorShader('#000000', 0.75),
     "&[data-active='true']": {
       color: theme.palette.primary.main
     }
   },
 }))
 
-const FilterDropdown = ({ filterName, buttonText, filterOptions, activeFilters, changeFilters, clearFilters }) => {
+const FilterDropdown = ({
+  // String
+  filterName,
+  // String
+  buttonText,
+  // Array of objects. objects shoould contain keys "id" and "text"
+  filterOptions,
+  // Array of ids. if this array contains some id that is inside filterOptions array, that option will be checked
+  activeFilters,
+  // Functions that are responsible to change the "activeFilters" array. 
+  // activeFilters should be associated with a useState to be able to see the check uncheck behavious
+  changeFilters,
+  clearFilters
+}) => {
 
   const classes = useStyles();
 
