@@ -1,15 +1,15 @@
-import React, { useEffect, useState } from 'react'
-import DialogBox from '../../Utils/DialogBox'
+import React, { useEffect, useMemo, useState } from 'react'
+import DialogBox from '../Utils/DialogBox'
 import { Box, Button, Checkbox, Divider, FormControlLabel, FormGroup, Grid, Slider, TextField, Typography } from '@material-ui/core'
-import { DateControl, Form, RadioControl, SelectControl, TextControl } from '../../Utils/Control';
+import { DateControl, Form, RadioControl, SelectControl, TextControl } from '../Utils/Control';
 import { Controller, useForm } from 'react-hook-form';
-import CustomAccordion from '../../Utils/CustomAccordion';
-import { useStyle } from './RiskRegisterUtils';
+import CustomAccordion from '../Utils/CustomAccordion';
+import { useStyle } from './RiskRegister/RiskRegisterUtils';
 import { Autocomplete } from '@mui/material';
-import { source_options } from '../../../assets/data/RiskManagement/RiskRegister/RiskRegisterFilters';
-import SelectCategories from './SelectCategories';
-import { cia_categories } from '../../../assets/data/RiskManagement/RiskRegister/RiskRegisterFilters';
-import SliderControl from './SliderControl';
+import { source_options } from '../../assets/data/RiskManagement/RiskRegister/RiskRegisterFilters';
+import SelectCategories from './RiskRegister/SelectCategories';
+import { cia_categories } from '../../assets/data/RiskManagement/RiskRegister/RiskRegisterFilters';
+import SliderControl from './RiskRegister/SliderControl';
 
 // Custom input compoent
 const FormInput = ({ ...rest }) => (
@@ -31,18 +31,19 @@ const TitleWrapper = ({ text }) => (
 );
 
 // DEFAULT EXPORT FUNCTION
-const RegisterDialog = ({
+const RiskFormDialog = ({
   open,
   closeHandler,
   rowIndex,
   row,
+  isLibraryRow = false,
   autocompleteOptions: { categories, owners },
   getSliderValue,
   scores,
   onFormSubmit
 }) => {
 
-  const isCreateForm = () => rowIndex === -1;
+  const isCreateForm = () => rowIndex === -1 || isLibraryRow;
 
   // Loading status for dialog
   const [isLoading, setisLoading] = useState(false);
@@ -50,25 +51,57 @@ const RegisterDialog = ({
   // state to handle inherent risk selector accordion open and close;
   const [inherentAccordion, setInherentAccordion] = useState(false)
 
+  // Checking if scenario is a object in string form by trying to parse it, and returning description
+  const scenarioDescription = useMemo(() => {
+    if (!row) return ""
+    try {
+      return JSON.parse(row["Scenario"]).description
+    }
+    catch (err) {
+      return row["Scenario"];
+    }
+  }, [row])
+
+  const categoriesList = useMemo(() => {
+    if (!row) return;
+    try {
+      return JSON.parse(row["Scenario"]).categories_id
+    }
+    catch (err) {
+      return row["Categories"];
+    }
+  }, [row])
+
   let formValues = row
     ? {
-      scenario: JSON.parse(row["Scenario"]).description,
-      categories: categories.filter(category => JSON.parse(row["Scenario"]).categories_id.includes(category.id)),
+      scenario: scenarioDescription,
+      categories: categories.filter(category => categoriesList.includes(category.id)),
       // Get id for a single cia category, and check if it is in the row data that is selected.
-      confidentiality: row["CIA"].includes(cia_categories.find(cat => cat.name === "confidentiality").id),
-      integrity: row["CIA"].includes(cia_categories.find(cat => cat.name === "integrity").id),
-      availability: row["CIA"].includes(cia_categories.find(cat => cat.name === "availability").id),
-      uncategorized: row["CIA"].includes(cia_categories.find(cat => cat.name === "uncategorized").id),
+      confidentiality: row["CIA"]?.includes(cia_categories.find(cat => cat.name === "confidentiality").id),
+      integrity: row["CIA"]?.includes(cia_categories.find(cat => cat.name === "integrity").id),
+      availability: row["CIA"]?.includes(cia_categories.find(cat => cat.name === "availability").id),
+      uncategorized: row["CIA"]?.includes(cia_categories.find(cat => cat.name === "uncategorized").id),
       // getting slider values (0-100) from actual scores. 
       // Boolean flag is to check if score is of likelihood or impact
-      inherent_likelihood: getSliderValue(
-        scores.likelihoodScores.find(score => score.id === row["Inherent Risk Likelihood Id"]).score,
-        true
-      ),
-      inherent_impact: getSliderValue(
-        scores.impactScores.find(score => score.id === row["Inherent Risk Impact Id"]).score,
-        false
-      ),
+      // If it is library row, set default risk value to 1 (slider value 0)
+      inherent_likelihood: isLibraryRow
+        ? getSliderValue(
+          scores.likelihoodScores.length > 0 && scores.likelihoodScores[0].score,
+          true
+        )
+        : getSliderValue(
+          scores.likelihoodScores.find(score => score.id === row["Inherent Risk Likelihood Id"]).score,
+          true
+        ),
+      inherent_impact: isLibraryRow
+        ? getSliderValue(
+          scores.impactScores.length > 0 && scores.impactScores[0].score,
+          false
+        )
+        : getSliderValue(
+          scores.impactScores.find(score => score.id === row["Inherent Risk Impact Id"]).score,
+          false
+        ),
       // Setting default slider values of residual risk scores to 1 (One) 
       // Here it is assumed first score object is the lowest score
       residual_likelihood: getSliderValue(
@@ -79,8 +112,8 @@ const RegisterDialog = ({
         scores.impactScores.length > 0 && scores.impactScores[0].score,
         false
       ),
-      notes: row["Notes"],
-      customId: row["Custom Id"],
+      notes: "Notes" in row ? row["Notes"] : "",
+      customId: "Custom Id" in row ? row["Custom Id"] : "",
     }
     : {
       // Setting default slider values to 1 (One) 
@@ -211,6 +244,7 @@ const RegisterDialog = ({
                 <FormInput
                   name="scenario"
                   label="Scenario"
+                  disabled={isLibraryRow}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -222,6 +256,7 @@ const RegisterDialog = ({
                   rules={validation}
                   optionList={categories}
                   className={classes.customAutocomplete}
+                  disabled={isLibraryRow}
                 />
               </Grid>
               {/* Not showing owner, source, identified and modified date fields if it is not a create risk  */}
@@ -373,7 +408,7 @@ const RegisterDialog = ({
                 </Box>
               </Grid>
               {/* Not showing residual risk field if it is not create form */}
-              {!isCreateForm() &&
+              {(!isCreateForm()) &&
                 <Grid item xs={12}>
                   <Box className={classes.subInputsContainer}>
                     <Typography className={classes.inputSubtitle}>Residual Risk</Typography>
@@ -408,7 +443,7 @@ const RegisterDialog = ({
                   name="notes"
                 />
               </Grid>
-              {!isCreateForm() &&
+              {(!isCreateForm()) &&
                 <Grid item xs={12}>
                   <Box className={classes.subInputsContainer}>
                     <Typography className={classes.inputSubtitle}>Treatment Plan</Typography>
@@ -453,7 +488,7 @@ const RegisterDialog = ({
           form="risk-form"
           type="submit"
         >
-          {isCreateForm() ? "ADD" : "UPDATE"}
+          {(isCreateForm()) ? "ADD" : "UPDATE"}
         </Button>,
       ]}
     >
@@ -462,4 +497,4 @@ const RegisterDialog = ({
   )
 }
 
-export default RegisterDialog
+export default RiskFormDialog

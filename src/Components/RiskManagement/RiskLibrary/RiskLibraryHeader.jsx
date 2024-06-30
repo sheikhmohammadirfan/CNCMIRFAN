@@ -1,7 +1,8 @@
-import { Box, Icon, IconButton, InputAdornment, makeStyles, useMediaQuery, useTheme } from '@material-ui/core'
+import { Box, Button, Icon, IconButton, InputAdornment, makeStyles, useMediaQuery, useTheme } from '@material-ui/core'
 import React, { useState } from 'react'
 import { TextControl } from '../../Utils/Control';
 import FilterDropdown from '../../Utils/DataTable/FilterDropdown';
+import colorShader from '../../Utils/ColorShader';
 
 // Generate Styles
 const useStyle = makeStyles((theme) => ({
@@ -25,11 +26,29 @@ const useStyle = makeStyles((theme) => ({
     },
     // overflow: "hidden"
   },
+
+  addInRiskButton: {
+    '&.Mui-disabled': {
+      backgroundColor: `${colorShader(theme.palette.primary.main, 0.6)} !important`
+    },
+    '&.Mui-disabled img': {
+      opacity: 0.4
+    },
+    maxHeight: 34,
+    color: "#FFFFFF !important",
+    paddingInline: 10,
+    textTransform: 'none',
+    transition: "color 0s"
+  },
+
+
 }))
 
 const RiskLibraryHeader = ({
+  selectedRows,
   tableFilters,
-  filters: { filters, changeFilters, clearFilters }
+  filters: { filters, changeFilters, clearFilters },
+  openAddRiskForm
 }) => {
 
   const classes = useStyle();
@@ -69,6 +88,7 @@ const RiskLibraryHeader = ({
         borderColor: '#d9d9d9'
       }}
     >
+      {/* Filters */}
       <Box
         display="flex"
         gridColumnGap={8}>
@@ -86,7 +106,9 @@ const RiskLibraryHeader = ({
             />
           ))}
       </Box>
-      <Box>
+
+      <Box display="flex" gridColumnGap={8}>
+
         {/* Search field */}
         <TextControl
           variant="outlined"
@@ -142,6 +164,22 @@ const RiskLibraryHeader = ({
         // value={}
         // onChange={}
         />
+
+        {/* Add in Risk form */}
+        <Box display="flex" gridColumnGap={8}>
+          <Button
+            size='small'
+            variant='contained'
+            disableElevation
+            color='primary'
+            startIcon={<Icon>add</Icon>}
+            className={classes.addInRiskButton}
+            disabled={selectedRows.length === 0}
+            onClick={openAddRiskForm}
+          >
+            Add
+          </Button>
+        </Box>
       </Box>
     </Box>
   )

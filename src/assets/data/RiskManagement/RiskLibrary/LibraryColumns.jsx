@@ -2,11 +2,10 @@ export const LibraryColumns = [
   "Scenario",
   "Categories",
   "Source",
-  "Actions"
 ]
 
 export const librayColumnWidths = [
-  600, 250, 100, 200
+  700, 400, 150
 ]
 
 export const HEADER_TABLE_NAME_MAP = {
@@ -14,5 +13,4 @@ export const HEADER_TABLE_NAME_MAP = {
   "description": "Scenario",
   "categories_id": "Categories",
   "source_type": "Source",
-  "actions": "Actions"
 }

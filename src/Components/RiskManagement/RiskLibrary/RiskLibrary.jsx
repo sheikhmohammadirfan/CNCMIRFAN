@@ -8,11 +8,12 @@ import SkeletonBox from '../../Utils/SkeletonBox';
 import DataTable from '../../Utils/DataTable/DataTable';
 import { getLibrary } from '../../../Service/RiskManagement/RiskLibrary.service';
 import { LibraryColumns, librayColumnWidths } from '../../../assets/data/RiskManagement/RiskLibrary/LibraryColumns';
+import RiskFormDialog from '../RiskFormDialog';
 
 const RiskLibrary = ({
   categories: { categories, setCategories },
   owners: { owners, getOwners },
-  scores: { likelihoodScores, setLikelihoodScores, impactScores, setImpactScores }
+  scores
 }) => {
 
   // React state to maintain loading status
@@ -36,6 +37,10 @@ const RiskLibrary = ({
 
   // State to track selected rows
   const [selectedRows, setSelectedRows] = useState([]);
+  const getCurrentIndex = () => {
+    if (selectedRows.length === 0) return -1;
+    return selectedRows[0];
+  }
 
   const [matchedCell, setMatchedCell] = useState([]);
 
@@ -72,6 +77,24 @@ const RiskLibrary = ({
     }))
   }
 
+  const [addRiskForm, setAddRiskForm] = useState(false);
+  const closeRiskForm = () => setAddRiskForm(false);
+
+  // Get a value between 0-100 from a small number
+  const getSliderValue = (num, isLikelihoodScore) => {
+    let min = 1;
+    let max = isLikelihoodScore ? scores.likelihoodScores.length : scores.impactScores.length;
+    let newMin = 0;
+    let newMax = 100;
+    // Applying linear interpolation formula, to convert a small value from 0-5/10 to a value between 0-100
+    let sliderValue = ((num - min) / (max - min)) * (newMax - newMin) + newMin;
+    return sliderValue;
+  }
+
+  const onAddFormSubmit = (values) => {
+    console.log(values);
+  }
+
   // Map data to header
   const mapTableHeader = () =>
     mapDataToHeader(libraryColumns);
@@ -100,9 +123,13 @@ const RiskLibrary = ({
       </Box>
 
       <RiskLibraryHeader
+        // Selected rows
+        selectedRows={selectedRows}
         // Dropdown data for filters
         tableFilters={filterDropdowns}
         filters={{ filters, changeFilters, clearFilters }}
+        // function to open add risk form on clicking add button
+        openAddRiskForm={() => setAddRiskForm(true)}
       />
 
       {isLoading()
@@ -127,6 +154,7 @@ const RiskLibrary = ({
               minCheckboxWidth={50}
               serialNo={false}
               resizeTable={true}
+              resizeAfterColumns={0}
               selectedRows={selectedRows}
               setSelectedRows={setSelectedRows}
               headerWrapper={(text) => <HeaderCell text={text} />}
@@ -148,6 +176,18 @@ const RiskLibrary = ({
         /> */}
         </Grid>
       }
+
+      <RiskFormDialog
+        open={addRiskForm}
+        closeHandler={closeRiskForm}
+        rowIndex={getCurrentIndex()}
+        row={library[getCurrentIndex()]}
+        isLibraryRow={true}
+        autocompleteOptions={{ categories }}
+        getSliderValue={getSliderValue}
+        scores={scores}
+        onFormSubmit={onAddFormSubmit}
+      />
     </Box>
   )
 }

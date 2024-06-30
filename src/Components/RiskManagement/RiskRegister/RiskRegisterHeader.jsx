@@ -4,6 +4,7 @@ import { TextControl } from '../../Utils/Control';
 import OptionDropdown from './OptionDropdown';
 import FilterDropdown from '../../Utils/DataTable/FilterDropdown';
 import ManageRegisterColumns from './ManageRegisterColumns';
+import colorShader from '../../Utils/ColorShader';
 
 // Generate Styles
 const useStyle = makeStyles((theme) => ({
@@ -29,14 +30,14 @@ const useStyle = makeStyles((theme) => ({
   },
   actionButton: {
     '&.Mui-disabled': {
-      color: "rgba(68, 119, 206, 0.5) !important"
+      color: `${colorShader('#4477CE', 0.5)} !important`
     },
     '&.Mui-disabled img': {
       opacity: 0.4
     },
     maxHeight: 34,
     backgroundColor: 'white',
-    color: "#4477CE",
+    color: theme.palette.primary.main,
     border: '1px solid rgba(0, 0, 0, 0.2)',
     paddingInline: 10,
     textTransform: 'none',

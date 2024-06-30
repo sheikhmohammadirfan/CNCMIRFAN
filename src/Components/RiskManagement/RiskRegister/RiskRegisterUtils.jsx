@@ -369,7 +369,7 @@ export const mapDataToHeader = (visibleColumns, sorting, updateSort) => ({
       text === "Custom Id" || text === "Scenario"
         ? {
           "sticky": "",
-          "scenario": text === "Scenario" && "true",
+          "scenario": text === "Scenario" ? "true" : "false",
           "header": "",
           onClick: () => updateSort(text),
           className: sorting && sorting.column === text ? sorting.order : "",
@@ -398,7 +398,7 @@ const mapDataToRow = (row, rowIndex, columns, matchedCell, categories, owners, s
         colName === "Custom Id" || colName === "Scenario"
           ? {
             "sticky": "",
-            "scenario": colName === "Scenario" && "true",
+            "scenario": colName === "Scenario" ? "true" : "false",
             "data-searched": Boolean(
               matchedCell.find(
                 (cell) =>

@@ -111,28 +111,30 @@ export const risk_register_rows = [
 ]
 
 export const dummy_row = {
-  id: 0,
-  scenario: JSON.stringify({
+  ID: 0,
+  Scenario: JSON.stringify({
     id: 0,
     description: "",
     categories_id: [],
     source_type: "",
   }),
-  owner: "",
-  identified_date: "",
-  modified_date: "",
-  cia: [],
-  custom_id: "",
-  inherent_risk_score: '',
-  residual_risk_score: '',
-  notes: "",
-  treatment: JSON.stringify({
+  Owner: "",
+  "Identified Date": "",
+  "Modified Date": "",
+  CIA: [],
+  "Custom Id": "",
+  "Inherent Risk Likelihood Id": "",
+  "Inherent Risk Impact Id": "",
+  "Residual Risk Likelihood Id": "",
+  "Residual Risk Impact Id": "",
+  Notes: "",
+  Treatment: JSON.stringify({
     type: -1,
     controls: [],
     status: -1
   }),
-  task_ids: [],
-  is_approved: false,
-  is_archived: false,
-  vendors: []
+  Tasks: [],
+  "Approved": false,
+  "Archived": false,
+  Vendors: []
 }

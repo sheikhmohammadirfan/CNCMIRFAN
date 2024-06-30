@@ -9,7 +9,7 @@ import useLoading from '../../Utils/Hooks/useLoading'
 import SkeletonBox from '../../Utils/SkeletonBox'
 import RiskManagementContext from '../RiskManagementContext'
 import RiskRegisterFilters, { cia_categories, treatmentTypes } from '../../../assets/data/RiskManagement/RiskRegister/RiskRegisterFilters'
-import RegisterDialog from './RegisterDialog'
+import RiskFormDialog from '../RiskFormDialog'
 import { dummy_row } from '../../../assets/data/RiskManagement/RiskRegister/RiskRegisterMockData'
 
 const RiskRegister = () => {
@@ -201,18 +201,18 @@ const RiskRegister = () => {
 
       const newRow = {
         ...dummy_row,
-        id: register.length + 1,
-        scenario: JSON.stringify({
+        ID: register.length + 1,
+        Scenario: JSON.stringify({
           id: 0,
           description: val.scenario,
           categories_id: val.categories.map(category => category.id),
           source_type: "CUSTOM"
         }),
-        cia: cia_categories.filter(category => Boolean(val[category.name])).map(category => category.text),
-        custom_id: val.customId,
-        inherent_risk_likelihood_id: scores.likelihoodScores.find(score => score.score === getRiskScore(val.inherent_likelihood)).id,
-        inherent_risk_impact_id: scores.impactScores.find(score => score.score === getRiskScore(val.inherent_impact)).id,
-        notes: val.notes,
+        CIA: cia_categories.filter(category => Boolean(val[category.name])).map(category => category.text),
+        "Custom Id": val.customId,
+        "Inherent Risk Likelihood Id": scores.likelihoodScores.find(score => score.score === getRiskScore(val.inherent_likelihood)).id,
+        "Inherent Risk Impact Id": scores.impactScores.find(score => score.score === getRiskScore(val.inherent_impact)).id,
+        Notes: val.notes,
       }
 
       const localRegister = JSON.parse(localStorage.getItem("risk-register"))
@@ -326,6 +326,7 @@ const RiskRegister = () => {
                 minCheckboxWidth={50}
                 serialNo={false}
                 resizeTable={true}
+                resizeAfterColumns={1}
                 selectedRows={selectedRow}
                 setSelectedRows={setSelectedRow}
                 headerWrapper={(text) => <HeaderCell text={text} />}
@@ -349,7 +350,7 @@ const RiskRegister = () => {
         }
       </Box>
 
-      <RegisterDialog
+      <RiskFormDialog
         open={scenarioDialog}
         closeHandler={closeScenarioDialog}
         rowIndex={getCurrentIndex()}

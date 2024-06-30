@@ -117,6 +117,7 @@ function DataTable({
   footerComponent,
   verticalBorder = false,
   resizeTable = false,
+  resizeAfterColumns = 1,
   header = { data: [], props: {}, style: {}, cellStyle: {} },
   // data: { text = "", props = {}, css = {} },
   rowList: {
@@ -293,7 +294,7 @@ function DataTable({
                 data-test="datatable-header-cell"
               >
                 {headerWrapper(text)}
-                {resizeTable && index > 1 && (
+                {resizeTable && index > resizeAfterColumns && (
                   <VerticalResizer index={index} data-test="column-resizer" />
                 )}
               </TableCell>
