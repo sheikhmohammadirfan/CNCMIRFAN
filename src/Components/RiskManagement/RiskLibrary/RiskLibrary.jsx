@@ -1,5 +1,5 @@
 import { Box, Grid, Typography } from '@material-ui/core'
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { HeaderCell, RowCell, generateRows, mapDataToHeader, useStyle } from './RiskLibraryUtils'
 import RiskLibraryHeader from './RiskLibraryHeader';
 import RiskLibraryFilters from '../../../assets/data/RiskManagement/RiskLibrary/RiskLibraryFilters';
@@ -9,6 +9,8 @@ import DataTable from '../../Utils/DataTable/DataTable';
 import { getLibrary } from '../../../Service/RiskManagement/RiskLibrary.service';
 import { LibraryColumns, librayColumnWidths } from '../../../assets/data/RiskManagement/RiskLibrary/LibraryColumns';
 import RiskFormDialog from '../RiskFormDialog';
+import { cia_categories } from '../../../assets/data/RiskManagement/RiskRegister/RiskRegisterFilters';
+import { createRisk } from '../../../Service/RiskManagement/RiskRegister.service';
 
 const RiskLibrary = ({
   categories: { categories, setCategories },
@@ -19,18 +21,45 @@ const RiskLibrary = ({
   // React state to maintain loading status
   const { isLoading, startLoading, stopLoading } = useLoading();
 
+  const prevPayload = useRef("");
+  const searchedValue = useRef("");
+  const [filters, setFilters] = useState({
+    categories: [],
+    register: [],
+  })
+
   // State to save library
-  const [library, setLibrary] = useState({});
-  const fetchLibrary = useCallback(async () => {
+  const [{scenarios: library}, setLibrary] = useState({scenarios: []});
+  const fetchLibrary = async () => {
+    const payload = { filters: {}, search: searchedValue.current };
+    if (filters.categories.length > 0) {
+      payload.filters["categories"] = filters.categories;
+    }
+    if (filters.register.length > 0) {
+      payload.filters["register"] = filters.register[0];
+    }
+    const currPayload = JSON.stringify(payload);
+    if (currPayload === prevPayload.current) {
+      return;
+    }
+    prevPayload.current = currPayload;
+
     startLoading();
-    const { data } = await getLibrary();
-    setLibrary(data);
+    const { data } = await getLibrary(payload);
+    setLibrary({
+      ...data,
+      scenarios: data.scenarios.map(x => ({
+        ...x,
+        "Scenario": x.scenario,
+        "Categories": x.categories,
+        "Source":  x.scenario_source === 0 ? "SYSTEM" : "CUSTOM"
+      }))});
     stopLoading();
-  }, [])
+  };
 
   useEffect(() => {
     fetchLibrary();
-  }, [fetchLibrary])
+  }, [])
 
   // Save library columns
   const [libraryColumns, setLibraryColumns] = useState(LibraryColumns);
@@ -48,22 +77,27 @@ const RiskLibrary = ({
   useEffect(() => {
     setFilterDropdowns(prev => ({
       ...prev,
-      categories: { ...prev.categories, options: categories }
+      categories: { ...prev.categories, options: categories.map(c => ({ id:c.id, text:c.category_name })) }
     }))
   }, [categories])
 
-  const [filters, setFilters] = useState({
-    categories: [],
-    register: [],
-  })
+
   const changeFilters = (filterName, itemId) => {
     setFilters(prev => {
       // Getting prev filters array of the filter
       let currentFilters = prev[filterName];
-      // If id is already in filter, remove it, else add the id
-      let updatedFilterIds = currentFilters.includes(itemId)
-        ? currentFilters.filter((id) => id !== itemId)
-        : [...currentFilters, itemId]
+      let updatedFilterIds;
+      if (filterName === "register") {
+        // If id is already in filter, remove it, else add the id
+        updatedFilterIds = currentFilters.includes(itemId)
+          ? []
+          : [itemId];
+      } else {
+        // If id is already in filter, remove it, else add the id
+        updatedFilterIds = currentFilters.includes(itemId)
+          ? currentFilters.filter((id) => id !== itemId)
+          : [...currentFilters, itemId];
+      }
       return ({
         ...prev,
         [filterName]: updatedFilterIds
@@ -80,6 +114,17 @@ const RiskLibrary = ({
   const [addRiskForm, setAddRiskForm] = useState(false);
   const closeRiskForm = () => setAddRiskForm(false);
 
+  // Get score from a value between 0-100
+  const getRiskScore = (val, isLikelihoodScore) => {
+    let min = 0;
+    let max = 100;
+    let newMin = 1;
+    let newMax = isLikelihoodScore ? scores.likelihoodScores.length : scores.impactScores.length;
+    // Applying linear interpolation formula, to convert a value from 0-100 to an actual risk score
+    let scaledValue = ((val - min) / (max - min)) * (newMax - newMin) + newMin;
+    return scaledValue;
+  }
+
   // Get a value between 0-100 from a small number
   const getSliderValue = (num, isLikelihoodScore) => {
     let min = 1;
@@ -91,8 +136,19 @@ const RiskLibrary = ({
     return sliderValue;
   }
 
-  const onAddFormSubmit = (values) => {
-    console.log(values);
+  const onAddFormSubmit = async (val) => {
+    const payload = {
+      scenario_id: library[getCurrentIndex()].id,
+      likelihood_id: scores.likelihoodScores.find(score => score.score === getRiskScore(val.inherent_likelihood, true)).id,
+      impact_id: scores.impactScores.find(score => score.score === getRiskScore(val.inherent_impact, false)).id,
+      notes: val.notes,
+      cia: cia_categories.filter(cia => Boolean(val[cia.name])).map(cia => cia.id),
+      custom_id: val.customId
+    }
+    const { status } = await createRisk(payload);
+    if (status) {
+      closeRiskForm();
+    }
   }
 
   // Map data to header
@@ -112,6 +168,11 @@ const RiskLibrary = ({
 
   const classes = useStyle();
 
+  const onSearch = (val) => {
+    searchedValue.current = val;
+    fetchLibrary();
+  }
+
   return (
     <Box className={classes.libraryContainer}>
 
@@ -127,9 +188,10 @@ const RiskLibrary = ({
         selectedRows={selectedRows}
         // Dropdown data for filters
         tableFilters={filterDropdowns}
-        filters={{ filters, changeFilters, clearFilters }}
+        filters={{ filters, changeFilters, clearFilters, triggerFilters: fetchLibrary }}
         // function to open add risk form on clicking add button
         openAddRiskForm={() => setAddRiskForm(true)}
+        onSearch={onSearch}
       />
 
       {isLoading()

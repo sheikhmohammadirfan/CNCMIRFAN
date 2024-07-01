@@ -1,18 +1,8 @@
-import { mock_categories } from "../../assets/data/RiskManagement/CategoriesMock";
-import { impact_scores, likelihood_scores } from "../../assets/data/RiskManagement/RiskScoresMock";
 import { mock_users } from "../../assets/data/RiskManagement/UsersMock";
+import { get } from "../CrudFactory";
 
 export async function getCategories() {
-  return new Promise(res => {
-    setTimeout(() => {
-      // Changing key name from "name" to "text". because "text" key is required to show in UI
-      const categories = mock_categories.map((category, index) => ({
-        ...category,
-        text: category.name
-      }))
-      res({ data: categories, status: true });
-    }, 2000)
-  });
+  return await get("/risk/categories/");
 }
 
 export async function getOwners() {
@@ -31,17 +21,9 @@ export async function getOwners() {
 }
 
 export async function getLikelihoodScores() {
-  return new Promise(res => {
-    setTimeout(() => {
-      res({ data: likelihood_scores, status: true });
-    }, 2000)
-  });
+  return await get("/risk/likelihood_scores/");
 }
 
 export async function getImpactScores() {
-  return new Promise(res => {
-    setTimeout(() => {
-      res({ data: impact_scores, status: true });
-    }, 2000)
-  });
+  return await get("/risk/impact_scores/");
 }

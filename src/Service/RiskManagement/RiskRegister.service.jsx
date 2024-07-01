@@ -1,38 +1,47 @@
-import { HEADER_TABLE_COLS_MAP } from "../../assets/data/RiskManagement/RiskRegister/RiskRegisterColumns";
-import { risk_register_rows } from "../../assets/data/RiskManagement/RiskRegister/RiskRegisterMockData"
+import { post } from "../CrudFactory";
 
 export async function getRegister(owners, likelihoodScores, impactScores) {
-  return new Promise(res => {
-    setTimeout(() => {
-
-      // Setting keys to Column name that is being used to map columns.
-      const mappedRegister = risk_register_rows.map(row => {
-        let mappedRow = {}
-        Object.keys(row).map(key => {
-          let colName = HEADER_TABLE_COLS_MAP[key];
-          mappedRow[colName] = row[key];
-        })
-        return mappedRow;
-      })
-
-      const localRegister = localStorage.getItem("risk-register");
-      if (!localRegister) {
-        localStorage.setItem("risk-register", JSON.stringify(mappedRegister))
-        res({ data: mappedRegister, status: true })
-      }
-      else {
-        res({ data: JSON.parse(localRegister), status: true })
-      }
-    }, 1000)
-  })
+  return await post("/risk/", {});
 }
 
-export async function getInherentRisks() {
-  await new Promise((res) => setTimeout(() => res()), 1000);
-  return { data: [], status: true }
+export async function createRisk(data) {
+  return await post("/risk/create/", data);
 }
 
-export async function getResidualRisks() {
+export async function getRiskScoreGroups() {
   await new Promise((res) => setTimeout(() => res()), 1000);
-  return { data: [], status: true }
+  return {
+    data: [
+      {
+        id: 1,
+        name: "Low",
+        description:
+          "A threat event could be expected to have a limited adverse effect on organizational operations, mission capabilities, assets, individuals, customers, or other organizations.",
+        range_from: 1,
+        range_to: 4,
+        color: "#00FF00",
+        source_type: 0,
+      },
+      {
+        id: 2,
+        name: "Mid",
+        description:
+          "A threat event could be expected to have a serious adverse effect on organizational operations, mission capabilities, assets, individuals, customers, or other organizations.",
+        range_from: 5,
+        range_to: 14,
+        color: "#FFFF00",
+        source_type: 0,
+      },
+      {
+        id: 3,
+        name: "High",
+        description:
+          "A threat event could be expected to have a severe adverse effect on organizational operations, mission capabilities, assets, individuals, customers, or other organizations.",
+        range_from: 15,
+        range_to: 25,
+        color: "#FF0000",
+        source_type: 0,
+      },
+    ],
+  };
 }

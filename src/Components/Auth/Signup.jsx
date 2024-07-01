@@ -185,12 +185,6 @@ export default function Signup({ title }) {
     password: {
       required: "Password is required.",
       validate: { invalid: (val) => val === "" || isPasswordValid(val) },
-    },
-    contact_no: {
-      required: "Contact Number is required",
-      validate: {
-        invalid: (val) => val === ""
-      }
     }
   };
 

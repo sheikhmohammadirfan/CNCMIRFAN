@@ -8,7 +8,7 @@ const CategoriesCell = ({ cellValue }) => {
   return (
     <Box display="flex" gridColumnGap={5}>
       {cellValue.length > 0 && cellValue.map((val, index) => (
-        <Typography key={index} variant="body1" noWrap className={classes.cellLabel}>{val.text}</Typography>
+        <Typography key={index} variant="body1" noWrap className={classes.cellLabel}>{val.category_name}</Typography>
       ))}
     </Box>
   )

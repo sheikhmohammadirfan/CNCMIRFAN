@@ -84,13 +84,17 @@ const FilterDropdown = ({
   // Functions that are responsible to change the "activeFilters" array. 
   // activeFilters should be associated with a useState to be able to see the check uncheck behavious
   changeFilters,
-  clearFilters
+  clearFilters,
+  trigger = () => {}
 }) => {
 
   const classes = useStyles();
 
   const [open, setOpen] = useState(false);
-  const handleClose = () => setOpen(false);
+  const handleClose = () => {
+    setOpen(false);
+    trigger();
+  }
 
   // Handling checkbox clicks and changing filters
   const handleCheckboxClick = (filterItem_id) => {

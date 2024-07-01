@@ -47,8 +47,9 @@ const useStyle = makeStyles((theme) => ({
 const RiskLibraryHeader = ({
   selectedRows,
   tableFilters,
-  filters: { filters, changeFilters, clearFilters },
-  openAddRiskForm
+  filters: { filters, changeFilters, clearFilters, triggerFilters },
+  openAddRiskForm,
+  onSearch
 }) => {
 
   const classes = useStyle();
@@ -103,6 +104,7 @@ const RiskLibraryHeader = ({
               activeFilters={filters[filter.name]}
               changeFilters={changeFilters}
               clearFilters={clearFilters}
+              trigger={triggerFilters}
             />
           ))}
       </Box>
@@ -161,8 +163,11 @@ const RiskLibraryHeader = ({
               </InputAdornment>
             ),
           }}
-        // value={}
-        // onChange={}
+          onKeyDown={e => {
+            if (e.keyCode === 13) {
+              onSearch(e.target.value);
+            }
+          }}
         />
 
         {/* Add in Risk form */}

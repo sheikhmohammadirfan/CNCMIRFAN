@@ -54,28 +54,18 @@ const RiskFormDialog = ({
   // Checking if scenario is a object in string form by trying to parse it, and returning description
   const scenarioDescription = useMemo(() => {
     if (!row) return ""
-    try {
-      return JSON.parse(row["Scenario"]).description
-    }
-    catch (err) {
-      return row["Scenario"];
-    }
+    return row["Scenario"];
   }, [row])
 
   const categoriesList = useMemo(() => {
     if (!row) return;
-    try {
-      return JSON.parse(row["Scenario"]).categories_id
-    }
-    catch (err) {
-      return row["Categories"];
-    }
+    return row["Categories"];
   }, [row])
 
   let formValues = row
     ? {
       scenario: scenarioDescription,
-      categories: categories.filter(category => categoriesList.includes(category.id)),
+      categories: categoriesList,
       // Get id for a single cia category, and check if it is in the row data that is selected.
       confidentiality: row["CIA"]?.includes(cia_categories.find(cat => cat.name === "confidentiality").id),
       integrity: row["CIA"]?.includes(cia_categories.find(cat => cat.name === "integrity").id),
@@ -161,14 +151,14 @@ const RiskFormDialog = ({
     isLikelihoodRisk ? scores.likelihoodScores.map(score => ({
       value: getSliderValue(score.score, true),
       label: score.score,
-      name: score.name,
-      desc: score.description
+      name: score.likelihood_name,
+      desc: score.likelihood_description
     })) :
       scores.impactScores.map(score => ({
         value: getSliderValue(score.score, false),
         label: score.score,
-        name: score.name,
-        desc: score.description
+        name: score.impact_name,
+        desc: score.impact_description
       }))
   )
 

@@ -18,7 +18,7 @@ const SelectCategories = ({ name, label, control, rules, multiple, optionList, .
             value={value || []}
             onChange={(e, newVal) => onChange(newVal)}
             options={optionList}
-            getOptionLabel={(option) => option.text}
+            getOptionLabel={(option) => option.category_name}
             filterSelectedOptions
             renderInput={(params) => (
               <TextField

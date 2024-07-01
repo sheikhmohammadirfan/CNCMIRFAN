@@ -24,20 +24,27 @@ const RiskManagement = () => {
   // Fetching all 4 things
   useEffect(() => {
     (async () => {
-      try {
-        const categoriesRes = await getCategories()
-        setCategories(categoriesRes.data);
-        const likelihoodScoresRes = await getLikelihoodScores();
-        setLikelihoodScores(likelihoodScoresRes.data);
-        const impactScoresRes = await getImpactScores();
-        setImpactScores(impactScoresRes.data)
-        const ownersRes = await getOwners();
-        setOwners(ownersRes.data)
+      const { data } = await getCategories();
+      if (data) {
+        setCategories(data);
       }
-      catch (err) {
-        console.log(err);
+    })();
+    (async () => {
+      const { data } = await getLikelihoodScores();
+      if (data) {
+        setLikelihoodScores(data);
       }
-    })()
+    })();
+    (async () => {
+      const { data } = await getImpactScores();
+      if (data) {
+        setImpactScores(data)
+      }
+    })();
+    (async () => {
+      const ownersRes = await getOwners();
+      setOwners(ownersRes.data)
+    })();
   }, [])
 
   // Making a context object to pass, so below fields are available everywhere to use

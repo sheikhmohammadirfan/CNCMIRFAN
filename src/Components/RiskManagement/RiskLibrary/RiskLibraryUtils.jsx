@@ -259,8 +259,5 @@ const mapDataToRow = (row, rowIndex, columns, matchedCell, categories) => (
 )
 
 const getCellValue = (row, colName, categories) => {
-  if(colName === "Categories") {
-    return categories.filter((cat, id) => row[colName].includes(cat.id))
-  }
   return row[colName]
 }

@@ -4,7 +4,7 @@ import RiskRegisterHeader from './RiskRegisterHeader'
 import DataTable from '../../Utils/DataTable/DataTable'
 import { HeaderCell, generateRows, mapDataToHeader, useStyle } from './RiskRegisterUtils'
 import { risk_register_columns, risk_register_columns_width } from '../../../assets/data/RiskManagement/RiskRegister/RiskRegisterColumns'
-import { getRegister, getInherentRisks, getOwners, getResidualRisks } from '../../../Service/RiskManagement/RiskRegister.service'
+import { getRegister, getOwners,  createRisk, getRiskScoreGroups } from '../../../Service/RiskManagement/RiskRegister.service'
 import useLoading from '../../Utils/Hooks/useLoading'
 import SkeletonBox from '../../Utils/SkeletonBox'
 import RiskManagementContext from '../RiskManagementContext'
@@ -24,13 +24,12 @@ const RiskRegister = () => {
     (async () => {
       try {
 
-        const inherent_risk = await getInherentRisks();
-        const residual_risk = await getResidualRisks();
+        const riskGroups = await getRiskScoreGroups();
 
         setFilterDropdowns(prev => ({
           ...prev,
-          inherentRisk: { ...prev.inherentRisk, options: inherent_risk.data },
-          residualRisk: { ...prev.residualRisk, options: residual_risk.data },
+          inherentRisk: { ...prev.inherentRisk, options: riskGroups.data.map(c => ({ id:c.id, text:c.name })) },
+          residualRisk: { ...prev.residualRisk, options: riskGroups.data.map(c => ({ id:c.id, text:c.name })) },
         }))
       }
       catch (err) {
@@ -46,12 +45,12 @@ const RiskRegister = () => {
     setFilterDropdowns(prev => ({
       ...prev,
       owners: { ...prev.owners, options: owners },
-      categories: { ...prev.categories, options: categories }
+      categories: { ...prev.categories, options: categories.map(c => ({ id:c.id, text:c.category_name })) }
     }))
   }, [categories, owners])
 
   // REGISTER TABLE: State to store the register table data
-  const [register, setRegister] = useState({})
+  const [{risks: register}, setRegister] = useState({risks: []})
 
   // Function to fetch register data, and set the state
   const fetchandSetRegister = useCallback(async (owners, scores) => {
@@ -191,37 +190,23 @@ const RiskRegister = () => {
     // is new row
     if (getCurrentIndex() === -1) {
       const payload = {
-        scenario: val.scenario,
-        categories_id: val.categories.map(category => category.id),
+        scenario_description: val.scenario,
+        categories_ids: val.categories.map(category => category.id),
         likelihood_id: scores.likelihoodScores.find(score => score.score === getRiskScore(val.inherent_likelihood, true)).id,
         impact_id: scores.impactScores.find(score => score.score === getRiskScore(val.inherent_impact, false)).id,
         notes: val.notes,
         cia: cia_categories.filter(cia => Boolean(val[cia.name])).map(cia => cia.id),
+        custom_id: val.customId
       }
 
-      const newRow = {
-        ...dummy_row,
-        ID: register.length + 1,
-        Scenario: JSON.stringify({
-          id: 0,
-          description: val.scenario,
-          categories_id: val.categories.map(category => category.id),
-          source_type: "CUSTOM"
-        }),
-        CIA: cia_categories.filter(category => Boolean(val[category.name])).map(category => category.id),
-        "Custom Id": val.customId,
-        "Inherent Risk Likelihood Id": scores.likelihoodScores.find(score => score.score === getRiskScore(val.inherent_likelihood)).id,
-        "Inherent Risk Impact Id": scores.impactScores.find(score => score.score === getRiskScore(val.inherent_impact)).id,
-        Notes: val.notes,
+      const { status } = await createRisk(payload);
+
+      if (status) {
+        closeScenarioDialog();
+        return fetchandSetRegister(owners, scores);
       }
 
-      const localRegister = JSON.parse(localStorage.getItem("risk-register"))
-      localRegister.push(newRow);
-      localStorage.setItem("risk-register", JSON.stringify(localRegister));
-      closeScenarioDialog();
-      return fetchandSetRegister(owners, scores);
-    }
-    else {
+    } else {
       // is edit row
       const payload = {
         scenario: {
