@@ -208,7 +208,7 @@ const RiskRegister = () => {
           categories_id: val.categories.map(category => category.id),
           source_type: "CUSTOM"
         }),
-        CIA: cia_categories.filter(category => Boolean(val[category.name])).map(category => category.text),
+        CIA: cia_categories.filter(category => Boolean(val[category.name])).map(category => category.id),
         "Custom Id": val.customId,
         "Inherent Risk Likelihood Id": scores.likelihoodScores.find(score => score.score === getRiskScore(val.inherent_likelihood)).id,
         "Inherent Risk Impact Id": scores.impactScores.find(score => score.score === getRiskScore(val.inherent_impact)).id,

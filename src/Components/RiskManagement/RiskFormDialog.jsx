@@ -313,6 +313,7 @@ const RiskFormDialog = ({
                   <Grid item xs={6}>
                     <DateControl
                       name="identified_date"
+                      label="Identified Date"
                       variant='outlined'
                       fullWidth
                     />
@@ -320,6 +321,7 @@ const RiskFormDialog = ({
                   <Grid item xs={6}>
                     <DateControl
                       name="modified_date"
+                      label="Modified Date"
                       variant='outlined'
                       fullWidth
                     />

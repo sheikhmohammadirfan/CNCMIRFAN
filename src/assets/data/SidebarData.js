@@ -143,19 +143,19 @@ export const SidebarData = [
         title: "Risk Library",
         component: Link,
         to: "/risk-management/risk-library",
-        icon: "library_books"
+        icon: "menu_book"
       },
       {
         title: "Risk Register",
         component: Link,
         to: "/risk-management/risk-register",
-        icon: "library_books"
+        icon: "list"
       },
       {
         title: "Action Tracker",
         component: Link,
         to: "/risk-management/action-tracker",
-        icon: "account_tree"
+        icon: "timeline"
       }
     ]
   }

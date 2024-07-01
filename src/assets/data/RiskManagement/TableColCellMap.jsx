@@ -58,7 +58,7 @@ const RiskScoreCell = ({ cellValue }) => {
         backgroundColor: cellValue && (cellValue <= 9 ? "#81c784" : (cellValue > 9 && cellValue < 15 ? "#ffd54f" : "#e57373"))
       }}
     >
-      {cellValue}
+      {cellValue > 0 && cellValue}
     </Typography>
   )
 }

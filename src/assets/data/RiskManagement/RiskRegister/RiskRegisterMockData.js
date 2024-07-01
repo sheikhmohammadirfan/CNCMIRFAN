@@ -56,7 +56,7 @@ export const risk_register_rows = [
     id: 1,
     scenario: JSON.stringify({
       id: 1,
-      description: "This is a description, first description.",
+      description: "Assets are not identified and protected according to company requirements.",
       categories_id: [1, 3],
       source_type: "CUSTOM",
     }),
@@ -84,7 +84,7 @@ export const risk_register_rows = [
     id: 2,
     scenario: JSON.stringify({
       id: 1,
-      description: "This is a description, first description.",
+      description: "Exployees do not return equipment at termination resulting in loss of company resources and/or breach of company data.",
       categories_id: [2, 3],
       source_type: "SYSTEM",
     }),

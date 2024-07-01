@@ -5,6 +5,7 @@ import RiskLibrary from '../Components/RiskManagement/RiskLibrary/RiskLibrary'
 import RiskManagementContext from '../Components/RiskManagement/RiskManagementContext'
 import { getCategories, getImpactScores, getLikelihoodScores, getOwners } from '../Service/RiskManagement/RiskManagement.service'
 import { Route, Switch } from 'react-router-dom/cjs/react-router-dom.min'
+import ActionTracker from '../Components/RiskManagement/ActionTracker/ActionTracker'
 
 const useStyle = makeStyles((theme) => ({
   riskManagementContainer: {
@@ -68,7 +69,7 @@ const RiskManagement = () => {
           <Route exact path="/risk-management/risk-library">
             <RiskLibrary
               categories={{ categories, setCategories }}
-              owners={{ owners, getOwners }}
+              owners={{ owners, setOwners }}
               scores={{ likelihoodScores, setLikelihoodScores, impactScores, setImpactScores }}
             />
           </Route>
@@ -76,7 +77,11 @@ const RiskManagement = () => {
             <RiskRegister />
           </Route>
           <Route exact path="/risk-management/action-tracker">
-            <RiskRegister />
+            <ActionTracker
+              categories={{ categories, setCategories }}
+              owners={{ owners, setOwners }}
+              scores={{ likelihoodScores, setLikelihoodScores, impactScores, setImpactScores }}
+            />
           </Route>
         </Switch>
       </RiskManagementContext.Provider>
