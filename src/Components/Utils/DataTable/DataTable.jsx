@@ -72,7 +72,7 @@ const useStyles = makeStyles((theme) => ({
   // Highlight headr backgroud
   headerStyle: {
     "& th": {
-      background: "#f1f1f1",
+      background: "#f4f4f4",
       borderColor: "#d9d9d9",
       border: "1px solid",
       borderLeft: 0,

@@ -80,10 +80,18 @@ const IsApprovedCell = ({ cellValue }) => {
   )
 }
 
-const SourceCell = ({cellValue}) => {
+const SourceCell = ({ cellValue }) => {
   const classes = useStyle();
   return (
     <Typography className={classes.cellLabel}>{cellValue}</Typography>
+  )
+}
+
+const RangeCell = ({ cellValue: { value, color } }) => {
+  return (
+    <Box style={{ backgroundColor: color, padding: '6px', borderRadius: '5px' }}>
+      <Typography style={{fontSize: '0.85rem'}}>{value}</Typography>
+    </Box>
   )
 }
 
@@ -94,7 +102,8 @@ const columnToCellMap = {
   "Inherent Risk": RiskScoreCell,
   "Residual Risk": RiskScoreCell,
   Approved: IsApprovedCell,
-  Source: SourceCell
+  Source: SourceCell,
+  Range: RangeCell
 }
 
 export default columnToCellMap;

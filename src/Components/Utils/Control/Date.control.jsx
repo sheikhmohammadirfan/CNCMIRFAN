@@ -32,6 +32,7 @@ function DateControl(props) {
               </InputAdornment>
             ),
           }}
+          onChange={(val) => console.log(val)}
           DialogProps={{
             container: () =>
               document.getElementById(localStorage.getItem("fullScreen")),

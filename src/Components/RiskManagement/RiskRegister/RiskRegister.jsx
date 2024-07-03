@@ -11,6 +11,7 @@ import RiskManagementContext from '../RiskManagementContext'
 import RiskRegisterFilters, { cia_categories, treatmentTypes } from '../../../assets/data/RiskManagement/RiskRegister/RiskRegisterFilters'
 import RiskFormDialog from '../RiskFormDialog'
 import { dummy_row } from '../../../assets/data/RiskManagement/RiskRegister/RiskRegisterMockData'
+import AddActionDialog from '../AddActionDialog'
 
 const RiskRegister = () => {
 
@@ -244,6 +245,31 @@ const RiskRegister = () => {
     console.log("configure auditor view");
   }
 
+  // MANAGE ADD ACTION
+  const [actionDialog, setActionDialog] = useState(false);
+  const closeAddActionForm = () => setActionDialog(false);
+
+  // get options for risks
+  const getRegisterOptions = () => register.length !== 0
+    ? register.map(row => ({
+      val: row["ID"],
+      text: JSON.parse(row["Scenario"]).description,
+    }))
+    : []
+
+  const handleAddActionFormSubmit = (values) => {
+    const payload = {
+      risk_id: values.risk,
+      // description: JSON.parse(register.find(row => row.ID.toString() === values.risk.toString())["Scenario"]).description,
+      description: values.action,
+      due_date: values.due_date,
+      assignee: owners.find(owner => owner.id.toString() === values.owner).id,
+      notes: values.notes,
+      source_id: 1,
+    }
+    console.log(payload);
+  }
+
   // All column names into a state
   const [allColumns, setAllColumns] = useState(risk_register_columns);
   const [visibleColumns, setVisibleColumns] = useState(risk_register_columns);
@@ -435,6 +461,8 @@ const RiskRegister = () => {
           // Edit button click handler
           editHandler={openEditForm}
           cols={{ allColumns, visibleColumns, hideColumn, showColumn }}
+          // open add action form
+          openAddActionForm={() => setActionDialog(true)}
           onSearch={onSearch}
         />
 
@@ -493,6 +521,15 @@ const RiskRegister = () => {
         getSliderValue={getSliderValue}
         scores={scores}
         onFormSubmit={onRegisterFormSubmit}
+      />
+
+      <AddActionDialog
+        open={actionDialog}
+        closeHandler={closeAddActionForm}
+        risks={getRegisterOptions()}
+        owners={owners.map(owner => ({ val: owner.id, text: owner.name }))}
+        riskVal={register[getCurrentIndex()]}
+        onFormSubmit={handleAddActionFormSubmit}
       />
     </Box>
   )

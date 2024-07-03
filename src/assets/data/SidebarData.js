@@ -156,6 +156,12 @@ export const SidebarData = [
         component: Link,
         to: "/risk-management/action-tracker",
         icon: "timeline"
+      },
+      {
+        title: "Settings",
+        component: Link,
+        to: "/risk-management/settings",
+        icon: "settings"
       }
     ]
   }

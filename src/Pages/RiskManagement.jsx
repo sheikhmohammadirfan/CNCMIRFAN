@@ -6,6 +6,7 @@ import RiskManagementContext from '../Components/RiskManagement/RiskManagementCo
 import { getCategories, getImpactScores, getLikelihoodScores, getOwners } from '../Service/RiskManagement/RiskManagement.service'
 import { Route, Switch } from 'react-router-dom/cjs/react-router-dom.min'
 import ActionTracker from '../Components/RiskManagement/ActionTracker/ActionTracker'
+import Settings from '../Components/RiskManagement/Settings/Settings'
 import { getRiskScoreGroups } from '../Service/RiskManagement/RiskRegister.service'
 
 const useStyle = makeStyles((theme) => ({
@@ -45,7 +46,11 @@ const RiskManagement = () => {
     })();
     (async () => {
       const ownersRes = await getOwners();
-      setOwners(ownersRes.data)
+      setOwners(ownersRes)
+    })();
+    (async () => {
+      const scoreGroupRes = await getRiskScoreGroups();
+      setScoreGroups(scoreGroupRes.data)
     })();
     (async () => {
       const riskGroups = await getRiskScoreGroups();
@@ -68,7 +73,7 @@ const RiskManagement = () => {
       setLikelihoodScores,
       impactScores,
       setImpactScores,
-      riskScoreGroups,
+      riskScoreGroups
     }
   }
 
@@ -95,6 +100,14 @@ const RiskManagement = () => {
               categories={{ categories, setCategories }}
               owners={{ owners, setOwners }}
               scores={{ likelihoodScores, setLikelihoodScores, impactScores, setImpactScores }}
+            />
+          </Route>
+          <Route exact path="/risk-management/settings">
+            <Settings
+              categories={{ categories, setCategories }}
+              owners={{ owners, setOwners }}
+              scores={{ likelihoodScores, setLikelihoodScores, impactScores, setImpactScores }}
+              scoreGroups={{ scoreGroups, setScoreGroups }}
             />
           </Route>
         </Switch>

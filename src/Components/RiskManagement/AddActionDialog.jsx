@@ -22,7 +22,8 @@ const FormInput = ({ ...rest }) => (
 const AddActionDialog = ({
   open,
   closeHandler,
-  register,
+  risks,
+  riskVal,
   owners,
   onFormSubmit,
 }) => {
@@ -34,12 +35,20 @@ const AddActionDialog = ({
 
   };
 
-  let formValues = {}
+  let formValues = {
+    risk: riskVal && `${riskVal["ID"]}`,
+    owner: riskVal && `${riskVal["Owner"]}`,
+    due_date: null
+  }
 
   // Get useForm Methods
   const { handleSubmit, getValues, setValue, control, reset } = useForm({
     defaultValues: formValues,
   });
+
+  useEffect(() => {
+    reset(formValues);
+  }, [riskVal])
 
   const onSubmit = async (values) => {
     onFormSubmit(values);
@@ -75,10 +84,11 @@ const AddActionDialog = ({
                   name="risk"
                   label="Risk"
                   variant="outlined"
-                  options={register}
+                  options={risks}
                   styleProps={{
                     fullWidth: true,
                   }}
+                  disabled={riskVal ? true : false}
                 />
               </Grid>
 
@@ -89,6 +99,7 @@ const AddActionDialog = ({
                   variant="outlined"
                   options={owners}
                   styleProps={{ fullWidth: true, }}
+                  disabled={riskVal ? true : false}
                 />
               </Grid>
               <Grid item xs={6}>

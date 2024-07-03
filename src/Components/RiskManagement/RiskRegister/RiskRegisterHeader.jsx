@@ -59,6 +59,7 @@ const RiskRegisterHeader = ({
   selectedRows,
   editHandler,
   cols: { allColumns, visibleColumns, hideColumn, showColumn },
+  openAddActionForm,
   onSearch
 }) => {
 
@@ -222,6 +223,7 @@ const RiskRegisterHeader = ({
             startIcon={<Icon style={{ fontSize: '1rem' }}>add</Icon>}
             className={classes.actionButton}
             disabled={selectedRows.length !== 1}
+            onClick={() => openAddActionForm()}
           >
             Add Task
           </Button>
