@@ -49,10 +49,10 @@ const SelectControl = forwardRef((props, ref) => {
             ) : (
               options.map((val, index) => (
                 <MenuItem
-                  value={val?.val ? val.val : val}
+                  value={val?.val === undefined || val?.val === null ? val : val.val}
                   key={index}
                   {...optionProps}
-                  data-test={`select-option-${val?.val ? val.val : val}`}
+                  data-test={`select-option-${val?.val === undefined || val?.val === null ? val : val.val}`}
                 >
                   {val?.text ? val.text : val}
                 </MenuItem>

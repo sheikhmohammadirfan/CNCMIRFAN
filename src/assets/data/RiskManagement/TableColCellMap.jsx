@@ -55,10 +55,10 @@ const RiskScoreCell = ({ cellValue }) => {
       noWrap
       className={classes.riskScore}
       style={{
-        backgroundColor: cellValue && (cellValue <= 9 ? "#81c784" : (cellValue > 9 && cellValue < 15 ? "#ffd54f" : "#e57373"))
+        backgroundColor: cellValue && cellValue.colour
       }}
     >
-      {cellValue > 0 && cellValue}
+      {cellValue.value > 0 && cellValue.value}
     </Typography>
   )
 }

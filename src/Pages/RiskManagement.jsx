@@ -6,6 +6,7 @@ import RiskManagementContext from '../Components/RiskManagement/RiskManagementCo
 import { getCategories, getImpactScores, getLikelihoodScores, getOwners } from '../Service/RiskManagement/RiskManagement.service'
 import { Route, Switch } from 'react-router-dom/cjs/react-router-dom.min'
 import ActionTracker from '../Components/RiskManagement/ActionTracker/ActionTracker'
+import { getRiskScoreGroups } from '../Service/RiskManagement/RiskRegister.service'
 
 const useStyle = makeStyles((theme) => ({
   riskManagementContainer: {
@@ -20,6 +21,7 @@ const RiskManagement = () => {
   const [likelihoodScores, setLikelihoodScores] = useState([]);
   const [impactScores, setImpactScores] = useState([]);
   const [owners, setOwners] = useState([])
+  const [riskScoreGroups, setRiskScoreGroups] = useState([]);  
 
   // Fetching all 4 things
   useEffect(() => {
@@ -45,6 +47,10 @@ const RiskManagement = () => {
       const ownersRes = await getOwners();
       setOwners(ownersRes.data)
     })();
+    (async () => {
+      const riskGroups = await getRiskScoreGroups();
+      setRiskScoreGroups(riskGroups.data);
+    })()
   }, [])
 
   // Making a context object to pass, so below fields are available everywhere to use
@@ -58,10 +64,11 @@ const RiskManagement = () => {
       setOwners
     },
     scores: {
-      likelihoodScores: likelihoodScores,
-      setLikelihoodScores: setLikelihoodScores,
-      impactScores: impactScores,
-      setImpactScores: setImpactScores,
+      likelihoodScores,
+      setLikelihoodScores,
+      impactScores,
+      setImpactScores,
+      riskScoreGroups,
     }
   }
 

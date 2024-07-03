@@ -4,7 +4,7 @@ import RiskRegisterHeader from './RiskRegisterHeader'
 import DataTable from '../../Utils/DataTable/DataTable'
 import { HeaderCell, generateRows, mapDataToHeader, useStyle } from './RiskRegisterUtils'
 import { risk_register_columns, risk_register_columns_width } from '../../../assets/data/RiskManagement/RiskRegister/RiskRegisterColumns'
-import { getRegister, getOwners,  createRisk, getRiskScoreGroups } from '../../../Service/RiskManagement/RiskRegister.service'
+import { getRegister, getOwners,  createRisk, getRiskScoreGroups, updateRegister } from '../../../Service/RiskManagement/RiskRegister.service'
 import useLoading from '../../Utils/Hooks/useLoading'
 import SkeletonBox from '../../Utils/SkeletonBox'
 import RiskManagementContext from '../RiskManagementContext'
@@ -16,54 +16,131 @@ const RiskRegister = () => {
 
   // React state to maintain loading status
   const { isLoading, startLoading, stopLoading } = useLoading();
-
-  // Get filters to show in table header
-  const [filterDropdowns, setFilterDropdowns] = useState(RiskRegisterFilters)
-  // Fetching all the filters before rendering the UI
-  useLayoutEffect(() => {
-    (async () => {
-      try {
-
-        const riskGroups = await getRiskScoreGroups();
-
-        setFilterDropdowns(prev => ({
-          ...prev,
-          inherentRisk: { ...prev.inherentRisk, options: riskGroups.data.map(c => ({ id:c.id, text:c.name })) },
-          residualRisk: { ...prev.residualRisk, options: riskGroups.data.map(c => ({ id:c.id, text:c.name })) },
-        }))
-      }
-      catch (err) {
-        console.log(err);
-      }
-    })()
-  }, [])
-
+  
   // Get categories and risk scores from RiskManagementContext, and populate it in our filterdropdown state
   const { categories: { categories, setCategories }, owners: { owners, getOwners }, scores } = useContext(RiskManagementContext);
 
+  // Get filters to show in table header
+  const [filterDropdowns, setFilterDropdowns] = useState(RiskRegisterFilters);
   useEffect(() => {
     setFilterDropdowns(prev => ({
       ...prev,
-      owners: { ...prev.owners, options: owners },
-      categories: { ...prev.categories, options: categories.map(c => ({ id:c.id, text:c.category_name })) }
+      owners: { ...prev.owners, options: owners.map(o => ({ id: o.id, text: `${o.first_name} ${o.last_name}` })) },
+      category: { ...prev.category, options: categories.map(c => ({ id:c.id, text:c.category_name })) },
+      inherentRisk: { ...prev.inherentRisk, options: scores.riskScoreGroups?.map(c => ({ id:c.id, text:c.name })) || [] },
+      residualRisk: { ...prev.residualRisk, options: scores.riskScoreGroups?.map(c => ({ id:c.id, text:c.name })) || [] },
     }))
-  }, [categories, owners])
+  }, [categories, owners, scores]);
+  
+  const prevPayload = useRef("");
+  const searchedValue = useRef("");
+  // If this state has some key missing from RiskRegisterFilters.jsx in data folder, it will result in error.
+  // That is why, all the keys in this state are predefined.
+  const [filters, setFilters] = useState({
+    owners: [],
+    category: [],
+    treatment: [],
+    inherent: [],
+    residual: [],
+    ciaCategories: [],
+    source: [],
+    status: [],
+    identified: [],
+    vendor: []
+  })
 
   // REGISTER TABLE: State to store the register table data
   const [{risks: register}, setRegister] = useState({risks: []})
 
   // Function to fetch register data, and set the state
-  const fetchandSetRegister = useCallback(async (owners, scores) => {
+  const fetchandSetRegister = async (reload) => {
+    const payload = { filters: {}, search: searchedValue.current };
+    if (filters.owners.length > 0) {
+      payload.filters["owner"] = filters.owners;
+    }
+    if (filters.category.length > 0) {
+      payload.filters["category"] = filters.category;
+    }
+    if (filters.treatment.length > 0) {
+      payload.filters["treatment"] = filters.treatment;
+    }
+    if (filters.inherent.length > 0) {
+      payload.filters["inherent"] = filters.inherent;
+    }
+    if (filters.residual.length > 0) {
+      payload.filters["residual"] = filters.residual;
+    }
+    if (filters.ciaCategories.length > 0) {
+      payload.filters["cia"] = filters.ciaCategories;
+    }
+    if (filters.source.length > 0) {
+      payload.filters["source"] = filters.source;
+    }
+    if (filters.status.length > 0) {
+      payload.filters["is_approved"] = filters.status;
+    }
+    if (filters.identified.length > 0) {
+      let dateRange =
+              filters.identified === 0
+              ? [new Date(), (() => {const d = new Date(); d.setMonth(d.getMonth() - 3); return d})()]
+              : filters.identified === 1
+              ? [new Date(), (() => {const d = new Date(); d.setMonth(d.getMonth() - 6); return d})()]
+              : filters.identified === 2
+              ? [new Date(), (() => {const d = new Date(); d.setMonth(d.getMonth() - 12); return d})()]
+              : [new Date(), new Date()];
+      payload.filters["identified_date"] = [dateRange[0].toISOString(), dateRange[1].toISOString()];
+    }
+    const currPayload = JSON.stringify(payload);
+    if (currPayload === prevPayload.current && !reload) {
+      return;
+    }
+    prevPayload.current = currPayload;
+
     startLoading();
-    if (scores.likelihoodScores.length === 0 || scores.impactScores.length === 0 || owners.length === 0) return;
-    const { data } = await getRegister(owners, scores.likelihoodScores, scores.impactScores);
+    const { data } = await getRegister(payload);
+    if (data) {
+      data.risks = data.risks.map(r => ({
+        ID: r.id,
+        Scenario: JSON.stringify({
+          id: r.scenario.id,
+          description: r.scenario.scenario,
+          categories_id: r.scenario.categories.map(c => c.id),
+          source_type: r.scenario.scenario_source,
+        }),
+        Owner: r.owner,
+        "Identified Date": r.identification_date,
+        "Modified Date": r.created_at,
+        CIA: r.cia.map(c => c.id),
+        "Custom Id": r.custom_id,
+        "Inherent Risk Likelihood Id": r.inherent_risk_likelihood,
+        "Inherent Risk Impact Id": r.inherent_risk_impact,
+        "Residual Risk Likelihood Id": r.residual_risk_impact,
+        "Residual Risk Impact Id": r.residual_risk_likelihood,
+        Notes: r.notes,
+        Treatment: JSON.stringify({
+          type: r.treatment,
+          controls: [],
+          status: r.treatment
+        }),
+        Tasks: [],
+        "Approved": r.is_approved,
+        "Archived": false,
+        Vendors: []
+      }))
+    }
     setRegister(data);
     stopLoading();
-  }, [])
+  };
 
   useEffect(() => {
-    fetchandSetRegister(owners, scores);
-  }, [owners, scores])
+    fetchandSetRegister();
+  }, [])
+
+  
+  const onSearch = (val) => {
+    searchedValue.current = val;
+    fetchandSetRegister();
+  }
 
   // State to track which rows are selected
   const [selectedRow, setSelectedRow] = useState([]);
@@ -76,28 +153,38 @@ const RiskRegister = () => {
   // State for matched cell
   const [matchedCell, setMatchedCell] = useState([]);
 
-  // If this state has some key missing from RiskRegisterFilters.jsx in data folder, it will result in error.
-  // That is why, all the keys in this state are predefined.
-  const [filters, setFilters] = useState({
-    owners: [],
-    categories: [],
-    treatment: [],
-    inherent: [],
-    residual: [],
-    ciaCategories: [],
-    source: [],
-    status: [],
-    identified: [],
-    vendor: []
-  })
+
   const changeFilters = (filterName, itemId) => {
     setFilters(prev => {
       // Getting prev filters array of the filter
       let currentFilters = prev[filterName];
-      // If id is already in filter, remove it, else add the id
-      let updatedFilterIds = currentFilters.includes(itemId)
-        ? currentFilters.filter((id) => id !== itemId)
-        : [...currentFilters, itemId]
+      let updatedFilterIds;
+      if (filterName === "treatment") {
+        if (itemId === 0) {
+          updatedFilterIds = currentFilters.includes(itemId) ? [] : [itemId];
+        } else {
+          updatedFilterIds = currentFilters.includes(itemId)
+            ? currentFilters.filter((id) => id !== itemId)
+            : [...currentFilters, itemId].filter(id => id !== 0);
+        }
+      } else if (filterName === "ciaCategories") {
+        if (itemId === 1) {
+          updatedFilterIds = currentFilters.includes(itemId) ? [] : [itemId];
+        } else {
+          updatedFilterIds = currentFilters.includes(itemId)
+            ? currentFilters.filter((id) => id !== itemId)
+            : [...currentFilters, itemId].filter(id => id !== 1);
+        }
+      } else if (filterName === "identified") {
+        updatedFilterIds = currentFilters.includes(itemId)
+          ? []
+          : [itemId];
+      } else {
+        // If id is already in filter, remove it, else add the id
+        updatedFilterIds = currentFilters.includes(itemId)
+          ? currentFilters.filter((id) => id !== itemId)
+          : [...currentFilters, itemId]
+      }
       return ({
         ...prev,
         [filterName]: updatedFilterIds
@@ -203,34 +290,94 @@ const RiskRegister = () => {
 
       if (status) {
         closeScenarioDialog();
-        return fetchandSetRegister(owners, scores);
+        return fetchandSetRegister(true);
       }
 
     } else {
       // is edit row
-      const payload = {
-        scenario: {
-          id: 0,
-          description: val.scenario,
-          categories_id: val.categories.map(category => category.id),
-          source_type: val.source || "SYSTEM" || "CUSTOM"
-        },
-        owner: val.owner || "",
-        identified_date: val.identified_date,
-        modified_date: val.modified_date,
-        cia: cia_categories.filter(cia => Boolean(val[cia.name])).map(cia => cia.id),
-        custom_id: val.customId,
-        inherent_risk_likelihood_id: scores.likelihoodScores.find(score => score.score === getRiskScore(val.inherent_likelihood)).id,
-        inherent_risk_impact_id: scores.impactScores.find(score => score.score === getRiskScore(val.inherent_impact)).id,
-        residual_risk_likelihood_id: val.residual_likelihood ? scores.likelihoodScores.find(score => score.score === getRiskScore(val.residual_likelihood)).id : null,
-        residual_risk_impact_id: val.residual_impact ? scores.likelihoodScores.find(score => score.score === getRiskScore(val.residual_impact)).id : null,
-        notes: val.notes,
-        treatment_type: treatmentTypes.find(type => type.text === val.treatment_plan).id,
-        treatment_controls: [],
-        is_approved: false,
-        is_archived: false,
+      const payload = {};
+      const row = register[getCurrentIndex()]; 
+      const prev_scenario = row.Scenario ? (JSON.parse(row.Scenario).description || "") : "";
+      const prev_categories = row.Scenario ? (JSON.parse(row.Scenario).categories_id || []).sort() : [];
+      const curr_scenario = val.scenario;
+      const curr_categories = val.categories.map(c => c.id).sort();
+
+      if (val.source === 0) {
+        if (prev_scenario === curr_scenario && JSON.stringify(prev_categories) === JSON.stringify(curr_categories)) {} else {
+          payload.scenario_description = val.scenario;
+          payload.categories_ids = val.categories.map(category => category.id);
+        }
+      } else {
+        if (prev_scenario !== curr_scenario) {
+          payload.scenario_description = val.scenario;
+        }
+        if (JSON.stringify(prev_categories) !== JSON.stringify(curr_categories)) {
+          payload.categories_ids = val.categories.map(category => category.id);
+        }
       }
-      console.log(payload);
+
+      if (val.owner !== row.Owner) {
+        payload.owner = val.owner;
+      }
+      if (val.notes !== row.Notes) {
+        payload.notes = val.notes;
+      }
+      if (val.customId !== row["Custom Id"]) {
+        payload.customId = val.customId;
+      }
+      if (val.identified_date !== row["Identified Date"]) {
+        payload.identified_date = typeof val.identified_date === "string" ? val.identified_date : val.identified_date.toDate().toISOString();
+      }
+      if (val.modified_date !== row["Modified Date"]) {
+        payload.modified_date = typeof val.modified_date === "string" ? val.modified_date : val.modified_date.toDate().toISOString();
+      }
+
+      const cia = [];
+      if (val.uncategorized) {
+        cia.push(1);
+      }
+      if (val.confidentiality) {
+        cia.push(2);
+      }
+      if (val.availability) {
+        cia.push(3);
+      }
+      if (val.integrity) {
+        cia.push(4);
+      }
+      if (JSON.stringify(cia) !== JSON.stringify(row.CIA)) {
+        payload.cia = cia;
+      }
+
+      const il = scores.likelihoodScores.find(score => score.score === getRiskScore(val.inherent_likelihood, true)).id;
+      if (il !== row["Inherent Risk Impact Id"]) {
+        payload.inherent_likelihood = il;
+      }
+      const ii = scores.impactScores.find(score => score.score === getRiskScore(val.inherent_impact, false)).id;
+      if (il !== row["Inherent Risk Impact Id"]) {
+        payload.inherent_impact = ii;
+      }
+
+      const rl = scores.likelihoodScores.find(score => score.score === getRiskScore(val.residual_likelihood, true)).id;
+      if (rl !== row["Residual Risk Likelihood Id"]) {
+        payload.residual_likelihood = rl;
+      }
+      const ri = scores.impactScores.find(score => score.score === getRiskScore(val.residual_impact, false)).id;
+      if (ri !== row["Residual Risk Impact Id"]) {
+        payload.residual_impact = ri;
+      }
+
+      if (val.treatment_plan !== (row["Treatment"] ? (JSON.parse(row["Treatment"]).type || -1) : -1)) {
+        payload.treatment_plan = val.treatment_plan
+      }
+
+      if (Object.keys(payload).length > 0) {
+        const {status} = await updateRegister(row["ID"], payload);
+        if (status) {
+          closeScenarioDialog();
+          return fetchandSetRegister(true);
+        }
+      }
     }
   }
 
@@ -282,11 +429,13 @@ const RiskRegister = () => {
           activeFilters={filters}
           changeFilters={changeFilters}
           clearFilters={clearFilters}
+          triggerFilters={fetchandSetRegister}
           // Selected rows
           selectedRows={selectedRow}
           // Edit button click handler
           editHandler={openEditForm}
           cols={{ allColumns, visibleColumns, hideColumn, showColumn }}
+          onSearch={onSearch}
         />
 
         {isLoading()

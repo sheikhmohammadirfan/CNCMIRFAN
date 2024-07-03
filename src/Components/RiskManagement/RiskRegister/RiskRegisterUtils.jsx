@@ -479,7 +479,7 @@ const getCellValue = (row, colName, categories, owners, scores) => {
   }
   else if (colName === "Source") {
     let sourceType = JSON.parse(row["Scenario"]).source_type;
-    return sourceType.charAt(0) + sourceType.slice(1).toLowerCase();
+    return sourceType === 0 ? "SYSTEM" : "CUSTOM";
   }
   else if (colName === "Categories") {
     let catsId = JSON.parse(row["Scenario"]).categories_id;
@@ -489,18 +489,18 @@ const getCellValue = (row, colName, categories, owners, scores) => {
     return owners.find(owner => owner.id === row["Owner"])?.name || ""
   }
   else if (colName === "Inherent Risk") {
-    return (
-      (scores.likelihoodScores.find(score => score.id === row["Inherent Risk Likelihood Id"]).score)
-      *
-      (scores.impactScores.find(score => score.id === row["Inherent Risk Impact Id"]).score)
-    )
+    const val = (scores.likelihoodScores.find(score => score.id === row["Inherent Risk Likelihood Id"]).score)
+    *
+    (scores.impactScores.find(score => score.id === row["Inherent Risk Impact Id"]).score);
+    const group = scores.riskScoreGroups.find(r => r.range_from <= val && val <= r.range_to);
+    return { value: val, colour: group.color };
   }
   else if (colName === "Residual Risk") {
-    return (
-      (scores.likelihoodScores.find(score => score.id === row["Residual Risk Likelihood Id"])?.score || null)
-      *
-      (scores.impactScores.find(score => score.id === row["Residual Risk Impact Id"])?.score || null)
-    )
+    const val = (scores.likelihoodScores.find(score => score.id === row["Residual Risk Likelihood Id"])?.score || 1)
+    *
+    (scores.impactScores.find(score => score.id === row["Residual Risk Impact Id"])?.score || 1)
+    const group = scores.riskScoreGroups.find(r => r.range_from <= val && val <= r.range_to);
+    return { value: val, colour: group.color };
   }
   else return row[colName]
 }

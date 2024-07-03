@@ -1,7 +1,11 @@
-import { post } from "../CrudFactory";
+import { post, put } from "../CrudFactory";
 
-export async function getRegister(owners, likelihoodScores, impactScores) {
-  return await post("/risk/", {});
+export async function getRegister(payload) {
+  return await post("/risk/", payload);
+}
+
+export async function updateRegister(id, payload) {
+  return await put(`/risk/update/${id}/`, payload);
 }
 
 export async function createRisk(data) {

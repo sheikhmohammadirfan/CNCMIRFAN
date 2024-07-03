@@ -1,22 +1,22 @@
 // "name" key is for the checkboxes inside edit risk form to work
 export const cia_categories = [
   {
-    id: 0,
+    id: 1,
     name: "uncategorized",
     text: "Uncategorized"
   },
   {
-    id: 1,
+    id: 2,
     name: "availability",
     text: "Availability"
   },
   {
-    id: 2,
+    id: 3,
     name: "confidentiality",
     text: "Confidentiality"
   },
   {
-    id: 3,
+    id: 4,
     name: "integrity",
     text: "Integrity"
   },
@@ -48,16 +48,46 @@ export const treatmentTypes = [
 // "name" and "val" key are to populate dropdowns inside Edit Risk form
 export const source_options = [
   {
-    id: "SYSTEM",
+    id: 0,
     name: "Library Risk",
     text: "Library Risk",
-    val: "SYSTEM"
+    val: 0
   },
   {
-    id: "CUSTOM",
+    id: 1,
     name: "Custom Risk",
     text: "Custom Risk",
-    val: "CUSTOM"
+    val: 1
+  },
+]
+
+export const status_options = [
+  {
+    id: 0,
+    text: "Not Approved",
+  },
+  {
+    id: 1,
+    text: "Approved",
+  },
+]
+
+export const identified_options = [
+  {
+    id: 0,
+    text: "Last 3 months",
+  },
+  {
+    id: 1,
+    text: "Last 6 months",
+  },
+  {
+    id: 2,
+    text: "Last year",
+  },
+  {
+    id: 3,
+    text: "Custom",
   },
 ]
 
@@ -74,8 +104,8 @@ const RiskRegisterFilters = {
     order: 1,
     options: []
   },
-  categories: {
-    name: "categories",
+  category: {
+    name: "category",
     text: "Categories",
     order: 2,
     options: []
@@ -114,13 +144,13 @@ const RiskRegisterFilters = {
     name: "status",
     text: "Status",
     order: 8,
-    options: []
+    options: [...status_options]
   },
   identified_date: {
     name: "identified",
     text: "Identified",
     order: 9,
-    options: []
+    options: [...identified_options]
   }
 }
 

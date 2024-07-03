@@ -55,9 +55,11 @@ const RiskRegisterHeader = ({
   activeFilters,
   changeFilters,
   clearFilters,
+  triggerFilters,
   selectedRows,
   editHandler,
-  cols: { allColumns, visibleColumns, hideColumn, showColumn }
+  cols: { allColumns, visibleColumns, hideColumn, showColumn },
+  onSearch
 }) => {
 
   const classes = useStyle();
@@ -283,8 +285,11 @@ const RiskRegisterHeader = ({
                 </InputAdornment>
               ),
             }}
-          // value={}
-          // onChange={}
+          onKeyDown={e => {
+            if (e.keyCode === 13) {
+              onSearch(e.target.value);
+            }
+          }}
           />
 
           {/* More dropdown */}
@@ -377,6 +382,7 @@ const RiskRegisterHeader = ({
                 activeFilters={activeFilters[filter.name]}
                 changeFilters={changeFilters}
                 clearFilters={clearFilters}
+                trigger={triggerFilters}
               />
             ))}
         </Box>
