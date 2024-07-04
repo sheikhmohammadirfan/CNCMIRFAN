@@ -36,6 +36,8 @@ const RiskFormDialog = ({
   closeHandler,
   rowIndex,
   row,
+  viaLibrary,
+  library,
   isLibraryRow = false,
   autocompleteOptions: { categories, owners },
   getSliderValue,
@@ -62,7 +64,7 @@ const RiskFormDialog = ({
     return row["Categories"];
   }, [row]);
 
-  
+
   const categoriesList = useMemo(() => {
     if (!row || isLibraryRow) return;
     return scenarioDescription ? (JSON.parse(scenarioDescription).categories_id || []) : [];
@@ -110,7 +112,7 @@ const RiskFormDialog = ({
       ),
       notes: "Notes" in row ? row["Notes"] : "",
       customId: "Custom Id" in row ? row["Custom Id"] : ""
-    } :  {
+    } : {
       scenario: scenarioDescription ? (JSON.parse(scenarioDescription).description || "") : "",
       categories: categories.filter(c => categoriesList.includes(c.id)),
       // Get id for a single cia category, and check if it is in the row data that is selected.
@@ -179,7 +181,7 @@ const RiskFormDialog = ({
   // reset is required as hook form caches default values. it won't change on its own
   useEffect(() => {
     reset(formValues)
-  }, [row, scores]);
+  }, [open]);
 
   const validation = {
     scenario: { required: "This field is required." },
@@ -194,7 +196,9 @@ const RiskFormDialog = ({
   }
 
   const onSubmit = async (values) => {
-    onFormSubmit(values);
+    setisLoading(true);
+    await onFormSubmit(values);
+    setisLoading(false);
   }
 
   const classes = useStyle();
@@ -283,24 +287,35 @@ const RiskFormDialog = ({
           >
             <Grid container spacing={2}>
               <Grid item xs={12}>
-                <FormInput
-                  name="scenario"
-                  label="Scenario"
-                  disabled={isLibraryRow}
-                />
+                {viaLibrary ?
+                  <SelectControl
+                    name="scenario"
+                    label="Scenario"
+                    variant="outlined"
+                    options={library.map(row => ({ val: row.id, text: row.scenario })) || []}
+                    styleProps={{ fullWidth: true, }}
+                  /> :
+                  <FormInput
+                    name="scenario"
+                    label="Scenario"
+                    disabled={isLibraryRow}
+                  />
+                }
               </Grid>
-              <Grid item xs={12}>
-                <SelectCategories
-                  multiple={true}
-                  name="categories"
-                  label="Categories"
-                  control={control}
-                  rules={validation}
-                  optionList={categories}
-                  className={classes.customAutocomplete}
-                  disabled={isLibraryRow}
-                />
-              </Grid>
+              {/* Dont show categories if adding via library */}
+              {!viaLibrary &&
+                <Grid item xs={12}>
+                  <SelectCategories
+                    multiple={true}
+                    name="categories"
+                    label="Categories"
+                    control={control}
+                    rules={validation}
+                    optionList={categories}
+                    className={classes.customAutocomplete}
+                    disabled={isLibraryRow}
+                  />
+                </Grid>}
               {/* Not showing owner, source, identified and modified date fields if it is not a create risk  */}
               {!isCreateForm() && (
                 <>
@@ -533,6 +548,7 @@ const RiskFormDialog = ({
           size="large"
           form="risk-form"
           type="submit"
+          disabled={isLoading}
         >
           {(isCreateForm()) ? "ADD" : "UPDATE"}
         </Button>,

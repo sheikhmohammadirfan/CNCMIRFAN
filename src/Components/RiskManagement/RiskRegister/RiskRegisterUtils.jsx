@@ -486,7 +486,8 @@ const getCellValue = (row, colName, categories, owners, scores) => {
     return categories.filter((cat, id) => catsId.includes(cat.id))
   }
   else if (colName === "Owner") {
-    return owners.find(owner => owner.id === row["Owner"])?.name || ""
+    let owner = owners.find(owner => owner.id === row["Owner"]);
+    return `${owner?.first_name} ${owner?.last_name}` || ""
   }
   else if (colName === "Inherent Risk") {
     const val = (scores.likelihoodScores.find(score => score.id === row["Inherent Risk Likelihood Id"]).score)

@@ -24,21 +24,28 @@ const AddActionDialog = ({
   closeHandler,
   risks,
   riskVal,
+  actionVal,
+  isCreateAction,
   owners,
   onFormSubmit,
 }) => {
-
   // Loading status for dialog
   const [isLoading, setisLoading] = useState(false);
 
   const validation = {
-
+    risk: { required: 'This field is required' },
+    owner: { required: 'This field is required' },
+    due_date: { required: 'This field is required' },
+    action: { required: 'This field is required' },
+    notes: { required: 'This field is required' },
   };
 
   let formValues = {
-    risk: riskVal && `${riskVal["ID"]}`,
-    owner: riskVal && `${riskVal["Owner"]}`,
-    due_date: null
+    risk: (riskVal && `${riskVal["ID"]}`) || (actionVal && actionVal.risk.id),
+    owner: (riskVal && `${riskVal["Owner"]}`) || (actionVal && actionVal.risk.owner),
+    due_date: actionVal ? new Date(actionVal.due_date) : null,
+    action: actionVal && actionVal.task,
+    notes: actionVal && actionVal.notes
   }
 
   // Get useForm Methods
@@ -48,10 +55,12 @@ const AddActionDialog = ({
 
   useEffect(() => {
     reset(formValues);
-  }, [riskVal])
+  }, [riskVal, actionVal])
 
   const onSubmit = async (values) => {
-    onFormSubmit(values);
+    setisLoading(true);
+    await onFormSubmit(values, (isCreateAction && !actionVal));
+    setisLoading(false);
   }
 
 
@@ -63,7 +72,7 @@ const AddActionDialog = ({
       close={closeHandler}
       title={
         <Typography style={{ fontWeight: "bold" }}>
-          Add New Action
+          {isCreateAction ? 'Add New Action' : 'Update Action'}
         </Typography>
       }
       loading={isLoading}
@@ -88,7 +97,7 @@ const AddActionDialog = ({
                   styleProps={{
                     fullWidth: true,
                   }}
-                  disabled={riskVal ? true : false}
+                  disabled={(riskVal || actionVal) ? true : false}
                 />
               </Grid>
 
@@ -99,7 +108,7 @@ const AddActionDialog = ({
                   variant="outlined"
                   options={owners}
                   styleProps={{ fullWidth: true, }}
-                  disabled={riskVal ? true : false}
+                  disabled={(riskVal || actionVal) ? true : false}
                 />
               </Grid>
               <Grid item xs={6}>
@@ -141,8 +150,9 @@ const AddActionDialog = ({
           size="large"
           form="add-action-form"
           type="submit"
+          disabled={isLoading}
         >
-          ADD
+          {isCreateAction ? 'ADD' : 'UPDATE'}
         </Button>,
       ]}
     >

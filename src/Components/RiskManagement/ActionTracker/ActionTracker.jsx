@@ -1,6 +1,6 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import actionTrackerFilters from '../../../assets/data/RiskManagement/ActionTracker/ActionTrackerFilters'
-import { Box, Grid } from '@material-ui/core';
+import { Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Grid } from '@material-ui/core';
 import ActionTrackerHeader from './ActionTrackerHeader';
 import AddActionDialog from '../AddActionDialog';
 import { getRegister } from '../../../Service/RiskManagement/RiskRegister.service';
@@ -10,8 +10,9 @@ import { HeaderCell, generateRows, mapDataToHeader, useStyle } from './ActionTra
 import { ACTION_TABLE_COL_WIDTHS, ACTION_TRACKER_COLUMNS, HEADER_TABLE_COLS_MAP } from '../../../assets/data/RiskManagement/ActionTracker/ActionTrackerColumns';
 import SkeletonBox from '../../Utils/SkeletonBox';
 import DataTable from '../../Utils/DataTable/DataTable';
-import { put } from '../../../Service/CrudFactory';
+import { deletes, patch, put } from '../../../Service/CrudFactory';
 import { HEADER_TABLE_NAME_MAP } from '../../../assets/data/RiskManagement/RiskLibrary/LibraryColumns';
+import DeleteConfirmationDialog from './DeleteConfirmationDialog';
 
 const ActionTracker = ({
   owners: { owners, getOwners }
@@ -23,21 +24,28 @@ const ActionTracker = ({
   // ACTIONS TABLE: State to store the action table data
   const [actions, setActions] = useState([])
 
+  // Saving filter values and search value
+  const prevPayload = useRef("");
+  const searchedValue = useRef("");
+
   // Function to fetch actions data, and set the state
-  const fetchandSetActionTable = useCallback(async (owners) => {
-    startLoading();
-    const { data } = await getActions({
-      search: '',
-      filters: {},
+  const fetchandSetActionTable = async () => {
+
+    const payload = { filters: {}, search: searchedValue.current };
+    if (filters.assignee.length > 0) {
+      payload.filters['assignee'] = filters.assignee;
     }
-    );
-    console.log(data.data);
+    const newPayload = JSON.stringify(payload);
+    if (prevPayload.current === newPayload) return;
+    prevPayload.current = newPayload;
+    startLoading();
+    const { data } = await getActions(payload);
     setActions(data.data.actions);
     stopLoading();
-  }, [])
+  }
 
   useEffect(() => {
-    fetchandSetActionTable(owners);
+    fetchandSetActionTable();
   }, [])
 
   const [columns, setColumns] = useState(ACTION_TRACKER_COLUMNS);
@@ -47,7 +55,7 @@ const ActionTracker = ({
   useEffect(() => {
     setFilterDropdowns(prev => ({
       ...prev,
-      assignee: { ...prev.assignee, options: owners }
+      assignee: { ...prev.assignee, options: owners.map(owner => ({ id: owner.id, val: owner.id, text: `${owner.first_name} ${owner.last_name}` })) }
     }))
   }, [owners])
 
@@ -77,6 +85,11 @@ const ActionTracker = ({
     }))
   }
 
+  const onSearch = (val) => {
+    searchedValue.current = val;
+    fetchandSetActionTable();
+  }
+
   const [selectedRows, setSelectedRows] = useState([])
   const getCurrentIndex = () => {
     if (selectedRows.length === 0) return -1;
@@ -90,13 +103,8 @@ const ActionTracker = ({
 
   useEffect(() => {
     (async () => {
-      const { data } = await getRegister()
-      // console.log(owners);
-      // console.log(data.map(row => ({ id: row["ID"], val: JSON.parse(row["Scenario"]).description })));
-      setRegister(() => data.risks.map(row => ({
-        val: row.id,
-        text: row.scenario.scenario,
-      })));
+      const { data } = await getRegister({ filters: {}, search: '' })
+      setRegister(data.risks);
     })()
   }, [owners])
 
@@ -104,7 +112,17 @@ const ActionTracker = ({
   const openAddActionForm = () => setActionDialog(true);
   const closeAddActionForm = () => setActionDialog(false);
 
-  const handleAddActionFormSubmit = async (values) => {
+  const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false);
+
+  // get options for risks
+  const getRegisterOptions = () => register.length !== 0
+    ? register.map(row => ({
+      val: row.id,
+      text: row.scenario.scenario,
+    }))
+    : []
+
+  const handleAddActionFormSubmit = async (values, isCreateAction) => {
 
     const date = new Date(values.due_date);
     const year = date.getFullYear();
@@ -115,15 +133,58 @@ const ActionTracker = ({
 
     const payload = {
       risk_id: values.risk,
-      description: register.find(row => row.val === values.risk).text,
+      description: values.action,
       due_date: formattedDate,
-      assignee: owners.find(owner => owner.val === values.owner)?.id || '',
+      assignee: owners.find(owner => owner.id === values.owner)?.id || '',
       notes: values.notes,
       task_type: 'custom',
       // source_id: 1,
     }
-    const res = await put('risk/tasks/', payload);
+
+    let res;
+    if (isCreateAction) {
+      res = await put('risk/tasks/', payload);
+      if (res.status) {
+        setActions(prev => ([
+          ...prev,
+          {
+            ...payload,
+            files: [],
+            id: res.data.task_id,
+            risk: {
+              id: payload.risk_id,
+              is_approved: register.find(row => row.id === payload.risk_id).is_approved,
+              owner: payload.assignee,
+              scenario: register.find(row => row.id === payload.risk_id).scenario.id
+            },
+            source: 'Custom',
+            status: 1,
+            task: payload.description,
+          }
+        ]))
+      };
+    }
+    else {
+      const idToUpdate = actions[getCurrentIndex()].id;
+      res = await patch(`risk/tasks/${idToUpdate}`, payload)
+      if (res.status) {
+        setActions(prev => prev.map(action => action.id === idToUpdate ? {
+          ...action,
+          ...payload,
+          task: payload.description,
+        } : { ...action }))
+      }
+    }
     setActionDialog(false);
+  }
+
+  const deleteAction = async () => {
+    const idToDelete = actions[getCurrentIndex()].id;
+    const res = await deletes(`/risk/tasks/${idToDelete}`);
+    if (res.status) {
+      setActions(prev => prev.filter(action => action.id !== idToDelete));
+    }
+    setDeleteConfirmationOpen(false);
   }
 
   const getColumns = () => {
@@ -140,6 +201,8 @@ const ActionTracker = ({
     generateRows(
       actions,
       getColumns(),
+      register,
+      owners,
       selectedRows,
       matchedCell,
       // sortingMap
@@ -153,8 +216,11 @@ const ActionTracker = ({
       <ActionTrackerHeader
         tableFilters={filterDropdowns}
         filters={{ filters, changeFilters, clearFilters }}
+        triggerFilters={fetchandSetActionTable}
         selectedRows={selectedRows}
         openAddActionForm={openAddActionForm}
+        openDeleteConfirmationDialog={() => setDeleteConfirmationOpen(true)}
+        onSearch={onSearch}
       />
 
       {isLoading()
@@ -179,7 +245,7 @@ const ActionTracker = ({
               minCheckboxWidth={50}
               serialNo={false}
               resizeTable={true}
-              resizeAfterColumns={0}
+              resizeAfterColumns={1}
               selectedRows={selectedRows}
               setSelectedRows={setSelectedRows}
               headerWrapper={(text) => <HeaderCell text={text} />}
@@ -205,9 +271,17 @@ const ActionTracker = ({
       <AddActionDialog
         open={actionDialog}
         closeHandler={closeAddActionForm}
-        risks={register}
-        owners={owners}
+        risks={getRegisterOptions()}
+        actionVal={actions[getCurrentIndex()]}
+        isCreateAction={getCurrentIndex() === -1}
+        owners={owners.map(owner => ({ val: owner.id, text: `${owner.first_name} ${owner.last_name}` }))}
         onFormSubmit={handleAddActionFormSubmit}
+      />
+
+      <DeleteConfirmationDialog
+        open={deleteConfirmationOpen}
+        closeHandler={() => setDeleteConfirmationOpen(false)}
+        deleteAction={deleteAction}
       />
 
     </Box>

@@ -1,8 +1,9 @@
 export const ACTION_TRACKER_COLUMNS = [
   "ID",
-  "Risk",
-  "Due Date",
   "Task",
+  "Risk",
+  "Owner",
+  "Due Date",
   "Status",
   "Source",
   "Source URL",
@@ -12,16 +13,17 @@ export const ACTION_TRACKER_COLUMNS = [
 ]
 
 export const ACTION_TABLE_COL_WIDTHS = [
-  80, 300, 150, 600, 200, 150, 150, 200, 150, 150
+  60, 300, 600, 200, 150, 200, 150, 150, 200, 150, 150
 ]
 
 export const HEADER_TABLE_COLS_MAP = {
   "ID": 'id',
-  "Risk": 'risk',
-  "Due Date": 'due_date',
   "Task": 'task',
+  "Risk": 'risk',
+  "Owner": 'owner',
+  "Due Date": 'due_date',
   "Status": 'status',
-  "Source": 'sourc_id',
+  "Source": 'source_id',
   "Source URL": 'source_url',
   "Notes": 'notes',
   // files: string[],

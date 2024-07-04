@@ -134,7 +134,7 @@ export const RowCell = ({ text }) => {
   const classes = useStyle();
   return (
     <Typography variant="body2" noWrap className={classes.tableCell}>
-      {text}
+      {text === 'load' ? 'Loading ...' : text}
     </Typography>
   )
 };
@@ -166,6 +166,8 @@ export const mapDataToHeader = (columns, sorting, updateSort) => ({
 export const generateRows = (
   data,
   columns,
+  register,
+  owners,
   selectedList,
   matchedCell,
   sortingMap
@@ -184,6 +186,8 @@ export const generateRows = (
       data: mapDataToRow(
         data[i],
         i,
+        register,
+        owners,
         columns,
         matchedCell,
       ),
@@ -192,8 +196,6 @@ export const generateRows = (
       },
     });
 
-  // console.log(rowData);
-  // console.log(rowData);
   return {
     rowData,
     rowStyle: { cursor: "pointer" },
@@ -205,10 +207,10 @@ export const generateRows = (
   };
 }
 
-const mapDataToRow = (row, rowIndex, columns, matchedCell) => (
+const mapDataToRow = (row, rowIndex, register, owners, columns, matchedCell) => (
   columns.map(colName => {
     let CellComponent = colName in columnToCellMap && columnToCellMap[colName]
-    let cellValue = getCellValue(row, colName);
+    let cellValue = getCellValue(row, colName, register, owners);
     return {
       text: colName in columnToCellMap ? <CellComponent cellValue={cellValue} /> : <RowCell text={cellValue} />,
       params:
@@ -240,8 +242,15 @@ const mapDataToRow = (row, rowIndex, columns, matchedCell) => (
   })
 )
 
-const getCellValue = (row, colName) => {
-  if (colName === 'risk') return 'dummy scenario';
-  // else if (colname === '')
+const getCellValue = (row, colName, register, owners) => {
+  if (colName === 'risk') {
+    if (register.length === 0) return 'load';
+    else return register.find(risk => risk.id === row[colName].id).scenario.scenario
+  }
+  else if (colName === 'owner') {
+    if (owners.length === 0) return 'load';
+    let owner = owners.find(owner => owner.id === row.risk.owner);
+    return `${owner.first_name} ${owner.last_name}`
+  }
   else return row[colName]
 }

@@ -83,8 +83,11 @@ const useStyle = makeStyles((theme) => ({
 const ActionTrackerHeader = ({
   tableFilters,
   filters: { filters, changeFilters, clearFilters },
+  triggerFilters,
   selectedRows,
   openAddActionForm,
+  openDeleteConfirmationDialog,
+  onSearch,
 }) => {
 
   // State to control search value
@@ -130,7 +133,7 @@ const ActionTrackerHeader = ({
             startIcon={<Icon>edit</Icon>}
             className={classes.outlineButton}
             disabled={selectedRows.length !== 1}
-          // onClick={editHandler}
+            onClick={openAddActionForm}
           >
             Edit
           </Button>
@@ -142,7 +145,7 @@ const ActionTrackerHeader = ({
             startIcon={<Icon>delete</Icon>}
             className={classes.outlineButton}
             disabled={selectedRows.length !== 1}
-          // onClick={editHandler}
+            onClick={() => openDeleteConfirmationDialog()}
           >
             Delete
           </Button>
@@ -154,7 +157,7 @@ const ActionTrackerHeader = ({
         >
           <TextControl
             variant="outlined"
-            placeholder="Search here"
+            placeholder="Search Task (Press Enter)"
             size="small"
             gutter={false}
             label=" "
@@ -203,8 +206,13 @@ const ActionTrackerHeader = ({
                 </InputAdornment>
               ),
             }}
-          // value={}
-          // onChange={}
+            // value={}
+            // onChange={}
+            onKeyDown={e => {
+              if (e.keyCode === 13) {
+                onSearch(e.target.value);
+              }
+            }}
           />
 
           <Button
@@ -262,6 +270,7 @@ const ActionTrackerHeader = ({
                 activeFilters={filters[filter.name]}
                 changeFilters={changeFilters}
                 clearFilters={clearFilters}
+                trigger={triggerFilters}
               />
             ))}
         </Box>
@@ -274,7 +283,7 @@ const ActionTrackerHeader = ({
             variant='contained'
             disableElevation
             className={classes.actionButton}
-            startIcon={<Icon style={{opacity: selectedRows.length > 0 ? 1 : 0.4 }}>upload_file</Icon>}
+            startIcon={<Icon style={{ opacity: selectedRows.length > 0 ? 1 : 0.4 }}>upload_file</Icon>}
           >
             Upload File
           </Button>
@@ -282,7 +291,7 @@ const ActionTrackerHeader = ({
             variant='contained'
             disableElevation
             className={classes.actionButton}
-            startIcon={<Icon style={{opacity: selectedRows.length > 0 ? 1 : 0.4 }}>mail</Icon>}
+            startIcon={<Icon style={{ opacity: selectedRows.length > 0 ? 1 : 0.4 }}>mail</Icon>}
           >
             Send Reminder
           </Button>

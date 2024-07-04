@@ -10,7 +10,7 @@ const Settings = ({
   categories: { categories, setCategories },
   owners: { owners, setOwners },
   scores: { likelihoodScores, setLikelihoodScores, impactScores, setImpactScores },
-  scoreGroups: { scoreGroups, setScoreGroups }
+  scoreGroups: { riskScoreGroups, setScoreGroups }
 }) => {
 
   const [likelihoodSelectedRow, setLikelihoodSelectedRow] = useState([])
@@ -55,7 +55,7 @@ const Settings = ({
     );
 
   const classes = useStyle();
-  console.log(categories);
+
   return (
     <Box display="flex" flexDirection="column" rowGap={4}>
 
@@ -213,7 +213,7 @@ const Settings = ({
           className={classes.tableStyle}
           verticalBorder={true}
           header={mapTableHeader(SCORE_GROUP_COLS)}
-          rowList={mapTableBody(scoreGroups || [], SCORE_GROUP_COLS, impactSelectedRow)}
+          rowList={mapTableBody(riskScoreGroups || [], SCORE_GROUP_COLS, impactSelectedRow)}
           checkbox={true}
           minCheckboxWidth={50}
           serialNo={false}

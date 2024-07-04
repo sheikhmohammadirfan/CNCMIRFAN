@@ -22,7 +22,7 @@ const RiskManagement = () => {
   const [likelihoodScores, setLikelihoodScores] = useState([]);
   const [impactScores, setImpactScores] = useState([]);
   const [owners, setOwners] = useState([])
-  const [riskScoreGroups, setRiskScoreGroups] = useState([]);  
+  const [riskScoreGroups, setRiskScoreGroups] = useState([]);
 
   // Fetching all 4 things
   useEffect(() => {
@@ -45,12 +45,8 @@ const RiskManagement = () => {
       }
     })();
     (async () => {
-      const ownersRes = await getOwners();
-      setOwners(ownersRes)
-    })();
-    (async () => {
-      const scoreGroupRes = await getRiskScoreGroups();
-      setScoreGroups(scoreGroupRes.data)
+      const { data } = await getOwners();
+      setOwners(data)
     })();
     (async () => {
       const riskGroups = await getRiskScoreGroups();
@@ -107,7 +103,7 @@ const RiskManagement = () => {
               categories={{ categories, setCategories }}
               owners={{ owners, setOwners }}
               scores={{ likelihoodScores, setLikelihoodScores, impactScores, setImpactScores }}
-              scoreGroups={{ scoreGroups, setScoreGroups }}
+              scoreGroups={{ riskScoreGroups, setRiskScoreGroups }}
             />
           </Route>
         </Switch>

@@ -4,7 +4,7 @@ import RiskRegisterHeader from './RiskRegisterHeader'
 import DataTable from '../../Utils/DataTable/DataTable'
 import { HeaderCell, generateRows, mapDataToHeader, useStyle } from './RiskRegisterUtils'
 import { risk_register_columns, risk_register_columns_width } from '../../../assets/data/RiskManagement/RiskRegister/RiskRegisterColumns'
-import { getRegister, getOwners,  createRisk, getRiskScoreGroups, updateRegister } from '../../../Service/RiskManagement/RiskRegister.service'
+import { getRegister, getOwners, createRisk, getRiskScoreGroups, updateRegister } from '../../../Service/RiskManagement/RiskRegister.service'
 import useLoading from '../../Utils/Hooks/useLoading'
 import SkeletonBox from '../../Utils/SkeletonBox'
 import RiskManagementContext from '../RiskManagementContext'
@@ -12,12 +12,13 @@ import RiskRegisterFilters, { cia_categories, treatmentTypes } from '../../../as
 import RiskFormDialog from '../RiskFormDialog'
 import { dummy_row } from '../../../assets/data/RiskManagement/RiskRegister/RiskRegisterMockData'
 import AddActionDialog from '../AddActionDialog'
+import { getLibrary } from '../../../Service/RiskManagement/RiskLibrary.service'
 
 const RiskRegister = () => {
 
   // React state to maintain loading status
   const { isLoading, startLoading, stopLoading } = useLoading();
-  
+
   // Get categories and risk scores from RiskManagementContext, and populate it in our filterdropdown state
   const { categories: { categories, setCategories }, owners: { owners, getOwners }, scores } = useContext(RiskManagementContext);
 
@@ -27,12 +28,12 @@ const RiskRegister = () => {
     setFilterDropdowns(prev => ({
       ...prev,
       owners: { ...prev.owners, options: owners.map(o => ({ id: o.id, text: `${o.first_name} ${o.last_name}` })) },
-      category: { ...prev.category, options: categories.map(c => ({ id:c.id, text:c.category_name })) },
-      inherentRisk: { ...prev.inherentRisk, options: scores.riskScoreGroups?.map(c => ({ id:c.id, text:c.name })) || [] },
-      residualRisk: { ...prev.residualRisk, options: scores.riskScoreGroups?.map(c => ({ id:c.id, text:c.name })) || [] },
+      category: { ...prev.category, options: categories.map(c => ({ id: c.id, text: c.category_name })) },
+      inherentRisk: { ...prev.inherentRisk, options: scores.riskScoreGroups?.map(c => ({ id: c.id, text: c.name })) || [] },
+      residualRisk: { ...prev.residualRisk, options: scores.riskScoreGroups?.map(c => ({ id: c.id, text: c.name })) || [] },
     }))
   }, [categories, owners, scores]);
-  
+
   const prevPayload = useRef("");
   const searchedValue = useRef("");
   // If this state has some key missing from RiskRegisterFilters.jsx in data folder, it will result in error.
@@ -50,8 +51,15 @@ const RiskRegister = () => {
     vendor: []
   })
 
+  // Fetch library to show as select options in add risk via library option
+  const [library, setLibrary] = useState([]);
+  const fetchLibrary = async () => {
+    const { data } = await getLibrary({ filters: {}, search: '' });
+    setLibrary(data.scenarios)
+  }
+
   // REGISTER TABLE: State to store the register table data
-  const [{risks: register}, setRegister] = useState({risks: []})
+  const [{ risks: register }, setRegister] = useState({ risks: [] })
 
   // Function to fetch register data, and set the state
   const fetchandSetRegister = async (reload) => {
@@ -82,12 +90,12 @@ const RiskRegister = () => {
     }
     if (filters.identified.length > 0) {
       let dateRange =
-              filters.identified === 0
-              ? [new Date(), (() => {const d = new Date(); d.setMonth(d.getMonth() - 3); return d})()]
-              : filters.identified === 1
-              ? [new Date(), (() => {const d = new Date(); d.setMonth(d.getMonth() - 6); return d})()]
-              : filters.identified === 2
-              ? [new Date(), (() => {const d = new Date(); d.setMonth(d.getMonth() - 12); return d})()]
+        filters.identified === 0
+          ? [new Date(), (() => { const d = new Date(); d.setMonth(d.getMonth() - 3); return d })()]
+          : filters.identified === 1
+            ? [new Date(), (() => { const d = new Date(); d.setMonth(d.getMonth() - 6); return d })()]
+            : filters.identified === 2
+              ? [new Date(), (() => { const d = new Date(); d.setMonth(d.getMonth() - 12); return d })()]
               : [new Date(), new Date()];
       payload.filters["identified_date"] = [dateRange[0].toISOString(), dateRange[1].toISOString()];
     }
@@ -135,9 +143,10 @@ const RiskRegister = () => {
 
   useEffect(() => {
     fetchandSetRegister();
+    fetchLibrary();
   }, [])
 
-  
+
   const onSearch = (val) => {
     searchedValue.current = val;
     fetchandSetRegister();
@@ -200,19 +209,20 @@ const RiskRegister = () => {
   }
 
   // State to toggle dialog, for adding scenario manually, and editing it
-  const [scenarioDialog, setScenarioDialog] = useState(false);
-  const closeScenarioDialog = () => setScenarioDialog(false);
+  const [scenarioDialog, setScenarioDialog] = useState({ open: false, isViaLibrary: false });
+  const closeScenarioDialog = () => setScenarioDialog({ open: false, isViaLibrary: false });
 
   // CLICK handlers for add scenario options
-  const addManualScenario = () => resetPageState() & setScenarioDialog(true);
+  const addManualScenario = () => resetPageState() & setScenarioDialog({ open: true, isViaLibrary: false });
   // reset page before trying to add new scenario
   const resetPageState = () => {
     setSelectedRow([]);
   }
-  const openEditForm = () => setScenarioDialog(true)
+  const openEditForm = () => setScenarioDialog({ open: true, isViaLibrary: false })
 
   const addScenarioViaLibrary = () => {
-    console.log("add scenario via library");
+    resetPageState();
+    setScenarioDialog({ open: true, isViaLibrary: true })
   }
 
   const addScenarioViaImport = () => {
@@ -301,7 +311,7 @@ const RiskRegister = () => {
 
   const onRegisterFormSubmit = async (val) => {
     // is new row
-    if (getCurrentIndex() === -1) {
+    if (getCurrentIndex() === -1 && !scenarioDialog.isViaLibrary) {
       const payload = {
         scenario_description: val.scenario,
         categories_ids: val.categories.map(category => category.id),
@@ -319,17 +329,32 @@ const RiskRegister = () => {
         return fetchandSetRegister(true);
       }
 
-    } else {
+    }
+    else if (scenarioDialog.isViaLibrary) {
+      const payload = {
+        scenario_id: val.scenario,
+        likelihood_id: scores.likelihoodScores.find(score => score.score === getRiskScore(val.inherent_likelihood, true)).id,
+        impact_id: scores.impactScores.find(score => score.score === getRiskScore(val.inherent_impact, false)).id,
+        cia: cia_categories.filter(cia => Boolean(val[cia.name])).map(cia => cia.id),
+        custom_id: val.customId
+      }
+      const { status } = await createRisk(payload);
+      if (status) {
+        closeScenarioDialog();
+        return fetchandSetRegister(true);
+      }
+    }
+    else {
       // is edit row
       const payload = {};
-      const row = register[getCurrentIndex()]; 
+      const row = register[getCurrentIndex()];
       const prev_scenario = row.Scenario ? (JSON.parse(row.Scenario).description || "") : "";
       const prev_categories = row.Scenario ? (JSON.parse(row.Scenario).categories_id || []).sort() : [];
       const curr_scenario = val.scenario;
       const curr_categories = val.categories.map(c => c.id).sort();
 
       if (val.source === 0) {
-        if (prev_scenario === curr_scenario && JSON.stringify(prev_categories) === JSON.stringify(curr_categories)) {} else {
+        if (prev_scenario === curr_scenario && JSON.stringify(prev_categories) === JSON.stringify(curr_categories)) { } else {
           payload.scenario_description = val.scenario;
           payload.categories_ids = val.categories.map(category => category.id);
         }
@@ -349,7 +374,7 @@ const RiskRegister = () => {
         payload.notes = val.notes;
       }
       if (val.customId !== row["Custom Id"]) {
-        payload.customId = val.customId;
+        payload.custom_id = val.customId;
       }
       if (val.identified_date !== row["Identified Date"]) {
         payload.identified_date = typeof val.identified_date === "string" ? val.identified_date : val.identified_date.toDate().toISOString();
@@ -398,7 +423,7 @@ const RiskRegister = () => {
       }
 
       if (Object.keys(payload).length > 0) {
-        const {status} = await updateRegister(row["ID"], payload);
+        const { status } = await updateRegister(row["ID"], payload);
         if (status) {
           closeScenarioDialog();
           return fetchandSetRegister(true);
@@ -513,10 +538,12 @@ const RiskRegister = () => {
       </Box>
 
       <RiskFormDialog
-        open={scenarioDialog}
+        open={scenarioDialog.open}
         closeHandler={closeScenarioDialog}
         rowIndex={getCurrentIndex()}
         row={register[getCurrentIndex()]}
+        viaLibrary={scenarioDialog.isViaLibrary}
+        library={library}
         autocompleteOptions={{ categories, owners: filterDropdowns.owners.options }}
         getSliderValue={getSliderValue}
         scores={scores}
@@ -527,7 +554,8 @@ const RiskRegister = () => {
         open={actionDialog}
         closeHandler={closeAddActionForm}
         risks={getRegisterOptions()}
-        owners={owners.map(owner => ({ val: owner.id, text: owner.name }))}
+        owners={owners.map(owner => ({ val: owner.id, text: owner.first_name }))}
+        isCreateAction={true}
         riskVal={register[getCurrentIndex()]}
         onFormSubmit={handleAddActionFormSubmit}
       />

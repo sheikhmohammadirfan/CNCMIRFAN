@@ -65,6 +65,7 @@ const RiskScoreCell = ({ cellValue }) => {
 
 const IsApprovedCell = ({ cellValue }) => {
   const classes = useStyle();
+  const approved = cellValue || cellValue === 1;
   return (
     <Typography variant="body2" noWrap className={classes.statusCell}>
       <span style={{
@@ -72,10 +73,10 @@ const IsApprovedCell = ({ cellValue }) => {
         minWidth: "10px",
         borderRadius: "50%",
         display: "inline-block",
-        backgroundColor: cellValue === true ? "#4caf50" : "#ffd54f"
+        backgroundColor: approved ? "#4caf50" : "#ffd54f"
       }}>
       </span>
-      {cellValue === true ? "Approved" : "Pending"}
+      {approved ? "Approved" : "Pending"}
     </Typography>
   )
 }
@@ -103,7 +104,8 @@ const columnToCellMap = {
   "Residual Risk": RiskScoreCell,
   Approved: IsApprovedCell,
   Source: SourceCell,
-  Range: RangeCell
+  Range: RangeCell,
+  status: IsApprovedCell
 }
 
 export default columnToCellMap;
