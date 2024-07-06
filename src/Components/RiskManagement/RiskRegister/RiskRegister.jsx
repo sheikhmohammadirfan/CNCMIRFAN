@@ -1,18 +1,18 @@
-import React, { useCallback, useContext, useEffect, useLayoutEffect, useRef, useState } from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 import { Box, Grid } from '@material-ui/core'
 import RiskRegisterHeader from './RiskRegisterHeader'
 import DataTable from '../../Utils/DataTable/DataTable'
 import { HeaderCell, generateRows, mapDataToHeader, useStyle } from './RiskRegisterUtils'
 import { risk_register_columns, risk_register_columns_width } from '../../../assets/data/RiskManagement/RiskRegister/RiskRegisterColumns'
-import { getRegister, getOwners, createRisk, getRiskScoreGroups, updateRegister } from '../../../Service/RiskManagement/RiskRegister.service'
+import { getRegister, createRisk, updateRegister } from '../../../Service/RiskManagement/RiskRegister.service'
 import useLoading from '../../Utils/Hooks/useLoading'
 import SkeletonBox from '../../Utils/SkeletonBox'
 import RiskManagementContext from '../RiskManagementContext'
-import RiskRegisterFilters, { cia_categories, treatmentTypes } from '../../../assets/data/RiskManagement/RiskRegister/RiskRegisterFilters'
+import RiskRegisterFilters, { cia_categories } from '../../../assets/data/RiskManagement/RiskRegister/RiskRegisterFilters'
 import RiskFormDialog from '../RiskFormDialog'
-import { dummy_row } from '../../../assets/data/RiskManagement/RiskRegister/RiskRegisterMockData'
 import AddActionDialog from '../AddActionDialog'
 import { getLibrary } from '../../../Service/RiskManagement/RiskLibrary.service'
+import { TREATMENT_NAME_ID_MAP } from '../../../assets/data/RiskManagement/RiskTreatments'
 
 const RiskRegister = () => {
 
@@ -51,6 +51,16 @@ const RiskRegister = () => {
     vendor: []
   })
 
+  // State to store page size, and function to update page size. function will be called from DataTable
+  const [pagination, setPagination] = useState({
+    page_no: 1,
+    page_size: 5,
+    total_items: null,
+    total_pages: null,
+  });
+  const updatePageSize = (size) => setPagination(prev => ({ ...prev, page_size: size }));
+  const updatePageNumber = (page) => setPagination(prev => ({ ...prev, page_no: page }));
+
   // Fetch library to show as select options in add risk via library option
   const [library, setLibrary] = useState([]);
   const fetchLibrary = async () => {
@@ -61,9 +71,16 @@ const RiskRegister = () => {
   // REGISTER TABLE: State to store the register table data
   const [{ risks: register }, setRegister] = useState({ risks: [] })
 
+  const abortControllerRef = useRef(null);
+
   // Function to fetch register data, and set the state
   const fetchandSetRegister = async (reload) => {
-    const payload = { filters: {}, search: searchedValue.current };
+    const payload = {
+      filters: {},
+      search: searchedValue.current,
+      page_size: pagination.page_size,
+      page_no: pagination.page_no
+    };
     if (filters.owners.length > 0) {
       payload.filters["owner"] = filters.owners;
     }
@@ -74,10 +91,10 @@ const RiskRegister = () => {
       payload.filters["treatment"] = filters.treatment;
     }
     if (filters.inherent.length > 0) {
-      payload.filters["inherent"] = filters.inherent;
+      payload.filters["inherent_risk"] = filters.inherent[0];
     }
     if (filters.residual.length > 0) {
-      payload.filters["residual"] = filters.residual;
+      payload.filters["residual_risk"] = filters.residual[0];
     }
     if (filters.ciaCategories.length > 0) {
       payload.filters["cia"] = filters.ciaCategories;
@@ -105,9 +122,26 @@ const RiskRegister = () => {
     }
     prevPayload.current = currPayload;
 
+    // ABORT CONTROLLER TO CONTROL REQUESTS
+    // Abort previous requests if any, before firing a new one
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    // Setting up abort controller to cancel current request if immediately another is fired
+    abortControllerRef.current = new AbortController();
+    const signal = abortControllerRef.current.signal;
+
     startLoading();
-    const { data } = await getRegister(payload);
+    const { data } = await getRegister(payload, { signal: signal });
+
+    let paginationData;
     if (data) {
+      paginationData = {
+        page_no: data.page_no,
+        page_size: data.page_size,
+        total_items: data.total_items,
+        total_pages: data.total_pages
+      }
       data.risks = data.risks.map(r => ({
         ID: r.id,
         Scenario: JSON.stringify({
@@ -137,15 +171,21 @@ const RiskRegister = () => {
         Vendors: []
       }))
     }
-    setRegister(data);
-    stopLoading();
+    // if signal is not aborted, that means no new reqs were fired. so we can safely stop loading and set the state.
+    if (!signal.aborted) {
+      setRegister(data);
+      setPagination({ ...paginationData })
+      stopLoading();
+    }
   };
 
   useEffect(() => {
-    fetchandSetRegister();
     fetchLibrary();
   }, [])
 
+  useEffect(() => {
+    fetchandSetRegister();
+  }, [pagination])
 
   const onSearch = (val) => {
     searchedValue.current = val;
@@ -177,7 +217,12 @@ const RiskRegister = () => {
             ? currentFilters.filter((id) => id !== itemId)
             : [...currentFilters, itemId].filter(id => id !== 0);
         }
-      } else if (filterName === "ciaCategories") {
+      }
+      else if (filterName === 'inherent' || filterName === 'residual') {
+        if (currentFilters.includes(itemId)) updatedFilterIds = [];
+        else updatedFilterIds = [itemId];
+      }
+      else if (filterName === "ciaCategories") {
         if (itemId === 1) {
           updatedFilterIds = currentFilters.includes(itemId) ? [] : [itemId];
         } else {
@@ -321,9 +366,7 @@ const RiskRegister = () => {
         cia: cia_categories.filter(cia => Boolean(val[cia.name])).map(cia => cia.id),
         custom_id: val.customId
       }
-
       const { status } = await createRisk(payload);
-
       if (status) {
         closeScenarioDialog();
         return fetchandSetRegister(true);
@@ -336,6 +379,7 @@ const RiskRegister = () => {
         likelihood_id: scores.likelihoodScores.find(score => score.score === getRiskScore(val.inherent_likelihood, true)).id,
         impact_id: scores.impactScores.find(score => score.score === getRiskScore(val.inherent_impact, false)).id,
         cia: cia_categories.filter(cia => Boolean(val[cia.name])).map(cia => cia.id),
+        notes: val.notes,
         custom_id: val.customId
       }
       const { status } = await createRisk(payload);
@@ -344,6 +388,7 @@ const RiskRegister = () => {
         return fetchandSetRegister(true);
       }
     }
+
     else {
       // is edit row
       const payload = {};
@@ -419,7 +464,7 @@ const RiskRegister = () => {
       }
 
       if (val.treatment_plan !== (row["Treatment"] ? (JSON.parse(row["Treatment"]).type || -1) : -1)) {
-        payload.treatment_plan = val.treatment_plan
+        payload.treatment = TREATMENT_NAME_ID_MAP[val.treatment_plan];
       }
 
       if (Object.keys(payload).length > 0) {
@@ -522,6 +567,12 @@ const RiskRegister = () => {
                 minCellWidth={visibleColumns.map(
                   (name) => risk_register_columns_width[allColumns.indexOf(name)]
                 )}
+                // Pagination props
+                currentPage={pagination.page_no}
+                pageSize={pagination.page_size}
+                totalItems={pagination.total_items}
+                updatePageSize={updatePageSize}
+                updatePageNumber={updatePageNumber}
               />
             </Grid>
 

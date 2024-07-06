@@ -10,6 +10,7 @@ import { source_options } from '../../assets/data/RiskManagement/RiskRegister/Ri
 import SelectCategories from './RiskRegister/SelectCategories';
 import { cia_categories } from '../../assets/data/RiskManagement/RiskRegister/RiskRegisterFilters';
 import SliderControl from './RiskRegister/SliderControl';
+import useLoading from '../Utils/Hooks/useLoading';
 
 // Custom input compoent
 const FormInput = ({ ...rest }) => (
@@ -23,12 +24,19 @@ const FormInput = ({ ...rest }) => (
   />
 );
 
-// Accrodion title wrapper
-const TitleWrapper = ({ text }) => (
-  <Typography style={{ fontSize: "1rem", color: "rgba(0, 0, 0, 0.6)" }}>
-    {text}
-  </Typography>
-);
+// Status text based on loading value
+const LoadingStatus = (loading) => ({
+  prop: {
+    style: { flexGrow: 1, fontStyle: "italic", paddingLeft: 8 },
+  },
+  element: (
+    <Typography noWrap>
+      {loading("library")
+        ? "Loading Library..."
+        : ""}
+    </Typography>
+  ),
+});
 
 // DEFAULT EXPORT FUNCTION
 const RiskFormDialog = ({
@@ -45,10 +53,22 @@ const RiskFormDialog = ({
   onFormSubmit
 }) => {
 
+  // Get loading status
+  const { isLoading, startLoading, stopLoading } = useLoading({
+    library: false,
+    categories: false,
+  });
+  // Set loading state of library
+  useEffect(() => {
+    if (!viaLibrary) return;
+    else if (library.length === 0) startLoading('library')
+    else if (library.length > 0) stopLoading('library');
+  }, [library, viaLibrary])
+
   const isCreateForm = () => rowIndex === -1 || isLibraryRow;
 
   // Loading status for dialog
-  const [isLoading, setisLoading] = useState(false);
+  const [isFormLoading, setisFormLoading] = useState(false);
 
   // state to handle inherent risk selector accordion open and close;
   const [inherentAccordion, setInherentAccordion] = useState(false)
@@ -196,9 +216,9 @@ const RiskFormDialog = ({
   }
 
   const onSubmit = async (values) => {
-    setisLoading(true);
+    setisFormLoading(true);
     await onFormSubmit(values);
-    setisLoading(false);
+    setisFormLoading(false);
   }
 
   const classes = useStyle();
@@ -274,7 +294,7 @@ const RiskFormDialog = ({
           {isCreateForm() ? "Create New Risk" : "Edit Risk"}
         </Typography>
       }
-      loading={isLoading}
+      loading={isFormLoading}
       bottomSeperator={true}
       className={classes.formContainer}
       content={
@@ -292,6 +312,7 @@ const RiskFormDialog = ({
                     name="scenario"
                     label="Scenario"
                     variant="outlined"
+                    loading={isLoading("library")}
                     options={library.map(row => ({ val: row.id, text: row.scenario })) || []}
                     styleProps={{ fullWidth: true, }}
                   /> :
@@ -407,13 +428,13 @@ const RiskFormDialog = ({
                                 // getting id of category who's value was changed
                                 let dataId = parseInt(e.target.getAttribute("data-id"));
                                 // If "Uncategorized" was checked to true, set all other cia categories to unchecked (false)
-                                if (dataId === 0 && value === true) {
+                                if (dataId === 1 && value === true) {
                                   setValue("confidentiality", false);
                                   setValue("integrity", false);
                                   setValue("availability", false);
                                 }
                                 // if some other checkbox was checked to true, uncheck "Uncategorized"
-                                else if (dataId !== 0 && value === true) setValue("uncategorized", false)
+                                else if (dataId !== 1 && value === true) setValue("uncategorized", false)
                                 onChange(value);
                               }
                               return (
@@ -534,6 +555,7 @@ const RiskFormDialog = ({
         </Box>
       }
       actions={[
+        LoadingStatus(isLoading),
         <Button
           variant="outlined"
           color="primary"
@@ -548,7 +570,7 @@ const RiskFormDialog = ({
           size="large"
           form="risk-form"
           type="submit"
-          disabled={isLoading}
+          disabled={isFormLoading || isLoading()}
         >
           {(isCreateForm()) ? "ADD" : "UPDATE"}
         </Button>,

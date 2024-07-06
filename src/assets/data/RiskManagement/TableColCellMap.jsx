@@ -2,6 +2,7 @@ import { Box, Icon, Typography } from "@material-ui/core";
 import { useStyle } from "../../../Components/RiskManagement/RiskRegister/RiskRegisterUtils";
 import { cia_categories } from "./RiskRegister/RiskRegisterFilters";
 import colorShader from "../../../Components/Utils/ColorShader";
+import { TREATMENT_ID_NAME_MAP } from "./RiskTreatments";
 
 const CategoriesCell = ({ cellValue }) => {
   const classes = useStyle();
@@ -33,7 +34,7 @@ const TreatmentCell = ({ cellValue }) => {
   return (
     <Box display="flex" flexDirection="column" gridRowGap={5}>
       <Typography variant="body2" noWrap className={classes.treatmentAction}>
-        {JSON.parse(cellValue).type === 1 ? "Mitigate" : "Avoid"}
+        {TREATMENT_ID_NAME_MAP[JSON.parse(cellValue).type]}
       </Typography>
       <Typography variant="body2" noWrap className={classes.treatmentStatus}>
         {/* Displaying icon based on treatment status */}

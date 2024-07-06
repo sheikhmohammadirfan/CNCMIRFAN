@@ -1,5 +1,5 @@
 import { post } from "../CrudFactory";
 
-export const getLibrary = async (payload) => {
-  return await post("/risk/scenarios/", payload)
+export const getLibrary = async (payload, signal) => {
+  return await post("/risk/scenarios/", payload, signal)
 }

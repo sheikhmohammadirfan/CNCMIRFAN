@@ -28,25 +28,62 @@ const ActionTracker = ({
   const prevPayload = useRef("");
   const searchedValue = useRef("");
 
+  // State to store page size, and function to update page size. function will be called from DataTable
+  const [pagination, setPagination] = useState({
+    page_no: 1,
+    page_size: 5,
+    total_items: null,
+    total_pages: null,
+  });
+  const updatePageSize = (size) => setPagination(prev => ({ ...prev, page_size: size }));
+  const updatePageNumber = (page) => setPagination(prev => ({ ...prev, page_no: page }));
+
+  const abortControllerRef = useRef(null);
+
   // Function to fetch actions data, and set the state
   const fetchandSetActionTable = async () => {
 
-    const payload = { filters: {}, search: searchedValue.current };
+    const payload = {
+      filters: {},
+      search: searchedValue.current,
+      page_size: pagination.page_size,
+      page_no: pagination.page_no
+    };
     if (filters.assignee.length > 0) {
       payload.filters['assignee'] = filters.assignee;
     }
     const newPayload = JSON.stringify(payload);
     if (prevPayload.current === newPayload) return;
     prevPayload.current = newPayload;
+
+    // ABORT CONTROLLER TO CONTROL REQUESTS
+    // Abort previous requests if any, before firing a new one
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    // Setting up abort controller to cancel current request if immediately another is fired
+    abortControllerRef.current = new AbortController();
+    const signal = abortControllerRef.current.signal;
+
     startLoading();
-    const { data } = await getActions(payload);
-    setActions(data.data.actions);
-    stopLoading();
+    const { data } = await getActions(payload, { signal: signal });
+    let paginationData = {
+      page_no: data.data.page_no,
+      page_size: data.data.page_size,
+      total_items: data.data.total_items,
+      total_pages: data.data.total_pages
+    }
+    // if signal is not aborted, that means no new reqs were fired. so we can safely stop loading and set the state.
+    if (!signal.aborted) {
+      setActions(data.data.actions);
+      setPagination({ ...paginationData })
+      stopLoading();
+    }
   }
 
   useEffect(() => {
     fetchandSetActionTable();
-  }, [])
+  }, [pagination])
 
   const [columns, setColumns] = useState(ACTION_TRACKER_COLUMNS);
 
@@ -254,6 +291,12 @@ const ActionTracker = ({
               minCellWidth={columns.map(
                 (name) => ACTION_TABLE_COL_WIDTHS[columns.indexOf(name)]
               )}
+              // Pagination props
+              currentPage={pagination.page_no}
+              pageSize={pagination.page_size}
+              totalItems={pagination.total_items}
+              updatePageSize={updatePageSize}
+              updatePageNumber={updatePageNumber}
             />
           </Grid>
 

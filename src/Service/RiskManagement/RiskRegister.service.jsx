@@ -1,7 +1,7 @@
 import { post, put } from "../CrudFactory";
 
-export async function getRegister(payload) {
-  return await post("/risk/", payload);
+export async function getRegister(payload, signal) {
+  return await post("/risk/", payload, signal);
 }
 
 export async function updateRegister(id, payload) {

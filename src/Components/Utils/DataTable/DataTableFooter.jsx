@@ -6,6 +6,7 @@ function DataTableFooter({
   component,
   pageSize,
   rowsPerPage,
+  handleRowsPerPageChange,
   page,
   onPageChange,
   count,
@@ -16,13 +17,15 @@ function DataTableFooter({
         {component}
         {pageSize !== 0 && (
           <TablePagination
-            rowsPerPageOptions={[]}
+            rowsPerPageOptions={[5, 10]}
+            onRowsPerPageChange={handleRowsPerPageChange}
             rowsPerPage={rowsPerPage}
             page={page}
             onPageChange={onPageChange}
             count={count}
             component={Box}
             data-test="footer-pagination"
+            sx={{ '&.MuiTablePagination-root': { overflow: 'visible' } }}
           />
         )}
       </Box>

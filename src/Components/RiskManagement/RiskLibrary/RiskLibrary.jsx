@@ -28,10 +28,27 @@ const RiskLibrary = ({
     register: [],
   })
 
+  // State to store page size, and function to update page size. function will be called from DataTable
+  const [pagination, setPagination] = useState({
+    page_no: 1,
+    page_size: 5,
+    total_items: null,
+    total_pages: null,
+  });
+  const updatePageSize = (size) => setPagination(prev => ({ ...prev, page_size: size }));
+  const updatePageNumber = (page) => setPagination(prev => ({ ...prev, page_no: page }));
+
+  const abortControllerRef = useRef(null);
+
   // State to save library
-  const [{scenarios: library}, setLibrary] = useState({scenarios: []});
+  const [{ scenarios: library }, setLibrary] = useState({ scenarios: [] });
   const fetchLibrary = async () => {
-    const payload = { filters: {}, search: searchedValue.current };
+    const payload = {
+      filters: {},
+      search: searchedValue.current,
+      page_size: pagination.page_size,
+      page_no: pagination.page_no
+    };
     if (filters.categories.length > 0) {
       payload.filters["categories"] = filters.categories;
     }
@@ -44,22 +61,42 @@ const RiskLibrary = ({
     }
     prevPayload.current = currPayload;
 
+    // ABORT CONTROLLER TO CONTROL REQUESTS
+    // Abort previous requests if any, before firing a new one
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    // Setting up abort controller to cancel current request if immediately another is fired
+    abortControllerRef.current = new AbortController();
+    const signal = abortControllerRef.current.signal;
+
     startLoading();
-    const { data } = await getLibrary(payload);
-    setLibrary({
-      ...data,
-      scenarios: data.scenarios.map(x => ({
-        ...x,
-        "Scenario": x.scenario,
-        "Categories": x.categories,
-        "Source":  x.scenario_source === 0 ? "SYSTEM" : "CUSTOM"
-      }))});
-    stopLoading();
+    const { data } = await getLibrary(payload, { signal: signal });
+    let paginationData = {
+      page_no: data.page_no,
+      page_size: data.page_size,
+      total_items: data.total_items,
+      total_pages: data.total_pages
+    }
+    // if signal is not aborted, that means no new reqs were fired. so we can safely stop loading and set the state.
+    if (!signal.aborted) {
+      setLibrary({
+        ...data,
+        scenarios: data.scenarios.map(x => ({
+          ...x,
+          "Scenario": x.scenario,
+          "Categories": x.categories,
+          "Source": x.scenario_source === 0 ? "SYSTEM" : "CUSTOM"
+        }))
+      });
+      setPagination({ ...paginationData })
+      stopLoading();
+    }
   };
 
   useEffect(() => {
     fetchLibrary();
-  }, [])
+  }, [pagination])
 
   // Save library columns
   const [libraryColumns, setLibraryColumns] = useState(LibraryColumns);
@@ -77,7 +114,7 @@ const RiskLibrary = ({
   useEffect(() => {
     setFilterDropdowns(prev => ({
       ...prev,
-      categories: { ...prev.categories, options: categories.map(c => ({ id:c.id, text:c.category_name })) }
+      categories: { ...prev.categories, options: categories.map(c => ({ id: c.id, text: c.category_name })) }
     }))
   }, [categories])
 
@@ -225,6 +262,13 @@ const RiskLibrary = ({
               minCellWidth={libraryColumns.map(
                 (name) => librayColumnWidths[libraryColumns.indexOf(name)]
               )}
+
+              // Pagination props
+              currentPage={pagination.page_no}
+              pageSize={pagination.page_size}
+              totalItems={pagination.total_items}
+              updatePageSize={updatePageSize}
+              updatePageNumber={updatePageNumber}
             />
           </Grid>
 

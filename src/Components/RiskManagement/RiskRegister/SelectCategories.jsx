@@ -20,6 +20,8 @@ const SelectCategories = ({ name, label, control, rules, multiple, optionList, .
             options={optionList}
             getOptionLabel={(option) => option.category_name}
             filterSelectedOptions
+            loading={true}
+            loadingText={"Loading..."}
             renderInput={(params) => (
               <TextField
                 error={Boolean(error)}
