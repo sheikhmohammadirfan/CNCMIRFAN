@@ -62,7 +62,7 @@ export default function ManageColumns({
           <ClickAwayListener onClickAway={closeMenu}>
             <List disablePadding>
               <ListItem divider disableGutters dense>
-                <Typography variant="button" style={{ fontWeight: "bold" }}>
+                <Typography variant="button" fontWeight="bold">
                   Default Columns
                 </Typography>
               </ListItem>
@@ -100,7 +100,7 @@ export default function ManageColumns({
                 ))}
 
               <ListItem divider disableGutters dense>
-                <Typography variant="button" style={{ fontWeight: "bold" }}>
+                <Typography variant="button" fontWeight="bold">
                   Hidden columns
                 </Typography>
               </ListItem>

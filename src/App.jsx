@@ -24,9 +24,8 @@ import Integrate from "./Pages/Integrate";
 import ParamsRoutes from "./Components/Utils/Routers/ParamsRoutes";
 import RiskManagement from "./Pages/RiskManagement";
 import React from "react";
+import VendorManagement from "./Pages/VendorManagement";
 import RiskLibrary from "./Components/RiskManagement/RiskLibrary/RiskLibrary";
-
-
 
 // Custom values
 const sidebarSmall = 50;
@@ -146,6 +145,9 @@ function App() {
                     </Route>
                     <Route exact path="/Integrated_Platforms">
                       <Integrate title="Integrated Platforms" />
+                    </Route>
+                    <Route path="/vendor_management">
+                      <VendorManagement title="Vendor Management" />
                     </Route>
                     <Route path="/risk-management">
                       <RiskManagement title="Risk Management" />

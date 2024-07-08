@@ -104,6 +104,16 @@ const useStyles = makeStyles((theme) => ({
     display: 'inline-block',
   },
 
+  // Style for highlighting row that the user is hovering over
+  tableRowHover: {
+    cursor: "pointer",
+    '&:hover': {
+      '& > *': {  // Apply to all children cells
+        backgroundColor: '#F4F4F4',
+      },
+    },
+  },
+  
 }));
 
 /** Main DataTable Component */
@@ -321,8 +331,10 @@ function DataTable({
                 key={rowIndex}
                 {...rowProps}
                 {...props}
+                className={classes.tableRowHover}
                 style={{ ...rowStyle, ...style }}
                 data-test="datatable-row-container"
+                onClick={props.onClick}
               >
                 {addColsToRow(data, rowIndex).map(
                   ({ text = "", params = {}, css = {} }, colIndex) => (
