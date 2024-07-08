@@ -24,6 +24,8 @@ const RadioControl = forwardRef((props, ref) => {
         hideLabel = false,
         controls,
         styleProps,
+        radioGroupProps,
+        radioProps,
         ...others
       }) => (
         <FormControl {...styleProps}>
@@ -36,6 +38,7 @@ const RadioControl = forwardRef((props, ref) => {
             ref={ref}
             row={direction === "row"}
             {...controls?.field}
+            {...radioGroupProps}
             {...others}
             data-test="radio-input"
           >
@@ -43,7 +46,7 @@ const RadioControl = forwardRef((props, ref) => {
               <FormControlLabel
                 value={val?.val !== undefined ? val.val : val}
                 key={index}
-                control={<Radio />}
+                control={<Radio {...radioProps} />}
                 label={val?.text !== undefined ? val.text : val}
                 data-test={`radio-option-${val?.val ? val.val : val}`}
               />

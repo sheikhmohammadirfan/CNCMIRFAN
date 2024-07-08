@@ -72,7 +72,7 @@ const useStyles = makeStyles((theme) => ({
   // Highlight headr backgroud
   headerStyle: {
     "& th": {
-      background: "#e6f6f4",
+      background: "#f4f4f4",
       borderColor: "#d9d9d9",
       border: "1px solid",
       borderLeft: 0,
@@ -120,13 +120,18 @@ const useStyles = makeStyles((theme) => ({
 function DataTable({
   selectedRows = [],
   setSelectedRows,
+  currentPage,
   pageSize = 0,
+  totalItems,
+  updatePageSize,
+  updatePageNumber,
   checkbox = false,
   serialNo = true,
   stickyHeader = true,
   footerComponent,
   verticalBorder = false,
   resizeTable = false,
+  resizeAfterColumns = 1,
   header = { data: [], props: {}, style: {}, cellStyle: {} },
   // data: { text = "", props = {}, css = {} },
   rowList: {
@@ -159,7 +164,16 @@ function DataTable({
     toggleAllRows,
     isSomeChecked,
     isAllChecked,
-  } = useRowSelect(rowData, pageSize, selectedRows, setSelectedRows);
+  } = useRowSelect(currentPage, rowData, pageSize, selectedRows, setSelectedRows);
+
+  const handleRowsPerPageChange = (e) => {
+    updatePageSize(e.target.value);
+  }
+
+  const handlePageChange = (e, pageNumber) => {
+    updatePageNumber(pageNumber + 1);
+    return updatePage(null, pageNumber)
+  }
 
   // Method to append Checkbox & Serial no. to Header data list
   const addColsToHeader = (data) => {
@@ -183,8 +197,8 @@ function DataTable({
               e.stopPropagation();
             }}
             data-test="datatable-header-checkbox"
-            // disableRipple
-            // style={{ padding: 0, margin: "0 9px" }}
+          // disableRipple
+          // style={{ padding: 0, margin: "0 9px" }}
           />
         ),
         params: { checkbox: "", header: "" },
@@ -211,8 +225,8 @@ function DataTable({
             onChange={(e) => toggleRow(startIndex + index, e.target.checked)}
             onClick={(e) => e.stopPropagation()}
             data-test="datatable-row-checkbox"
-            // disableRipple
-            // style={{ padding: 0, margin: "0 9px" }}
+          // disableRipple
+          // style={{ padding: 0, margin: "0 9px" }}
           />
         ),
         params: { checkbox: "", row: "" },
@@ -267,9 +281,8 @@ function DataTable({
 
   return (
     <TableContainer
-      className={`${classes.root} ${
-        verticalBorder && classes.border
-      } ${className}`}
+      className={`${classes.root} ${verticalBorder && classes.border
+        } ${className}`}
       {...rest}
     >
       <Table
@@ -277,11 +290,11 @@ function DataTable({
         style={
           resizeTable
             ? {
-                gridTemplateColumns: generateColumns(),
-                gridTemplateRows: Array(rowData.length + 1)
-                  .fill("50px")
-                  .join(" "),
-              }
+              gridTemplateColumns: generateColumns(),
+              gridTemplateRows: Array(rowData.length + 1)
+                .fill("50px")
+                .join(" "),
+            }
             : {}
         }
         ref={tableRef}
@@ -303,7 +316,7 @@ function DataTable({
                 data-test="datatable-header-cell"
               >
                 {headerWrapper(text)}
-                {resizeTable && index > 1 && (
+                {resizeTable && index > resizeAfterColumns && (
                   <VerticalResizer index={index} data-test="column-resizer" />
                 )}
               </TableCell>
@@ -335,7 +348,7 @@ function DataTable({
                       }
                       data-test="datatable-row-cell"
                     >
-                      {rowWrapper(highlightSearchTerm(text))}
+                      {rowWrapper(highlightSearchTerm(text), params.colname)}
                       {resizeTable && colIndex === 0 && (
                         <HeightResizer index={rowIndex + 1} />
                       )}
@@ -351,9 +364,10 @@ function DataTable({
           component={footerComponent}
           pageSize={pageSize}
           rowsPerPage={rowsPerPage}
+          handleRowsPerPageChange={handleRowsPerPageChange}
           page={page}
-          onPageChange={updatePage}
-          count={rowData.length}
+          onPageChange={handlePageChange}
+          count={totalItems}
         />
       </Table>
     </TableContainer>

@@ -400,6 +400,7 @@ export default function PoamTable({ fileID }) {
                 checkbox={true}
                 serialNo={false}
                 resizeTable={true}
+                resizeAfterColumns={1}
                 selectedRows={selectedRow}
                 setSelectedRows={setSelectedRow}
                 headerWrapper={(text) => <HeaderCell text={text} />}

@@ -12,4 +12,8 @@ export const BreadcrumbMapper = {
   'security_review': "Security Review",
   'compliance_reports': "Compliance Reports",
   'settings': "Settings",
+  'risk-management': "Risk Management",
+  'risk-library': "Risk Library",
+  'risk-register': "Risk Register",
+  'action-tracker': "Action Tracker"
 };

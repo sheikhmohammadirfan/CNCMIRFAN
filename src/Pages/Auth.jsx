@@ -132,6 +132,7 @@ listItems:{
     gap:"20px",
     width: "200%",
     transform: "translateX(0%)",
+    transition: 'transform 300ms',
     "&.login": { transform: "translateX(-50%)" },
   },
 }));

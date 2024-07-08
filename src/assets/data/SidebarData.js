@@ -189,4 +189,34 @@ export const SidebarData = [
       },
     ],
   },
+  {
+    icon: "warning",
+    title: "Risk Management",
+    collapseMenu: [
+      {
+        title: "Risk Library",
+        component: Link,
+        to: "/risk-management/risk-library",
+        icon: "menu_book"
+      },
+      {
+        title: "Risk Register",
+        component: Link,
+        to: "/risk-management/risk-register",
+        icon: "list"
+      },
+      {
+        title: "Action Tracker",
+        component: Link,
+        to: "/risk-management/action-tracker",
+        icon: "timeline"
+      },
+      {
+        title: "Settings",
+        component: Link,
+        to: "/risk-management/settings",
+        icon: "settings"
+      }
+    ]
+  }
 ];
