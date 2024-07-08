@@ -23,8 +23,7 @@ import Profile from "./Pages/Profile";
 import Integrate from "./Pages/Integrate";
 import ParamsRoutes from "./Components/Utils/Routers/ParamsRoutes";
 import React from "react";
-
-
+import VendorManagement from "./Pages/VendorManagement";
 
 // Custom values
 const sidebarSmall = 50;
@@ -144,6 +143,9 @@ function App() {
                     </Route>
                     <Route exact path="/Integrated_Platforms">
                       <Integrate title="Integrated Platforms" />
+                    </Route>
+                    <Route path="/vendor_management">
+                      <VendorManagement title="Vendor Management" />
                     </Route>
                   </div>
                 </Box>

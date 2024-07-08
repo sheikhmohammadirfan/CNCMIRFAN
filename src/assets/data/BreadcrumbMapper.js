@@ -3,4 +3,13 @@ export const BreadcrumbMapper = {
   verify: "Verify",
   Integrated_Platforms: "Integrated Platforms",
   profile: "Setting",
+  'vendor_management': "Vendors",
+  'requirement_analysis': "Requirement Analysis",
+  'risk_dashboard': "Risk Dashboard",
+  'assessment': "Vendor Assessment",
+  'procurement': "Vendor Procurement",
+  'onboard': "Onboard Vendor",
+  'security_review': "Security Review",
+  'compliance_reports': "Compliance Reports",
+  'settings': "Settings",
 };

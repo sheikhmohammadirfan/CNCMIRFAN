@@ -135,4 +135,58 @@ export const SidebarData = [
       search: `?${changeQueryParams({ email: true })}`,
     }),
   },
+  {
+    icon: "store",
+    title: "Vendor Management",
+    subMenu: [
+      {
+        icon: "assessment",
+        title: "Vendor Risk Dashboard",
+        component: Link,
+        to: "/vendor_management/risk_dashboard",
+      },
+      {
+        icon: "search",
+        title: "Requirement Analysis",
+        component: Link,
+        to: "/vendor_management/requirement_analysis",
+      },
+      {
+        icon: "find_in_page",
+        title: "Vendor Assessment",
+        component: Link,
+        to: "/vendor_management/assessment",
+      },
+      {
+        icon: "shopping_cart",
+        title: "Vendor Procurement",
+        component: Link,
+        to: "/vendor_management/procurement",
+      },
+      {
+        icon: "person_add",
+        title: "Onboard Vendor",
+        component: Link,
+        to: "/vendor_management/onboard",
+      },
+      {
+        icon: "security",
+        title: "Security Review",
+        component: Link,
+        to: "/vendor_management/security_review",
+      },
+      {
+        icon: "assignment",
+        title: "Compliance Reports",
+        component: Link,
+        to: "/vendor_management/compliance_reports",
+      },
+      {
+        icon: "settings",
+        title: "Vendor Settings",
+        component: Link,
+        to: "/vendor_management/settings",
+      },
+    ],
+  },
 ];
