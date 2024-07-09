@@ -24,12 +24,14 @@ export const useStyle = makeStyles(theme => ({
   },
 
   categoryChip: {
-    backgroundColor: `${colorShader(theme.palette.primary.main, 0.05)} !important`,
-    color: `${theme.palette.primary.main} !important`,
-    '& svg': {
-      color: colorShader(theme.palette.primary.main, 0.4),
+    backgroundColor: `${colorShader(theme.palette.primary.main, 0.1)} !important`,
+    '&>.MuiChip-label': {
+      color: `${theme.palette.primary.main}`,
+    },
+    '&.MuiButtonBase-root.MuiChip-root .MuiChip-deleteIcon': {
+      color: `${colorShader(theme.palette.primary.main, 0.4)}`,
       '&:hover': {
-        color: `${colorShader(theme.palette.primary.main, 0.6)} !important`
+        color: `${colorShader(theme.palette.primary.main, 0.75)}`
       }
     },
   },
@@ -125,7 +127,6 @@ export const useStyle = makeStyles(theme => ({
 
   // Style to make all cell height of 3 line
   tableCell: {
-    whiteSpace: "pre",
     overflow: "hidden",
     userSelect: "none",
   },
@@ -145,7 +146,7 @@ export const HeaderCell = ({ text }) => {
 export const RowCell = ({ text }) => {
   const classes = useStyle();
   return (
-    <Typography variant="body2" noWrap className={classes.tableCell}>
+    <Typography variant="body2" className={classes.tableCell}>
       {text}
     </Typography>
   )
@@ -158,7 +159,7 @@ export const mapDataToHeader = (visibleColumns, sorting, updateSort) => ({
     params:
       text === "Score" || text === "Range"
         ? {
-          "sticky": "",
+          // "sticky": "",
           "scenario": text === "Scenario" ? "true" : "false",
           "header": "",
           onClick: () => updateSort(text),
@@ -187,7 +188,7 @@ const mapDataToRow = (row, rowIndex, columns, matchedCell, categories, owners, s
       params:
         colName === "Score" || colName === "Range"
           ? {
-            "sticky": "",
+            // "sticky": "",
             "scenario": colName === "Scenario" ? "true" : "false",
             "data-searched": Boolean(
               matchedCell.find(

@@ -118,10 +118,8 @@ export const useStyle = makeStyles(theme => ({
 
   // Style to make all cell height of 3 line
   tableCell: {
-    whiteSpace: "pre",
     overflow: "hidden",
     userSelect: "none",
-    textWrap: "nowrap"
   },
 
   cellLabel: {
@@ -149,7 +147,7 @@ export const HeaderCell = ({ text }) => {
 export const RowCell = ({ text }) => {
   const classes = useStyle();
   return (
-    <Typography variant="body2" noWrap className={classes.tableCell}>
+    <Typography variant="body2" className={classes.tableCell}>
       {text}
     </Typography>
   )

@@ -1,5 +1,5 @@
 import { Box, Grid, Typography } from '@material-ui/core'
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { HeaderCell, RowCell, generateRows, mapDataToHeader, useStyle } from './RiskLibraryUtils'
 import RiskLibraryHeader from './RiskLibraryHeader';
 import RiskLibraryFilters from '../../../assets/data/RiskManagement/RiskLibrary/RiskLibraryFilters';
@@ -11,15 +11,16 @@ import { LibraryColumns, librayColumnWidths } from '../../../assets/data/RiskMan
 import RiskFormDialog from '../RiskFormDialog';
 import { cia_categories } from '../../../assets/data/RiskManagement/RiskRegister/RiskRegisterFilters';
 import { createRisk } from '../../../Service/RiskManagement/RiskRegister.service';
+import RiskManagementContext from '../RiskManagementContext';
+import useSlider from '../../Utils/Hooks/useSlider';
 
-const RiskLibrary = ({
-  categories: { categories, setCategories },
-  owners: { owners, getOwners },
-  scores
-}) => {
+const RiskLibrary = () => {
 
   // React state to maintain loading status
   const { isLoading, startLoading, stopLoading } = useLoading();
+
+  // Get categories and risk scores from RiskManagementContext, and populate it in our filterdropdown state
+  const { categories: { categories }, scores } = useContext(RiskManagementContext);
 
   const prevPayload = useRef("");
   const searchedValue = useRef("");
@@ -35,7 +36,7 @@ const RiskLibrary = ({
     total_items: null,
     total_pages: null,
   });
-  const updatePageSize = (size) => setPagination(prev => ({ ...prev, page_size: size }));
+  const updatePageSize = (size) => setPagination(prev => ({ ...prev, page_no: 1, page_size: size }));
   const updatePageNumber = (page) => setPagination(prev => ({ ...prev, page_no: page }));
 
   const abortControllerRef = useRef(null);
@@ -151,33 +152,13 @@ const RiskLibrary = ({
   const [addRiskForm, setAddRiskForm] = useState(false);
   const closeRiskForm = () => setAddRiskForm(false);
 
-  // Get score from a value between 0-100
-  const getRiskScore = (val, isLikelihoodScore) => {
-    let min = 0;
-    let max = 100;
-    let newMin = 1;
-    let newMax = isLikelihoodScore ? scores.likelihoodScores.length : scores.impactScores.length;
-    // Applying linear interpolation formula, to convert a value from 0-100 to an actual risk score
-    let scaledValue = ((val - min) / (max - min)) * (newMax - newMin) + newMin;
-    return scaledValue;
-  }
-
-  // Get a value between 0-100 from a small number
-  const getSliderValue = (num, isLikelihoodScore) => {
-    let min = 1;
-    let max = isLikelihoodScore ? scores.likelihoodScores.length : scores.impactScores.length;
-    let newMin = 0;
-    let newMax = 100;
-    // Applying linear interpolation formula, to convert a small value from 0-5/10 to a value between 0-100
-    let sliderValue = ((num - min) / (max - min)) * (newMax - newMin) + newMin;
-    return sliderValue;
-  }
+  const { getLikelihoodScore, getImpactScore, getLikelihoodSliderValue, getImpactSliderValue } = useSlider(scores)
 
   const onAddFormSubmit = async (val) => {
     const payload = {
       scenario_id: library[getCurrentIndex()].id,
-      likelihood_id: scores.likelihoodScores.find(score => score.score === getRiskScore(val.inherent_likelihood, true)).id,
-      impact_id: scores.impactScores.find(score => score.score === getRiskScore(val.inherent_impact, false)).id,
+      likelihood_id: scores.likelihoodScores.find(score => score.score === getLikelihoodScore(val.inherent_likelihood)).id,
+      impact_id: scores.impactScores.find(score => score.score === getImpactScore(val.inherent_impact)).id,
       notes: val.notes,
       cia: cia_categories.filter(cia => Boolean(val[cia.name])).map(cia => cia.id),
       custom_id: val.customId
@@ -252,7 +233,7 @@ const RiskLibrary = ({
               checkbox={true}
               minCheckboxWidth={50}
               serialNo={false}
-              resizeTable={true}
+              resizeTable={false}
               resizeAfterColumns={0}
               selectedRows={selectedRows}
               setSelectedRows={setSelectedRows}
@@ -290,7 +271,7 @@ const RiskLibrary = ({
         row={library[getCurrentIndex()]}
         isLibraryRow={true}
         autocompleteOptions={{ categories }}
-        getSliderValue={getSliderValue}
+        getSliderValue={{ getLikelihoodSliderValue, getImpactSliderValue }}
         scores={scores}
         onFormSubmit={onAddFormSubmit}
       />

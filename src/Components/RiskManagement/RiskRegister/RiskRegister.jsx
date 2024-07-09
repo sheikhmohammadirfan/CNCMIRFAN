@@ -13,6 +13,8 @@ import RiskFormDialog from '../RiskFormDialog'
 import AddActionDialog from '../AddActionDialog'
 import { getLibrary } from '../../../Service/RiskManagement/RiskLibrary.service'
 import { TREATMENT_NAME_ID_MAP } from '../../../assets/data/RiskManagement/RiskTreatments'
+import useSlider from '../../Utils/Hooks/useSlider'
+import { put } from '../../../Service/CrudFactory'
 
 const RiskRegister = () => {
 
@@ -20,7 +22,7 @@ const RiskRegister = () => {
   const { isLoading, startLoading, stopLoading } = useLoading();
 
   // Get categories and risk scores from RiskManagementContext, and populate it in our filterdropdown state
-  const { categories: { categories, setCategories }, owners: { owners, getOwners }, scores } = useContext(RiskManagementContext);
+  const { categories: { categories }, owners: { owners }, scores } = useContext(RiskManagementContext);
 
   // Get filters to show in table header
   const [filterDropdowns, setFilterDropdowns] = useState(RiskRegisterFilters);
@@ -58,7 +60,7 @@ const RiskRegister = () => {
     total_items: null,
     total_pages: null,
   });
-  const updatePageSize = (size) => setPagination(prev => ({ ...prev, page_size: size }));
+  const updatePageSize = (size) => setPagination(prev => ({ ...prev, page_no: 1, page_size: size }));
   const updatePageNumber = (page) => setPagination(prev => ({ ...prev, page_no: page }));
 
   // Fetch library to show as select options in add risk via library option
@@ -74,12 +76,12 @@ const RiskRegister = () => {
   const abortControllerRef = useRef(null);
 
   // Function to fetch register data, and set the state
-  const fetchandSetRegister = async (reload) => {
+  const fetchandSetRegister = async (reload, filterTrigger) => {
     const payload = {
       filters: {},
       search: searchedValue.current,
       page_size: pagination.page_size,
-      page_no: pagination.page_no
+      page_no: filterTrigger ? 1 : pagination.page_no
     };
     if (filters.owners.length > 0) {
       payload.filters["owner"] = filters.owners;
@@ -312,17 +314,29 @@ const RiskRegister = () => {
     }))
     : []
 
-  const handleAddActionFormSubmit = (values) => {
+  const handleAddActionFormSubmit = async (values) => {
+
+    const date = new Date(values.due_date);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+    const day = String(date.getDate()).padStart(2, '0');
+
+    const formattedDate = `${year}-${month}-${day}`;
+
     const payload = {
-      risk_id: values.risk,
+      risk_id: values.risk.val,
       // description: JSON.parse(register.find(row => row.ID.toString() === values.risk.toString())["Scenario"]).description,
       description: values.action,
-      due_date: values.due_date,
+      due_date: formattedDate,
       assignee: owners.find(owner => owner.id.toString() === values.owner).id,
       notes: values.notes,
-      source_id: 1,
+      task_type: "custom",
+      // source_id: 1,
     }
-    console.log(payload);
+    const res = await put('risk/tasks/', payload);
+    if (res.status) {
+      closeAddActionForm();
+    }
   }
 
   // All column names into a state
@@ -344,15 +358,7 @@ const RiskRegister = () => {
   }
 
   // Get score from a value between 0-100
-  const getRiskScore = (val, isLikelihoodScore) => {
-    let min = 0;
-    let max = 100;
-    let newMin = 1;
-    let newMax = isLikelihoodScore ? scores.likelihoodScores.length : scores.impactScores.length;
-    // Applying linear interpolation formula, to convert a value from 0-100 to an actual risk score
-    let scaledValue = ((val - min) / (max - min)) * (newMax - newMin) + newMin;
-    return scaledValue;
-  }
+  const { getLikelihoodScore, getImpactScore, getLikelihoodSliderValue, getImpactSliderValue } = useSlider(scores)
 
   const onRegisterFormSubmit = async (val) => {
     // is new row
@@ -360,8 +366,8 @@ const RiskRegister = () => {
       const payload = {
         scenario_description: val.scenario,
         categories_ids: val.categories.map(category => category.id),
-        likelihood_id: scores.likelihoodScores.find(score => score.score === getRiskScore(val.inherent_likelihood, true)).id,
-        impact_id: scores.impactScores.find(score => score.score === getRiskScore(val.inherent_impact, false)).id,
+        likelihood_id: scores.likelihoodScores.find(score => score.score === getLikelihoodScore(val.inherent_likelihood)).id,
+        impact_id: scores.impactScores.find(score => score.score === getImpactScore(val.inherent_impact)).id,
         notes: val.notes,
         cia: cia_categories.filter(cia => Boolean(val[cia.name])).map(cia => cia.id),
         custom_id: val.customId
@@ -376,8 +382,8 @@ const RiskRegister = () => {
     else if (scenarioDialog.isViaLibrary) {
       const payload = {
         scenario_id: val.scenario,
-        likelihood_id: scores.likelihoodScores.find(score => score.score === getRiskScore(val.inherent_likelihood, true)).id,
-        impact_id: scores.impactScores.find(score => score.score === getRiskScore(val.inherent_impact, false)).id,
+        likelihood_id: scores.likelihoodScores.find(score => score.score === getLikelihoodScore(val.inherent_likelihood)).id,
+        impact_id: scores.impactScores.find(score => score.score === getImpactScore(val.inherent_impact)).id,
         cia: cia_categories.filter(cia => Boolean(val[cia.name])).map(cia => cia.id),
         notes: val.notes,
         custom_id: val.customId
@@ -445,20 +451,20 @@ const RiskRegister = () => {
         payload.cia = cia;
       }
 
-      const il = scores.likelihoodScores.find(score => score.score === getRiskScore(val.inherent_likelihood, true)).id;
+      const il = scores.likelihoodScores.find(score => score.score === getLikelihoodScore(val.inherent_likelihood)).id;
       if (il !== row["Inherent Risk Impact Id"]) {
         payload.inherent_likelihood = il;
       }
-      const ii = scores.impactScores.find(score => score.score === getRiskScore(val.inherent_impact, false)).id;
+      const ii = scores.impactScores.find(score => score.score === getImpactScore(val.inherent_impact)).id;
       if (il !== row["Inherent Risk Impact Id"]) {
         payload.inherent_impact = ii;
       }
 
-      const rl = scores.likelihoodScores.find(score => score.score === getRiskScore(val.residual_likelihood, true)).id;
+      const rl = scores.likelihoodScores.find(score => score.score === getLikelihoodScore(val.residual_likelihood)).id;
       if (rl !== row["Residual Risk Likelihood Id"]) {
         payload.residual_likelihood = rl;
       }
-      const ri = scores.impactScores.find(score => score.score === getRiskScore(val.residual_impact, false)).id;
+      const ri = scores.impactScores.find(score => score.score === getImpactScore(val.residual_impact)).id;
       if (ri !== row["Residual Risk Impact Id"]) {
         payload.residual_impact = ri;
       }
@@ -475,17 +481,6 @@ const RiskRegister = () => {
         }
       }
     }
-  }
-
-  // Get a value between 0-100 from a small number
-  const getSliderValue = (num, isLikelihoodScore) => {
-    let min = 1;
-    let max = isLikelihoodScore ? scores.likelihoodScores.length : scores.impactScores.length;
-    let newMin = 0;
-    let newMax = 100;
-    // Applying linear interpolation formula, to convert a small value from 0-5/10 to a value between 0-100
-    let sliderValue = ((num - min) / (max - min)) * (newMax - newMin) + newMin;
-    return sliderValue;
   }
 
   // Map data to header
@@ -557,7 +552,7 @@ const RiskRegister = () => {
                 checkbox={true}
                 minCheckboxWidth={50}
                 serialNo={false}
-                resizeTable={true}
+                resizeTable={false}
                 resizeAfterColumns={1}
                 selectedRows={selectedRow}
                 setSelectedRows={setSelectedRow}
@@ -596,7 +591,7 @@ const RiskRegister = () => {
         viaLibrary={scenarioDialog.isViaLibrary}
         library={library}
         autocompleteOptions={{ categories, owners: filterDropdowns.owners.options }}
-        getSliderValue={getSliderValue}
+        getSliderValue={{ getLikelihoodSliderValue, getImpactSliderValue }}
         scores={scores}
         onFormSubmit={onRegisterFormSubmit}
       />
@@ -605,7 +600,7 @@ const RiskRegister = () => {
         open={actionDialog}
         closeHandler={closeAddActionForm}
         risks={getRegisterOptions()}
-        owners={owners.map(owner => ({ val: owner.id, text: owner.first_name }))}
+        owners={owners.map(owner => ({ val: owner.id, text: `${owner.first_name} ${owner.last_name}` }))}
         isCreateAction={true}
         riskVal={register[getCurrentIndex()]}
         onFormSubmit={handleAddActionFormSubmit}

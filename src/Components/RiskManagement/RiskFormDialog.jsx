@@ -11,6 +11,7 @@ import SelectCategories from './RiskRegister/SelectCategories';
 import { cia_categories } from '../../assets/data/RiskManagement/RiskRegister/RiskRegisterFilters';
 import SliderControl from './RiskRegister/SliderControl';
 import useLoading from '../Utils/Hooks/useLoading';
+import useSlider from '../Utils/Hooks/useSlider';
 
 // Custom input compoent
 const FormInput = ({ ...rest }) => (
@@ -48,7 +49,7 @@ const RiskFormDialog = ({
   library,
   isLibraryRow = false,
   autocompleteOptions: { categories, owners },
-  getSliderValue,
+  getSliderValue: {getLikelihoodSliderValue, getImpactSliderValue},
   scores,
   onFormSubmit
 }) => {
@@ -70,9 +71,6 @@ const RiskFormDialog = ({
   // Loading status for dialog
   const [isFormLoading, setisFormLoading] = useState(false);
 
-  // state to handle inherent risk selector accordion open and close;
-  const [inherentAccordion, setInherentAccordion] = useState(false)
-
   // Checking if scenario is a object in string form by trying to parse it, and returning description
   const scenarioDescription = useMemo(() => {
     if (!row) return ""
@@ -83,7 +81,6 @@ const RiskFormDialog = ({
     if (!row || !isLibraryRow) return;
     return row["Categories"];
   }, [row]);
-
 
   const categoriesList = useMemo(() => {
     if (!row || isLibraryRow) return;
@@ -103,32 +100,26 @@ const RiskFormDialog = ({
       // Boolean flag is to check if score is of likelihood or impact
       // If it is library row, set default risk value to 1 (slider value 0)
       inherent_likelihood: isLibraryRow
-        ? getSliderValue(
-          scores.likelihoodScores.length > 0 && scores.likelihoodScores[0].score,
-          true
+        ? getLikelihoodSliderValue(
+          scores.likelihoodScores.length > 0 && scores.likelihoodScores[0].score
         )
-        : getSliderValue(
-          scores.likelihoodScores.find(score => score.id === row["Inherent Risk Likelihood Id"]).score,
-          true
+        : getLikelihoodSliderValue(
+          scores.likelihoodScores.find(score => score.id === row["Inherent Risk Likelihood Id"]).score
         ),
       inherent_impact: isLibraryRow
-        ? getSliderValue(
-          scores.impactScores.length > 0 && scores.impactScores[0].score,
-          false
+        ? getImpactSliderValue(
+          scores.impactScores.length > 0 && scores.impactScores[0].score
         )
-        : getSliderValue(
+        : getImpactSliderValue(
           scores.impactScores.find(score => score.id === row["Inherent Risk Impact Id"]).score,
-          false
         ),
       // Setting default slider values of residual risk scores to 1 (One) 
       // Here it is assumed first score object is the lowest score
-      residual_likelihood: getSliderValue(
+      residual_likelihood: getLikelihoodSliderValue(
         scores.likelihoodScores.length > 0 && scores.likelihoodScores[0].score,
-        true
       ),
-      residual_impact: getSliderValue(
+      residual_impact: getImpactSliderValue(
         scores.impactScores.length > 0 && scores.impactScores[0].score,
-        false
       ),
       notes: "Notes" in row ? row["Notes"] : "",
       customId: "Custom Id" in row ? row["Custom Id"] : ""
@@ -144,32 +135,26 @@ const RiskFormDialog = ({
       // Boolean flag is to check if score is of likelihood or impact
       // If it is library row, set default risk value to 1 (slider value 0)
       inherent_likelihood: isLibraryRow
-        ? getSliderValue(
-          scores.likelihoodScores.length > 0 && scores.likelihoodScores[0].score,
-          true
+        ? getLikelihoodSliderValue(
+          scores.likelihoodScores.length > 0 && scores.likelihoodScores[0].score
         )
-        : getSliderValue(
-          scores.likelihoodScores.find(score => score.id === row["Inherent Risk Likelihood Id"]).score,
-          true
+        : getLikelihoodSliderValue(
+          scores.likelihoodScores.find(score => score.id === row["Inherent Risk Likelihood Id"]).score
         ),
       inherent_impact: isLibraryRow
-        ? getSliderValue(
-          scores.impactScores.length > 0 && scores.impactScores[0].score,
-          false
+        ? getImpactSliderValue(
+          scores.impactScores.length > 0 && scores.impactScores[0].score
         )
-        : getSliderValue(
-          scores.impactScores.find(score => score.id === row["Inherent Risk Impact Id"]).score,
-          false
+        : getImpactSliderValue(
+          scores.impactScores.find(score => score.id === row["Inherent Risk Impact Id"]).score
         ),
       // Setting default slider values of residual risk scores to 1 (One) 
       // Here it is assumed first score object is the lowest score
-      residual_likelihood: getSliderValue(
-        scores.likelihoodScores.find(score => score.id === row["Residual Risk Likelihood Id"])?.score || scores.likelihoodScores[0].score,
-        true
+      residual_likelihood: getLikelihoodSliderValue(
+        scores.likelihoodScores.find(score => score.id === row["Residual Risk Likelihood Id"])?.score || scores.likelihoodScores[0].score
       ),
-      residual_impact: getSliderValue(
-        scores.impactScores.find(score => score.id === row["Residual Risk Impact Id"])?.score || scores.impactScores[0].score,
-        false
+      residual_impact: getImpactSliderValue(
+        scores.impactScores.find(score => score.id === row["Residual Risk Impact Id"])?.score || scores.impactScores[0].score
       ),
       notes: "Notes" in row ? row["Notes"] : "",
       customId: "Custom Id" in row ? row["Custom Id"] : "",
@@ -182,13 +167,11 @@ const RiskFormDialog = ({
     : {
       // Setting default slider values to 1 (One) 
       // Here it is assumed first score object is the lowest score
-      inherent_likelihood: getSliderValue(
-        scores.likelihoodScores.length > 0 && scores.likelihoodScores[0].score,
-        true
+      inherent_likelihood: getLikelihoodSliderValue(
+        scores.likelihoodScores.length > 0 && scores.likelihoodScores[0].score
       ),
-      inherent_impact: getSliderValue(
-        scores.impactScores.length > 0 && scores.impactScores[0].score,
-        false
+      inherent_impact: getImpactSliderValue(
+        scores.impactScores.length > 0 && scores.impactScores[0].score
       )
     }
 
@@ -211,10 +194,6 @@ const RiskFormDialog = ({
     customId: { required: "This field is required." },
   };
 
-  const handleSliderError = (error) => {
-    setInherentAccordion(true);
-  }
-
   const onSubmit = async (values) => {
     setisFormLoading(true);
     await onFormSubmit(values);
@@ -225,13 +204,13 @@ const RiskFormDialog = ({
 
   const getSliderMarks = (isLikelihoodRisk) => (
     isLikelihoodRisk ? scores.likelihoodScores.map(score => ({
-      value: getSliderValue(score.score, true),
+      value: getLikelihoodSliderValue(score.score),
       label: score.score,
       name: score.likelihood_name,
       desc: score.likelihood_description
     })) :
       scores.impactScores.map(score => ({
-        value: getSliderValue(score.score, false),
+        value: getImpactSliderValue(score.score),
         label: score.score,
         name: score.impact_name,
         desc: score.impact_description
@@ -469,7 +448,6 @@ const RiskFormDialog = ({
                         // Boolean flag is to check if score is of likelihood or impact
                         marks={getSliderMarks(true)}
                         classes={classes}
-                        handleError={handleSliderError}
                         isCreateForm={isCreateForm()}
                       />
                     </Box>
@@ -482,7 +460,6 @@ const RiskFormDialog = ({
                         // Boolean flag is to check if score is of likelihood or impact
                         marks={getSliderMarks(false)}
                         classes={classes}
-                        handleError={handleSliderError}
                         isCreateForm={isCreateForm()}
                       />
                     </Box>

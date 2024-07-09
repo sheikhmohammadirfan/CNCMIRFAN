@@ -3,7 +3,7 @@ import { Autocomplete } from '@mui/material'
 import React from 'react'
 import { Controller } from 'react-hook-form'
 
-const SelectCategories = ({ name, label, control, rules, multiple, optionList, ...rest }) => {
+const SelectCategories = ({ name, label, control, rules, multiple, optionList, disabled, ...rest }) => {
 
   return (
     <Controller
@@ -16,12 +16,12 @@ const SelectCategories = ({ name, label, control, rules, multiple, optionList, .
             size='medium'
             multiple={multiple}
             value={value || []}
-            onChange={(e, newVal) => onChange(newVal)}
-            options={optionList}
+            onChange={(e, newVal) => !disabled && onChange(newVal)}
+            options={!disabled ? optionList : []}
             getOptionLabel={(option) => option.category_name}
             filterSelectedOptions
             loading={true}
-            loadingText={"Loading..."}
+            loadingText={disabled ? "Can't be changed" : "Loading..."}
             renderInput={(params) => (
               <TextField
                 error={Boolean(error)}
@@ -32,6 +32,7 @@ const SelectCategories = ({ name, label, control, rules, multiple, optionList, .
                 {...params}
               />
             )}
+            disabled={disabled}
             {...rest}
           />
         )

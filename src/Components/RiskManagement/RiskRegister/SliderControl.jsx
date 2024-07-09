@@ -2,14 +2,13 @@ import { Box, Divider, Icon, Slider, Tooltip, Typography } from '@material-ui/co
 import React from 'react'
 import { Controller } from 'react-hook-form'
 
-const SliderControl = ({ name, control, rules, marks, classes, handleError, isCreateForm, ...props }) => {
+const SliderControl = ({ name, control, rules, marks, classes, isCreateForm, ...props }) => {
   return (
     <Controller
       name={name}
       control={control}
       rules={rules?.[name]}
       render={({ field: { value, onChange }, fieldState: { error } }) => {
-        error && handleError(error);
         return (
           <>
             <Box display={!isCreateForm && "flex"} gridColumnGap={30}>

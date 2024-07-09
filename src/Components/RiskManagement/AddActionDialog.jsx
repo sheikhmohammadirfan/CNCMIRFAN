@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react'
 import DialogBox from '../Utils/DialogBox'
-import { Typography } from '@material-ui/core'
+import { FormHelperText, TextField, Typography } from '@material-ui/core'
 import { useStyle } from './RmUtils';
-import { Box, Button, Grid } from '@mui/material';
+import { Autocomplete, Box, Button, Grid } from '@mui/material';
 import { DateControl, Form, SelectControl, TextControl } from '../Utils/Control';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { getRegister } from '../../Service/RiskManagement/RiskRegister.service';
 import useLoading from '../Utils/Hooks/useLoading';
 
@@ -74,8 +74,13 @@ const AddActionDialog = ({
     notes: { required: 'This field is required' },
   };
 
+  const disabled = Boolean(actionVal) || Boolean(riskVal)
+
   let formValues = {
-    risk: (riskVal && `${riskVal["ID"]}`) || (actionVal && actionVal.risk.id),
+    risk: (
+      (riskVal && risks.find(risk => risk.val === riskVal["ID"])))
+      ||
+      (actionVal && risks.find(risk => risk.val === actionVal.risk.id)),
     owner: (riskVal && `${riskVal["Owner"]}`) || (actionVal && actionVal.risk.owner),
     due_date: actionVal ? new Date(actionVal.due_date) : null,
     action: actionVal && actionVal.task,
@@ -86,6 +91,8 @@ const AddActionDialog = ({
   const { handleSubmit, getValues, setValue, control, reset } = useForm({
     defaultValues: formValues,
   });
+
+
 
   useEffect(() => {
     reset(formValues);
@@ -121,18 +128,35 @@ const AddActionDialog = ({
             onSubmit={handleSubmit(onSubmit)}
           >
             <Grid container spacing={1}>
-
               <Grid item xs={12}>
-                <SelectControl
+                <Controller
                   name="risk"
-                  label="Risk"
-                  variant="outlined"
-                  options={risks}
-                  loading={isLoading('risk')}
-                  styleProps={{
-                    fullWidth: true,
-                  }}
-                  disabled={(riskVal || actionVal) ? true : false}
+                  control={control}
+                  rules={validation.risk}
+                  render={({ field: { value, onChange }, fieldState: { error } }) => (
+                    <>
+                      <Autocomplete
+                        value={value}
+                        onChange={(e, newVal) => !disabled && onChange(newVal)}
+                        options={disabled ? [] : risks}
+                        disabled={disabled}
+                        noOptionsText={disabled ? "Already Selected !" : "No Options"}
+                        // defaultValue={riskVal && risks.find(risk => risk.val === riskVal["ID"])}
+                        getOptionLabel={(option) => option.text ? option.text : ""}
+                        renderInput={(params) => (
+                          // Added error prop here. This results in border becoming red if there's some error
+                          <TextField error={error ? true : false} variant="outlined" label="Risk" {...params} />
+                        )}
+                        loading={isLoading("risk")}
+                      />
+                      {/* If error, show the error message */}
+                      {error &&
+                        <FormHelperText style={{ marginLeft: '14px' }} error={Boolean(error)}>
+                          {error.message}
+                        </FormHelperText>
+                      }
+                    </>
+                  )}
                 />
               </Grid>
 

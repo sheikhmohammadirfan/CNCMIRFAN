@@ -286,16 +286,14 @@ function DataTable({
       {...rest}
     >
       <Table
-        className={resizeTable ? classes.table : ""}
+        className={classes.table}
         style={
-          resizeTable
-            ? {
-              gridTemplateColumns: generateColumns(),
-              gridTemplateRows: Array(rowData.length + 1)
-                .fill("50px")
-                .join(" "),
-            }
-            : {}
+          {
+            gridTemplateColumns: generateColumns(),
+            // gridTemplateRows: Array(rowData.length + 1)
+            //   .fill("50px")
+            //   .join(" "),
+          }
         }
         ref={tableRef}
         data-test="datatable-table"

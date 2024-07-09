@@ -29,7 +29,7 @@ const useStyle = makeStyles(theme => ({
   }
 }))
 
-const SettingsHeader = ({ title, showButton }) => {
+const SettingsHeader = ({ title, showActionButtons }) => {
 
   // State to manage md breakpoint
   const theme = useTheme();
@@ -61,8 +61,8 @@ const SettingsHeader = ({ title, showButton }) => {
         borderColor: '#d9d9d9'
       }}
     >
-      <Typography color="primary" style={{fontSize: '1rem', fontWeight: 'bolder'}}>{title}</Typography>
-      <Box display="flex" gridColumnGap={8}>
+      <Typography color="primary" style={{ fontSize: '1rem', fontWeight: 'bolder' }}>{title}</Typography>
+      <Box display={showActionButtons ? "flex" : "none"} gridColumnGap={8}>
         <Button
           size='small'
           disableElevation

@@ -1,17 +1,16 @@
 import { Box, Chip, FormControl, FormControlLabel, Grid, Radio, RadioGroup, Typography } from '@mui/material'
-import React, { useMemo, useState } from 'react'
+import React, { useContext, useMemo, useState } from 'react'
 import SettingsHeader from './SettingsHeader'
 import { HeaderCell, generateRows, mapDataToHeader, useStyle } from './SettingsUtils'
 import DataTable from '../../Utils/DataTable/DataTable'
 import { SCORE_COLS, SCORE_COL_WIDTHS, SCORE_GROUP_COLS, SCORE_GROUP_COL_WIDTHS } from '../../../assets/data/RiskManagement/Settings/SettingsColumns'
 import RadioControl from '../../Utils/Control/Radio.control'
+import RiskManagementContext from '../RiskManagementContext'
 
-const Settings = ({
-  categories: { categories, setCategories },
-  owners: { owners, setOwners },
-  scores: { likelihoodScores, setLikelihoodScores, impactScores, setImpactScores },
-  scoreGroups: { riskScoreGroups, setScoreGroups }
-}) => {
+const Settings = () => {
+
+  // Using context to get values
+  const { categories: { categories }, scores: { likelihoodScores, impactScores }, scoreGroups: { riskScoreGroups } } = useContext(RiskManagementContext);
 
   const [likelihoodSelectedRow, setLikelihoodSelectedRow] = useState([])
   const [impactSelectedRow, setImpactSelectedRow] = useState([])
@@ -57,11 +56,11 @@ const Settings = ({
   const classes = useStyle();
 
   return (
-    <Box display="flex" flexDirection="column" rowGap={4}>
+    <Box display="flex" flexDirection="column" rowGap={4} pb={10}>
 
       <Box>
-        <Typography variant='h6' color='primary' fontWeight='bold' sx={{opacity: 0.8}}>Risk Management Settings</Typography>
-        <Typography sx={{fontSize: '0.9rem', opacity: 0.8}}>Manage your settings across risk management module from here.</Typography>
+        <Typography variant='h6' color='primary' fontWeight='bold' sx={{ opacity: 0.8 }}>Risk Management Settings</Typography>
+        <Typography sx={{ fontSize: '0.9rem', opacity: 0.8 }}>Manage your settings across risk management module from here.</Typography>
       </Box>
 
       <Box>
@@ -96,7 +95,7 @@ const Settings = ({
       </Box>
 
       <Box>
-        <SettingsHeader title="Custom Categories" />
+        <SettingsHeader title="Custom Categories" showActionButtons={true} />
         <Box
           p={2}
           border={1}
@@ -155,10 +154,10 @@ const Settings = ({
               verticalBorder={true}
               header={mapTableHeader(SCORE_COLS)}
               rowList={mapTableBody(likelihoodScores || [], SCORE_COLS, likelihoodSelectedRow)}
-              checkbox={true}
+              checkbox={false}
               minCheckboxWidth={50}
               serialNo={false}
-              resizeTable={true}
+              resizeTable={false}
               resizeAfterColumns={1}
               selectedRows={likelihoodSelectedRow}
               setSelectedRows={setLikelihoodSelectedRow}
@@ -189,10 +188,10 @@ const Settings = ({
               verticalBorder={true}
               header={mapTableHeader(SCORE_COLS)}
               rowList={mapTableBody(impactScores || [], SCORE_COLS, impactSelectedRow)}
-              checkbox={true}
+              checkbox={false}
               minCheckboxWidth={50}
               serialNo={false}
-              resizeTable={true}
+              resizeTable={false}
               resizeAfterColumns={1}
               selectedRows={impactSelectedRow}
               setSelectedRows={setImpactSelectedRow}
@@ -214,10 +213,10 @@ const Settings = ({
           verticalBorder={true}
           header={mapTableHeader(SCORE_GROUP_COLS)}
           rowList={mapTableBody(riskScoreGroups || [], SCORE_GROUP_COLS, impactSelectedRow)}
-          checkbox={true}
+          checkbox={false}
           minCheckboxWidth={50}
           serialNo={false}
-          resizeTable={true}
+          resizeTable={false}
           resizeAfterColumns={1}
           selectedRows={scoreGroupSelectedRow}
           setSelectedRows={setScoreGroupSelectedRow}

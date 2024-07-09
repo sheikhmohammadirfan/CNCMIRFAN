@@ -70,6 +70,9 @@ const RiskManagement = () => {
       impactScores,
       setImpactScores,
       riskScoreGroups
+    },
+    scoreGroups: {
+      riskScoreGroups
     }
   }
 
@@ -82,29 +85,16 @@ const RiskManagement = () => {
       <RiskManagementContext.Provider value={contextValues}>
         <Switch>
           <Route exact path="/risk-management/risk-library">
-            <RiskLibrary
-              categories={{ categories, setCategories }}
-              owners={{ owners, setOwners }}
-              scores={{ likelihoodScores, setLikelihoodScores, impactScores, setImpactScores }}
-            />
+            <RiskLibrary />
           </Route>
           <Route exact path="/risk-management/risk-register">
             <RiskRegister />
           </Route>
           <Route exact path="/risk-management/action-tracker">
-            <ActionTracker
-              categories={{ categories, setCategories }}
-              owners={{ owners, setOwners }}
-              scores={{ likelihoodScores, setLikelihoodScores, impactScores, setImpactScores }}
-            />
+            <ActionTracker />
           </Route>
           <Route exact path="/risk-management/settings">
-            <Settings
-              categories={{ categories, setCategories }}
-              owners={{ owners, setOwners }}
-              scores={{ likelihoodScores, setLikelihoodScores, impactScores, setImpactScores }}
-              scoreGroups={{ riskScoreGroups, setRiskScoreGroups }}
-            />
+            <Settings />
           </Route>
         </Switch>
       </RiskManagementContext.Provider>

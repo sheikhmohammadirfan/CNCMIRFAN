@@ -93,7 +93,7 @@ const FilterDropdown = ({
   const [open, setOpen] = useState(false);
   const handleClose = () => {
     setOpen(false);
-    trigger();
+    trigger(false, true);
   }
 
   // Handling checkbox clicks and changing filters

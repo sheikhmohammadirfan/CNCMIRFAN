@@ -102,10 +102,8 @@ export const useStyle = makeStyles(theme => ({
 
   // Style to make all cell height of 3 line
   tableCell: {
-    whiteSpace: "pre",
     overflow: "hidden",
     userSelect: "none",
-    textWrap: "nowrap"
   },
 
   cellLabel: {
@@ -245,7 +243,7 @@ const mapDataToRow = (row, rowIndex, register, owners, columns, matchedCell) => 
 const getCellValue = (row, colName, register, owners) => {
   if (colName === 'risk') {
     if (register.length === 0) return 'load';
-    else return register.find(risk => risk.id === row[colName].id).scenario.scenario
+    else return register.find(risk => risk.id === row.id).scenario.scenario
   }
   else if (colName === 'owner') {
     if (owners.length === 0) return 'load';

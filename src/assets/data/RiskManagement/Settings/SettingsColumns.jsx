@@ -6,7 +6,7 @@ export const SCORE_COLS = [
 ]
 
 export const SCORE_COL_WIDTHS = [
-  100, 300, 800
+  100, 300, 850
 ]
 
 export const SCORE_COL_NAMES_MAP = {
@@ -25,5 +25,5 @@ export const SCORE_GROUP_COLS = [
 ]
 
 export const SCORE_GROUP_COL_WIDTHS = [
-  200, 200, 800
+  200, 200, 850
 ]

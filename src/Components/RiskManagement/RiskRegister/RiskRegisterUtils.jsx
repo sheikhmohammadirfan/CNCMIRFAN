@@ -106,7 +106,6 @@ export const useStyle = makeStyles(theme => ({
 
   // Style to make all cell height of 3 line
   tableCell: {
-    whiteSpace: "pre",
     overflow: "hidden",
     userSelect: "none",
   },

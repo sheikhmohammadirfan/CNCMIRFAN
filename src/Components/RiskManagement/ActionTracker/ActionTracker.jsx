@@ -1,6 +1,6 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 import actionTrackerFilters from '../../../assets/data/RiskManagement/ActionTracker/ActionTrackerFilters'
-import { Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Grid } from '@material-ui/core';
+import { Box, Grid } from '@material-ui/core';
 import ActionTrackerHeader from './ActionTrackerHeader';
 import AddActionDialog from '../AddActionDialog';
 import { getRegister } from '../../../Service/RiskManagement/RiskRegister.service';
@@ -11,15 +11,16 @@ import { ACTION_TABLE_COL_WIDTHS, ACTION_TRACKER_COLUMNS, HEADER_TABLE_COLS_MAP 
 import SkeletonBox from '../../Utils/SkeletonBox';
 import DataTable from '../../Utils/DataTable/DataTable';
 import { deletes, patch, put } from '../../../Service/CrudFactory';
-import { HEADER_TABLE_NAME_MAP } from '../../../assets/data/RiskManagement/RiskLibrary/LibraryColumns';
 import DeleteConfirmationDialog from './DeleteConfirmationDialog';
+import RiskManagementContext from '../RiskManagementContext';
 
-const ActionTracker = ({
-  owners: { owners, getOwners }
-}) => {
+const ActionTracker = () => {
 
   // React state to maintain loading status
   const { isLoading, startLoading, stopLoading } = useLoading();
+
+  // Get owners from RiskManagementContext
+  const { owners: { owners } } = useContext(RiskManagementContext);
 
   // ACTIONS TABLE: State to store the action table data
   const [actions, setActions] = useState([])
@@ -35,7 +36,7 @@ const ActionTracker = ({
     total_items: null,
     total_pages: null,
   });
-  const updatePageSize = (size) => setPagination(prev => ({ ...prev, page_size: size }));
+  const updatePageSize = (size) => setPagination(prev => ({ ...prev, page_no: 1, page_size: size }));
   const updatePageNumber = (page) => setPagination(prev => ({ ...prev, page_no: page }));
 
   const abortControllerRef = useRef(null);
@@ -140,7 +141,7 @@ const ActionTracker = ({
 
   useEffect(() => {
     (async () => {
-      const { data } = await getRegister({ filters: {}, search: '' })
+      const { data } = await getRegister({ filters: {}, search: '', page_size: 30 })
       setRegister(data.risks);
     })()
   }, [owners])
@@ -169,7 +170,7 @@ const ActionTracker = ({
     const formattedDate = `${year}-${month}-${day}`;
 
     const payload = {
-      risk_id: values.risk,
+      risk_id: values.risk.val,
       description: values.action,
       due_date: formattedDate,
       assignee: owners.find(owner => owner.id === values.owner)?.id || '',
@@ -281,7 +282,7 @@ const ActionTracker = ({
               checkbox={true}
               minCheckboxWidth={50}
               serialNo={false}
-              resizeTable={true}
+              resizeTable={false}
               resizeAfterColumns={1}
               selectedRows={selectedRows}
               setSelectedRows={setSelectedRows}
