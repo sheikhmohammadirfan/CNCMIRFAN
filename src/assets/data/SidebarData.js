@@ -218,5 +218,32 @@ export const SidebarData = [
         icon: "settings"
       }
     ]
+  },
+
+  {
+    icon: "accessibility",
+    title: "Access Management",
+    collapseMenu: [
+      {
+        title: "Accounts",
+        component: Link,
+        to: "/access_management/accounts",
+        icon: "menu_book"
+      },
+      {
+        title: "Reviews",
+        component: Link,
+        to: "/access_management/reviews",
+        icon: "list"
+      },
+
+      {
+        title: "Settings",
+        component: Link,
+        to: "//access_management/settings",
+        icon: "settings"
+      }
+    ]
   }
+
 ];

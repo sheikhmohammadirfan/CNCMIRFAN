@@ -24,6 +24,7 @@ import Integrate from "./Pages/Integrate";
 import ParamsRoutes from "./Components/Utils/Routers/ParamsRoutes";
 import RiskManagement from "./Pages/RiskManagement";
 import React from "react";
+import AccessManagement from "./Pages/AccessManagement";
 import VendorManagement from "./Pages/VendorManagement";
 
 // Custom values
@@ -151,6 +152,10 @@ function App() {
                     <Route path="/risk-management">
                       <RiskManagement title="Risk Management" />
                     </Route>
+                    <Route path="/access_management/">
+                      <AccessManagement title="Access Management" />
+                    </Route>
+                    
                   </div>
                 </Box>
               </Box>
