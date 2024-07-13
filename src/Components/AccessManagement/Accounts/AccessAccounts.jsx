@@ -21,7 +21,6 @@ import {
   statusOptions,
   mfaOptions,
 } from "../Accounts/AccountsColumns";
-import AccessTable from "./AccessTable";
 
 const useStyle = makeStyles((theme) => ({
   tableStyle: {
