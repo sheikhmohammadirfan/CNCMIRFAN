@@ -7,7 +7,6 @@ import {
   Typography,
   IconButton,
   Tooltip,
-  makeStyles,
   Icon,
   Button,
 } from "@material-ui/core";
@@ -28,16 +27,10 @@ import {
 } from "../../../Service/VendorManagement/Review.service";
 import { useStyle } from "../Utils";
 
-const VendorDetails = ({
-  activeRows,
-  setActiveRows,
-  archivedRows,
-  setArchivedRows,
-}) => {
+const VendorDetails = ({ isLoading, vendorList }) => {
   const classes = useStyle();
-  const { id } = useParams();
+  const { vendorId } = useParams();
   const [vendorData, setVendorData] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState(0);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeDetailsTab, setActiveDetailsTab] = useState(0);
@@ -57,22 +50,18 @@ const VendorDetails = ({
   };
 
   useEffect(() => {
-    // Wait for the rows
-    if (archivedRows.length < 1 || activeRows < 1) {
-      return;
-    }
-    (async () => {
-      try {
-        const allRows = [...activeRows, ...archivedRows];
-        let data = allRows.find(({ ID }) => ID == id);
+    if (!isLoading()) {
+      (async () => {
+        const allRows = vendorList;
+        let data = allRows.find(({ id }) => id == vendorId);
         const [findingsRes, referencesRes] = await Promise.all([
           getReviewFindings(),
           getReviewReferences(),
         ]);
 
-        let findings = findingsRes.data.filter((finding) => finding.ID === id);
+        let findings = findingsRes.data.filter((finding) => finding.ID === vendorId);
         let references = referencesRes.data.filter(
-          (reference) => reference.ID === id
+          (reference) => reference.ID === vendorId
         );
 
         const combinedData = {
@@ -84,21 +73,12 @@ const VendorDetails = ({
         setFindingsRows(findings);
         setReferencesRows(references);
         setVendorData(combinedData);
-      } catch (err) {
-        console.log(err);
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, [archivedRows, activeRows, id]);
+      })();
+    }
+  }, [isLoading, vendorList]);
 
-  if (loading) {
+  if (!vendorData || !vendorData.vendor_name) {
     return <CircularProgress />;
-  }
-
-  if (!vendorData || !vendorData["NAME / CATEGORY"]) {
-    return <div>No data found for this vendor.</div>;
-  } else {
   }
 
   return (
@@ -106,32 +86,35 @@ const VendorDetails = ({
       <Box justifyContent="space-between" display="flex">
         <Box p={2}>
           <Typography variant="h4">
-            {vendorData["NAME / CATEGORY"].name}
+            {vendorData.vendor_name}
           </Typography>
           <Box display="flex" mt={2}>
             <Box mr={4}>
               <Typography variant="body2">
-                {vendorData["NAME / CATEGORY"].category}
+                {vendorData.category}
               </Typography>
             </Box>
             <Box mr={4}>
               <Typography variant="body2">
-                {vendorData["INHERENT RISK"]} inherent risk
+                {vendorData.inherent_risk} inherent risk
               </Typography>
             </Box>
-            <Box>
+            {/*This needs Security Review api*/}
+            {/* <Box>
               <Typography variant="body2">
                 {vendorData["SECURITY REVIEW"].due_date
                   ? `Security review due ${vendorData["SECURITY REVIEW"].due_date}`
                   : "No due date"}
               </Typography>
-            </Box>
+            </Box> */}
           </Box>
         </Box>
         <Box p={2}>
           <Box display="flex" mt={2}>
             <Box mr={4}>
-              <Button variant="outlined" color="primary">Configure inherent risk</Button>
+              <Button variant="outlined" color="primary">
+                Configure inherent risk
+              </Button>
             </Box>
             <Box>
               <Button variant="outlined" color="primary">
@@ -149,7 +132,7 @@ const VendorDetails = ({
             <Overview
               sidebarOpen={sidebarOpen}
               findings={findingsRows}
-              loading={loading}
+              loading={isLoading}
             />
           </TabPanel>
           <TabPanel activeTab={activeTab} index={1}>
@@ -159,7 +142,7 @@ const VendorDetails = ({
             <References
               references={referencesRows}
               setReferences={setReferencesRows}
-              loading={loading}
+              loading={isLoading}
             />
           </TabPanel>
           <TabPanel activeTab={activeTab} index={3}>

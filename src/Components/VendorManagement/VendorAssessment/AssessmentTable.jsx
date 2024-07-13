@@ -29,7 +29,7 @@ const AssessmentTable = ({
   const history = useHistory();
 
   const handleRowClick = (rowIndex) => {
-    const vendorId = filteredRows[rowIndex].ID;
+    const vendorId = filteredRows[rowIndex].id;
     history.push(`/vendor_management/${vendorId}`);
     console.log("vendorId", vendorId);
   };

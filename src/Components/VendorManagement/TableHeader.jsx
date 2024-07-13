@@ -30,11 +30,8 @@ const useStyle = makeStyles((theme) => ({
     },
     "& .MuiOutlinedInput-root": {
       borderRadius: 7,
-      // borderTopRightRadius: 0,
-      // borderBottomRightRadius: 0,
       height: 40,
     },
-    // overflow: "hidden"
   },
   actionButton: {
     "&.Mui-disabled": {
@@ -151,6 +148,7 @@ const TableHeader = ({
                 key={index}
                 onClick={button.onClick}
                 disabled={button.disabled}
+                className={classes.actionButton}
               >
                 {button.label}
               </Button>
@@ -172,7 +170,7 @@ const TableHeader = ({
         </Box>
 
         {/* Dropdown to show and hide columns */}
-        <Box mr={4}>
+        <Box mr={0}>
           <ManageColumns
             open={ismanageColsOpen}
             handleClose={closeManageColsDropdown}

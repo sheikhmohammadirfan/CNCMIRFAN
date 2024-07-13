@@ -11,31 +11,24 @@ import VendorComplianceReports from "../Components/VendorManagement/VendorCompli
 import SecurityReview from "../Components/VendorManagement/SecurityReview/SecurityReview";
 import VendorDetails from "../Components/VendorManagement/VendorDetails/VendorDetails";
 import { useState, useEffect } from "react";
-import {
-  getActiveRows,
-  getArchivedRows,
-} from "../Service/VendorManagement/Assessment.service";
 import useLoading from "../Components/Utils/Hooks/useLoading";
+import { listVendors } from "../Service/VendorManagement/VendorManagement.service";
 
 const VendorManagement = ({ title }) => {
   DocumentTitle(title);
 
+  const [vendorList, setVendorList] = useState([]);
   const { isLoading, startLoading, stopLoading } = useLoading();
-
-  // Rows for Vendor Assessment and Security Review
-  const [activeRows, setActiveRows] = useState([]);
-  const [archivedRows, setArchivedRows] = useState([]);
-
+  
+  // Fetch the list of vendors.
   useEffect(() => {
     (async () => {
       startLoading();
       try {
-        const [activeRes, archivedRes] = await Promise.all([
-          getActiveRows(),
-          getArchivedRows(),
-        ]);
-        setActiveRows(activeRes.data);
-        setArchivedRows(archivedRes.data);
+        const { data } = await listVendors();
+        if (data) {
+          setVendorList(data);
+        }
       } catch (err) {
         console.log(err);
       } finally {
@@ -51,7 +44,10 @@ const VendorManagement = ({ title }) => {
           <Redirect to="/vendor_management/risk_dashboard" />
         </Route>
         <Route exact path="/vendor_management/requirement_analysis">
-          <Discovery setActiveRows={setActiveRows} />
+          <Discovery
+            isLoading={isLoading}
+            vendorList={vendorList}
+          />
         </Route>
         <Route exact path="/vendor_management/risk_dashboard">
           <VendorRiskDashboard />
@@ -59,10 +55,7 @@ const VendorManagement = ({ title }) => {
         <Route exact path="/vendor_management/assessment">
           <VendorAssessment
             isLoading={isLoading}
-            activeRows={activeRows}
-            setActiveRows={setActiveRows}
-            archivedRows={archivedRows}
-            setArchivedRows={setArchivedRows}
+            vendorList={vendorList}
           />
         </Route>
         <Route exact path="/vendor_management/procurement">
@@ -80,13 +73,10 @@ const VendorManagement = ({ title }) => {
         <Route exact path="/vendor_management/settings">
           <VendorSettings />
         </Route>
-        <Route exact path="/vendor_management/:id">
+        <Route exact path="/vendor_management/:vendorId">
           <VendorDetails
             isLoading={isLoading}
-            activeRows={activeRows}
-            setActiveRows={setActiveRows}
-            archivedRows={archivedRows}
-            setArchivedRows={setArchivedRows}
+            vendorList={vendorList}
           />
         </Route>
       </Switch>

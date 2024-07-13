@@ -36,7 +36,7 @@ const ReviewTable = ({
   const mapTableHeader = () => mapDataToHeader(visibleColumns);
 
   const mapTableBody = () =>
-    generateRows(filteredRows, visibleColumns, selectedRows, matchedCell);
+    generateRows(filteredRows, visibleColumns, selectedRows, matchedCell, handleRowClick);
 
   return (
     <Box className={classes.tableContainer}>
@@ -71,7 +71,6 @@ const ReviewTable = ({
               minCellWidth={visibleColumns.map(
                 (name) => review_columns_width[allColumns.indexOf(name)]
               )}
-              handleRowClick={handleRowClick}
             />
           </Grid>
         </Grid>

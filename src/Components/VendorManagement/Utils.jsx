@@ -259,6 +259,17 @@ const mapDataToRow = (row, rowIndex, columns, matchedCell = []) =>
   columns.map((colName) => {
     let CellComponent = columnToCellMap[colName];
     let cellValue = row[colName];
+    const columnMapping = {
+      "NAME / CATEGORY": { name: row.vendor_name, category: row.category },
+      "SOURCE": row.source,
+      "INHERENT RISK": row.inherent_risk,
+      "# OF ACCOUNTS": row.number_of_accounts,
+      "DATE DISCOVERED": row.date_discovered,
+    };
+
+    if (cellValue === undefined) {
+      cellValue = columnMapping[colName]
+    }
 
     return {
       text: CellComponent ? (
@@ -287,7 +298,8 @@ export const generateRows = (
   columns,
   selectedList,
   matchedCell = [],
-  handleRowClick = () => {}
+  handleRowClick = () => {},
+  rowStyle = {}
 ) => {
   // count of number of rows
   const rowCount = data.length;
@@ -299,7 +311,7 @@ export const generateRows = (
     rowData.push({
       data: mapDataToRow(data[i], i, columns, matchedCell),
       props: {
-        selected: selectedList.indexOf(data[i].id) !== -1,
+        selected: selectedList.indexOf(i) !== -1,
         onClick: () => handleRowClick(i),
       },
     });

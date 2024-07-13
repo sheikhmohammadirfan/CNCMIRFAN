@@ -147,6 +147,54 @@ const SecurityReviewCell = ({ cellValue }) => {
   );
 };
 
+const SecurityOwnerCell = ({ cellValue }) => {
+  const classes = useStyle();
+
+  if (!cellValue) {
+    return (
+      <Box>
+        <Typography variant="body1" noWrap className={classes.cellLabel}>
+          No Data
+        </Typography>
+      </Box>
+    );
+  }
+
+  const { owner } = cellValue;
+
+  return (
+    <Box>
+      <Typography variant="body2" noWrap className={classes.cellLabel}>
+        {owner}
+      </Typography>
+    </Box>
+  );
+};
+
+const LastReviewedCell = ({ cellValue }) => {
+  const classes = useStyle();
+
+  if (!cellValue) {
+    return (
+      <Box>
+        <Typography variant="body1" noWrap className={classes.cellLabel}>
+          No Data
+        </Typography>
+      </Box>
+    );
+  }
+
+  const { date } = cellValue;
+
+  return (
+    <Box>
+      <Typography variant="body2" noWrap className={classes.cellLabel}>
+        {date}
+      </Typography>
+    </Box>
+  );
+};
+
 const columnToCellMap = {
   "NAME / CATEGORY": NameCategoryCell,
   SOURCE: SourceCell,
@@ -154,6 +202,8 @@ const columnToCellMap = {
   "# OF ACCOUNTS": AccountsCell,
   "DATE DISCOVERED": DateDiscoveredCell,
   "SECURITY REVIEW": SecurityReviewCell,
+  "SECURITY OWNER": SecurityOwnerCell,
+  "LAST REVIEWED": LastReviewedCell,
 };
 
 export default columnToCellMap;

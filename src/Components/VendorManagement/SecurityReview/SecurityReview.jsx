@@ -5,8 +5,10 @@ import ReviewTable from "../SecurityReview/ReviewTable";
 import ReviewFilters from "../../../assets/data/VendorManagement/SecurityReview/ReviewFilters";
 import { getReviewRows } from "../../../Service/VendorManagement/Review.service";
 import { review_columns } from "../../../assets/data/VendorManagement/SecurityReview/ReviewColumns";
+import useParams from "../../Utils/Hooks/useParams";
 
 const SecurityReview = () => {
+  const { params, changeParams, deleteParams } = useParams("review");
   const { isLoading, startLoading, stopLoading } = useLoading();
   const [reviewRows, setReviewRows] = useState([]);
   const [matchedCell, setMatchedCell] = useState([]);
@@ -31,21 +33,35 @@ const SecurityReview = () => {
   const [filters, setFilters] = useState({
     risk: [],
     owner: [],
-    review: [],
+    review: params.review ? params.review.split(",") : [],
     date: [],
   });
 
-  const changeFilters = (filterName, itemId, itemText) => {
-    setFilters((prev) => {
-      let currentFilters = prev[filterName] || [];
-      let updatedFilterTexts = currentFilters.includes(itemText)
-        ? currentFilters.filter((text) => text !== itemText)
-        : [...currentFilters, itemText];
-      return {
+  // Update filters when URL params change
+  useEffect(() => {
+    if (params.review) {
+      setFilters((prev) => ({
         ...prev,
-        [filterName]: updatedFilterTexts,
-      };
-    });
+        review: params.review.split(","),
+      }));
+    }
+  }, [params.review]);
+
+  const changeFilters = (filterName, itemText) => {
+    const updatedFilterTexts = filters[filterName].includes(itemText)
+      ? filters[filterName].filter((text) => text !== itemText)
+      : [...filters[filterName], itemText];
+
+    setFilters((prev) => ({
+      ...prev,
+      [filterName]: updatedFilterTexts,
+    }));
+
+    if (updatedFilterTexts.length === 0) {
+      deleteParams(filterName);
+    } else {
+      changeParams({ [filterName]: updatedFilterTexts.join(",") });
+    }
   };
 
   const clearFilters = (filterName) => {
@@ -53,6 +69,7 @@ const SecurityReview = () => {
       ...prev,
       [filterName]: [],
     }));
+    deleteParams(filterName);
   };
 
   const filterRows = (rows, searchValue, filters) => {

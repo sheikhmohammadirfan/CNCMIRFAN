@@ -10,7 +10,7 @@ import ReferencesTable from "./ReferencesTable";
 import { useState } from "react";
 import DialogBox from "../../Utils/DialogBox";
 
-const References = ({ references, loading, setReferences }) => {
+const References = ({ references, isLoading, setReferences }) => {
   const CustomTooltip = withStyles((theme) => ({
     tooltip: {
       backgroundColor: theme.palette.common.white,
@@ -85,7 +85,7 @@ const References = ({ references, loading, setReferences }) => {
   return (
     <Box mt={6}>
       <ReferencesTable
-        isLoading={loading}
+        isLoading={isLoading}
         allColumns={column_names}
         columns={references_columns}
         rows={rows}

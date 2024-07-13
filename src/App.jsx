@@ -25,7 +25,6 @@ import ParamsRoutes from "./Components/Utils/Routers/ParamsRoutes";
 import RiskManagement from "./Pages/RiskManagement";
 import React from "react";
 import VendorManagement from "./Pages/VendorManagement";
-import RiskLibrary from "./Components/RiskManagement/RiskLibrary/RiskLibrary";
 
 // Custom values
 const sidebarSmall = 50;

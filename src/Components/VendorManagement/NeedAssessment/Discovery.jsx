@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { Box, Typography, Divider } from "@material-ui/core";
-import useLoading from "../../Utils/Hooks/useLoading";
 import DiscoveryTabs from "./DiscoveryTabs";
 import TabPanel from "../TabPanel";
 import NeedsReview from "./NeedsReview";
@@ -8,22 +7,25 @@ import Rejected from "./Rejected";
 import Ignored from "./Ignored";
 import DiscoveryTable from "./DiscoveryTable";
 import DiscoveryFilters from "../../../assets/data/VendorManagement/Discovery/DiscoveryFilters";
-import {
-  getNeedsReviewRows,
-  getRejectedRows,
-  getIgnoredRows,
-} from "../../../Service/VendorManagement/Discovery.service";
 import { discovery_columns } from "../../../assets/data/VendorManagement/Discovery/DiscoveryColumns";
+import useParams from "../../Utils/Hooks/useParams";
 
-const Discovery = ({ setActiveRows }) => {
-  const { isLoading, startLoading, stopLoading } = useLoading();
+const Discovery = ({ isLoading, vendorList }) => {
+  const { params, changeParams, deleteParams } = useParams(
+    "risk",
+    "searchValue"
+  );
   const [needsReviewRows, setNeedsReviewRows] = useState([]);
   const [ignoredRows, setIgnoredRows] = useState([]);
   const [rejectedRows, setRejectedRows] = useState([]);
   const [matchedCell, setMatchedCell] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
-  const [searchValue, setSearchValue] = useState("");
+  const [searchValue, setSearchValue] = useState(params.searchValue || "");
   const [activeTab, setActiveTab] = useState(0);
+
+  const unmanagedVendors = vendorList.filter(
+    (vendor) => vendor.managed === false
+  );
 
   const handleChange = (event, newValue) => {
     setActiveTab(newValue);
@@ -31,44 +33,54 @@ const Discovery = ({ setActiveRows }) => {
   };
 
   useEffect(() => {
-    (async () => {
-      startLoading();
-      try {
-        const [needsReviewRes, ignoredRes, rejectedRes] = await Promise.all([
-          getNeedsReviewRows(),
-          getIgnoredRows(),
-          getRejectedRows(),
-        ]);
-        setNeedsReviewRows(needsReviewRes.data);
-        setIgnoredRows(ignoredRes.data);
-        setRejectedRows(rejectedRes.data);
-      } catch (err) {
-        console.log(err);
-      } finally {
-        stopLoading();
-      }
-    })();
-  }, []);
+    if (!isLoading()) {
+      (async () => {
+        setNeedsReviewRows(unmanagedVendors);
+        setIgnoredRows(unmanagedVendors);
+        setRejectedRows(unmanagedVendors);
+      })();
+    }
+  }, [isLoading]);
 
   const [filterDropdowns, setFilterDropdowns] = useState(DiscoveryFilters);
   const [filters, setFilters] = useState({
     source: [],
-    risk: [],
+    risk: params.risk ? params.risk.split(",") : [],
     date: [],
     accounts: [],
   });
 
-  const changeFilters = (filterName, itemId, itemText) => {
-    setFilters((prev) => {
-      let currentFilters = prev[filterName] || [];
-      let updatedFilterTexts = currentFilters.includes(itemText)
-        ? currentFilters.filter((text) => text !== itemText)
-        : [...currentFilters, itemText];
-      return {
+  // Update filters when URL params change
+  useEffect(() => {
+    if (params.risk) {
+      setFilters((prev) => ({
         ...prev,
-        [filterName]: updatedFilterTexts,
-      };
-    });
+        risk: params.risk.split(","),
+      }));
+    }
+  }, [params.risk]);
+
+  useEffect(() => {
+    if (params.searchValue) {
+      setSearchValue(params.searchValue);
+    }
+  }, [params.searchValue]);
+
+  const changeFilters = (filterName, itemText) => {
+    const updatedFilterTexts = filters[filterName].includes(itemText)
+      ? filters[filterName].filter((text) => text !== itemText)
+      : [...filters[filterName], itemText];
+
+    setFilters((prev) => ({
+      ...prev,
+      [filterName]: updatedFilterTexts,
+    }));
+    
+    if (updatedFilterTexts.length === 0) {
+      deleteParams(filterName);
+    } else {
+      changeParams({ [filterName]: updatedFilterTexts.join(",") });
+    }
   };
 
   const clearFilters = (filterName) => {
@@ -76,14 +88,22 @@ const Discovery = ({ setActiveRows }) => {
       ...prev,
       [filterName]: [],
     }));
+    deleteParams(filterName);
+  };
+
+  const updateSearchValue = (newValue) => {
+    setSearchValue(newValue);
+    if (newValue) {
+      changeParams({ searchValue: newValue });
+    } else {
+      deleteParams("searchValue");
+    }
   };
 
   const filterRows = (rows, searchValue, filters) => {
     return rows.filter((row) => {
       const matchesSearch = searchValue
-        ? row["NAME / CATEGORY"].name
-            .toLowerCase()
-            .includes(searchValue.toLowerCase())
+        ? row.vendor_name.toLowerCase().includes(searchValue.toLowerCase())
         : true;
 
       const matchesFilters = Object.keys(filters).every((filterName) => {
@@ -92,8 +112,8 @@ const Discovery = ({ setActiveRows }) => {
           return true;
         }
         return (
-          activeFilterValues.includes(row.SOURCE) ||
-          activeFilterValues.includes(row["INHERENT RISK"])
+          activeFilterValues.includes(row.source) ||
+          activeFilterValues.includes(row.inherent_risk)
         );
       });
 
@@ -177,7 +197,7 @@ const Discovery = ({ setActiveRows }) => {
     }
     if (targetTab === 3) {
       copyRows.forEach((row) => {
-        setActiveRows((prev) => [...prev, row]);
+        row.managed = true;
       });
     }
     copyRows = [];
@@ -290,7 +310,7 @@ const Discovery = ({ setActiveRows }) => {
         changeFilters={changeFilters}
         clearFilters={clearFilters}
         searchValue={searchValue}
-        setSearchValue={setSearchValue}
+        setSearchValue={updateSearchValue}
         filteredRows={filteredRows}
         selectedRows={selectedRows}
         setSelectedRows={setSelectedRows}

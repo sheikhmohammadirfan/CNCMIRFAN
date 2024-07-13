@@ -138,7 +138,7 @@ export const SidebarData = [
   {
     icon: "store",
     title: "Vendor Management",
-    subMenu: [
+    collapseMenu: [
       {
         icon: "assessment",
         title: "Vendor Risk Dashboard",

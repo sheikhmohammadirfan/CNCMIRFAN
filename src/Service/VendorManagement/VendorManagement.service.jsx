@@ -1,50 +1,31 @@
-import { mock_categories } from "../assets/data/VendorManagement/CategoriesMock";
-import {
-  impact_scores,
-  likelihood_scores,
-} from "../assets/data/VendorManagement/RiskScoresMock";
-import { mock_users } from "../assets/data/VendorManagement/UsersMock.js";
+import { get, post, put, deletes } from "../CrudFactory";
 
-export async function getCategories() {
-  return new Promise((res) => {
-    setTimeout(() => {
-      // Changing key name from "name" to "text". because "text" key is required to show in UI
-      const categories = mock_categories.map((category, index) => ({
-        ...category,
-        text: category.name,
-      }));
-      res({ data: categories, status: true });
-    }, 2000);
-  });
+/* Method to create a new Vendor */
+export async function createVendor(data) {
+  return await post("/vendor/vendors/create/", data);
 }
 
-export async function getOwners() {
-  return new Promise((res) => {
-    setTimeout(() => {
-      // Adding "text" key, because filters use "text" key to populate data
-      // "val" key is required by Select.control.jsx to set value of MenuItem component
-      const users = mock_users.map((user) => ({
-        ...user,
-        text: user.name,
-        val: user.name,
-      }));
-      res({ data: users, status: true });
-    }, 1000);
-  });
+/* Method to list all Vendors */
+export async function listVendors() {
+  return await get("/vendor/vendors/");
 }
 
-export async function getLikelihoodScores() {
-  return new Promise((res) => {
-    setTimeout(() => {
-      res({ data: likelihood_scores, status: true });
-    }, 2000);
-  });
+/* Method to fetch a specific Vendor by ID */
+export async function fetchVendor(id) {
+  return await get(`/vendor/vendors/${id}/`);
 }
 
-export async function getImpactScores() {
-  return new Promise((res) => {
-    setTimeout(() => {
-      res({ data: impact_scores, status: true });
-    }, 2000);
-  });
+/* Method to update a Vendor by ID */
+export async function updateVendor(id, data) {
+  return await put(`/vendor/vendors/update/${id}/`, data);
+}
+
+/* Method to delete a Vendor by ID */
+export async function deleteVendor(id) {
+  return await deletes(`/vendor/vendors/delete/${id}/`);
+}
+
+/* Method to list managed Vendors */
+export async function listManagedVendors() {
+  return await get("/vendor/vendors/managed/");  // doesn't work "unable to list managed vendors"
 }

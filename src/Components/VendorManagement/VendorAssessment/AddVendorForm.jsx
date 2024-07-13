@@ -34,30 +34,28 @@ const AddVendorForm = ({
       category: "Select an option",
       source: "Select an option",
       inherentRisk: "Select an option",
-      owner: "select an option",
+      owner: "Select an option",
     },
   });
 
   const handleFormSubmit = (data) => {
     const formattedData = {
-      id: 7,
-      "NAME / CATEGORY": {
-        name: data.name,
-        category:
-          data.category === "Select an option" ? "Unknown" : data.category,
-      },
-      "INHERENT RISK":
+      vendor_name: data.name,
+      category:
+        data.category === "Select an option" ? "Unknown" : data.category,
+      source: data.source === "Select an option" ? "Unknown" : data.source,
+      inherent_risk:
         data.inherentRisk === "Select an option"
           ? "Unknown"
           : data.inherentRisk,
-      "SECURITY OWNER": data.owner === "" ? "Owner Unassigned" : data.source,
-      "LAST REVIEWED": "",
-      "SECURITY REVIEW": {
-        due_date: "",
-        status: "",
-      },
+      number_of_accounts: 10,
+      date_discovered: "2024-01-01T00:00:01Z",
+      website: data.website ? data.website : "Unknown",
+      auth_method: "SSO",
+      linked_apps: null,
+      managed: true,
     };
-
+    console.log("data", data);
     onSubmit(formattedData);
     reset();
     onClose();
@@ -65,6 +63,7 @@ const AddVendorForm = ({
 
   const FormInput = ({ name, label, rules, error, helperText, ...rest }) => (
     <Controller
+      sx={{ fullWidth: true }}
       name={name}
       control={control}
       rules={rules}
@@ -78,6 +77,22 @@ const AddVendorForm = ({
           InputLabelProps={{ shrink: true }}
           {...field}
           {...rest}
+        />
+      )}
+    />
+  );
+
+  const FormSelect = ({ name, label, options }) => (
+    <Controller
+      name={name}
+      control={control}
+      render={({ field }) => (
+        <SelectControl
+          styleProps={{ fullWidth: true }}
+          variant="outlined"
+          label={label}
+          options={options}
+          {...field}
         />
       )}
     />
@@ -111,40 +126,24 @@ const AddVendorForm = ({
               <FormInput name="website" label="Vendor Website" />
             </Grid>
             <Grid item xs={12}>
-              <SelectControl
+              <FormSelect
                 name="category"
                 label="Category"
-                variant="outlined"
                 options={categories}
-                styleProps={{ fullWidth: true }}
               />
             </Grid>
             <Grid item xs={12}>
-              <SelectControl
-                name="source"
-                label="Source"
-                variant="outlined"
-                options={sources}
-                styleProps={{ fullWidth: true }}
-              />
+              <FormSelect name="source" label="Source" options={sources} />
             </Grid>
             <Grid item xs={12}>
-              <SelectControl
+              <FormSelect
                 name="inherentRisk"
-                label="Inherent Risk"
-                variant="outlined"
-                options={categories}
-                styleProps={{ fullWidth: true }}
+                label="Inherent Risk Level"
+                options={riskLevels}
               />
             </Grid>
             <Grid item xs={12}>
-              <SelectControl
-                name="owner"
-                label="Owner"
-                variant="outlined"
-                options={owners}
-                styleProps={{ fullWidth: true }}
-              />
+              <FormSelect name="owner" label="Owner" options={owners} />
             </Grid>
           </Grid>
 

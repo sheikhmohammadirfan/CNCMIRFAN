@@ -85,8 +85,8 @@ const useStyles = makeStyles((theme) => ({
     "&[data-active='true']": {
       color: theme.palette.primary.main,
     },
-    // height: "39px",
-    // whiteSpace: "nowrap",
+    height: "39px",
+    whiteSpace: "nowrap",
   },
 }));
 
@@ -105,7 +105,7 @@ const FilterDropdown = ({
 
   // Handling checkbox clicks and changing filters
   const handleCheckboxClick = (filterItem_id, filterItem_text) => {
-    changeFilters(filterName, filterItem_id, filterItem_text);
+    changeFilters(filterName, filterItem_text);
   };
 
   // Checking if filters are active, if yes then how many?

@@ -30,7 +30,7 @@ const SecurityReviewTab = ({ vendorData }) => {
               p={4}
               width="400px"
             >
-              <Typography variant="h6" align="center">
+              <Typography variant="h6" textAlign="center">
                 Next security review due{" "}
                 {vendorData["SECURITY REVIEW"].due_date}
               </Typography>
@@ -75,12 +75,12 @@ const SecurityReviewTab = ({ vendorData }) => {
               p={4}
               width="370px"
             >
-              <Typography variant="h6">
-                Start a security review for {vendorData["NAME / CATEGORY"].name}
+              <Typography variant="h6" align="center">
+                Start a security review for {vendorData.vendor_name}
               </Typography>
               <Typography variant="subtitle2" align="center">
-                Would you like to start the next review? Once the security
-                review has been started, you may save or cancel at anytime.
+                Once the security review has been started, you may save or
+                cancel at anytime.
               </Typography>
             </Box>
             <Button variant="contained" color="primary">

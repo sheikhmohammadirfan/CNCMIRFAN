@@ -2,7 +2,7 @@ import { Box, Typography } from "@material-ui/core";
 import FindingsTable from "./FindingsTable";
 import { useStyle } from "../Utils";
 
-const Overview = ({ findings, loading, sidebarOpen }) => {
+const Overview = ({ findings, isLoading, sidebarOpen }) => {
   const classes = useStyle();
   const column_names = ["Finding", "Author"];
 
@@ -17,7 +17,7 @@ const Overview = ({ findings, loading, sidebarOpen }) => {
       </Box>
       <Box>
         <FindingsTable
-          isLoading={loading}
+          isLoading={isLoading}
           allColumns={column_names}
           columns={findings_columns}
           rows={rows}

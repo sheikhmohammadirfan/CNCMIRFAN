@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Typography,
@@ -17,21 +17,15 @@ import { assessment_columns } from "../../../assets/data/VendorManagement/Vendor
 import AddVendorForm from "./AddVendorForm";
 import UploadFileDialog from "./UploadFileDialog";
 import XLSX from "xlsx";
-import { ClassNames } from "@emotion/react";
-
+import useParams from "../../Utils/Hooks/useParams";
+import { createVendor, deleteVendor } from "../../../Service/VendorManagement/VendorManagement.service.jsx";
 const useStyles = makeStyles({
   button: {
     textTransform: "none",
   },
 });
 
-const VendorAssessment = ({
-  activeRows,
-  setActiveRows,
-  archivedRows,
-  setArchivedRows,
-  isLoading,
-}) => {
+const VendorAssessment = ({ isLoading, vendorList }) => {
   const classes = useStyles();
   const [matchedCell, setMatchedCell] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
@@ -39,33 +33,67 @@ const VendorAssessment = ({
   const [activeTab, setActiveTab] = useState(0);
   const [showAddVendor, setShowAddVendor] = useState(false);
   const [showUploadFile, setShowUploadFile] = useState(false);
+  const { params, changeParams, deleteParams } = useParams("risk", "category");
+  const [activeRows, setActiveRows] = useState([]);
+  const [archivedRows, setArchivedRows] = useState([]);
+
+  const managedVendors = vendorList.filter((vendor) => vendor.managed === true);
 
   const handleChange = (event, newValue) => {
     setActiveTab(newValue);
     setSelectedRows([]); // Reset selected rows when changing tabs
   };
 
+  useEffect(() => {
+    if (!isLoading()) {
+      (async () => {
+        setActiveRows(managedVendors);
+        setArchivedRows(managedVendors);
+      })();
+    }
+  }, [isLoading]);
+
   const [filterDropdowns, setFilterDropdowns] = useState(AssessmentFilters);
   const [filters, setFilters] = useState({
-    category: [],
-    risk: [],
+    category: params.category ? params.category.split(",") : [],
+    risk: params.risk ? params.risk.split(",") : [],
     owner: [],
     data: [],
     review: [],
     date: [],
   });
 
-  const changeFilters = (filterName, itemId, itemText) => {
-    setFilters((prev) => {
-      let currentFilters = prev[filterName] || [];
-      let updatedFilterTexts = currentFilters.includes(itemText)
-        ? currentFilters.filter((text) => text !== itemText)
-        : [...currentFilters, itemText];
-      return {
+  // Update filters when URL params change
+  useEffect(() => {
+    if (params.risk) {
+      setFilters((prev) => ({
         ...prev,
-        [filterName]: updatedFilterTexts,
-      };
-    });
+        risk: params.risk.split(","),
+      }));
+    }
+    if (params.category) {
+      setFilters((prev) => ({
+        ...prev,
+        category: params.category.split(","),
+      }));
+    }
+  }, [params.risk, params.category]);
+
+  const changeFilters = (filterName, itemText) => {
+    const updatedFilterTexts = filters[filterName].includes(itemText)
+      ? filters[filterName].filter((text) => text !== itemText)
+      : [...filters[filterName], itemText];
+
+    setFilters((prev) => ({
+      ...prev,
+      [filterName]: updatedFilterTexts,
+    }));
+
+    if (updatedFilterTexts.length === 0) {
+      deleteParams(filterName);
+    } else {
+      changeParams({ [filterName]: updatedFilterTexts.join(",") });
+    }
   };
 
   const clearFilters = (filterName) => {
@@ -73,14 +101,13 @@ const VendorAssessment = ({
       ...prev,
       [filterName]: [],
     }));
+    deleteParams(filterName);
   };
 
   const filterRows = (rows, searchValue, filters) => {
     return rows.filter((row) => {
       const matchesSearch = searchValue
-        ? row["NAME / CATEGORY"].name
-            .toLowerCase()
-            .includes(searchValue.toLowerCase())
+        ? row.vendor_name.toLowerCase().includes(searchValue.toLowerCase())
         : true;
 
       const matchesFilters = Object.keys(filters).every((filterName) => {
@@ -89,11 +116,11 @@ const VendorAssessment = ({
           return true;
         }
         return (
-          activeFilterValues.includes(row["SECURITY OWNER"]) ||
-          activeFilterValues.includes(row["SECURITY REVIEW"].status) ||
-          activeFilterValues.includes(row["NAME / CATEGORY"].category) ||
-          activeFilterValues.includes(row.SOURCE) ||
-          activeFilterValues.includes(row["INHERENT RISK"])
+          activeFilterValues.includes(row.security_owner) ||
+          activeFilterValues.includes(row.review_status) ||
+          activeFilterValues.includes(row.category) ||
+          activeFilterValues.includes(row.source) ||
+          activeFilterValues.includes(row.inherent_risk)
         );
       });
 
@@ -183,6 +210,7 @@ const VendorAssessment = ({
     {
       label: "Delete",
       onClick: () => {
+        selectedRows.forEach((rowIndex) => deleteVendor(activeRows[rowIndex].id))
         deleteRow(selectedRows);
         setSelectedRows([]);
       },
@@ -254,7 +282,25 @@ const VendorAssessment = ({
   const handleAddVendorClick = () => setShowAddVendor(true);
   const handleCloseAddVendor = () => setShowAddVendor(false);
   const handleAddVendor = (vendor) => {
-    setActiveRows((prev) => [...prev, vendor]);
+    const vendorData = {
+      vendor_name: "Vendor1",
+      category: "Category1", 
+      source: "OKTA",
+      inherent_risk: "Low",
+      number_of_accounts: 10,
+      date_discovered: "2024-01-01T00:00:00Z",
+      website: "http://vendor1.com",
+      auth_method: "SSO",
+      linked_apps: null,
+      managed: false,
+    };
+    console.log("vendordata", vendorData)
+    console.log("vendor", vendor)
+    createVendor(vendor)
+      .then((response) => {
+        console.log("created vendorresponse", response);
+      })
+      .catch((error) => console.error("Error: ", error));
   };
 
   const handleImportClick = () => {
