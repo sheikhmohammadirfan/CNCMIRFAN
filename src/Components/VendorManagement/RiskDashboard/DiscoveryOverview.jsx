@@ -38,8 +38,15 @@ const DiscoveryOverview = ({
   handleDiscoveryMediumClick,
   handleDiscoveryLowClick,
   handleDiscoveryVendorClick,
+  vendorList
 }) => {
   const classes = useStyles();
+
+  const riskLevel = ["Critical", "High", "Medium", "Low"];
+  const riskColor = ["criticalIcon", "highIcon", "mediumIcon", "lowIcon"];
+
+  const unManagedVendors = vendorList.filter(v => !v.managed);
+  const riskCounts = riskLevel.map(r => unManagedVendors.filter(v => v.inherent_risk === r).length);
 
   return (
     <Box border={1} p={2} borderColor="#ddd" mt={2} borderRadius={16}>
@@ -49,25 +56,9 @@ const DiscoveryOverview = ({
         </Typography>
       </Box>
       <Box>
+      
         <Grid container spacing={2}>
-          <Grid item xs={3}>
-            <Button
-              fullWidth
-              className={classes.button}
-              onClick={handleDiscoveryCriticalClick}
-            >
-              <Box display="flex" flexDirection="column">
-                <Box display="flex" alignItems="center">
-                  <FiberManualRecordIcon className={classes.criticalIcon} />
-                  <Typography>Critical</Typography>
-                </Box>
-                <Box display="flex" justifyContent="center">
-                  <Typography variant="h6">0</Typography>
-                </Box>
-              </Box>
-            </Button>
-          </Grid>
-          <Grid item xs={3}>
+          {riskLevel.map((level, idx) => (<Grid item xs={3}>
             <Button
               fullWidth
               className={classes.button}
@@ -75,49 +66,15 @@ const DiscoveryOverview = ({
             >
               <Box display="flex" flexDirection="column">
                 <Box display="flex" alignItems="center">
-                  <FiberManualRecordIcon className={classes.highIcon} />
-                  <Typography>High</Typography>
+                  <FiberManualRecordIcon className={classes[riskColor[idx]]} />
+                  <Typography>{level}</Typography>
                 </Box>
                 <Box display="flex" justifyContent="center">
-                  <Typography variant="h6">4</Typography>
+                  <Typography variant="h6">{riskCounts[idx]}</Typography>
                 </Box>
               </Box>
             </Button>
-          </Grid>
-          <Grid item xs={3}>
-            <Button
-              fullWidth
-              className={classes.button}
-              onClick={handleDiscoveryMediumClick}
-            >
-              <Box display="flex" flexDirection="column">
-                <Box display="flex" alignItems="center">
-                  <FiberManualRecordIcon className={classes.mediumIcon} />
-                  <Typography>Medium</Typography>
-                </Box>
-                <Box display="flex" justifyContent="center">
-                  <Typography variant="h6">12</Typography>
-                </Box>
-              </Box>
-            </Button>
-          </Grid>
-          <Grid item xs={3}>
-            <Button
-              fullWidth
-              className={classes.button}
-              onClick={handleDiscoveryLowClick}
-            >
-              <Box display="flex" flexDirection="column">
-                <Box display="flex" alignItems="center">
-                  <FiberManualRecordIcon className={classes.lowIcon} />
-                  <Typography>Low</Typography>
-                </Box>
-                <Box display="flex" justifyContent="center">
-                  <Typography variant="h6">12</Typography>
-                </Box>
-              </Box>
-            </Button>
-          </Grid>
+          </Grid>))}
         </Grid>
       </Box>
       <Box mt={2}>

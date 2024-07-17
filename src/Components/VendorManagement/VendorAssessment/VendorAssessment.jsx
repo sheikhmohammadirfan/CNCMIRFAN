@@ -6,6 +6,8 @@ import {
   Button,
   Icon,
   makeStyles,
+  Backdrop,
+  CircularProgress,
 } from "@material-ui/core";
 import AssessmentTabs from "./AssessmentTabs";
 import TabPanel from "../TabPanel";
@@ -18,14 +20,27 @@ import AddVendorForm from "./AddVendorForm";
 import UploadFileDialog from "./UploadFileDialog";
 import XLSX from "xlsx";
 import useParams from "../../Utils/Hooks/useParams";
-import { createVendor, deleteVendor } from "../../../Service/VendorManagement/VendorManagement.service.jsx";
+import { createVendor, deleteVendor, updateVendor } from "../../../Service/VendorManagement/VendorManagement.service.jsx";
+import { getUser } from "../../../Service/UserFactory.jsx";
 const useStyles = makeStyles({
   button: {
     textTransform: "none",
   },
+  backdrop: {
+    zIndex: 1000000,
+    display: "flex",
+    flexDirection: "column",
+    color: "white",
+    "&  .backdrop-label": {
+      marginTop: 10,
+      fontWeight: "bold",
+      letterSpacing: 1,
+      fontStyle: "italic",
+    },
+  }
 });
 
-const VendorAssessment = ({ isLoading, vendorList }) => {
+const VendorAssessment = ({ isLoading, vendorList, securityReviewList, reload }) => {
   const classes = useStyles();
   const [matchedCell, setMatchedCell] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
@@ -36,8 +51,7 @@ const VendorAssessment = ({ isLoading, vendorList }) => {
   const { params, changeParams, deleteParams } = useParams("risk", "category");
   const [activeRows, setActiveRows] = useState([]);
   const [archivedRows, setArchivedRows] = useState([]);
-
-  const managedVendors = vendorList.filter((vendor) => vendor.managed === true);
+  const [showLoader, updateLoader] = useState(false);
 
   const handleChange = (event, newValue) => {
     setActiveTab(newValue);
@@ -47,11 +61,41 @@ const VendorAssessment = ({ isLoading, vendorList }) => {
   useEffect(() => {
     if (!isLoading()) {
       (async () => {
-        setActiveRows(managedVendors);
-        setArchivedRows(managedVendors);
+        const activeVendors = vendorList
+                            .filter((vendor) => vendor.website !== "archived")
+                            .map(vendor => {
+                              const res = vendor;
+                              const review = securityReviewList.find(s => s.vendor === res.id);
+                              if (review) {
+                                res.review = {
+                                  due_date: review.last_review_date,
+                                  status: review.review_status_reason,
+                                };
+                                res.last_date = review.last_review_date;
+                                res.owner = review.security_owner;
+                              }
+                              return res;
+                            });
+        setActiveRows(activeVendors);
+        const archivedVendors = vendorList
+                            .filter((vendor) => vendor.website === "archived")
+                            .map(vendor => {
+                              const res = vendor;
+                              const review = securityReviewList.find(s => s.vendor === res.id);
+                              if (review) {
+                                res.review = {
+                                  due_date: review.last_review_date,
+                                  status: review.review_status_reason,
+                                };
+                                res.last_date = review.last_review_date;
+                                res.owner = review.security_owner;
+                              }
+                              return res;
+                            });
+        setArchivedRows(archivedVendors);
       })();
     }
-  }, [isLoading]);
+  }, [vendorList, isLoading]);
 
   const [filterDropdowns, setFilterDropdowns] = useState(AssessmentFilters);
   const [filters, setFilters] = useState({
@@ -189,53 +233,45 @@ const VendorAssessment = ({ isLoading, vendorList }) => {
     copyRows = [];
   };
 
-  const deleteRow = (rows) => {
-    if (activeTab === 0) {
-      setActiveRows(activeRows.filter((_, index) => !rows.includes(index)));
+  const actionButton = async (target) => {
+    updateLoader(true);
+    const list = getFilteredRowsForActiveTab();
+    const row = list.find((_,idx) => idx === selectedRows[0]);
+    let res;
+    if (target === 0) {
+      res = await updateVendor(row.id, { website: "archived", organization: getUser().organization_id });
+    } else if (target === 1) {
+      res = await updateVendor(row.id, { website: "temp", organization: getUser().organization_id });
+    } else if (target === 2) {
+      res = await deleteVendor(row.id);
     }
-    if (activeTab === 1) {
-      setArchivedRows(archivedRows.filter((_, index) => !rows.includes(index)));
+    updateLoader(false);
+    if (res.status) {
+      setSelectedRows([]);
+      reload();
     }
+  }
+
+  const ArchiveButton = {
+    label: "Archive",
+    onClick: () => actionButton(0),
+    disabled: selectedRows.length !== 1,
   };
 
-  const activeButtons = [
-    {
-      label: "Archive",
-      onClick: () => {
-        moveRow(selectedRows, 1);
-        setSelectedRows([]);
-      },
-      disabled: selectedRows.length === 0,
-    },
-    {
-      label: "Delete",
-      onClick: () => {
-        selectedRows.forEach((rowIndex) => deleteVendor(activeRows[rowIndex].id))
-        deleteRow(selectedRows);
-        setSelectedRows([]);
-      },
-      disabled: selectedRows.length === 0,
-    },
-  ];
+  const DeleteButton = {
+    label: "Delete",
+    onClick: () => actionButton(2),
+    disabled: selectedRows.length !== 1,
+  };
 
-  const archivedButtons = [
-    {
-      label: "Unarchive",
-      onClick: () => {
-        moveRow(selectedRows, 0);
-        setSelectedRows([]);
-      },
-      disabled: selectedRows.length === 0,
-    },
-    {
-      label: "Delete",
-      onClick: () => {
-        moveRow(selectedRows);
-        setSelectedRows([]);
-      },
-      disabled: selectedRows.length === 0,
-    },
-  ];
+  const UnarchiveButton = {
+    label: "Unarchive",
+    onClick: () => actionButton(1),
+    disabled: selectedRows.length !== 1,
+  };
+
+  const activeButtons = [ ArchiveButton, DeleteButton ];
+  const archivedButtons = [ UnarchiveButton, DeleteButton ];
 
   let headerButtons = [];
   switch (activeTab) {
@@ -252,13 +288,13 @@ const VendorAssessment = ({ isLoading, vendorList }) => {
   const vendorExport = (activeData, archivedData) => {
     const mapData = (data) => {
       return data.map((row) => ({
-        "Vendor Name": row["NAME / CATEGORY"].name,
-        Category: row["NAME / CATEGORY"].category,
-        "Inherent Risk": row["INHERENT RISK"],
-        "Security Review Status": row["SECURITY REVIEW"].status,
-        "Security Review Due Date": row["SECURITY REVIEW"].due_date,
-        "Security Owner": row["SECURITY OWNER"],
-        "Last Reviewed": row["LAST REVIEWED"],
+        "Vendor Name": row?.vendor_name || "",
+        Category: row?.category || "",
+        "Inherent Risk": row?.inherent_risk || "",
+        "Security Review Status": row.review?.status || "",
+        "Security Review Due Date": row.review?.due_date || "",
+        "Security Owner": row?.review || "",
+        "Last Reviewed": row?.last_date || "",
       }));
     };
 
@@ -281,26 +317,14 @@ const VendorAssessment = ({ isLoading, vendorList }) => {
 
   const handleAddVendorClick = () => setShowAddVendor(true);
   const handleCloseAddVendor = () => setShowAddVendor(false);
-  const handleAddVendor = (vendor) => {
-    const vendorData = {
-      vendor_name: "Vendor1",
-      category: "Category1", 
-      source: "OKTA",
-      inherent_risk: "Low",
-      number_of_accounts: 10,
-      date_discovered: "2024-01-01T00:00:00Z",
-      website: "http://vendor1.com",
-      auth_method: "SSO",
-      linked_apps: null,
-      managed: false,
-    };
-    console.log("vendordata", vendorData)
-    console.log("vendor", vendor)
-    createVendor(vendor)
-      .then((response) => {
-        console.log("created vendorresponse", response);
-      })
-      .catch((error) => console.error("Error: ", error));
+  const handleAddVendor = async (vendor) => {
+    updateLoader(true);
+    const { status } = await createVendor(vendor);
+    updateLoader(false);
+    if (status) {
+      reload();
+    }
+    return status;
   };
 
   const handleImportClick = () => {
@@ -433,6 +457,13 @@ const VendorAssessment = ({ isLoading, vendorList }) => {
         onClose={handleCloseUploadFile}
         onImport={handleImport}
       />
+
+      <Backdrop className={classes.backdrop} open={showLoader}>
+        <CircularProgress color="inherit" />
+        <Typography className="backdrop-label" variant="h5">
+          Please wait...
+        </Typography>
+      </Backdrop>
     </Box>
   );
 };

@@ -38,7 +38,7 @@ const AddVendorForm = ({
     },
   });
 
-  const handleFormSubmit = (data) => {
+  const handleFormSubmit = async (data) => {
     const formattedData = {
       vendor_name: data.name,
       category:
@@ -49,16 +49,17 @@ const AddVendorForm = ({
           ? "Unknown"
           : data.inherentRisk,
       number_of_accounts: 10,
-      date_discovered: "2024-01-01T00:00:01Z",
+      date_discovered: new Date(),
       website: data.website ? data.website : "Unknown",
       auth_method: "SSO",
       linked_apps: null,
-      managed: true,
+      managed: false,
     };
-    console.log("data", data);
-    onSubmit(formattedData);
-    reset();
-    onClose();
+    const status = await onSubmit(formattedData);
+    if (status) {
+      reset();
+      onClose();
+    }
   };
 
   const FormInput = ({ name, label, rules, error, helperText, ...rest }) => (
@@ -82,7 +83,7 @@ const AddVendorForm = ({
     />
   );
 
-  const FormSelect = ({ name, label, options }) => (
+  const FormSelect = ({ name, label, options, ...rest }) => (
     <Controller
       name={name}
       control={control}
@@ -123,13 +124,22 @@ const AddVendorForm = ({
               />
             </Grid>
             <Grid item xs={12}>
-              <FormInput name="website" label="Vendor Website" />
+              <FormInput
+                name="website"
+                label="Vendor Website"
+                rules={{ required: "Vendor website is required" }}
+                error={!!errors.website}
+                helperText={errors.website ? errors.website.message : ""}
+              />
             </Grid>
             <Grid item xs={12}>
               <FormSelect
                 name="category"
                 label="Category"
                 options={categories}
+                rules={{ required: "Vendor categories is required" }}
+                error={!!errors.category}
+                helperText={errors.category ? errors.category.message : ""}
               />
             </Grid>
             <Grid item xs={12}>

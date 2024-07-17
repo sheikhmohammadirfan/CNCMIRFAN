@@ -4,70 +4,70 @@ import SecurityReviewProgress from "./SecurityReviewProgress";
 import DiscoveryOverview from "./DiscoveryOverview";
 import VendorsManaged from "./VendorsManaged";
 
-const VendorRiskDashboard = () => {
+const VendorRiskDashboard = ({ isLoading, vendorList, securityReviewList }) => {
   const history = useHistory();
 
   //Security review methods
   const handleNeedsUpdateClick = () => {
-    history.push("/vendor_management/security_review?review=Needs+update");
+    history.push("/vendor-management/security-review?review=Need+Update");
   };
 
   const handleNeedsInitialReviewClick = () => {
     history.push(
-      "/vendor_management/security_review?review=Needs+initial+review"
+      "/vendor-management/security-review?review=Needs+Review"
     );
   };
 
   const handleUpToDateClick = () => {
-    history.push("/vendor_management/security_review?review=Up+to+date");
+    history.push("/vendor-management/security-review?review=Up+To+Date");
   };
 
   // Discovery methods
   const handleDiscoveryCriticalClick = () => {
-    history.push("/vendor_management/requirement_analysis?risk=Critical");
+    history.push("/vendor-management/requirement-analysis?risk=Critical");
   };
 
   const handleDiscoveryHighClick = () => {
-    history.push("/vendor_management/requirement_analysis?risk=High");
+    history.push("/vendor-management/requirement-analysis?risk=High");
   };
 
   const handleDiscoveryMediumClick = () => {
-    history.push("/vendor_management/requirement_analysis?risk=Medium");
+    history.push("/vendor-management/requirement-analysis?risk=Medium");
   };
 
   const handleDiscoveryLowClick = () => {
-    history.push("/vendor_management/requirement_analysis?risk=Low");
+    history.push("/vendor-management/requirement-analysis?risk=Low");
   };
 
   const handleDiscoveryVendorClick = (vendorName) => {
     history.push(
-      `/vendor_management/requirement_analysis?searchValue=${vendorName}`
+      `/vendor-management/requirement-analysis?searchValue=${vendorName}`
     );
   };
 
   // Managed vendors methods
   const handleManagedUnknownClick = () => {
-    history.push("/vendor_management/assessment?risk=Unknown");
+    history.push("/vendor-management/assessment?risk=Unknown");
   };
 
   const handleManagedCriticalClick = () => {
-    history.push("/vendor_management/assessment?risk=Critical");
+    history.push("/vendor-management/assessment?risk=Critical");
   };
 
   const handleManagedHighClick = () => {
-    history.push("/vendor_management/assessment?risk=High");
+    history.push("/vendor-management/assessment?risk=High");
   };
 
   const handleManagedMediumClick = () => {
-    history.push("/vendor_management/assessment?risk=Medium");
+    history.push("/vendor-management/assessment?risk=Medium");
   };
 
   const handleManagedLowClick = () => {
-    history.push("/vendor_management/assessment?risk=Low");
+    history.push("/vendor-management/assessment?risk=Low");
   };
 
   const handleCategoryClick = (categoryName) => {
-    history.push(`/vendor_management/assessment?category=${categoryName}`);
+    history.push(`/vendor-management/assessment?category=${categoryName}`);
   };
 
   return (
@@ -93,6 +93,8 @@ const VendorRiskDashboard = () => {
                 handleDiscoveryMediumClick={handleDiscoveryMediumClick}
                 handleDiscoveryLowClick={handleDiscoveryLowClick}
                 handleDiscoveryVendorClick={handleDiscoveryVendorClick}
+                isLoading={isLoading}
+                vendorList={vendorList}
               />
             </Grid>
           </Grid>
@@ -104,6 +106,8 @@ const VendorRiskDashboard = () => {
               handleManagedMediumClick={handleManagedMediumClick}
               handleManagedLowClick={handleManagedLowClick}
               handleCategoryClick={handleCategoryClick}
+              isLoading={isLoading}
+              vendorList={vendorList}
             />
           </Grid>
         </Grid>

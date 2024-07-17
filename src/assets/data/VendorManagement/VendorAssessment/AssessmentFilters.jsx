@@ -45,10 +45,10 @@ const AssessmentFilters = {
     text: "Review status",
     order: 5,
     options: [
-      { id: 0, text: "Up to date" },
-      { id: 1, text: "Needs initial review" },
-      { id: 2, text: "Needs update" },
-      { id: 3, text: "Not required" },
+      { id: 0, text: "Up To Date" },
+      { id: 1, text: "Need Review" },
+      { id: 2, text: "Need Update" },
+      { id: 3, text: "Not Required" },
     ],
   },
   date: {

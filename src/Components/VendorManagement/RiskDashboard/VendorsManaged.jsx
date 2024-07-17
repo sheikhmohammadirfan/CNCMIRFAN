@@ -10,6 +10,8 @@ import ArrowUpward from "@mui/icons-material/ArrowUpward";
 import { Doughnut } from "react-chartjs-2";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
+import SkeletonBox from "../../Utils/SkeletonBox";
+import colorShader from "../../Utils/ColorShader";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -40,6 +42,19 @@ const useStyles = makeStyles({
   },
 });
 
+function getRandomColor() {
+  var evenletters = '0123456789';
+  var oddletters = '0123456789ABCDEF';
+  var color = '#';
+  for (var i = 0; i < 6; i++) {
+    color += i % 2
+              ? evenletters[Math.floor(Math.random() * 10)]
+              : oddletters[Math.floor(Math.random() * 16)];
+  }
+  return color;
+}
+
+
 const VendorsManaged = ({
   handleManagedUnknownClick,
   handleManagedCriticalClick,
@@ -47,35 +62,33 @@ const VendorsManaged = ({
   handleManagedMediumClick,
   handleManagedLowClick,
   handleCategoryClick,
+  isLoading,
+  vendorList
 }) => {
+
   const classes = useStyles();
-  const [category, setCategory] = useState("category");
 
-  const dataSets = {
-    category: [12, 19, 3],
-  };
+  const riskLevel = ["Unknown", "Critical", "High", "Medium", "Low"];
+  const riskColor = ["unknownIcon", "criticalIcon", "highIcon", "mediumIcon", "lowIcon"];
 
-  const labels = [
-    "Recruiting",
-    "Tech",
-    "Unknown",
-  ];
+  const managedVendors = vendorList.filter(v => v.managed);
+  const riskRatios = riskLevel.map(r => {
+    const rC = managedVendors.filter(v => v.inherent_risk === r).length;
+    return [Math.round((rC / managedVendors.length) * 100) || 0, rC];
+  });
+
+  const labels = Array.from(new Set(vendorList.map(v => v.category)));
+  const values = labels.map(l => vendorList.filter(v => v.category === l).length);
+  const backgroundColor = labels.map(getRandomColor);
+  const hoverColor = backgroundColor.map(c => colorShader(c, 0.75));
 
   const data = {
     labels: labels,
     datasets: [
       {
-        data: dataSets[category],
-        backgroundColor: [
-          "#FF6384",
-          "#36A2EB",
-          "#FFCE56",
-        ],
-        hoverBackgroundColor: [
-          "#FF6384",
-          "#36A2EB",
-          "#FFCE56",
-        ],
+        data: values,
+        backgroundColor: backgroundColor,
+        hoverBackgroundColor: hoverColor,
       },
     ],
   };
@@ -102,12 +115,12 @@ const VendorsManaged = ({
   };
 
   return (
-    <Box border={1} p={2} borderColor="#ddd" borderRadius={16}>
+    <Box border={1} p={2} borderColor="#ddd" borderRadius={16} overflow="hidden">
       <Box mb={2}>
         <Typography variant="h5">Vendors Managed</Typography>
         <Box mt={2} display="flex" flexDirection="row" alignItems="center">
           <Box mr={1}>
-            <Typography variant="h5">26</Typography>
+            <Typography variant="h5">{managedVendors.length}</Typography>
           </Box>
           <Box>
             <ArrowUpward fontSize="small" />
@@ -120,81 +133,36 @@ const VendorsManaged = ({
       <Box mb={2}>
         <Typography variant="body1">By inherent risk level</Typography>
         <Box mt={2}>
-          <Button
-            fullWidth
-            className={classes.button}
-            onClick={handleManagedUnknownClick}
-          >
-            <Box display="flex" flexDirection="column">
-              <Box display="flex" alignItems="center">
-                <FiberManualRecordIcon className={classes.unknownIcon} />
-                <Typography>Unknown</Typography>
-              </Box>
-            </Box>
+          {riskLevel.map((level, idx) => 
+            <>
+              <Button
+                fullWidth
+                className={classes.button}
+                onClick={handleManagedUnknownClick}
+              >
+                <Box display="flex" flexDirection="column">
+                  <Box display="flex" alignItems="center">
+                    <FiberManualRecordIcon className={classes[riskColor[idx]]} />
+                    <Typography>{level}</Typography>
+                  </Box>
+                </Box>
 
-            <Typography variant="body1">0% (0)</Typography>
-          </Button>
-          <Divider />
-          <Button
-            fullWidth
-            className={classes.button}
-            onClick={handleManagedCriticalClick}
-          >
-            <Box display="flex" flexDirection="column">
-              <Box display="flex" alignItems="center">
-                <FiberManualRecordIcon className={classes.criticalIcon} />
-                <Typography>Critical</Typography>
-              </Box>
-            </Box>
-            <Typography variant="body1">0% (0)</Typography>
-          </Button>
-          <Divider />
-          <Button
-            fullWidth
-            className={classes.button}
-            onClick={handleManagedHighClick}
-          >
-            <Box display="flex" alignItems="center">
-              <FiberManualRecordIcon className={classes.highIcon} />
-              <Typography>High</Typography>
-            </Box>
-            <Typography variant="body1">61.5% (16)</Typography>
-          </Button>
-          <Divider />
-          <Button
-            fullWidth
-            className={classes.button}
-            onClick={handleManagedMediumClick}
-          >
-            <Box display="flex" flexDirection="column">
-              <Box display="flex" alignItems="center">
-                <FiberManualRecordIcon className={classes.mediumIcon} />
-                <Typography>Medium</Typography>
-              </Box>
-            </Box>
-            <Typography variant="body1">34.6% (9)</Typography>
-          </Button>
-          <Divider />
-          <Button
-            fullWidth
-            className={classes.button}
-            onClick={handleManagedLowClick}
-          >
-            <Box display="flex" flexDirection="column">
-              <Box display="flex" alignItems="center">
-                <FiberManualRecordIcon className={classes.lowIcon} />
-                <Typography>Low</Typography>
-              </Box>
-            </Box>
-            <Typography variant="body1">3.8% (1)</Typography>
-          </Button>
+                <Typography variant="body1">{riskRatios[idx][0]}% ({riskRatios[idx][1]})</Typography>
+              </Button>
+              {idx < riskLevel.length && <Divider />}
+            </>)}
         </Box>
       </Box>
       <Box>
         <Typography variant="body1">By category</Typography>
-        <Box display="flex" width="600px" height="400px">
-          <Doughnut data={data} options={options} />
-        </Box>
+        {isLoading()
+          ? <SkeletonBox text="Loading.." height="400px" width="100%" />
+          : (
+            <Box display="flex" width="100%" height="400px">
+              <Doughnut data={data} options={options} />
+            </Box>
+          )}
+        
       </Box>
     </Box>
   );

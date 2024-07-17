@@ -265,6 +265,9 @@ const mapDataToRow = (row, rowIndex, columns, matchedCell = []) =>
       "INHERENT RISK": row.inherent_risk,
       "# OF ACCOUNTS": row.number_of_accounts,
       "DATE DISCOVERED": row.date_discovered,
+      "SECURITY OWNER": row.owner,
+      "SECURITY REVIEW": row.review,
+      "LAST REVIEWED": row.last_date,
     };
 
     if (cellValue === undefined) {

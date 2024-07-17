@@ -118,7 +118,7 @@ export const SidebarData = [
     icon: "merge_type",
     title: "Integration",
     component: Link,
-    to: "/Integrated_Platforms",
+    to: "/Integrated-Platforms",
   },
   {
     icon: "task",
@@ -143,49 +143,49 @@ export const SidebarData = [
         icon: "assessment",
         title: "Vendor Risk Dashboard",
         component: Link,
-        to: "/vendor_management/risk_dashboard",
+        to: "/vendor-management/risk-dashboard",
       },
       {
         icon: "search",
         title: "Requirement Analysis",
         component: Link,
-        to: "/vendor_management/requirement_analysis",
+        to: "/vendor-management/requirement-analysis",
       },
       {
         icon: "find_in_page",
         title: "Vendor Assessment",
         component: Link,
-        to: "/vendor_management/assessment",
+        to: "/vendor-management/assessment",
       },
       {
         icon: "shopping_cart",
         title: "Vendor Procurement",
         component: Link,
-        to: "/vendor_management/procurement",
+        to: "/vendor-management/procurement",
       },
       {
         icon: "person_add",
         title: "Onboard Vendor",
         component: Link,
-        to: "/vendor_management/onboard",
+        to: "/vendor-management/onboard",
       },
       {
         icon: "security",
         title: "Security Review",
         component: Link,
-        to: "/vendor_management/security_review",
+        to: "/vendor-management/security-review",
       },
       {
         icon: "assignment",
         title: "Compliance Reports",
         component: Link,
-        to: "/vendor_management/compliance_reports",
+        to: "/vendor-management/compliance-reports",
       },
       {
         icon: "settings",
         title: "Vendor Settings",
         component: Link,
-        to: "/vendor_management/settings",
+        to: "/vendor-management/settings",
       },
     ],
   },
@@ -227,20 +227,20 @@ export const SidebarData = [
       {
         title: "Accounts",
         component: Link,
-        to: "/access_management/accounts",
+        to: "/access-management/accounts",
         icon: "menu_book"
       },
       {
         title: "Reviews",
         component: Link,
-        to: "/access_management/reviews",
+        to: "/access-management/reviews",
         icon: "list"
       },
 
       {
         title: "Settings",
         component: Link,
-        to: "//access_management/settings",
+        to: "//access-management/settings",
         icon: "settings"
       }
     ]

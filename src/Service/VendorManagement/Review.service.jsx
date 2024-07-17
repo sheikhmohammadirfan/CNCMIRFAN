@@ -4,21 +4,7 @@ import {
   reviewFindings,
   reviewReferences,
 } from "../../assets/data/VendorManagement/SecurityReview/ReviewMockData";
-
-export const getReviewRows = async () => {
-  return new Promise((res) => {
-    setTimeout(() => {
-      const mappedRows = reviewRows.map((row) => {
-        const mappedRow = {};
-        Object.keys(HEADER_TABLE_COLS_MAP).forEach((key) => {
-          mappedRow[HEADER_TABLE_COLS_MAP[key]] = row[key];
-        });
-        return mappedRow;
-      });
-      res({ data: mappedRows, status: true });
-    }, 1000);
-  });
-};
+import { getSecurityReview } from "./VendorManagement.service";
 
 export const getReviewFindings = async () => {
   return new Promise((res) => {

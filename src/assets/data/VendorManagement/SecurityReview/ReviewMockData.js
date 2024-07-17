@@ -10,7 +10,7 @@ export const reviewRows = [
     owner: "Owned by me",
     review: {
       due_date: "2024-1-10",
-      status: "Up to date",
+      status: "Up To Date",
     },
     last_date: "2022-1-10",
   },
@@ -23,7 +23,7 @@ export const reviewRows = [
     risk: "Low",
     owner: "Owner unassigned",
     review: {
-      status: "Needs initial review",
+      status: "Need Review",
     },
     last_date: "2021-1-10",
   },
@@ -37,7 +37,7 @@ export const reviewRows = [
     owner: "Owner offboarded",
     review: {
       due_date: "2024-1-10",
-      status: "Needs update",
+      status: "Need Update",
     },
     last_date: "2020-1-10",
   },

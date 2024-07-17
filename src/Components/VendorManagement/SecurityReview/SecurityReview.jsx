@@ -3,31 +3,52 @@ import { Box, Typography, Divider } from "@mui/material";
 import useLoading from "../../Utils/Hooks/useLoading";
 import ReviewTable from "../SecurityReview/ReviewTable";
 import ReviewFilters from "../../../assets/data/VendorManagement/SecurityReview/ReviewFilters";
-import { getReviewRows } from "../../../Service/VendorManagement/Review.service";
 import { review_columns } from "../../../assets/data/VendorManagement/SecurityReview/ReviewColumns";
 import useParams from "../../Utils/Hooks/useParams";
+import { HEADER_TABLE_COLS_MAP } from "../../../assets/data/VendorManagement/SecurityReview/ReviewColumns";
 
-const SecurityReview = () => {
+const SecurityReview = ({
+  isLoading,
+  vendorList,
+  securityReviewList,
+  reload,
+}) => {
   const { params, changeParams, deleteParams } = useParams("review");
-  const { isLoading, startLoading, stopLoading } = useLoading();
   const [reviewRows, setReviewRows] = useState([]);
   const [matchedCell, setMatchedCell] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
   const [searchValue, setSearchValue] = useState("");
 
   useEffect(() => {
-    (async () => {
-      startLoading();
-      try {
-        const [reviewRes] = await Promise.all([getReviewRows()]);
-        setReviewRows(reviewRes.data);
-      } catch (err) {
-        console.log(err);
-      } finally {
-        stopLoading();
-      }
-    })();
-  }, []);
+    if (!isLoading()) {
+      const list = securityReviewList.map((s) => {
+        const vendor = vendorList.find((v) => v.id === s.vendor);
+        const review = {
+          id: s.id,
+          owner: s.security_owner,
+          review: {
+            due_date: s.last_review_date,
+            status: s.review_status_reason,
+          },
+          last_date: s.last_review_date,
+          name_and_category: {
+            name: vendor.vendor_name,
+            category: vendor.category,
+          },
+          risk: vendor.inherent_risk,
+        };
+        return review;
+      });
+      const mappedRows = list.map((row) => {
+        const mappedRow = {};
+        Object.keys(HEADER_TABLE_COLS_MAP).forEach((key) => {
+          mappedRow[HEADER_TABLE_COLS_MAP[key]] = row[key];
+        });
+        return mappedRow;
+      });
+      setReviewRows(mappedRows);
+    }
+  }, [isLoading, securityReviewList]);
 
   const [filterDropdowns, setFilterDropdowns] = useState(ReviewFilters);
   const [filters, setFilters] = useState({

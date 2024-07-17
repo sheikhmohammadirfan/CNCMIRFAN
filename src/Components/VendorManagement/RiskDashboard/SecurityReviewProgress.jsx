@@ -28,7 +28,11 @@ const useStyles = makeStyles({
   },
 });
 
-const SecurityReviewProgress = ( {handleNeedsUpdateClick, handleNeedsInitialReviewClick, handleUpToDateClick} ) => {
+const SecurityReviewProgress = ({
+  handleNeedsUpdateClick,
+  handleNeedsInitialReviewClick,
+  handleUpToDateClick,
+}) => {
   const classes = useStyles();
   const [dateRange, setDateRange] = useState("This month");
   const [dueReviews, setDueReviews] = useState([]);
@@ -47,11 +51,15 @@ const SecurityReviewProgress = ( {handleNeedsUpdateClick, handleNeedsInitialRevi
       <Box mb={2}>
         <Grid container spacing={2}>
           <Grid item xs={4}>
-            <Button fullWidth className={classes.button} onClick={handleNeedsUpdateClick}>
+            <Button
+              fullWidth
+              className={classes.button}
+              onClick={handleNeedsUpdateClick}
+            >
               <Box display="flex" flexDirection="column">
                 <Box display="flex" alignItems="center">
                   <AccessTimeIcon style={{ color: "red", marginRight: 8 }} />
-                  <Typography>Needs update</Typography>
+                  <Typography>Need Update</Typography>
                 </Box>
                 <Box display="flex" justifyContent="center">
                   <Typography variant="h6">0</Typography>
@@ -60,7 +68,11 @@ const SecurityReviewProgress = ( {handleNeedsUpdateClick, handleNeedsInitialRevi
             </Button>
           </Grid>
           <Grid item xs={4}>
-            <Button fullWidth className={classes.button} onClick={handleNeedsInitialReviewClick}>
+            <Button
+              fullWidth
+              className={classes.button}
+              onClick={handleNeedsInitialReviewClick}
+            >
               <Box display="flex" flexDirection="column">
                 <Box display="flex" alignItems="center">
                   <FlagIcon style={{ color: "orange", marginRight: 8 }} />
@@ -73,11 +85,15 @@ const SecurityReviewProgress = ( {handleNeedsUpdateClick, handleNeedsInitialRevi
             </Button>
           </Grid>
           <Grid item xs={4}>
-            <Button fullWidth className={classes.button} onClick={handleUpToDateClick}>
+            <Button
+              fullWidth
+              className={classes.button}
+              onClick={handleUpToDateClick}
+            >
               <Box display="flex" flexDirection="column">
                 <Box display="flex" alignItems="center">
                   <CheckCircleIcon style={{ color: "green", marginRight: 8 }} />
-                  <Typography>Up to date</Typography>
+                  <Typography>Up To Date</Typography>
                 </Box>
                 <Box display="flex" justifyContent="center">
                   <Typography variant="h6">12</Typography>

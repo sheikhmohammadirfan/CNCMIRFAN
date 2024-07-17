@@ -57,7 +57,6 @@ const DiscoveryTable = ({
               checkbox={true}
               minCheckboxWidth={50}
               serialNo={false}
-              resizeTable={true}
               selectedRows={selectedRows}
               setSelectedRows={setSelectedRows}
               headerWrapper={(text) => <HeaderCell text={text} />}

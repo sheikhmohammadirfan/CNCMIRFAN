@@ -29,13 +29,13 @@ function AccessManagement() {
     <>
       <Box className={classes.accessManagementContainer}>
         <Switch>
-          <Route exact path="/access_management/accounts">
+          <Route exact path="/access-management/accounts">
             <AccessAccounts />
           </Route>
-          <Route exact path="/access_management/reviews">
+          <Route exact path="/access-management/reviews">
             <AccessReviews />
           </Route>
-          <Route path="/access_management/reviews/user-details/:id" component={UserDetails} />
+          <Route path="/access-management/reviews/user-details/:id" component={UserDetails} />
         </Switch>
       </Box>
     </>

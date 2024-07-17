@@ -29,7 +29,7 @@ const ReviewTable = ({
 
   const handleRowClick = (rowIndex) => {
     const vendorId = filteredRows[rowIndex].ID;
-    history.push(`/vendor_management/${vendorId}`);
+    history.push(`/vendor-management/${vendorId}`);
   };
 
   // Map data to header
@@ -64,7 +64,6 @@ const ReviewTable = ({
               checkbox={true}
               minCheckboxWidth={50}
               serialNo={false}
-              resizeTable={true}
               selectedRows={selectedRows}
               setSelectedRows={setSelectedRows}
               headerWrapper={(text) => <HeaderCell text={text} />}

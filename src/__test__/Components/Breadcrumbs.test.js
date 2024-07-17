@@ -18,7 +18,7 @@ describe("<Breadcrumbs />", () => {
   });
 
   test("Test breadcrumbs chip generated properly", () => {
-    const wrapper = setup({}, "/poam/verify/Integrated_Platforms/profile");
+    const wrapper = setup({}, "/poam/verify/Integrated-Platforms/profile");
     const chip = findByAttr(wrapper, "breadcrumbs-path-chip");
 
     // Test all chips are rendered
@@ -29,7 +29,7 @@ describe("<Breadcrumbs />", () => {
 
     // Test chips have correct path
     expect(chip.last().props().path).toBe(
-      "/poam/verify/Integrated_Platforms/profile"
+      "/poam/verify/Integrated-Platforms/profile"
     );
   });
 
@@ -37,7 +37,7 @@ describe("<Breadcrumbs />", () => {
     let wrapper, chip;
 
     // Test when path is there, then last btn is not-clickable
-    wrapper = setup({}, "/poam/verify/Integrated_Platforms");
+    wrapper = setup({}, "/poam/verify/Integrated-Platforms");
     chip = findByAttr(wrapper, "breadcrumbs-path-chip");
     expect(chip.at(0).props().link).toBe(true);
     expect(chip.last().props().link).toBe(false);

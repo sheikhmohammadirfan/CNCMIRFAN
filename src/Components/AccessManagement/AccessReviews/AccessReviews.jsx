@@ -151,7 +151,7 @@ function AccessReviews() {
   const handleRowClick = (rowId) => {
     console.log("Row Clicked")
     const selectedItem = filteredData[rowId];
-    history.push(`/access_management/reviews/user-details/${rowId}`, { data: selectedItem });
+    history.push(`/access-management/reviews/user-details/${rowId}`, { data: selectedItem });
   };
 
   const handleShowCreateReview = () => {

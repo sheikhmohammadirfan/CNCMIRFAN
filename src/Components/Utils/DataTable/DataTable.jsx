@@ -290,9 +290,6 @@ function DataTable({
         style={
           {
             gridTemplateColumns: generateColumns(),
-            // gridTemplateRows: Array(rowData.length + 1)
-            //   .fill("50px")
-            //   .join(" "),
           }
         }
         ref={tableRef}

@@ -160,12 +160,10 @@ const SecurityOwnerCell = ({ cellValue }) => {
     );
   }
 
-  const { owner } = cellValue;
-
   return (
     <Box>
       <Typography variant="body2" noWrap className={classes.cellLabel}>
-        {owner}
+        {cellValue}
       </Typography>
     </Box>
   );
@@ -184,12 +182,10 @@ const LastReviewedCell = ({ cellValue }) => {
     );
   }
 
-  const { date } = cellValue;
-
   return (
     <Box>
       <Typography variant="body2" noWrap className={classes.cellLabel}>
-        {date}
+        {cellValue}
       </Typography>
     </Box>
   );

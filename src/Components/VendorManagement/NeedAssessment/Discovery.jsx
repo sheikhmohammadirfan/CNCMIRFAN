@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Box, Typography, Divider } from "@material-ui/core";
+import { Box, Typography, Divider, Backdrop, CircularProgress, makeStyles } from "@material-ui/core";
 import DiscoveryTabs from "./DiscoveryTabs";
 import TabPanel from "../TabPanel";
 import NeedsReview from "./NeedsReview";
@@ -9,8 +9,29 @@ import DiscoveryTable from "./DiscoveryTable";
 import DiscoveryFilters from "../../../assets/data/VendorManagement/Discovery/DiscoveryFilters";
 import { discovery_columns } from "../../../assets/data/VendorManagement/Discovery/DiscoveryColumns";
 import useParams from "../../Utils/Hooks/useParams";
+import { getUser } from "../../../Service/UserFactory";
+import { createSecurityReview, updateVendor } from "../../../Service/VendorManagement/VendorManagement.service";
 
-const Discovery = ({ isLoading, vendorList }) => {
+const useStyles = makeStyles(theme => ({
+  backdrop: {
+    zIndex: 1000,
+    display: "flex",
+    flexDirection: "column",
+    color: "white",
+    "&  .backdrop-label": {
+      marginTop: 10,
+      fontWeight: "bold",
+      letterSpacing: 1,
+      fontStyle: "italic",
+    },
+  }
+}));
+
+const Discovery = ({ isLoading, vendorList, reload }) => {
+  const classes = useStyles();
+
+  const [showLoader, updateLoader] = useState(false);
+
   const { params, changeParams, deleteParams } = useParams(
     "risk",
     "searchValue"
@@ -23,9 +44,6 @@ const Discovery = ({ isLoading, vendorList }) => {
   const [searchValue, setSearchValue] = useState(params.searchValue || "");
   const [activeTab, setActiveTab] = useState(0);
 
-  const unmanagedVendors = vendorList.filter(
-    (vendor) => vendor.managed === false
-  );
 
   const handleChange = (event, newValue) => {
     setActiveTab(newValue);
@@ -35,12 +53,15 @@ const Discovery = ({ isLoading, vendorList }) => {
   useEffect(() => {
     if (!isLoading()) {
       (async () => {
-        setNeedsReviewRows(unmanagedVendors);
-        setIgnoredRows(unmanagedVendors);
-        setRejectedRows(unmanagedVendors);
+        const unmanagedVendors = vendorList.filter(
+          (vendor) => vendor.managed === false && vendor.website !== "archived"
+        );
+        setNeedsReviewRows(unmanagedVendors.filter(v => v.website !== "ignore" && v.website !== "reject"));
+        setIgnoredRows(unmanagedVendors.filter(v => v.website === "ignore"));
+        setRejectedRows(unmanagedVendors.filter(v => v.website === "reject"));
       })();
     }
-  }, [isLoading]);
+  }, [vendorList, isLoading]);
 
   const [filterDropdowns, setFilterDropdowns] = useState(DiscoveryFilters);
   const [filters, setFilters] = useState({
@@ -155,118 +176,78 @@ const Discovery = ({ isLoading, vendorList }) => {
   };
 
   // Functions to move rows between tabs
-  const moveRow = (rows, targetTab) => {
-    // Copy the selected rows from the active tab then delete it
-    let copyRows = [];
-    if (activeTab === 0) {
-      rows.forEach((row) => {
-        copyRows.push(needsReviewRows[row]);
-      });
-      setNeedsReviewRows(
-        needsReviewRows.filter((_, index) => !rows.includes(index))
-      );
-    }
-    if (activeTab === 1) {
-      rows.forEach((row) => {
-        copyRows.push(ignoredRows[row]);
-      });
-      setIgnoredRows(ignoredRows.filter((_, index) => !rows.includes(index)));
-    }
-    if (activeTab === 2) {
-      rows.forEach((row) => {
-        copyRows.push(rejectedRows[row]);
-      });
-      setRejectedRows(rejectedRows.filter((_, index) => !rows.includes(index)));
-    }
-
+  const moveRow = async (rows, targetTab) => {
     // Add the copied rows from the active tab to the target tab
-    if (targetTab === 0) {
-      copyRows.forEach((row) => {
-        setNeedsReviewRows((prev) => [...prev, row]);
-      });
-    }
+    updateLoader(true);
+    const list = getFilteredRowsForActiveTab();
+    const row = list.find((_,idx) => idx === rows[0]);
     if (targetTab === 1) {
-      copyRows.forEach((row) => {
-        setIgnoredRows((prev) => [...prev, row]);
-      });
+      const res = await updateVendor(row.id, { website: "ignore", organization: getUser().organization_id });
+      updateLoader(false);
+      if (res.status) {
+          reload();
+          return;
+      }
+    } else if (targetTab === 2) {
+      const res = await updateVendor(row.id, { website: "reject", organization: getUser().organization_id });
+      updateLoader(false);
+      if (res.status) {
+          reload();
+          return;
+      }
+    } else if (targetTab === 3) {
+      const reviewDate = new Date();
+      reviewDate.setDate(reviewDate.getDate() + 15);
+      const payload = {
+        "vendor": row.id,
+        "security_owner": getUser().id,
+        "review_status": false ,
+        "review_status_reason": "Need Review",
+        "last_review_date": reviewDate.toISOString()
+      }
+      let res = await createSecurityReview(payload);
+      if (res.status) {
+        res = await updateVendor(row.id, { managed: true, website: "temp", organization: getUser().organization_id });
+        updateLoader(false);
+        if (res.status) {
+            reload();
+            return;
+        }
+      }
     }
-    if (targetTab === 2) {
-      copyRows.forEach((row) => {
-        setRejectedRows((prev) => [...prev, row]);
-      });
-    }
-    if (targetTab === 3) {
-      copyRows.forEach((row) => {
-        row.managed = true;
-      });
-    }
-    copyRows = [];
+    updateLoader(false);
   };
 
-  const needsReviewButtons = [
-    {
-      label: "Add",
-      onClick: () => {
-        moveRow(selectedRows, 3);
-        setSelectedRows([]);
-      },
-      disabled: selectedRows.length === 0,
+  const ReviewButton = {
+    label: "Add",
+    onClick: async () => {
+      await moveRow(selectedRows, 3);
+      setSelectedRows([]);
     },
-    {
-      label: "Ignore",
-      onClick: () => {
-        moveRow(selectedRows, 1);
-        setSelectedRows([]);
-      },
-      disabled: selectedRows.length === 0,
-    },
-    {
-      label: "Reject",
-      onClick: () => {
-        moveRow(selectedRows, 2);
-        setSelectedRows([]);
-      },
-      disabled: selectedRows.length === 0,
-    },
-  ];
+    disabled: selectedRows.length !== 1,
+  };
 
-  const ignoredButtons = [
-    {
-      label: "Review",
-      onClick: () => {
-        moveRow(selectedRows, 0);
-        setSelectedRows([]);
-      },
-      disabled: selectedRows.length === 0,
+  const IgnoreButton = {
+    label: "Ignore",
+    onClick: async () => {
+      await moveRow(selectedRows, 1);
+      setSelectedRows([]);
     },
-    {
-      label: "Reject",
-      onClick: () => {
-        moveRow(selectedRows, 2);
-        setSelectedRows([]);
-      },
-      disabled: selectedRows.length === 0,
-    },
-  ];
+    disabled: selectedRows.length !== 1,
+  };
 
-  const rejectedButtons = [
-    {
-      label: "Review",
-      onClick: () => {
-        moveRow(selectedRows, 0);
-        setSelectedRows([]);
-      },
-      disabled: selectedRows.length === 0,
+  const RejectButton = {
+    label: "Reject",
+    onClick: async () => {
+      await moveRow(selectedRows, 2);
+      setSelectedRows([]);
     },
-    {
-      label: "Ignore",
-      onClick: () => {
-        moveRow(selectedRows, 1);
-        setSelectedRows([]);
-      },
-      disabled: selectedRows.length === 0,
-    },
-  ];
+    disabled: selectedRows.length !== 1,
+  };
+
+  const needsReviewButtons = [ ReviewButton, IgnoreButton, RejectButton ];
+  const ignoredButtons = [ ReviewButton, RejectButton ];
+  const rejectedButtons = [ ReviewButton, IgnoreButton ];
 
   let headerButtons = [];
   switch (activeTab) {
@@ -321,6 +302,13 @@ const Discovery = ({ isLoading, vendorList }) => {
         matchedCell={matchedCell}
         headerButtons={headerButtons}
       />
+
+      <Backdrop className={classes.backdrop} open={showLoader}>
+        <CircularProgress color="inherit" />
+        <Typography className="backdrop-label" variant="h5">
+          Please wait...
+        </Typography>
+      </Backdrop>
     </Box>
   );
 };

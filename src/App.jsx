@@ -65,6 +65,7 @@ const useStyles = makeStyles((theme) => ({
   },
   // Wrapper to add a small padding to left to show sidebar over the content
   wrapper: {
+    height: `calc(100vh - ${headerHeight}px)`,
     minHeight: `calc(100vh - ${headerHeight}px)`,
     overflow: "auto",
     position: 'relative',
@@ -143,16 +144,16 @@ function App() {
                     <Route exact path="/profile">
                       <Profile title="PROFILE" />
                     </Route>
-                    <Route exact path="/Integrated_Platforms">
+                    <Route exact path="/Integrated-Platforms">
                       <Integrate title="Integrated Platforms" />
                     </Route>
-                    <Route path="/vendor_management">
+                    <Route path="/vendor-management">
                       <VendorManagement title="Vendor Management" />
                     </Route>
                     <Route path="/risk-management">
                       <RiskManagement title="Risk Management" />
                     </Route>
-                    <Route path="/access_management/">
+                    <Route path="/access-management/">
                       <AccessManagement title="Access Management" />
                     </Route>
                     

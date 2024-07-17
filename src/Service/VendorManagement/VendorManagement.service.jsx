@@ -29,3 +29,11 @@ export async function deleteVendor(id) {
 export async function listManagedVendors() {
   return await get("/vendor/vendors/managed/");  // doesn't work "unable to list managed vendors"
 }
+
+export async function createSecurityReview(payload) {
+  return await post("/vendor/security-reviews/create/", payload);
+}
+
+export async function getSecurityReview() {
+  return await get("/vendor/security-reviews/");
+}
