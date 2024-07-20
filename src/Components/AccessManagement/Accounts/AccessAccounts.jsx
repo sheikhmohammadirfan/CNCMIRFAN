@@ -21,6 +21,7 @@ import {
   statusOptions,
   mfaOptions,
 } from "../Accounts/AccountsColumns";
+import AccessTable from "./AccessTable";
 
 const useStyle = makeStyles((theme) => ({
   tableStyle: {
@@ -137,7 +138,7 @@ const useStyle = makeStyles((theme) => ({
     maxHeight: `calc(100vh - ${theme.headerHeight}px)`,
     overflow: "hidden",
     // padding: `${theme.spacing(2)-2} ${theme.spacing(2)}`,
-    paddingTop:"0",
+    paddingTop: "0",
     padding: theme.spacing(2),
 
     // "&.zoomed": { padding: theme.spacing(3) },
@@ -146,7 +147,6 @@ const useStyle = makeStyles((theme) => ({
     "& > div": { maxHeight: "60vh" },
     "&.zoomed > div": { maxHeight: "83vh" },
   },
-
 }));
 
 function AccessAccounts() {
@@ -197,8 +197,6 @@ function AccessAccounts() {
   const handleDropdownChange = (setter) => (value) => {
     setter(value);
   };
-
-
 
   const classes = useStyle();
   return (
@@ -454,44 +452,42 @@ function AccessAccounts() {
             </IconButton>
           </Box>
         </Box>
-        <Grid container
-            spacing={1} className={classes.dataTableContainer}>
+        <Grid container spacing={1} className={classes.dataTableContainer}>
           <Grid item xs={12}>
-          <DataTable
-            className={classes.tableStyle}
-            checkbox={false}
-            serialNo={false}
-            stickyHeader={true}
-            verticalBorder={true}
-            resizeTable={true}
-            header={{
-              data: [
-                { text: "Account Name" },
-                { text: "Owner" },
-                { text: "Groups" },
-                { text: "Type" },
-                { text: "Status" },
-                { text: "MFA" },
-                { text: "Created" },
-              ],
-            }}
-            rowList={{
-              rowData: filteredData.map((item) => ({
+            <DataTable
+              className={classes.tableStyle}
+              checkbox={false}
+              serialNo={false}
+              stickyHeader={true}
+              verticalBorder={true}
+              resizeTable={true}
+              header={{
                 data: [
-                  { text: item.accountName },
-                  { text: item.owner },
-                  { text: item.groups },
-                  { text: item.type },
-                  { text: item.status },
-                  { text: item.mfa },
-                  { text: item.created },
+                  { text: "Account Name" },
+                  { text: "Owner" },
+                  { text: "Groups" },
+                  { text: "Type" },
+                  { text: "Status" },
+                  { text: "MFA" },
+                  { text: "Created" },
                 ],
-              })),
-            }}
-            minCellWidth={[350, 200, 150, 250, 150, 150, 150]}
-          />
+              }}
+              rowList={{
+                rowData: filteredData.map((item) => ({
+                  data: [
+                    { text: item.accountName },
+                    { text: item.owner },
+                    { text: item.groups },
+                    { text: item.type },
+                    { text: item.status },
+                    { text: item.mfa },
+                    { text: item.created },
+                  ],
+                })),
+              }}
+              minCellWidth={[350, 200, 150, 250, 150, 150, 150]}
+            />
           </Grid>
-          
         </Grid>
       </Box>
     </>

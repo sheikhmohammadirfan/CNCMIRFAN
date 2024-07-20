@@ -1,4 +1,4 @@
-import React, { useState,useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import {
   useLocation,
   useParams,
@@ -14,6 +14,9 @@ import {
   Paper,
   Popover,
   makeStyles,
+  Divider,
+  Tooltip,
+  Menu,
 } from "@material-ui/core";
 import Chip from "@mui/material/Chip";
 import { TextControl } from "../../Utils/Control";
@@ -29,7 +32,10 @@ import TabContext from "@material-ui/lab/TabContext";
 import TabList from "@material-ui/lab/TabList";
 import TabPanel from "@material-ui/lab/TabPanel";
 import SystemCards from "./SystemCards";
-
+import DoughnutChart from "./DoughnutChart";
+import CompletedStatusContent from "./CompletedStatusContent";
+import InReviewStatusContent from "./InReviewStatusContent";
+import DraftStatusContent from "./DraftStatusContent";
 
 const useStyle = makeStyles((theme) => ({
   usersContainer: {
@@ -42,7 +48,6 @@ const useStyle = makeStyles((theme) => ({
     "&::-webkit-scrollbar": {
       display: "none",
     },
-
   },
   buttonContainer: {
     display: "flex",
@@ -54,9 +59,9 @@ const useStyle = makeStyles((theme) => ({
     color: theme.palette.primary.main,
     textTransform: "none",
   },
-  systemsContainer:{
-    display:"flex",
-    justifyContent:"space-between",
+  systemsContainer: {
+    display: "flex",
+    justifyContent: "space-between",
   },
   tableStyle: {
     "& tbody td": { background: "#fff" },
@@ -113,30 +118,213 @@ const useStyle = makeStyles((theme) => ({
     },
     "& tbody td[data-searched='true']": { border: "2px solid #4477CE" },
 
-    cursor:"pointer",
+    cursor: "pointer",
   },
   dataTableContainer: {
     "& > div": { maxHeight: "50vh" },
     "&.zoomed > div": { maxHeight: "83vh" },
   },
+  menuText: {
+    color: theme.palette.primary.main,
+    fontSize: "0.875rem",
+  },
+  menuIcon: {
+    marginRight: theme.spacing(1),
+    color: theme.palette.primary.main,
+    fontSize: "1rem",
+  },
 }));
 
+const getStatusChip = (status) => {
+  switch (status) {
+    case "Completed":
+      return (
+        <Chip
+          variant="outlined"
+          label="Completed"
+          style={{ minWidth: "100px" }}
+          icon={<Icon style={{ color: "green" }}>radio_button_checked</Icon>}
+        />
+      );
+    case "In Review":
+      return (
+        <Chip
+          variant="outlined"
+          label="In Review"
+          style={{ minWidth: "100px" }}
+          icon={<Icon style={{ color: "yellow" }}>radio_button_checked</Icon>}
+        />
+      );
+    case "Draft":
+      return (
+        <Chip
+          variant="outlined"
+          label="Draft"
+          style={{ minWidth: "100px" }}
+          icon={<Icon style={{ color: "gray" }}>radio_button_checked</Icon>}
+        />
+      );
+    default:
+      return <Chip label={status} />;
+  }
+};
+
 const steps = ["Draft", "In review", "Completed"];
+
+const CompletedContent = ({ classes }) => (
+  <>
+    <Box className={classes.systemsContainer} width="100%">
+      <SystemCards
+        iconName="fact_check"
+        title="# of systems reviewed"
+        count="1"
+      />
+      <SystemCards
+        iconName="how_to_reg"
+        title="# of accounts reviewed"
+        count="163"
+      />
+      <SystemCards iconName="warning" title="# of accounts flagged" count="0" />
+      <SystemCards
+        iconName="manage_accounts"
+        title="# of access changes"
+        count="12"
+      />
+    </Box>
+  </>
+);
+
+const InReviewContent = ({ data }) => (
+  <Grid container spacing={2}>
+    <Grid item xs={6} md={6} lg={6}>
+      <Box border={1} p={2}>
+        <Typography variant="h6">Access review progress</Typography>
+      </Box>
+      <Box borderBottom={1} borderRight={1} borderLeft={1} p={2}>
+        <DoughnutChart data={data} />
+      </Box>
+    </Grid>
+    <Grid item xs={6} md={6} lg={6}>
+      <Box border={1} p={2}>
+        <Typography variant="h6">Accounts flagged by Falcon</Typography>
+      </Box>
+      <Box
+        borderBottom={1}
+        borderRight={1}
+        borderLeft={1}
+        p={2}
+        overflow="auto"
+        height="183px"
+      >
+        <Button fullWidth>
+          <Box
+            display="flex"
+            alignContent="center"
+            justifyContent="space-between"
+            width="100%"
+            sx={{ textTransform: "none" }}
+          >
+            <Box
+              display="flex"
+              justifyContent="space-between"
+              flexDirection="column"
+            >
+              <Box>
+                <Typography align="left">Project Sigma</Typography>
+              </Box>
+              <Box>
+                <Typography>hanz@cncmllc.com</Typography>
+              </Box>
+            </Box>
+            <Box p={2}>
+              <Typography>Owner terminated</Typography>
+            </Box>
+          </Box>
+        </Button>
+        <Divider />
+        <Button fullWidth>
+          <Box
+            display="flex"
+            alignContent="center"
+            justifyContent="space-between"
+            width="100%"
+            sx={{ textTransform: "none" }}
+          >
+            <Box
+              display="flex"
+              justifyContent="space-between"
+              flexDirection="column"
+            >
+              <Box>
+                <Typography align="left">Project Sigma</Typography>
+              </Box>
+              <Box>
+                <Typography>hanz@cncmllc.com</Typography>
+              </Box>
+            </Box>
+            <Box p={2}>
+              <Typography>Owner group changed</Typography>
+            </Box>
+          </Box>
+        </Button>
+        <Divider />
+        <Button fullWidth>
+          <Box
+            display="flex"
+            alignContent="center"
+            justifyContent="space-between"
+            width="100%"
+            sx={{ textTransform: "none" }}
+          >
+            <Box
+              display="flex"
+              justifyContent="space-between"
+              flexDirection="column"
+            >
+              <Box>
+                <Typography align="left">Project Sigma</Typography>
+              </Box>
+              <Box>
+                <Typography>hanz@cncmllc.com</Typography>
+              </Box>
+            </Box>
+            <Box p={2}>
+              <Typography>Owner group changed</Typography>
+            </Box>
+          </Box>
+        </Button>
+      </Box>
+    </Grid>
+  </Grid>
+);
+
+const DraftContent = ({ data }) => (
+  <Grid container>
+    <Grid item xs={12} md={12} lg={12}>
+      <Box border={1} p={2}>
+        <Typography variant="h6">Access review progress</Typography>
+      </Box>
+      <Box borderBottom={1} borderRight={1} borderLeft={1} p={2}>
+        <DoughnutChart data={data} />
+      </Box>
+    </Grid>
+  </Grid>
+);
 
 function UserDetails() {
   const classes = useStyle();
   const location = useLocation();
   const { id } = useParams();
-  const { data } = location.state || {}; // Destructure data from state
+  const { data } = location.state || {};
 
   let activeStep = 0;
   if (data) {
     if (data.status === "Draft") {
+      activeStep = 0;
+    } else if (data.status === "In Review") {
       activeStep = 1;
-    } else if (data.status === "In review") {
-      activeStep = 2;
     } else if (data.status === "Completed") {
-      activeStep = 3;
+      activeStep = 2;
     }
   }
 
@@ -146,7 +334,20 @@ function UserDetails() {
   const [reviewerOpen, setReviewerOpen] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState("");
   const [selectedReviewer, setSelectedReviewer] = useState("");
+  const [systemOpen, setSystemOpen] = useState(false);
+  const [selectedSystem, setSelectedSytem] = useState("");
   const [filteredData, setFilteredData] = useState(tableMockData);
+  const [anchorEl, setAnchorEl] = useState(null);
+
+
+
+  const handleMoreClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMoreClose = () => {
+    setAnchorEl(null);
+  };
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -166,9 +367,175 @@ function UserDetails() {
     setFilteredData(data);
   };
 
+  // const handleRowClick = (rowId) => {
+  //   console.log("Row Clicked");
+  //   const selectedItem = filteredData[rowId];
+  //   history.push(`/access_management/reviews/user-details//${rowId}`, {
+  //     data: selectedItem,
+  //   });
+  // };
+
   useEffect(() => {
     handleFilter();
   }, [selectedStatus, searchValue]);
+
+  const renderContent = () => {
+    switch (data.status) {
+      case "Completed":
+        return <CompletedStatusContent />;
+      case "In Review":
+        const data = {
+          labels: ["Not started", "In progress", "Completed"],
+          datasets: [
+            {
+              data: [0, 1, 0],
+              backgroundColor: ["#A9A9A9", "#FF6384", "#4BC0C0"],
+              borderColor: ["#A9A9A9", "#FF6384", "#4BC0C0"],
+              borderWidth: 1,
+            },
+          ],
+        };
+        return <InReviewStatusContent />;
+      case "Draft":
+        const data2 = {
+          labels: [
+            "Systems requiring access file",
+            "Systems requiring connection",
+            "Systems ready to review",
+          ],
+          datasets: [
+            {
+              data: [4, 3, 7],
+              backgroundColor: ["#A9A9A9", "#FF6384", "#4BC0C0"],
+              borderColor: ["#A9A9A9", "#FF6384", "#4BC0C0"],
+              borderWidth: 1,
+            },
+          ],
+        };
+        return <DraftStatusContent />;
+      default:
+        return null;
+    }
+  };
+
+  const renderHeaderButtons = () => {
+    if (data.status == "Completed") {
+      return (
+        <Box className={classes.buttonContainer}>
+          <Button
+            variant="outlined"
+            size="small"
+            startIcon={<Icon>delete</Icon>}
+            className={classes.exp_Del_Button}
+          >
+            Delete
+          </Button>
+          <Button
+            variant="outlined"
+            size="small"
+            startIcon={<Icon>download</Icon>}
+            className={classes.exp_Del_Button}
+          >
+            Export
+          </Button>
+        </Box>
+      );
+    } else if (data.status == "In review") {
+      return (
+        <Box className={classes.buttonContainer}>
+          <Button
+            onClick={handleMoreClick}
+            variant="outlined"
+            size="small"
+            startIcon={<Icon>arrow_drop_down</Icon>}
+            className={classes.exp_Del_Button}
+          >
+            More
+          </Button>
+          <Menu
+            anchorEl={anchorEl}
+            keepMounted
+            open={Boolean(anchorEl)}
+            onClose={handleMoreClose}
+          >
+            <MenuItem onClick={handleMoreClose}>
+              <Icon className={classes.menuIcon}>mail</Icon>
+              <Typography className={classes.menuText}>
+                Send reminders
+              </Typography>
+            </MenuItem>
+            <MenuItem onClick={handleMoreClose}>
+              <Icon className={classes.menuIcon}>edit</Icon>
+              <Typography className={classes.menuText}>Edit</Typography>
+            </MenuItem>
+            <MenuItem onClick={handleMoreClose}>
+              <Icon className={classes.menuIcon}>download</Icon>
+              <Typography className={classes.menuText}>Export</Typography>
+            </MenuItem>
+            <MenuItem onClick={handleMoreClose}>
+              <Icon className={classes.menuIcon}>delete</Icon>
+              <Typography className={classes.menuText}>Delete</Typography>
+            </MenuItem>
+          </Menu>
+          <Tooltip title="To complete the review, please ensure all reviews are submitted and all remediation evidence is added under the 'Access changes' tab.">
+            <span>
+              <Button
+                variant="outlined"
+                size="small"
+                startIcon={<Icon>check</Icon>}
+                disabled
+                className={classes.exp_Del_Button}
+              >
+                Complete
+              </Button>
+            </span>
+          </Tooltip>
+        </Box>
+      );
+    } else {
+      return (
+        <Box className={classes.buttonContainer}>
+          <Button
+            onClick={handleMoreClick}
+            variant="outlined"
+            size="small"
+            startIcon={<Icon>arrow_drop_down</Icon>}
+            className={classes.exp_Del_Button}
+          >
+            More
+          </Button>
+          <Menu
+            anchorEl={anchorEl}
+            keepMounted
+            open={Boolean(anchorEl)}
+            onClose={handleMoreClose}
+          >
+            <MenuItem onClick={handleMoreClose}>
+              <Icon className={classes.menuIcon}>edit</Icon>
+              <Typography className={classes.menuText}>Edit</Typography>
+            </MenuItem>
+            <MenuItem onClick={handleMoreClose}>
+              <Icon className={classes.menuIcon}>download</Icon>
+              <Typography className={classes.menuText}>Export</Typography>
+            </MenuItem>
+            <MenuItem onClick={handleMoreClose}>
+              <Icon className={classes.menuIcon}>delete</Icon>
+              <Typography className={classes.menuText}>Delete</Typography>
+            </MenuItem>
+          </Menu>
+          <Button
+            variant="outlined"
+            size="small"
+            startIcon={<Icon>check</Icon>}
+            disabled
+            className={classes.exp_Del_Button}
+          >
+            Start review
+          </Button>
+        </Box>
+      );
+    }
+  };
 
   return (
     <>
@@ -199,202 +566,13 @@ function UserDetails() {
                   ))}
                 </Stepper>
               </Box>
-              <Box className={classes.buttonContainer}>
-                <Button
-                  variant="outlined"
-                  size="small"
-                  startIcon={<Icon>delete</Icon>}
-                  className={classes.exp_Del_Button}
-                >
-                  Delete
-                </Button>
-                <Button
-                  variant="outlined"
-                  size="small"
-                  startIcon={<Icon>download</Icon>}
-                  className={classes.exp_Del_Button}
-                >
-                  Export
-                </Button>
-              </Box>
+              {renderHeaderButtons()}
+              {renderHeaderButtons()}
             </Box>
           </Box>
         </Box>
 
-        <Box sx={{ width: "100%", typography: "body1"}}
-        style={{marginTop:"20px"}}
-        >
-          <TabContext value={value}>
-            <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-              <TabList
-                onChange={handleChange}
-                aria-label="lab API tabs example"
-              >
-                <Tab label="Systems" value="1" />
-                <Tab label="Access changes" value="2" />
-              </TabList>
-            </Box>
-            <TabPanel value="1" style={{padding:"24px 0"}}>
-                <Box className={classes.systemsContainer} width="100%">
-                  <SystemCards iconName="fact_check" title="# of systems reviewed" count="1"/>
-                  <SystemCards iconName="how_to_reg" title="# of accounts reviewed" count="163"/>
-                  <SystemCards iconName="warning" title="# of accounts flagged" count="0"/>
-                  <SystemCards iconName="manage_accounts" title="# of access changes" count="12"/>
-                </Box>
-
-                <Box
-        style={{
-          display: "flex",
-          alignItems: "center",
-          margin: "20px 0",
-          gap: "30px",
-        }}
-      >
-        <Box display="flex" gridColumnGap={15} alignItems="center">
-          <TextControl
-            variant="outlined"
-            placeholder="Search"
-            size="small"
-            gutter={false}
-            label=" "
-            className={classes.searchInput}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <IconButton size="small">
-                    <Icon>search</Icon>
-                  </IconButton>
-                </InputAdornment>
-              ),
-            }}
-            value={searchValue}
-            onChange={(e) => setSearchValue(e.target.value)}
-          />
-        </Box>
-
-        <Box display="flex" alignItems="center" gridColumnGap={10}>
-          <OptionDropdown
-            open={statusOpen}
-            handleClose={() => setStatusOpen(false)}
-            placement="bottom-start"
-            options={[
-              {
-                text: "Draft",
-                clickHandler: () =>
-                  handleDropdownChange(setSelectedStatus)("Draft"),
-              },
-              {
-                text: "Completed",
-                clickHandler: () =>
-                  handleDropdownChange(setSelectedStatus)("Completed"),
-              },
-              {
-                text: "Clear",
-                clickHandler: () => handleDropdownChange(setSelectedStatus)(""),
-              },
-            ]}
-          >
-            <Button
-              size="medium"
-              endIcon={
-                <Icon style={{ rotate: "90deg" }}>arrow_forward_ios</Icon>
-              }
-              className={classes.dropdownButton}
-              style={{
-                backgroundColor: "transparent",
-                color: "#4477CE",
-                textTransform: "none",
-                paddingInline: 10,
-                border: "none",
-              }}
-              onClick={() => setStatusOpen((prev) => !prev)}
-            >
-              {selectedStatus || "Status"}
-            </Button>
-          </OptionDropdown>
-          <OptionDropdown
-            open={reviewerOpen}
-            handleClose={() => setReviewerOpen(false)}
-            placement="bottom-start"
-            options={[
-              {
-                text: "Reviwer 1",
-                clickHandler: () =>
-                  handleDropdownChange(setSelectedReviewer)("Reviwer 1"),
-              },
-              {
-                text: "Reviwer 2",
-                clickHandler: () =>
-                  handleDropdownChange(setSelectedReviewer)("Reviwer 2"),
-              },
-              {
-                text: "Clear",
-                clickHandler: () => handleDropdownChange(setSelectedReviewer)(""),
-              },
-            ]}
-          >
-            <Button
-              size="medium"
-              endIcon={
-                <Icon style={{ rotate: "90deg" }}>arrow_forward_ios</Icon>
-              }
-              className={classes.dropdownButton}
-              style={{
-                backgroundColor: "transparent",
-                color: "#4477CE",
-                textTransform: "none",
-                paddingInline: 10,
-                border: "none",
-              }}
-              onClick={() => setReviewerOpen((prev) => !prev)}
-            >
-              {selectedReviewer || "Reviewer"}
-            </Button>
-          </OptionDropdown>
-        </Box>
-      </Box>
-
-
-
-      <Grid container spacing={1} className={classes.dataTableContainer}>
-        <Grid item xs={12}>
-          <DataTable
-            className={classes.tableStyle}
-            checkbox={false}
-            serialNo={false}
-            stickyHeader={true}
-            verticalBorder={true}
-            resizeTable={true}
-            header={{
-              data: [
-                { text: "System" },
-                { text: "Reviewer" },
-                { text: "Access Data" },
-                { text: "Status" },
-              ],
-            }}
-            rowList={{
-              rowData: filteredData.map((item, index) => ({
-                data: [
-                  { text: item.name },
-                  { text: item.owner },
-                  { text: item.dateStarted },
-                  { text: item.status },
-                ],
-                
-              })),
-            }}
-            minCellWidth={[350, 300, 350, 350]}
-          />
-        </Grid>
-      </Grid>
-
-
-            </TabPanel>
-            <TabPanel value="2">Item Two</TabPanel>
-          </TabContext>
-        </Box>
-
+        {renderContent()}
       </Box>
     </>
   );
