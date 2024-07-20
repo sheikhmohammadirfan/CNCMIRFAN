@@ -35,6 +35,7 @@ const DeleteConfirmationDialog = ({
           color="primary"
           size="small"
           onClick={closeHandler}
+          disabled={isLoading}
         >
           Cancel
         </Button>,

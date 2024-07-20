@@ -1,5 +1,6 @@
 import { Typography, makeStyles } from "@material-ui/core";
 import columnToCellMap from "../../../assets/data/RiskManagement/TableColCellMap";
+import { HEADER_TABLE_NAME_MAP } from "../../../assets/data/RiskManagement/RiskLibrary/LibraryColumns";
 
 export const useStyle = makeStyles(theme => ({
 
@@ -161,12 +162,12 @@ export const mapDataToHeader = (columns, sorting, updateSort) => ({
         ? {
           "sticky": "",
           "header": "",
-          // onClick: () => updateSort(text),
-          // className: sorting && sorting.column === text ? sorting.order : "",
+          onClick: () => updateSort(text),
+          className: sorting && sorting.sort_by === HEADER_TABLE_NAME_MAP[text] ? (sorting.sort_order === 1 ? 'asc' : 'dsc') : "",
         }
         : {
-          // onClick: () => updateSort(text),
-          // className: sorting && sorting.column === text ? sorting.order : "",
+          onClick: () => updateSort(text),
+          className: sorting && sorting.sort_by === HEADER_TABLE_NAME_MAP[text] ? (sorting.sort_order === 1 ? 'asc' : 'dsc') : "",
         },
   })),
   cellStyle: {

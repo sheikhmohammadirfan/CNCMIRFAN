@@ -22,8 +22,8 @@ const useStyles = makeStyles((theme) => ({
     border: `1px solid #d9d9d9`,
     borderTop: 0,
     borderRadius: theme.shape.borderRadius,
-    maxHeight: "100%",
-    overflow: "auto",
+    // maxHeight: "100%",
+    // overflow: "auto",
     "& > table": { borderCollapse: "separate" },
     // "&, & td, & th": { borderColor: theme.palette.grey[400] },
     "& tr:last-child td": {
@@ -33,8 +33,9 @@ const useStyles = makeStyles((theme) => ({
 
   // Table style
   table: {
-    overflow: "visible",
-    width: "max-content",
+    maxWidth: "100%",
+    maxHeight: "65vh",
+    overflow: "auto",
     display: "grid",
     "& thead, & tbody, & tr": { display: "contents" },
     // Make cell relative to put dragger inside cell
@@ -113,7 +114,7 @@ const useStyles = makeStyles((theme) => ({
       },
     },
   },
-  
+
 }));
 
 /** Main DataTable Component */
@@ -355,16 +356,16 @@ function DataTable({
           )}
         </TableBody>
 
-        <DataTableFooter
-          component={footerComponent}
-          pageSize={pageSize}
-          rowsPerPage={rowsPerPage}
-          handleRowsPerPageChange={handleRowsPerPageChange}
-          page={page}
-          onPageChange={handlePageChange}
-          count={totalItems}
-        />
       </Table>
+      <DataTableFooter
+        component={footerComponent}
+        pageSize={pageSize}
+        rowsPerPage={rowsPerPage}
+        handleRowsPerPageChange={handleRowsPerPageChange}
+        page={page}
+        onPageChange={handlePageChange}
+        count={totalItems}
+      />
     </TableContainer>
   );
 }

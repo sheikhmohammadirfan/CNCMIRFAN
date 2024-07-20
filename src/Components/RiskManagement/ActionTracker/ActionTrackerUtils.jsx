@@ -1,5 +1,6 @@
 import { Typography, makeStyles } from "@material-ui/core";
 import columnToCellMap from "../../../assets/data/RiskManagement/TableColCellMap";
+import { HEADER_TABLE_COLS_MAP } from "../../../assets/data/RiskManagement/ActionTracker/ActionTrackerColumns";
 
 export const useStyle = makeStyles(theme => ({
 
@@ -143,14 +144,14 @@ export const mapDataToHeader = (columns, sorting, updateSort) => ({
     params:
       text === "ID"
         ? {
-          "sticky": "",
-          "header": "",
-          // onClick: () => updateSort(text),
-          // className: sorting && sorting.column === text ? sorting.order : "",
+          "sticky": "true",
+          "header": "true",
+          onClick: () => updateSort(text),
+          className: (sorting && sorting.sort_by === HEADER_TABLE_COLS_MAP[text]) ? (sorting.sort_order === 1 ? "asc" : "dsc") : "",
         }
         : {
-          // onClick: () => updateSort(text),
-          // className: sorting && sorting.column === text ? sorting.order : "",
+          onClick: () => updateSort(text),
+          className: (sorting && sorting.sort_by === HEADER_TABLE_COLS_MAP[text]) ? (sorting.sort_order === 1 ? "asc" : "dsc") : "",
         },
   })),
   cellStyle: {
@@ -243,7 +244,7 @@ const mapDataToRow = (row, rowIndex, register, owners, columns, matchedCell) => 
 const getCellValue = (row, colName, register, owners) => {
   if (colName === 'risk') {
     if (register.length === 0) return 'load';
-    else return register.find(risk => risk.id === row.id).scenario.scenario
+    else return register.find(risk => risk.id === row['risk'].id).scenario.scenario
   }
   else if (colName === 'owner') {
     if (owners.length === 0) return 'load';

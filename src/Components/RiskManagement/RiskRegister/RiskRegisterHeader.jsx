@@ -5,6 +5,7 @@ import OptionDropdown from './OptionDropdown';
 import FilterDropdown from '../../Utils/DataTable/FilterDropdown';
 import ManageRegisterColumns from './ManageRegisterColumns';
 import colorShader from '../../Utils/ColorShader';
+import FILTER_HANDLERS from './FilterHandlerMap';
 
 // Generate Styles
 const useStyle = makeStyles((theme) => ({
@@ -48,6 +49,7 @@ const useStyle = makeStyles((theme) => ({
 }))
 
 const RiskRegisterHeader = ({
+  contextLoading,
   moreOptionsHandlers,
   shareOptionsHandlers,
   addScenarioOptionsHandlers,
@@ -103,7 +105,7 @@ const RiskRegisterHeader = ({
       text: "Export all risk scenarios",
       clickHandler: () => {
         setMoreOpen(false);
-        moreOptionsHandlers.exportAllScenarios()
+        moreOptionsHandlers.openExportDialog()
       }
     }
   ]
@@ -201,6 +203,7 @@ const RiskRegisterHeader = ({
                 paddingInline: 10,
               }}
               onClick={() => setIsAddScenarioOpen(prev => !prev)}
+              disabled={contextLoading}
             >
               Add Scenario
             </Button>
@@ -211,7 +214,7 @@ const RiskRegisterHeader = ({
             // size='small'
             startIcon={<Icon style={{ fontSize: '1rem' }}>edit</Icon>}
             className={classes.actionButton}
-            disabled={selectedRows.length !== 1}
+            disabled={contextLoading || selectedRows.length !== 1}
             onClick={editHandler}
           >
             Edit
@@ -222,7 +225,7 @@ const RiskRegisterHeader = ({
             // size='small'
             startIcon={<Icon style={{ fontSize: '1rem' }}>add</Icon>}
             className={classes.actionButton}
-            disabled={selectedRows.length !== 1}
+            disabled={contextLoading || selectedRows.length !== 1}
             onClick={() => openAddActionForm()}
           >
             Add Task
@@ -237,6 +240,7 @@ const RiskRegisterHeader = ({
         >
           {/* Search field */}
           <TextControl
+            disabled={contextLoading}
             variant="outlined"
             placeholder="Search here"
             size="small"
@@ -287,11 +291,11 @@ const RiskRegisterHeader = ({
                 </InputAdornment>
               ),
             }}
-          onKeyDown={e => {
-            if (e.keyCode === 13) {
-              onSearch(e.target.value);
-            }
-          }}
+            onKeyDown={e => {
+              if (e.keyCode === 13) {
+                onSearch(e.target.value);
+              }
+            }}
           />
 
           {/* More dropdown */}
@@ -312,6 +316,7 @@ const RiskRegisterHeader = ({
                 paddingInline: 10,
               }}
               onClick={() => setMoreOpen(prev => !prev)}
+              disabled={contextLoading}
             >
               More
             </Button>
@@ -335,6 +340,7 @@ const RiskRegisterHeader = ({
                 paddingInline: 10,
               }}
               onClick={() => setShareOpen(prev => !prev)}
+              disabled={contextLoading}
             >
               Share
             </Button>
@@ -385,6 +391,8 @@ const RiskRegisterHeader = ({
                 changeFilters={changeFilters}
                 clearFilters={clearFilters}
                 trigger={triggerFilters}
+                contextLoading={contextLoading}
+                filterHandlerMap={FILTER_HANDLERS}
               />
             ))}
         </Box>

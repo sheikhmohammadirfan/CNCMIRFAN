@@ -1,10 +1,10 @@
 import React, { useContext, useEffect, useRef, useState } from 'react'
-import { Box, Grid } from '@material-ui/core'
+import { Backdrop, Box, CircularProgress, Grid, Typography } from '@material-ui/core'
 import RiskRegisterHeader from './RiskRegisterHeader'
 import DataTable from '../../Utils/DataTable/DataTable'
 import { HeaderCell, generateRows, mapDataToHeader, useStyle } from './RiskRegisterUtils'
-import { risk_register_columns, risk_register_columns_width } from '../../../assets/data/RiskManagement/RiskRegister/RiskRegisterColumns'
-import { getRegister, createRisk, updateRegister } from '../../../Service/RiskManagement/RiskRegister.service'
+import { HEADER_TABLE_COLS_MAP, risk_register_columns, risk_register_columns_width } from '../../../assets/data/RiskManagement/RiskRegister/RiskRegisterColumns'
+import { getRegister, createRisk, updateRegister, importRisk, exportRisk } from '../../../Service/RiskManagement/RiskRegister.service'
 import useLoading from '../../Utils/Hooks/useLoading'
 import SkeletonBox from '../../Utils/SkeletonBox'
 import RiskManagementContext from '../RiskManagementContext'
@@ -15,14 +15,37 @@ import { getLibrary } from '../../../Service/RiskManagement/RiskLibrary.service'
 import { TREATMENT_NAME_ID_MAP } from '../../../assets/data/RiskManagement/RiskTreatments'
 import useSlider from '../../Utils/Hooks/useSlider'
 import { put } from '../../../Service/CrudFactory'
+import UploadFileDialog from '../../Utils/UploadFileDialog'
+import { COL_TOOLTIP_MAP, OPTIONAL_COLUMNS, REQUIRED_COLUMNS } from '../../../assets/data/RiskManagement/RiskRegister/ImportCols'
+import { notification } from '../../Utils/Utils'
+import ExportFile from '../../Utils/ExportFile'
+import XLSX from "xlsx";
+import { obj_to_yyyy_mm_dd } from '../../Utils/DateFormatConverter'
 
 const RiskRegister = () => {
 
   // React state to maintain loading status
-  const { isLoading, startLoading, stopLoading } = useLoading();
+  const { isLoading, startLoading, stopLoading } = useLoading({
+    register: false,
+    contextData: false,
+    export: false
+  });
 
+  const [isContextLoading, setContextLoading] = useState(true);
   // Get categories and risk scores from RiskManagementContext, and populate it in our filterdropdown state
   const { categories: { categories }, owners: { owners }, scores } = useContext(RiskManagementContext);
+  useEffect(() => {
+    if (
+      (categories.length > 0) &&
+      (owners.length > 0) &&
+      (scores.likelihoodScores.length > 0) &&
+      (scores.impactScores.length > 0) &&
+      (scores.riskScoreGroups.length > 0)
+    ) {
+      setContextLoading(false);
+    }
+  }, [categories, owners, scores])
+
 
   // Get filters to show in table header
   const [filterDropdowns, setFilterDropdowns] = useState(RiskRegisterFilters);
@@ -63,6 +86,24 @@ const RiskRegister = () => {
   const updatePageSize = (size) => setPagination(prev => ({ ...prev, page_no: 1, page_size: size }));
   const updatePageNumber = (page) => setPagination(prev => ({ ...prev, page_no: page }));
 
+  // SORTING
+  const [sorting, setSorting] = useState(null);
+  const updateSort = (colName) => {
+    let currSort = {};
+    if (sorting) {
+      currSort = { ...sorting };
+    }
+    if (currSort.sort_by === HEADER_TABLE_COLS_MAP[colName]) {
+      currSort.sort_order = currSort.sort_order === 1 ? -1 : 1;
+    } else {
+      currSort = {
+        sort_by: HEADER_TABLE_COLS_MAP[colName],
+        sort_order: 1,
+      };
+    }
+    setSorting(currSort);
+  };
+
   // Fetch library to show as select options in add risk via library option
   const [library, setLibrary] = useState([]);
   const fetchLibrary = async () => {
@@ -81,8 +122,10 @@ const RiskRegister = () => {
       filters: {},
       search: searchedValue.current,
       page_size: pagination.page_size,
-      page_no: filterTrigger ? 1 : pagination.page_no
+      page_no: filterTrigger ? 1 : pagination.page_no,
+      ...sorting
     };
+
     if (filters.owners.length > 0) {
       payload.filters["owner"] = filters.owners;
     }
@@ -93,10 +136,10 @@ const RiskRegister = () => {
       payload.filters["treatment"] = filters.treatment;
     }
     if (filters.inherent.length > 0) {
-      payload.filters["inherent_risk"] = filters.inherent[0];
+      payload.filters["inherent_risk"] = filters.inherent;
     }
     if (filters.residual.length > 0) {
-      payload.filters["residual_risk"] = filters.residual[0];
+      payload.filters["residual_risk"] = filters.residual;
     }
     if (filters.ciaCategories.length > 0) {
       payload.filters["cia"] = filters.ciaCategories;
@@ -108,15 +151,18 @@ const RiskRegister = () => {
       payload.filters["is_approved"] = filters.status;
     }
     if (filters.identified.length > 0) {
-      let dateRange =
-        filters.identified === 0
-          ? [new Date(), (() => { const d = new Date(); d.setMonth(d.getMonth() - 3); return d })()]
-          : filters.identified === 1
-            ? [new Date(), (() => { const d = new Date(); d.setMonth(d.getMonth() - 6); return d })()]
-            : filters.identified === 2
-              ? [new Date(), (() => { const d = new Date(); d.setMonth(d.getMonth() - 12); return d })()]
-              : [new Date(), new Date()];
-      payload.filters["identified_date"] = [dateRange[0].toISOString(), dateRange[1].toISOString()];
+
+      let filterId = filters.identified[0]
+      let last_n_months = ((filterId === 0) ? 3 : ((filterId === 1) ? 6 : ((filterId === 2) ? 12 : 0)))
+
+      const date_from = new Date();
+      date_from.setMonth(date_from.getMonth() - last_n_months);
+
+      let dateRange = last_n_months === 0
+        ? [new Date(), new Date()]
+        : [date_from, new Date()]
+
+      payload.filters["identified_date"] = [obj_to_yyyy_mm_dd(dateRange[0]), obj_to_yyyy_mm_dd(dateRange[1])];
     }
     const currPayload = JSON.stringify(payload);
     if (currPayload === prevPayload.current && !reload) {
@@ -133,51 +179,54 @@ const RiskRegister = () => {
     abortControllerRef.current = new AbortController();
     const signal = abortControllerRef.current.signal;
 
-    startLoading();
-    const { data } = await getRegister(payload, { signal: signal });
+    startLoading("register");
+    const { data, status } = await getRegister(payload, { signal: signal });
+
+    if (!status) {
+      stopLoading("register");
+      return;
+    }
 
     let paginationData;
-    if (data) {
-      paginationData = {
-        page_no: data.page_no,
-        page_size: data.page_size,
-        total_items: data.total_items,
-        total_pages: data.total_pages
-      }
-      data.risks = data.risks.map(r => ({
-        ID: r.id,
-        Scenario: JSON.stringify({
-          id: r.scenario.id,
-          description: r.scenario.scenario,
-          categories_id: r.scenario.categories.map(c => c.id),
-          source_type: r.scenario.scenario_source,
-        }),
-        Owner: r.owner,
-        "Identified Date": r.identification_date,
-        "Modified Date": r.created_at,
-        CIA: r.cia.map(c => c.id),
-        "Custom Id": r.custom_id,
-        "Inherent Risk Likelihood Id": r.inherent_risk_likelihood,
-        "Inherent Risk Impact Id": r.inherent_risk_impact,
-        "Residual Risk Likelihood Id": r.residual_risk_impact,
-        "Residual Risk Impact Id": r.residual_risk_likelihood,
-        Notes: r.notes,
-        Treatment: JSON.stringify({
-          type: r.treatment,
-          controls: [],
-          status: r.treatment
-        }),
-        Tasks: [],
-        "Approved": r.is_approved,
-        "Archived": false,
-        Vendors: []
-      }))
+    paginationData = {
+      page_no: data.page_no,
+      page_size: data.page_size,
+      total_items: data.total_items,
+      total_pages: data.total_pages
     }
+    data.risks = data.risks.map(r => ({
+      ID: r.id,
+      Scenario: JSON.stringify({
+        id: r.scenario.id,
+        description: r.scenario.scenario,
+        categories_id: r.scenario.categories.map(c => c.id),
+        source_type: r.scenario.scenario_source,
+      }),
+      Owner: r.owner,
+      "Identified Date": r.identification_date,
+      "Modified Date": r.created_at,
+      CIA: r.cia.map(c => c.id),
+      "Custom Id": r.custom_id,
+      "Inherent Risk Likelihood Id": r.inherent_risk_likelihood,
+      "Inherent Risk Impact Id": r.inherent_risk_impact,
+      "Residual Risk Likelihood Id": r.residual_risk_impact,
+      "Residual Risk Impact Id": r.residual_risk_likelihood,
+      Notes: r.notes,
+      Treatment: JSON.stringify({
+        type: r.treatment,
+        controls: [],
+        status: r.treatment
+      }),
+      Tasks: [],
+      "Approved": r.is_approved,
+      "Archived": false,
+      Vendors: []
+    }))
     // if signal is not aborted, that means no new reqs were fired. so we can safely stop loading and set the state.
     if (!signal.aborted) {
       setRegister(data);
       setPagination({ ...paginationData })
-      stopLoading();
+      stopLoading("register");
     }
   };
 
@@ -187,11 +236,20 @@ const RiskRegister = () => {
 
   useEffect(() => {
     fetchandSetRegister();
-  }, [pagination])
+  }, [pagination, sorting])
+
+  const filterStringified = useRef('');
+  // Whenever any filters are changed, set page to 1
+  const filterTrigger = () => {
+    // If filters haven't changed, return;
+    if (filterStringified.current === JSON.stringify(filters)) return;
+    filterStringified.current = JSON.stringify(filters);
+    setPagination(prev => ({ ...prev, page_no: 1 }))
+  }
 
   const onSearch = (val) => {
     searchedValue.current = val;
-    fetchandSetRegister();
+    setPagination(prev => ({ ...prev, page_no: 1 }));
   }
 
   // State to track which rows are selected
@@ -206,42 +264,8 @@ const RiskRegister = () => {
   const [matchedCell, setMatchedCell] = useState([]);
 
 
-  const changeFilters = (filterName, itemId) => {
+  const changeFilters = (filterName, updatedFilterIds) => {
     setFilters(prev => {
-      // Getting prev filters array of the filter
-      let currentFilters = prev[filterName];
-      let updatedFilterIds;
-      if (filterName === "treatment") {
-        if (itemId === 0) {
-          updatedFilterIds = currentFilters.includes(itemId) ? [] : [itemId];
-        } else {
-          updatedFilterIds = currentFilters.includes(itemId)
-            ? currentFilters.filter((id) => id !== itemId)
-            : [...currentFilters, itemId].filter(id => id !== 0);
-        }
-      }
-      else if (filterName === 'inherent' || filterName === 'residual') {
-        if (currentFilters.includes(itemId)) updatedFilterIds = [];
-        else updatedFilterIds = [itemId];
-      }
-      else if (filterName === "ciaCategories") {
-        if (itemId === 1) {
-          updatedFilterIds = currentFilters.includes(itemId) ? [] : [itemId];
-        } else {
-          updatedFilterIds = currentFilters.includes(itemId)
-            ? currentFilters.filter((id) => id !== itemId)
-            : [...currentFilters, itemId].filter(id => id !== 1);
-        }
-      } else if (filterName === "identified") {
-        updatedFilterIds = currentFilters.includes(itemId)
-          ? []
-          : [itemId];
-      } else {
-        // If id is already in filter, remove it, else add the id
-        updatedFilterIds = currentFilters.includes(itemId)
-          ? currentFilters.filter((id) => id !== itemId)
-          : [...currentFilters, itemId]
-      }
       return ({
         ...prev,
         [filterName]: updatedFilterIds
@@ -273,7 +297,8 @@ const RiskRegister = () => {
   }
 
   const addScenarioViaImport = () => {
-    console.log("Add scenario via import");
+    resetPageState();
+    openUploadForm();
   }
 
   // CLICK handlers for more options
@@ -285,9 +310,40 @@ const RiskRegister = () => {
     console.log("Hide Guide");
   }
 
-  const exportAllScenarios = () => {
-    console.log("Export All");
+  const [exportDialog, setExportDialog] = useState(false);
+  const openExportDialog = async () => {
+    // Directly handling download without showing download dialog
+
+    startLoading("export")
+
+    const { data, status } = await exportRisk();
+
+    if (!status) {
+      stopLoading("export");
+      return;
+    };
+
+    const finalData = data.map(mapRiskRows);
+
+    // Generate XLSX sheets
+    const sheetOpen = XLSX.utils.json_to_sheet(finalData);
+
+    // Create a empty xlsx file
+    const book = XLSX.utils.book_new();
+
+    // Append sheets
+    XLSX.utils.book_append_sheet(book, sheetOpen, "Register");
+
+    // Save & download file
+    XLSX.write(book, { bookType: 'xlsx', type: "binary" });
+    XLSX.writeFile(book, `risks.xlsx`);
+
+    stopLoading("export")
+
+    // setExportDialog(true);
   }
+  const closeExportDialog = () => setExportDialog(false);
+
 
   // CLICK handlers for share options
   const createSnapshot = () => {
@@ -375,6 +431,7 @@ const RiskRegister = () => {
       const { status } = await createRisk(payload);
       if (status) {
         closeScenarioDialog();
+        notification("scenario-add-success", "Scenario Successfully Created !", 'success')
         return fetchandSetRegister(true);
       }
 
@@ -391,6 +448,7 @@ const RiskRegister = () => {
       const { status } = await createRisk(payload);
       if (status) {
         closeScenarioDialog();
+        notification("risk-add-success", "Risk Successfully Created !", 'success')
         return fetchandSetRegister(true);
       }
     }
@@ -477,15 +535,40 @@ const RiskRegister = () => {
         const { status } = await updateRegister(row["ID"], payload);
         if (status) {
           closeScenarioDialog();
+          notification("risk-udpate-success", "Risk Successfully Updated !", 'success')
           return fetchandSetRegister(true);
         }
       }
     }
   }
 
+  // state to open upload csv dialog
+  const [uploadCsv, setUploadCsv] = useState(false)
+  const openUploadForm = () => setUploadCsv(true);
+  const closeUploadForm = () => setUploadCsv(false);
+
+  const handleImport = async (file) => {
+    startLoading("register");
+    const { status } = await importRisk(file);
+    closeUploadForm();
+    stopLoading("register");
+    if (status) return fetchandSetRegister(true)
+  }
+
+  const mapRiskRows = (row) => {
+    let mappedRow = {}
+    Object.keys(row).map(key => {
+      if (key === 'scenario') mappedRow['scenario'] = row['scenario']['scenario']
+      else if (key === 'cia') mappedRow['cia'] = row['cia'].map(cia => cia.name).join(", ");
+      else if (key === 'owner') mappedRow['owner'] = `${row['owner']['first_name']} ${row['owner']['last_name']}`
+      else mappedRow[key] = row[key];
+    })
+    return mappedRow;
+  }
+
   // Map data to header
   const mapTableHeader = () =>
-    mapDataToHeader(visibleColumns);
+    mapDataToHeader(visibleColumns, sorting, updateSort);
 
   // Map data to body
   const mapTableBody = () =>
@@ -510,9 +593,11 @@ const RiskRegister = () => {
         className={classes.registerContainer}
       >
         <RiskRegisterHeader
+          // Global disable
+          contextLoading={isContextLoading}
           // Dropdown options click handlers
           addScenarioOptionsHandlers={{ addManualScenario, addScenarioViaLibrary, addScenarioViaImport }}
-          moreOptionsHandlers={{ viewArchived, hideGuide, exportAllScenarios }}
+          moreOptionsHandlers={{ viewArchived, hideGuide, openExportDialog }}
           shareOptionsHandlers={{ createSnapshot, generateAssessmentReport, configAuditorView }}
           // Dropdown data for filters
           tableFilters={filterDropdowns}
@@ -520,7 +605,7 @@ const RiskRegister = () => {
           activeFilters={filters}
           changeFilters={changeFilters}
           clearFilters={clearFilters}
-          triggerFilters={fetchandSetRegister}
+          triggerFilters={filterTrigger}
           // Selected rows
           selectedRows={selectedRow}
           // Edit button click handler
@@ -531,7 +616,7 @@ const RiskRegister = () => {
           onSearch={onSearch}
         />
 
-        {isLoading()
+        {isLoading("register")
           ?
           <SkeletonBox text="Loading.." height="60vh" width="100%" />
           :
@@ -570,15 +655,6 @@ const RiskRegister = () => {
                 updatePageNumber={updatePageNumber}
               />
             </Grid>
-
-            {/* <SecondaryTable
-          data={getPoam()}
-          currentRow={getRowIndex(getPoam(), secondaryOpen, sortingMap)}
-          columnsList={secondaryColumns.filter(
-            (name) => !hiddenColumns.includes(name)
-          )}
-          closeTable={() => setSecondaryOpen(-1)}
-        /> */}
           </Grid>
         }
       </Box>
@@ -604,6 +680,34 @@ const RiskRegister = () => {
         isCreateAction={true}
         riskVal={register[getCurrentIndex()]}
         onFormSubmit={handleAddActionFormSubmit}
+      />
+
+      <UploadFileDialog
+        open={uploadCsv}
+        onClose={closeUploadForm}
+        onImport={handleImport}
+        requiredColumns={REQUIRED_COLUMNS}
+        optionalColumns={OPTIONAL_COLUMNS}
+        col_TooltipDesc_Map={COL_TOOLTIP_MAP}
+        getPlainFile={true}
+      />
+
+      {/* For loading when export is done */}
+      <Backdrop className={classes.backdrop} open={isLoading("export")}>
+        <CircularProgress color="inherit" />
+        <Typography className="backdrop-label" variant="h5">
+          Fetching data...
+        </Typography>
+      </Backdrop>
+
+      <ExportFile
+        open={exportDialog}
+        dialogTitle="Export All Risks"
+        close={closeExportDialog}
+        allColumns={[]}
+        hiddenColumns={[]}
+        dataFetcher={exportRisk}
+        dataMapper={mapRiskRows}
       />
     </Box>
   )

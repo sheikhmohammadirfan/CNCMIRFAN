@@ -12,24 +12,22 @@ function DataTableFooter({
   count,
 }) {
   return (
-    <caption style={{ padding: 0 }}>
-      <Box display="flex" alignItems="center" justifyContent="space-between">
-        {component}
-        {pageSize !== 0 && (
-          <TablePagination
-            rowsPerPageOptions={[5, 10]}
-            onRowsPerPageChange={handleRowsPerPageChange}
-            rowsPerPage={rowsPerPage}
-            page={page}
-            onPageChange={onPageChange}
-            count={count}
-            component={Box}
-            data-test="footer-pagination"
-            sx={{ '&.MuiTablePagination-root': { overflow: 'visible' } }}
-          />
-        )}
-      </Box>
-    </caption>
+    <Box display="flex" alignItems="center" justifyContent="end">
+      {component}
+      {pageSize !== 0 && (
+        <TablePagination
+          rowsPerPageOptions={[5, 10]}
+          onRowsPerPageChange={handleRowsPerPageChange}
+          rowsPerPage={rowsPerPage}
+          page={page}
+          onPageChange={onPageChange}
+          count={count}
+          component={Box}
+          data-test="footer-pagination"
+          sx={{ '&.MuiTablePagination-root': { overflow: 'visible' } }}
+        />
+      )}
+    </Box>
   );
 }
 DataTableFooter.propTypes = {

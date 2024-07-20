@@ -7,12 +7,13 @@ import useLoading from '../../Utils/Hooks/useLoading';
 import SkeletonBox from '../../Utils/SkeletonBox';
 import DataTable from '../../Utils/DataTable/DataTable';
 import { getLibrary } from '../../../Service/RiskManagement/RiskLibrary.service';
-import { LibraryColumns, librayColumnWidths } from '../../../assets/data/RiskManagement/RiskLibrary/LibraryColumns';
+import { HEADER_TABLE_NAME_MAP, LibraryColumns, librayColumnWidths } from '../../../assets/data/RiskManagement/RiskLibrary/LibraryColumns';
 import RiskFormDialog from '../RiskFormDialog';
 import { cia_categories } from '../../../assets/data/RiskManagement/RiskRegister/RiskRegisterFilters';
 import { createRisk } from '../../../Service/RiskManagement/RiskRegister.service';
 import RiskManagementContext from '../RiskManagementContext';
 import useSlider from '../../Utils/Hooks/useSlider';
+import { notification } from '../../Utils/Utils';
 
 const RiskLibrary = () => {
 
@@ -27,6 +28,7 @@ const RiskLibrary = () => {
   const [filters, setFilters] = useState({
     categories: [],
     register: [],
+    source: [],
   })
 
   // State to store page size, and function to update page size. function will be called from DataTable
@@ -39,6 +41,24 @@ const RiskLibrary = () => {
   const updatePageSize = (size) => setPagination(prev => ({ ...prev, page_no: 1, page_size: size }));
   const updatePageNumber = (page) => setPagination(prev => ({ ...prev, page_no: page }));
 
+  // SORTING
+  const [sorting, setSorting] = useState(null);
+  const updateSort = (colName) => {
+    let currSort = {};
+    if (sorting) {
+      currSort = { ...sorting };
+    }
+    if (currSort.sort_by === HEADER_TABLE_NAME_MAP[colName]) {
+      currSort.sort_order = currSort.sort_order === 1 ? -1 : 1;
+    } else {
+      currSort = {
+        sort_by: HEADER_TABLE_NAME_MAP[colName],
+        sort_order: 1,
+      };
+    }
+    setSorting(currSort);
+  };
+
   const abortControllerRef = useRef(null);
 
   // State to save library
@@ -48,13 +68,17 @@ const RiskLibrary = () => {
       filters: {},
       search: searchedValue.current,
       page_size: pagination.page_size,
-      page_no: pagination.page_no
+      page_no: pagination.page_no,
+      ...sorting
     };
     if (filters.categories.length > 0) {
       payload.filters["categories"] = filters.categories;
     }
     if (filters.register.length > 0) {
       payload.filters["register"] = filters.register[0];
+    }
+    if (filters.source.length > 0) {
+      payload.filters['source'] = filters.source;
     }
     const currPayload = JSON.stringify(payload);
     if (currPayload === prevPayload.current) {
@@ -72,7 +96,13 @@ const RiskLibrary = () => {
     const signal = abortControllerRef.current.signal;
 
     startLoading();
-    const { data } = await getLibrary(payload, { signal: signal });
+    const { data, status } = await getLibrary(payload, { signal: signal });
+
+    if (!status) {
+      stopLoading();
+      return;
+    }
+
     let paginationData = {
       page_no: data.page_no,
       page_size: data.page_size,
@@ -97,7 +127,17 @@ const RiskLibrary = () => {
 
   useEffect(() => {
     fetchLibrary();
-  }, [pagination])
+  }, [pagination, sorting])
+
+  const filterStringified = useRef('');
+  // Whenever any filters are changed, set page to 1
+  const filterTrigger = () => {
+    console.log(filters);
+    // If filters haven't changed, return;
+    if (filterStringified.current === JSON.stringify(filters)) return;
+    filterStringified.current = JSON.stringify(filters);
+    setPagination(prev => ({ ...prev, page_no: 1 }))
+  }
 
   // Save library columns
   const [libraryColumns, setLibraryColumns] = useState(LibraryColumns);
@@ -120,22 +160,8 @@ const RiskLibrary = () => {
   }, [categories])
 
 
-  const changeFilters = (filterName, itemId) => {
+  const changeFilters = (filterName, updatedFilterIds) => {
     setFilters(prev => {
-      // Getting prev filters array of the filter
-      let currentFilters = prev[filterName];
-      let updatedFilterIds;
-      if (filterName === "register") {
-        // If id is already in filter, remove it, else add the id
-        updatedFilterIds = currentFilters.includes(itemId)
-          ? []
-          : [itemId];
-      } else {
-        // If id is already in filter, remove it, else add the id
-        updatedFilterIds = currentFilters.includes(itemId)
-          ? currentFilters.filter((id) => id !== itemId)
-          : [...currentFilters, itemId];
-      }
       return ({
         ...prev,
         [filterName]: updatedFilterIds
@@ -166,12 +192,13 @@ const RiskLibrary = () => {
     const { status } = await createRisk(payload);
     if (status) {
       closeRiskForm();
+      notification("risk-add-success", "Risk Successfully Created !", 'success')
     }
   }
 
   // Map data to header
   const mapTableHeader = () =>
-    mapDataToHeader(libraryColumns);
+    mapDataToHeader(libraryColumns, sorting, updateSort);
 
   // Map data to body
   const mapTableBody = () =>
@@ -206,10 +233,11 @@ const RiskLibrary = () => {
         selectedRows={selectedRows}
         // Dropdown data for filters
         tableFilters={filterDropdowns}
-        filters={{ filters, changeFilters, clearFilters, triggerFilters: fetchLibrary }}
+        filters={{ filters, changeFilters, clearFilters, triggerFilters: filterTrigger }}
         // function to open add risk form on clicking add button
         openAddRiskForm={() => setAddRiskForm(true)}
         onSearch={onSearch}
+
       />
 
       {isLoading()

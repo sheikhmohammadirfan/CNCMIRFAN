@@ -3,6 +3,7 @@ import React, { useState } from 'react'
 import { TextControl } from '../../Utils/Control';
 import FilterDropdown from '../../Utils/DataTable/FilterDropdown';
 import colorShader from '../../Utils/ColorShader';
+import FILTER_HANDLERS from './FilterHandlerMap';
 
 // Generate Styles
 const useStyle = makeStyles((theme) => ({
@@ -105,6 +106,7 @@ const RiskLibraryHeader = ({
               changeFilters={changeFilters}
               clearFilters={clearFilters}
               trigger={triggerFilters}
+              filterHandlerMap={FILTER_HANDLERS}
             />
           ))}
       </Box>
@@ -179,7 +181,7 @@ const RiskLibraryHeader = ({
             color='primary'
             startIcon={<Icon>add</Icon>}
             className={classes.addInRiskButton}
-            disabled={selectedRows.length === 0}
+            disabled={selectedRows.length !== 1}
             onClick={openAddRiskForm}
           >
             Add

@@ -14,6 +14,7 @@ import { SidebarData } from "../../assets/data/SidebarData";
 import { logout } from "../../Service/UserFactory";
 import SidebarItem from "./SidebarItem";
 import logo from "../../assets/img/logo.png";
+import colorShader from "../Utils/ColorShader";
 
 /** CSS Class Generator */
 const useStyles = makeStyles((theme) => {

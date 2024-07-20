@@ -202,6 +202,7 @@ const AddActionDialog = ({
           color="primary"
           size="large"
           onClick={closeHandler}
+          disabled={isFormLoading}
         >
           CANCEL
         </Button>,

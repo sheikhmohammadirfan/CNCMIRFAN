@@ -20,7 +20,6 @@ const FormInput = ({ ...rest }) => (
     gutter={false}
     fullWidth
     multiline
-    maxRows={20}
     {...rest}
   />
 );
@@ -49,7 +48,7 @@ const RiskFormDialog = ({
   library,
   isLibraryRow = false,
   autocompleteOptions: { categories, owners },
-  getSliderValue: {getLikelihoodSliderValue, getImpactSliderValue},
+  getSliderValue: { getLikelihoodSliderValue, getImpactSliderValue },
   scores,
   onFormSubmit
 }) => {
@@ -299,6 +298,7 @@ const RiskFormDialog = ({
                     name="scenario"
                     label="Scenario"
                     disabled={isLibraryRow}
+                    maxRows={5}
                   />
                 }
               </Grid>
@@ -500,6 +500,7 @@ const RiskFormDialog = ({
               <Grid item xs={12}>
                 <FormInput
                   name="notes"
+                  rows={3}
                 />
               </Grid>
               {(!isCreateForm()) &&
@@ -525,6 +526,7 @@ const RiskFormDialog = ({
               <Grid item xs={12}>
                 <FormInput
                   name="customId"
+                  rows={1}
                 />
               </Grid>
             </Grid>
@@ -538,6 +540,7 @@ const RiskFormDialog = ({
           color="primary"
           size="large"
           onClick={closeHandler}
+          disabled={isFormLoading}
         >
           CANCEL
         </Button>,

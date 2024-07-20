@@ -17,11 +17,13 @@ import AssessmentTable from "./AssessmentTable";
 import AssessmentFilters from "../../../assets/data/VendorManagement/VendorAssessment/AssessmentFilters";
 import { assessment_columns } from "../../../assets/data/VendorManagement/VendorAssessment/AssessmentColumns";
 import AddVendorForm from "./AddVendorForm";
-import UploadFileDialog from "./UploadFileDialog";
+import UploadFileDialog from "../../Utils/UploadFileDialog";
 import XLSX from "xlsx";
 import useParams from "../../Utils/Hooks/useParams";
+import { COLUMN_DESCRIPTION_MAP, REQUIRED_COLUMNS, OPTIONAL_COLUMNS } from "../../../assets/data/VendorManagement/VendorAssessment/ImportCols";
 import { createVendor, deleteVendor, updateVendor } from "../../../Service/VendorManagement/VendorManagement.service.jsx";
 import { getUser } from "../../../Service/UserFactory.jsx";
+
 const useStyles = makeStyles({
   button: {
     textTransform: "none",
@@ -456,6 +458,9 @@ const VendorAssessment = ({ isLoading, vendorList, securityReviewList, reload })
         open={showUploadFile}
         onClose={handleCloseUploadFile}
         onImport={handleImport}
+        requiredColumns={REQUIRED_COLUMNS}
+        optionalColumns={OPTIONAL_COLUMNS}
+        col_TooltipDesc_Map={COLUMN_DESCRIPTION_MAP}
       />
 
       <Backdrop className={classes.backdrop} open={showLoader}>

@@ -1,5 +1,5 @@
-import { Box, Button, Checkbox, ClickAwayListener, Divider, FormControlLabel, Icon, List, ListItem, Tooltip, makeStyles } from '@material-ui/core'
-import React, { useState } from 'react'
+import { Box, Button, Checkbox, ClickAwayListener, Divider, FormControlLabel, Grid, Icon, List, ListItem, Tooltip, makeStyles } from '@material-ui/core'
+import React, { useEffect, useState } from 'react'
 import colorShader from '../ColorShader';
 
 const useStyles = makeStyles((theme) => ({
@@ -47,12 +47,20 @@ const useStyles = makeStyles((theme) => ({
       color: theme.palette.primary.main,
     }
   },
-  clearButton: {
-    backgroundColor: theme.palette.primary.main,
-    color: "white",
-    textTransform: "none",
+  actionButton: {
+    textTransform: 'none',
     height: 25,
     width: "100%",
+  },
+  secondaryActionBtn: {
+    backgroundColor: colorShader(theme.palette.primary.main, 0.15),
+    '&:hover': {
+      backgroundColor: colorShader(theme.palette.primary.main, 0.2),
+    }
+  },
+  submitButton: {
+    backgroundColor: theme.palette.primary.main,
+    color: "white",
     "&:hover": {
       backgroundColor: colorShader(theme.palette.primary.main, 0.85)
     }
@@ -85,20 +93,38 @@ const FilterDropdown = ({
   // activeFilters should be associated with a useState to be able to see the check uncheck behavious
   changeFilters,
   clearFilters,
-  trigger = () => {}
+  trigger = () => { },
+  contextLoading = false,
+  filterHandlerMap = {}
 }) => {
 
   const classes = useStyles();
 
   const [open, setOpen] = useState(false);
   const handleClose = () => {
+    setInternalActiveFilters(activeFilters)
     setOpen(false);
-    trigger(false, true);
   }
+
+  const [internalActiveFilters, setInternalActiveFilters] = useState(activeFilters);
+  useEffect(() => {
+    setInternalActiveFilters(activeFilters)
+  }, [activeFilters])
 
   // Handling checkbox clicks and changing filters
   const handleCheckboxClick = (filterItem_id) => {
-    changeFilters(filterName, filterItem_id)
+    setInternalActiveFilters(prev => filterName in filterHandlerMap
+      ? filterHandlerMap[filterName](prev, filterItem_id)
+      : (prev.includes(filterItem_id))
+        ? prev.filter(id => id !== filterItem_id)
+        : [...prev, filterItem_id]
+    )
+  }
+
+  // Handle submit button click
+  const handleSubmitBtnClick = () => {
+    changeFilters(filterName, internalActiveFilters)
+    trigger(false, true)
   }
 
   // Checking if filters are active, if yes then how many?
@@ -127,7 +153,7 @@ const FilterDropdown = ({
                         control={
                           <Checkbox
                             size='small'
-                            checked={activeFilters.includes(filterItem.id)}
+                            checked={internalActiveFilters.includes(filterItem.id)}
                             onChange={() => handleCheckboxClick(filterItem.id)}
                             className={classes.checkbox}
                           />
@@ -138,21 +164,38 @@ const FilterDropdown = ({
                   ))}
               </List>
               <Divider />
-              <Box
-                style={{
-                  display: "flex",
-                  justifyContent: "center",
-                  padding: "10px"
-                }}
-              >
-                <Button
-                  size='small'
-                  className={classes.clearButton}
-                  onClick={() => clearFilters(filterName)}
-                >
-                  Clear
-                </Button>
-              </Box>
+
+              <Grid container spacing={1} style={{ padding: '10px' }}>
+                <Grid item xs={6}>
+                  <Button
+                    color='primary'
+                    className={`${classes.actionButton} ${classes.secondaryActionBtn}`}
+                    onClick={() => handleClose()}
+                  >
+                    Cancel
+                  </Button>
+                </Grid>
+
+                <Grid item xs={6}>
+                  <Button
+                    color='primary'
+                    className={`${classes.actionButton} ${classes.secondaryActionBtn}`}
+                    onClick={() => clearFilters(filterName)}
+                  >
+                    Clear
+                  </Button>
+                </Grid>
+
+                <Grid item xs={12}>
+                  <Button
+                    size='small'
+                    className={`${classes.actionButton} ${classes.submitButton}`}
+                    onClick={() => handleSubmitBtnClick()}
+                  >
+                    Apply
+                  </Button>
+                </Grid>
+              </Grid>
             </Box>
           </ClickAwayListener>
         </Box>
@@ -164,6 +207,7 @@ const FilterDropdown = ({
         className={classes.filterButton}
         onClick={() => setOpen(true)}
         data-active={isFiltersActive ? "true" : "false"}
+        disabled={contextLoading}
       >
         {buttonText}
         {isFiltersActive ? ` (${activeFiltersCount})` : ""}

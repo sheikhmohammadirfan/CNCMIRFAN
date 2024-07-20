@@ -1,5 +1,6 @@
 import { Typography, makeStyles } from "@material-ui/core";
 import columnToCellMap from "../../../assets/data/RiskManagement/TableColCellMap";
+import { HEADER_TABLE_COLS_MAP } from "../../../assets/data/RiskManagement/RiskRegister/RiskRegisterColumns";
 
 export const useStyle = makeStyles(theme => ({
 
@@ -337,7 +338,21 @@ export const useStyle = makeStyles(theme => ({
         color: theme.palette.primary.main
       }
     },
-  }
+  },
+
+  // Backdrop style when export is loading
+  backdrop: {
+    zIndex: 1000,
+    display: "flex",
+    flexDirection: "column",
+    color: "white",
+    "&  .backdrop-label": {
+      marginTop: 10,
+      fontWeight: "bold",
+      letterSpacing: 1,
+      fontStyle: "italic",
+    },
+  },
 }))
 
 /* Header cell component */
@@ -371,11 +386,11 @@ export const mapDataToHeader = (visibleColumns, sorting, updateSort) => ({
           "scenario": text === "Scenario" ? "true" : "false",
           "header": "",
           onClick: () => updateSort(text),
-          className: sorting && sorting.column === text ? sorting.order : "",
+          className: (sorting && sorting.sort_by === HEADER_TABLE_COLS_MAP[text]) ? (sorting.sort_order === 1 ? "asc" : "dsc") : "",
         }
         : {
           onClick: () => updateSort(text),
-          className: sorting && sorting.column === text ? sorting.order : "",
+          className: (sorting && sorting.sort_by === HEADER_TABLE_COLS_MAP[text]) ? (sorting.sort_order === 1 ? "asc" : "dsc") : "",
         },
   })),
   cellStyle: {
@@ -442,7 +457,7 @@ export const generateRows = (
   if (sortingMap) {
   }
 
-  // Generate row of POA&M table
+  // Generate row of register table
   for (let i = 0; i < rowCount; i++)
     rowData.push({
       data: mapDataToRow(
@@ -489,17 +504,23 @@ const getCellValue = (row, colName, categories, owners, scores) => {
     return `${owner?.first_name} ${owner?.last_name}` || ""
   }
   else if (colName === "Inherent Risk") {
-    const val = (scores.likelihoodScores.find(score => score.id === row["Inherent Risk Likelihood Id"]).score)
-    *
-    (scores.impactScores.find(score => score.id === row["Inherent Risk Impact Id"]).score);
+    const val =
+      (scores.likelihoodScores.find(score => score.id === row["Inherent Risk Likelihood Id"]).score)
+      *
+      (scores.impactScores.find(score => score.id === row["Inherent Risk Impact Id"]).score);
     const group = scores.riskScoreGroups.find(r => r.range_from <= val && val <= r.range_to);
     return { value: val, colour: group.color };
   }
   else if (colName === "Residual Risk") {
-    const val = (scores.likelihoodScores.find(score => score.id === row["Residual Risk Likelihood Id"])?.score || 1)
-    *
-    (scores.impactScores.find(score => score.id === row["Residual Risk Impact Id"])?.score || 1)
-    const group = scores.riskScoreGroups.find(r => r.range_from <= val && val <= r.range_to);
+    const val =
+      (scores.likelihoodScores.find(score => score.id === row["Residual Risk Likelihood Id"])?.score || 0)
+      *
+      (scores.impactScores.find(score => score.id === row["Residual Risk Impact Id"])?.score || 0)
+
+    const group = Boolean(val)
+      ? scores.riskScoreGroups.find(r => r.range_from <= val && val <= r.range_to)
+      : { color: null }
+
     return { value: val, colour: group.color };
   }
   else return row[colName]

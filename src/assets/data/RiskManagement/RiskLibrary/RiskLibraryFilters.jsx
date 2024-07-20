@@ -9,6 +9,17 @@ const registerFilterOptions = [
   }
 ]
 
+const sourceFilterOptions = [
+  {
+    id: 1,
+    text: "System"
+  },
+  {
+    id: 2,
+    text: "Custom"
+  }
+]
+
 const RiskLibraryFilters = {
   categories: {
     name: "categories",
@@ -21,6 +32,12 @@ const RiskLibraryFilters = {
     text: "Risk Register",
     order: 2,
     options: [...registerFilterOptions]
+  },
+  source: {
+    name: "source",
+    text: "Source",
+    order: 3,
+    options: [...sourceFilterOptions]
   }
 }
 

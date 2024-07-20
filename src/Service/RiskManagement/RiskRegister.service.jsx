@@ -1,4 +1,4 @@
-import { post, put } from "../CrudFactory";
+import { get, post, put } from "../CrudFactory";
 
 export async function getRegister(payload, signal) {
   return await post("/risk/", payload, signal);
@@ -48,4 +48,16 @@ export async function getRiskScoreGroups() {
       },
     ],
   };
+}
+
+export async function importRisk(file) {
+
+  let formData = new FormData();
+  formData.append('file', file)
+
+  return await post("/risk/importrisk/", formData);
+}
+
+export async function exportRisk() {
+  return await get("/risk/export/");
 }

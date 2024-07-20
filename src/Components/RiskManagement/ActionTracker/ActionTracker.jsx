@@ -39,6 +39,24 @@ const ActionTracker = () => {
   const updatePageSize = (size) => setPagination(prev => ({ ...prev, page_no: 1, page_size: size }));
   const updatePageNumber = (page) => setPagination(prev => ({ ...prev, page_no: page }));
 
+  // SORTING
+  const [sorting, setSorting] = useState(null);
+  const updateSort = (colName) => {
+    let currSort = {};
+    if (sorting) {
+      currSort = { ...sorting };
+    }
+    if (currSort.sort_by === HEADER_TABLE_COLS_MAP[colName]) {
+      currSort.sort_order = currSort.sort_order === 1 ? -1 : 1;
+    } else {
+      currSort = {
+        sort_by: HEADER_TABLE_COLS_MAP[colName],
+        sort_order: 1,
+      };
+    }
+    setSorting(currSort);
+  };
+
   const abortControllerRef = useRef(null);
 
   // Function to fetch actions data, and set the state
@@ -48,7 +66,8 @@ const ActionTracker = () => {
       filters: {},
       search: searchedValue.current,
       page_size: pagination.page_size,
-      page_no: pagination.page_no
+      page_no: pagination.page_no,
+      ...sorting
     };
     if (filters.assignee.length > 0) {
       payload.filters['assignee'] = filters.assignee;
@@ -67,16 +86,22 @@ const ActionTracker = () => {
     const signal = abortControllerRef.current.signal;
 
     startLoading();
-    const { data } = await getActions(payload, { signal: signal });
+    const { data, status } = await getActions(payload, { signal: signal });
+
+    if (!status) {
+      stopLoading();
+      return;
+    }
+
     let paginationData = {
-      page_no: data.data.page_no,
-      page_size: data.data.page_size,
-      total_items: data.data.total_items,
-      total_pages: data.data.total_pages
+      page_no: data.page_no,
+      page_size: data.page_size,
+      total_items: data.total_items,
+      total_pages: data.total_pages
     }
     // if signal is not aborted, that means no new reqs were fired. so we can safely stop loading and set the state.
     if (!signal.aborted) {
-      setActions(data.data.actions);
+      setActions(data.actions);
       setPagination({ ...paginationData })
       stopLoading();
     }
@@ -84,7 +109,7 @@ const ActionTracker = () => {
 
   useEffect(() => {
     fetchandSetActionTable();
-  }, [pagination])
+  }, [pagination, sorting])
 
   const [columns, setColumns] = useState(ACTION_TRACKER_COLUMNS);
 
@@ -102,14 +127,8 @@ const ActionTracker = () => {
     falcon_status: [],
     integration_status: []
   })
-  const changeFilters = (filterName, itemId) => {
+  const changeFilters = (filterName, updatedFilterIds) => {
     setFilters(prev => {
-      // Getting prev filters array of the filter
-      let currentFilters = prev[filterName];
-      // If id is already in filter, remove it, else add the id
-      let updatedFilterIds = currentFilters.includes(itemId)
-        ? currentFilters.filter((id) => id !== itemId)
-        : [...currentFilters, itemId]
       return ({
         ...prev,
         [filterName]: updatedFilterIds
@@ -121,6 +140,15 @@ const ActionTracker = () => {
       ...prev,
       [filterName]: []
     }))
+  }
+
+  const filterStringified = useRef('');
+  // Whenever any filters are changed, set page to 1
+  const filterTrigger = () => {
+    // If filters haven't changed, return;
+    if (filterStringified.current === JSON.stringify(filters)) return;
+    filterStringified.current = JSON.stringify(filters);
+    setPagination(prev => ({ ...prev, page_no: 1 }))
   }
 
   const onSearch = (val) => {
@@ -232,7 +260,7 @@ const ActionTracker = () => {
 
   // Map data to header
   const mapTableHeader = () =>
-    mapDataToHeader(columns);
+    mapDataToHeader(columns, sorting, updateSort);
 
   // Map data to body
   const mapTableBody = () =>
@@ -254,7 +282,7 @@ const ActionTracker = () => {
       <ActionTrackerHeader
         tableFilters={filterDropdowns}
         filters={{ filters, changeFilters, clearFilters }}
-        triggerFilters={fetchandSetActionTable}
+        triggerFilters={filterTrigger}
         selectedRows={selectedRows}
         openAddActionForm={openAddActionForm}
         openDeleteConfirmationDialog={() => setDeleteConfirmationOpen(true)}
