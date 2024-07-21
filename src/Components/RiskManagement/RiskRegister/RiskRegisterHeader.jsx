@@ -42,6 +42,10 @@ const useStyle = makeStyles((theme) => ({
     border: '1px solid rgba(0, 0, 0, 0.2)',
     paddingInline: 10,
     textTransform: 'none',
+    "&.text": {
+      border: "none",
+      paddingInline: 6
+    }
   },
   dropdownButton: {
     maxHeight: 32
@@ -58,6 +62,7 @@ const RiskRegisterHeader = ({
   changeFilters,
   clearFilters,
   triggerFilters,
+  filterMetadata,
   selectedRows,
   editHandler,
   cols: { allColumns, visibleColumns, hideColumn, showColumn },
@@ -393,8 +398,24 @@ const RiskRegisterHeader = ({
                 trigger={triggerFilters}
                 contextLoading={contextLoading}
                 filterHandlerMap={FILTER_HANDLERS}
+                filterMetadata={filterMetadata}
               />
             ))}
+            {Object
+              .values(activeFilters)
+              .some(filter => filter.length > 0) &&
+              <Button
+                variant='text'
+                disableElevation
+                className={`${classes.actionButton} text`}
+                onClick={() => {
+                  clearFilters();
+                  triggerFilters();
+                }}
+              >
+                Clear Filters
+              </Button>
+              }
         </Box>
 
         {/* Dropdown to show and hide columns */}

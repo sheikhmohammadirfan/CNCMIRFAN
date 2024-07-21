@@ -33,12 +33,12 @@ const RiskLibraryFilters = {
     order: 2,
     options: [...registerFilterOptions]
   },
-  source: {
-    name: "source",
-    text: "Source",
-    order: 3,
-    options: [...sourceFilterOptions]
-  }
+  // source: {
+  //   name: "source",
+  //   text: "Source",
+  //   order: 3,
+  //   options: [...sourceFilterOptions]
+  // }
 }
 
 export default RiskLibraryFilters;

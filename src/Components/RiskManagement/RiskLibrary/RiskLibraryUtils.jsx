@@ -157,18 +157,10 @@ export const RowCell = ({ text }) => {
 export const mapDataToHeader = (columns, sorting, updateSort) => ({
   data: columns.map((text) => ({
     text,
-    params:
-      text === "Id"
-        ? {
-          "sticky": "",
-          "header": "",
-          onClick: () => updateSort(text),
-          className: sorting && sorting.sort_by === HEADER_TABLE_NAME_MAP[text] ? (sorting.sort_order === 1 ? 'asc' : 'dsc') : "",
-        }
-        : {
-          onClick: () => updateSort(text),
-          className: sorting && sorting.sort_by === HEADER_TABLE_NAME_MAP[text] ? (sorting.sort_order === 1 ? 'asc' : 'dsc') : "",
-        },
+    params: {
+      onClick: text === "Categories" ? () => {} : () => updateSort(text),
+      className: sorting && sorting.sort_by === HEADER_TABLE_NAME_MAP[text] ? (sorting.sort_order === 1 ? 'asc' : 'dsc') : "",
+    },
   })),
   cellStyle: {
     fontWeight: "bold",

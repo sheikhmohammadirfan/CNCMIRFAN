@@ -28,7 +28,7 @@ const RiskLibrary = () => {
   const [filters, setFilters] = useState({
     categories: [],
     register: [],
-    source: [],
+    // source: [],
   })
 
   // State to store page size, and function to update page size. function will be called from DataTable
@@ -38,8 +38,16 @@ const RiskLibrary = () => {
     total_items: null,
     total_pages: null,
   });
-  const updatePageSize = (size) => setPagination(prev => ({ ...prev, page_no: 1, page_size: size }));
-  const updatePageNumber = (page) => setPagination(prev => ({ ...prev, page_no: page }));
+  const [loader, setLoader] = useState(0);
+  const reload = () => setLoader(p => p === 100 ? 0 : p+1);
+  const updatePageSize = (size) => {
+    setPagination(prev => ({ ...prev, page_no: 1, page_size: size }));
+    reload();
+  }
+  const updatePageNumber = (page) => {
+    setPagination(prev => ({ ...prev, page_no: page }));
+    reload();
+  }
 
   // SORTING
   const [sorting, setSorting] = useState(null);
@@ -77,9 +85,9 @@ const RiskLibrary = () => {
     if (filters.register.length > 0) {
       payload.filters["register"] = filters.register[0];
     }
-    if (filters.source.length > 0) {
-      payload.filters['source'] = filters.source;
-    }
+    // if (filters.source.length > 0) {
+    //   payload.filters['source'] = filters.source;
+    // }
     const currPayload = JSON.stringify(payload);
     if (currPayload === prevPayload.current) {
       return;
@@ -120,23 +128,23 @@ const RiskLibrary = () => {
           "Source": x.scenario_source === 0 ? "SYSTEM" : "CUSTOM"
         }))
       });
-      setPagination({ ...paginationData })
+      setPagination({ ...paginationData, page_no: pagination.page_no > data.total_pages ? 1 : pagination.page_no });
       stopLoading();
     }
   };
 
   useEffect(() => {
     fetchLibrary();
-  }, [pagination, sorting])
+  }, [loader, sorting])
 
   const filterStringified = useRef('');
   // Whenever any filters are changed, set page to 1
   const filterTrigger = () => {
-    console.log(filters);
     // If filters haven't changed, return;
     if (filterStringified.current === JSON.stringify(filters)) return;
     filterStringified.current = JSON.stringify(filters);
-    setPagination(prev => ({ ...prev, page_no: 1 }))
+    setPagination(prev => ({ ...prev, page_no: 1 }));
+    reload();
   }
 
   // Save library columns
@@ -169,10 +177,20 @@ const RiskLibrary = () => {
     })
   }
   const clearFilters = (filterName) => {
-    setFilters(prev => ({
-      ...prev,
-      [filterName]: []
-    }))
+    if (filterName) {
+      setFilters(prev => ({
+        ...prev,
+        [filterName]: []
+      }));
+    } else {
+      setFilters(prev => {
+        const obj = {};
+        for(const key in prev) {
+          obj[key] = [];
+        }
+        return obj;
+      })
+    }
   }
 
   const [addRiskForm, setAddRiskForm] = useState(false);

@@ -197,6 +197,9 @@ export const useStyle = makeStyles(theme => ({
   subInputsContainer: {
     border: "1px solid #c5c5c5",
     borderRadius: "4px",
+    "&.error": {
+      borderColor: theme.palette.error.main
+    }
   },
 
   // subtitle in inputs
@@ -239,6 +242,12 @@ export const useStyle = makeStyles(theme => ({
     "&:nth-of-type(2)": {
       marginTop: "10px"
     }
+  },
+
+  errorText: {
+    color: theme.palette.error.main,
+    padding: "3px 14px 0 9px",
+    display: "inline-block"
   },
 
   // Risk scoring slider container

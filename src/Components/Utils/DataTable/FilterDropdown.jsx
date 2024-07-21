@@ -1,6 +1,8 @@
 import { Box, Button, Checkbox, ClickAwayListener, Divider, FormControlLabel, Grid, Icon, List, ListItem, Tooltip, makeStyles } from '@material-ui/core'
 import React, { useEffect, useState } from 'react'
 import colorShader from '../ColorShader';
+import { DateControl } from '../Control';
+import { notification } from '../Utils';
 
 const useStyles = makeStyles((theme) => ({
   customTooltip: {
@@ -29,7 +31,8 @@ const useStyles = makeStyles((theme) => ({
     }
   },
   listItem: {
-    padding: "0 0 0 8px"
+    padding: "0 0 0 8px",
+    flexDirection: "column"
   },
   checkboxLabel: {
     width: "100%",
@@ -63,6 +66,10 @@ const useStyles = makeStyles((theme) => ({
     color: "white",
     "&:hover": {
       backgroundColor: colorShader(theme.palette.primary.main, 0.85)
+    },
+    "&:disabled": {
+      color: "white",
+      opacity: 0.75
     }
   },
   filterButtonIcon: {
@@ -78,6 +85,26 @@ const useStyles = makeStyles((theme) => ({
       color: theme.palette.primary.main
     }
   },
+  dateContainer: {
+    paddingBottom: 12,
+    gap: 12,
+    "& .MuiInputBase-root": {
+      fontSize: "inherit",
+      marginTop: 0
+    },
+    "& .MuiInputAdornment-root .material-icons": {
+      fontSize: 16
+    },
+    "& .MuiFormLabel-root": {
+      display: "none"
+    },
+    "& .showLabel .MuiInputBase-root": {
+      marginTop: 16
+    },
+    "& .showLabel .MuiFormLabel-root": {
+      display: "initial"
+    }
+  }
 }))
 
 const FilterDropdown = ({
@@ -95,21 +122,30 @@ const FilterDropdown = ({
   clearFilters,
   trigger = () => { },
   contextLoading = false,
-  filterHandlerMap = {}
+  filterHandlerMap = {},
+  filterMetadata = {}
 }) => {
 
   const classes = useStyles();
 
   const [open, setOpen] = useState(false);
-  const handleClose = () => {
-    setInternalActiveFilters(activeFilters)
-    setOpen(false);
-  }
+  const handleClose = () => setOpen(false);
 
   const [internalActiveFilters, setInternalActiveFilters] = useState(activeFilters);
   useEffect(() => {
-    setInternalActiveFilters(activeFilters)
-  }, [activeFilters])
+    setInternalActiveFilters(activeFilters);
+  }, [open]);
+
+  const [dateInput, setDateInput] = useState([null, null]);
+  useEffect(() => {
+    const dateFilterOption = filterOptions.find(f => !!f.showDateRange);
+    if (dateFilterOption && internalActiveFilters.includes(dateFilterOption.id)) {
+      if (filterMetadata?.[filterName]?.[dateFilterOption.id]) {
+        const {fromDate, toDate} = filterMetadata[filterName][dateFilterOption.id];
+        setDateInput([fromDate, toDate]);
+      }
+    }
+  }, [internalActiveFilters]);
 
   // Handling checkbox clicks and changing filters
   const handleCheckboxClick = (filterItem_id) => {
@@ -122,9 +158,22 @@ const FilterDropdown = ({
   }
 
   // Handle submit button click
+  const handleClearBtnClick = () => {
+    setInternalActiveFilters([]);
+  }
+
+  // Handle submit button click
   const handleSubmitBtnClick = () => {
-    changeFilters(filterName, internalActiveFilters)
-    trigger(false, true)
+    const dateFilterOption = filterOptions.find(f => !!f.showDateRange);
+    if (dateFilterOption && internalActiveFilters.includes(dateFilterOption.id)) {
+      if (dateInput[0] === null || dateInput[1] === null) {
+        notification("err", "Select valid date range", "error");
+        return;
+      }
+    }
+    changeFilters(filterName, internalActiveFilters, dateInput);
+    trigger(false, true);
+    handleClose();
   }
 
   // Checking if filters are active, if yes then how many?
@@ -160,6 +209,35 @@ const FilterDropdown = ({
                         }
                         label={filterItem.text}
                       />
+                      {!!filterItem.showDateRange && 
+                        internalActiveFilters.includes(filterItem.id) && 
+                        <Box
+                          display="flex"
+                          flexDirection="column"
+                          className={classes.dateContainer}>
+                          <DateControl
+                            size="small"
+                            name="fromDate"
+                            label="From"
+                            placeholder="From Date"
+                            className={dateInput[0] ? "showLabel" : ""}
+                            value={dateInput[0]}
+                            onChange={v => setDateInput([v, dateInput[1]])}
+                            maxDate={dateInput[1] || undefined}
+                            clearable={true}
+                            />
+                          <DateControl
+                            size="small"
+                            name="toDate"
+                            label="To"
+                            placeholder="To Date"
+                            className={dateInput[1] ? "showLabel" : ""}
+                            value={dateInput[1]}
+                            onChange={v => setDateInput([ dateInput[0], v])}
+                            minDate={dateInput[0] || undefined}
+                            clearable={true}
+                            />
+                        </Box>}
                     </ListItem>
                   ))}
               </List>
@@ -170,7 +248,7 @@ const FilterDropdown = ({
                   <Button
                     color='primary'
                     className={`${classes.actionButton} ${classes.secondaryActionBtn}`}
-                    onClick={() => handleClose()}
+                    onClick={handleClose}
                   >
                     Cancel
                   </Button>
@@ -180,7 +258,7 @@ const FilterDropdown = ({
                   <Button
                     color='primary'
                     className={`${classes.actionButton} ${classes.secondaryActionBtn}`}
-                    onClick={() => clearFilters(filterName)}
+                    onClick={handleClearBtnClick}
                   >
                     Clear
                   </Button>
@@ -190,7 +268,8 @@ const FilterDropdown = ({
                   <Button
                     size='small'
                     className={`${classes.actionButton} ${classes.submitButton}`}
-                    onClick={() => handleSubmitBtnClick()}
+                    onClick={handleSubmitBtnClick}
+                    disabled={JSON.stringify(activeFilters) === JSON.stringify(internalActiveFilters)}
                   >
                     Apply
                   </Button>

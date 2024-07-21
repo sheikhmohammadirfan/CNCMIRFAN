@@ -88,6 +88,7 @@ export const identified_options = [
   {
     id: 3,
     text: "Custom",
+    showDateRange: true
   },
 ]
 

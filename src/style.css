@@ -47,3 +47,7 @@
     box-shadow: 0 0 0 0 rgb(var(--color), 0);
   }
 }
+
+.MuiDialog-root {
+  z-index: 2000 !important;
+}

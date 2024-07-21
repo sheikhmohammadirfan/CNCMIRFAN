@@ -76,6 +76,15 @@ const RiskRegister = () => {
     vendor: []
   })
 
+  const [filterMetadata, setFilterMetadata] = useState({
+    identified: {
+      3: {
+        fromDate: null,
+        toDate: null
+      }
+    }
+  });
+
   // State to store page size, and function to update page size. function will be called from DataTable
   const [pagination, setPagination] = useState({
     page_no: 1,
@@ -159,7 +168,8 @@ const RiskRegister = () => {
       date_from.setMonth(date_from.getMonth() - last_n_months);
 
       let dateRange = last_n_months === 0
-        ? [new Date(), new Date()]
+        ? [filterMetadata.identified[3].fromDate.toDate(),
+            filterMetadata.identified[3].toDate.toDate()]
         : [date_from, new Date()]
 
       payload.filters["identified_date"] = [obj_to_yyyy_mm_dd(dateRange[0]), obj_to_yyyy_mm_dd(dateRange[1])];
@@ -264,19 +274,41 @@ const RiskRegister = () => {
   const [matchedCell, setMatchedCell] = useState([]);
 
 
-  const changeFilters = (filterName, updatedFilterIds) => {
+  const changeFilters = (filterName, updatedFilterIds, identifiedDates) => {
     setFilters(prev => {
       return ({
         ...prev,
         [filterName]: updatedFilterIds
       })
     })
+    if (filterName === "identified"
+          && updatedFilterIds[0] === 3
+          && identifiedDates) {
+      setFilterMetadata({
+        identified: {
+          3: {
+            fromDate: identifiedDates[0],
+            toDate: identifiedDates[1]
+          }
+        }
+      });
+    }
   }
   const clearFilters = (filterName) => {
-    setFilters(prev => ({
-      ...prev,
-      [filterName]: []
-    }))
+    if (filterName) {
+      setFilters(prev => ({
+        ...prev,
+        [filterName]: []
+      }));
+    } else {
+      setFilters(prev => {
+        const obj = {};
+        for(const key in prev) {
+          obj[key] = [];
+        }
+        return obj;
+      })
+    }
   }
 
   // State to toggle dialog, for adding scenario manually, and editing it
@@ -606,6 +638,7 @@ const RiskRegister = () => {
           changeFilters={changeFilters}
           clearFilters={clearFilters}
           triggerFilters={filterTrigger}
+          filterMetadata={filterMetadata}
           // Selected rows
           selectedRows={selectedRow}
           // Edit button click handler

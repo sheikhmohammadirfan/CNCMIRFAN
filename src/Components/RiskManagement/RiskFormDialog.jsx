@@ -91,10 +91,10 @@ const RiskFormDialog = ({
       scenario: scenarioDescription,
       categories: categoriesList_l,
       // Get id for a single cia category, and check if it is in the row data that is selected.
-      confidentiality: row["CIA"]?.includes(cia_categories.find(cat => cat.name === "confidentiality").id),
-      integrity: row["CIA"]?.includes(cia_categories.find(cat => cat.name === "integrity").id),
-      availability: row["CIA"]?.includes(cia_categories.find(cat => cat.name === "availability").id),
-      uncategorized: row["CIA"]?.includes(cia_categories.find(cat => cat.name === "uncategorized").id),
+      confidentiality: false,
+      integrity: false,
+      availability: false,
+      uncategorized: true,
       // getting slider values (0-100) from actual scores. 
       // Boolean flag is to check if score is of likelihood or impact
       // If it is library row, set default risk value to 1 (slider value 0)
@@ -175,7 +175,7 @@ const RiskFormDialog = ({
     }
 
   // Get useForm Methods
-  const { handleSubmit, getValues, setValue, control, reset } = useForm({
+  const { handleSubmit, getValues, setValue, control, reset, formState: { errors } } = useForm({
     defaultValues: formValues,
   });
 
@@ -191,6 +191,14 @@ const RiskFormDialog = ({
     inherent_likelihood: { required: "Select a number" },
     inherent_impact: { required: "Select a number" },
     customId: { required: "This field is required." },
+    uncategorized: {
+      validate: { invalid: () => {
+        return getValues("uncategorized")
+                || getValues("confidentiality")
+                || getValues("integrity")
+                || getValues("availability");
+      } },
+    }
   };
 
   const onSubmit = async (values) => {
@@ -388,7 +396,7 @@ const RiskFormDialog = ({
                 </>
               )}
               <Grid item xs={12}>
-                <Box className={classes.subInputsContainer}>
+                <Box className={`${classes.subInputsContainer} ${!!errors.uncategorized ? "error" : ""}`}>
                   <Typography className={classes.inputSubtitle}>CIA Categories</Typography>
                   <Divider />
                   <Box padding="16px" width="100%" display="flex" justifyContent="space-between">
@@ -401,6 +409,7 @@ const RiskFormDialog = ({
                           <Controller
                             name={category.name}
                             control={control}
+                            rules={validation.uncategorized}
                             render={({ field: { value, onChange } }) => {
                               const handleChange = (e, value) => {
                                 // CONTROLLING "UNCATEGORIZED" CHECKBOX
@@ -433,7 +442,13 @@ const RiskFormDialog = ({
                     ))}
                   </Box>
                 </Box>
-              </Grid>
+                {!!errors.uncategorized &&
+                  <Typography
+                    variant='caption'
+                    className={`${classes.subInputSubtitle} ${classes.errorText}`}>
+                      Select atleast one CIA Categories
+                  </Typography>}
+                </Grid>
               <Grid item xs={12}>
                 <Box className={classes.subInputsContainer}>
                   <Typography className={classes.inputSubtitle}>Inherent Risk</Typography>

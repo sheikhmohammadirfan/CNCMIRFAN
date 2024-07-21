@@ -43,6 +43,15 @@ const useStyle = makeStyles((theme) => ({
   },
 
 
+  actionButton: {
+    maxHeight: 34,
+    textTransform: 'none',
+    color: theme.palette.primary.main,
+    "&.text": {
+      border: "none",
+      paddingInline: 6
+    }
+  },
 }))
 
 const RiskLibraryHeader = ({
@@ -109,6 +118,20 @@ const RiskLibraryHeader = ({
               filterHandlerMap={FILTER_HANDLERS}
             />
           ))}
+        {Object
+          .values(filters)
+          .some(filter => filter.length > 0) &&
+          <Button
+            variant='text'
+            disableElevation
+            className={`${classes.actionButton} text`}
+            onClick={() => {
+              clearFilters();
+              triggerFilters();
+            }}
+          >
+            Clear Filters
+          </Button>}
       </Box>
 
       <Box display="flex" gridColumnGap={8}>
