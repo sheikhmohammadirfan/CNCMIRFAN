@@ -300,6 +300,9 @@ const RiskRegister = () => {
         ...prev,
         [filterName]: []
       }));
+      if (filterName === "identified") {
+        setFilterMetadata({identified: {3: {fromDate: null, toDate: null}}});
+      }
     } else {
       setFilters(prev => {
         const obj = {};
@@ -307,7 +310,8 @@ const RiskRegister = () => {
           obj[key] = [];
         }
         return obj;
-      })
+      });
+      setFilterMetadata({identified: {3: {fromDate: null, toDate: null}}});
     }
   }
 
