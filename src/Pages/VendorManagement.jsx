@@ -24,7 +24,7 @@ const VendorManagement = ({ title }) => {
   const [securityReviewList, setSecurityReviewList] = useState([]);
   const { isLoading, startLoading, stopLoading } = useLoading();
   
-  // Fetch the list of vendors.
+  // Fetch the list of vendors and reviews.
   useEffect(() => {
     (async () => {
       startLoading();
@@ -92,6 +92,8 @@ const VendorManagement = ({ title }) => {
           <VendorDetails
             isLoading={isLoading}
             vendorList={vendorList}
+            securityReviewList={securityReviewList}            
+            reload={reload}
           />
         </Route>
       </Switch>

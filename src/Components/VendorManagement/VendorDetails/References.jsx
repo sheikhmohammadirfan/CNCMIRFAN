@@ -5,12 +5,15 @@ import {
   Tooltip,
   withStyles,
   TextField,
+  Icon
 } from "@material-ui/core";
 import ReferencesTable from "./ReferencesTable";
 import { useState } from "react";
 import DialogBox from "../../Utils/DialogBox";
+import { useStyle } from "../Utils";
 
 const References = ({ references, isLoading, setReferences }) => {
+  const classes = useStyle();
   const CustomTooltip = withStyles((theme) => ({
     tooltip: {
       backgroundColor: theme.palette.common.white,
@@ -26,6 +29,7 @@ const References = ({ references, isLoading, setReferences }) => {
   const [editDialog, setEditDialog] = useState(false);
   const [newName, setNewName] = useState("");
   const [newDesc, setNewDesc] = useState("");
+  const [showUploadFile, setShowUploadFile] = useState(false);
 
   const column_names = [
     "DOCUMENT NAME",
@@ -82,15 +86,51 @@ const References = ({ references, isLoading, setReferences }) => {
     //Download the current row's document
   };
 
+  const handleImportClick = () => {
+    setShowUploadFile(true);
+  };
+
+  const handleCloseUploadFile = () => {
+    setShowUploadFile(false);
+  };
+
+  const handleImport = (rows) => {
+    // upload the document
+  };
+
   return (
-    <Box mt={6}>
-      <ReferencesTable
-        isLoading={isLoading}
-        allColumns={column_names}
-        columns={references_columns}
-        rows={rows}
-        handleRowClick={handleRowClick}
-      />
+    <Box className={classes.table}>
+      <Box ml={4} mt={2}>
+        <Box
+          display="flex"
+          justifyContent="space-between"
+          width="95%"
+          height="40px"
+          alignItems="center"
+        >
+          <Box ml={1} mb={2}>
+            <Typography variant="h6">References</Typography>
+          </Box>
+          <Button
+            variant="outlined"
+            onClick={handleImportClick}
+            startIcon={<Icon>uploadFile</Icon>}
+            color="primary"
+            className={classes.button}
+          >
+            Upload file
+          </Button>
+        </Box>
+      </Box>
+      <Box>
+        <ReferencesTable
+          isLoading={isLoading}
+          allColumns={column_names}
+          columns={references_columns}
+          rows={rows}
+          handleRowClick={handleRowClick}
+        />
+      </Box>
 
       {/* Dialog for when a row is clicked*/}
       <DialogBox

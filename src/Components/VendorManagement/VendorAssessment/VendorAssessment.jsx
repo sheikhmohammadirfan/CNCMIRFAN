@@ -64,7 +64,7 @@ const VendorAssessment = ({ isLoading, vendorList, securityReviewList, reload })
     if (!isLoading()) {
       (async () => {
         const activeVendors = vendorList
-                            .filter((vendor) => vendor.website !== "archived")
+                            .filter((vendor) => vendor.managed === true && vendor.archived === false)
                             .map(vendor => {
                               const res = vendor;
                               const review = securityReviewList.find(s => s.vendor === res.id);
@@ -75,12 +75,18 @@ const VendorAssessment = ({ isLoading, vendorList, securityReviewList, reload })
                                 };
                                 res.last_date = review.last_review_date;
                                 res.owner = review.security_owner;
+                              } else {
+                                  res.review = {
+                                    status: "Not Required"
+                                  }
+                                  res.last_date = "—";
+                                  res.owner = "Owner unassigned";
                               }
                               return res;
                             });
         setActiveRows(activeVendors);
         const archivedVendors = vendorList
-                            .filter((vendor) => vendor.website === "archived")
+                            .filter((vendor) => vendor.archived === true && vendor.managed === true)
                             .map(vendor => {
                               const res = vendor;
                               const review = securityReviewList.find(s => s.vendor === res.id);
@@ -100,6 +106,52 @@ const VendorAssessment = ({ isLoading, vendorList, securityReviewList, reload })
   }, [vendorList, isLoading]);
 
   const [filterDropdowns, setFilterDropdowns] = useState(AssessmentFilters);
+  
+  const extractUniqueValues = (rows, key) => {
+    const uniqueValues = [...new Set(rows.map(row => row[key]))];
+    return uniqueValues.map((value, index) => ({ id: index, text: value }));
+  };
+
+  const updateFilterDropdowns = (rows) => {
+    const uniqueOwners = extractUniqueValues(rows, "owner");
+
+    // Remove specific options if they exist in the dynamic data
+    const filteredUniqueOwners = uniqueOwners.filter(owner => 
+      owner.text !== "Owned by me" && 
+      owner.text !== "Owner unassigned" && 
+      owner.text !== "Owner offboarded"
+    );
+
+    setFilterDropdowns((prev) => ({
+      ...prev,
+      category: {
+        name: "category",
+        text: "Category",
+        order: 1,
+        options: extractUniqueValues(rows, "category"),
+      },
+      securityOwner: {
+        name: "owner",
+        text: "Security owner",
+        order: 3,
+        options: [
+          { id: 0, text: "Owned by me" },
+          { id: 1, text: "Owner unassigned" },
+          { id: 2, text: "Owner offboarded" },
+          ...filteredUniqueOwners,
+        ],
+      },
+    }));
+  }; 
+
+  useEffect(() => {
+    if (activeTab === 0) {
+      updateFilterDropdowns(activeRows);
+    } else {
+      updateFilterDropdowns(archivedRows);
+    }
+  }, [activeRows, archivedRows, activeTab]);
+
   const [filters, setFilters] = useState({
     category: params.category ? params.category.split(",") : [],
     risk: params.risk ? params.risk.split(",") : [],
@@ -151,6 +203,13 @@ const VendorAssessment = ({ isLoading, vendorList, securityReviewList, reload })
   };
 
   const filterRows = (rows, searchValue, filters) => {
+    const filterMapping = {
+      category: "category",
+      risk: "inherent_risk",
+      owner: "owner",
+      review: "review.status",
+    };
+
     return rows.filter((row) => {
       const matchesSearch = searchValue
         ? row.vendor_name.toLowerCase().includes(searchValue.toLowerCase())
@@ -161,13 +220,10 @@ const VendorAssessment = ({ isLoading, vendorList, securityReviewList, reload })
         if (activeFilterValues.length === 0) {
           return true;
         }
-        return (
-          activeFilterValues.includes(row.security_owner) ||
-          activeFilterValues.includes(row.review_status) ||
-          activeFilterValues.includes(row.category) ||
-          activeFilterValues.includes(row.source) ||
-          activeFilterValues.includes(row.inherent_risk)
-        );
+        const rowField = filterMapping[filterName];
+        const fieldPath = rowField.split('.');
+        const fieldValue = fieldPath.reduce((acc, field) => acc && acc[field], row);
+        return activeFilterValues.includes(fieldValue);
       });
 
       return matchesSearch && matchesFilters;
@@ -241,9 +297,9 @@ const VendorAssessment = ({ isLoading, vendorList, securityReviewList, reload })
     const row = list.find((_,idx) => idx === selectedRows[0]);
     let res;
     if (target === 0) {
-      res = await updateVendor(row.id, { website: "archived", organization: getUser().organization_id });
+      res = await updateVendor(row.id, { archived: false, organization: getUser().organization_id });
     } else if (target === 1) {
-      res = await updateVendor(row.id, { website: "temp", organization: getUser().organization_id });
+      res = await updateVendor(row.id, { archived: true, organization: getUser().organization_id });
     } else if (target === 2) {
       res = await deleteVendor(row.id);
     }
@@ -256,7 +312,7 @@ const VendorAssessment = ({ isLoading, vendorList, securityReviewList, reload })
 
   const ArchiveButton = {
     label: "Archive",
-    onClick: () => actionButton(0),
+    onClick: () => actionButton(1),
     disabled: selectedRows.length !== 1,
   };
 
@@ -268,7 +324,7 @@ const VendorAssessment = ({ isLoading, vendorList, securityReviewList, reload })
 
   const UnarchiveButton = {
     label: "Unarchive",
-    onClick: () => actionButton(1),
+    onClick: () => actionButton(0),
     disabled: selectedRows.length !== 1,
   };
 
@@ -341,34 +397,53 @@ const VendorAssessment = ({ isLoading, vendorList, securityReviewList, reload })
     vendorExport(activeRows, archivedRows);
   };
 
-  const handleImport = (rows) => {
-    console.log("rows", ...rows);
-    const formattedRows = rows.map((row, index) => ({
-      id: activeRows.length + index + 1,
-      "NAME / CATEGORY": {
-        name: row["Vendor Name"] || "Unknown",
-        category: row.Category || "Unknown",
-      },
-      "INHERENT RISK": row["Inherent Risk"] || "Unknown",
-      "SECURITY OWNER": row["Security Owner"] || "Owner Unassigned",
-      "LAST REVIEWED": row["Last Reviewed"],
-      "SECURITY REVIEW": {
-        due_date: row["Security Review Due Date"],
-        status: row["Security Review Status"],
-      },
+  const handleImport = async (rows) => {
+    const formattedRows = rows.map((row) => ({
+      vendor_name: row["Vendor Name"] || "Unknown",
+      category: row.Category || "Unknown",
+      inherent_risk: row["Inherent Risk"] || "Unknown",
+      website: row.Website || "Unknown",
+      source: row.Source || "Unknown",
+      number_of_accounts: row["Number of Accounts"] || 0,
+      date_discovered: new Date(),
+      managed: true,
+      auth_method: "SSO"
     }));
-    console.log("formatted", ...formattedRows);
-    console.log("activerows", activeRows);
-    setActiveRows((prev) => [...prev, ...formattedRows]);
+  
+    updateLoader(true);
+    for (const vendor of formattedRows) {
+      try {
+        const vendorRes = await createVendor(vendor);
+        if (vendorRes.status) {
+          const reviewDate = new Date();
+          reviewDate.setDate(reviewDate.getDate());
+          const payload = {
+            vendor: vendorRes.data.id,
+            security_owner: getUser().id,
+            review_status: false,
+            review_status_reason: "Need Review",
+            last_review_date: reviewDate.toISOString(),
+          };
+          const reviewRes = await createSecurityReview(payload);
+          if (reviewRes.status) {
+            await updateVendor(vendorRes.data.id, { managed: true, archived: false, organization: getUser().organization_id });
+          }
+        }
+      } catch (error) {
+        console.error("Error creating vendor or security review: ", vendor, error);
+      }
+    }
+    updateLoader(false);
+    reload();
   };
 
   const categories = AssessmentFilters.category.options.map(
     (option) => option.text
   );
   const sources = ["Microsoft 365", "Gmail", "Zoho"];
-  const riskLevels = AssessmentFilters.risk.options.map(
-    (option) => option.text
-  );
+  const riskLevels = AssessmentFilters.risk.options
+    .filter(option => option.text !== "Unknown")
+    .map(option => option.text);
   const owners = AssessmentFilters.securityOwner.options.map(
     (option) => option.text
   );

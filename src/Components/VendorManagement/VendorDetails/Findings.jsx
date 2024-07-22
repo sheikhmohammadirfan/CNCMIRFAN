@@ -46,7 +46,7 @@ const useStyle = makeStyles((theme) => ({
   },
 }));
 
-const Findings = ({ findings, setFindingsRows }) => {
+const Findings = ({ findings = [], setFindingsRows }) => {
   const classes = useStyle();
   const [searchValue, setSearchValue] = useState("");
   const [addFindingVisible, setAddFindingVisible] = useState(false);
@@ -70,20 +70,18 @@ const Findings = ({ findings, setFindingsRows }) => {
   const searchFindings = (rows, searchValue) => {
     return rows.filter((row) => {
       const matchesSearch = searchValue
-        ? row.DESCRIPTION.toLowerCase().includes(searchValue.toLowerCase())
+        ? row.description.toLowerCase().includes(searchValue.toLowerCase())
         : true;
       return matchesSearch;
     });
   };
 
-  const handleAddFinding = () => {
-    const newFindings = [
-      ...findings,
-      { AUTHOR: "author's name", DESCRIPTION: newFinding },
-    ];
-    setFindingsRows(newFindings);
+  const handleAddFinding = async () => {
+    const res = await setFindingsRows("add", newFinding);
     setNewFinding("");
-    setAddFindingVisible(false);
+    if (res && res.status) {
+      setAddFindingVisible(false);
+    }
   };
 
   const handleMenuOpen = (event, finding) => {
@@ -93,24 +91,22 @@ const Findings = ({ findings, setFindingsRows }) => {
 
   const handleMenuClose = () => {
     setAnchorEl(null);
-    setSelectedFinding(null);
   };
 
   const handleEditFinding = () => {
-    setNewFinding(selectedFinding.DESCRIPTION);
+    setNewFinding(selectedFinding.description);
     setIsEditing(true);
     setEditingIndex(findings.indexOf(selectedFinding));
     handleMenuClose();
   };
 
-  const handleSaveEdit = () => {
-    const updatedFindings = findings.map((finding, index) =>
-      index === editingIndex ? { ...finding, DESCRIPTION: newFinding } : finding
-    );
-    setFindingsRows(updatedFindings);
-    setNewFinding("");
-    setIsEditing(false);
-    setEditingIndex(null);
+  const handleSaveEdit = async () => {
+    const res = await setFindingsRows("edit", { id: selectedFinding.id, description: newFinding });
+    if (res && res.status) {
+      setNewFinding("");
+      setIsEditing(false);
+      setEditingIndex(null);
+    }
   };
 
   const handleCancelEdit = () => {
@@ -119,21 +115,23 @@ const Findings = ({ findings, setFindingsRows }) => {
     setEditingIndex(null);
   };
 
-  const handleDeleteFinding = () => {
-    const updatedFindings = findings.filter(
-      (finding) => finding !== selectedFinding
-    );
-    setFindingsRows(updatedFindings);
+  const handleDeleteFinding = async () => {
+    await setFindingsRows("delete", selectedFinding.id);
     handleMenuClose();
   };
 
   const searchedFindings = searchFindings(findings, searchValue);
 
   return (
-    <Box display="flex" height="55vh" flexDirection="column">
+    <Box
+      display="flex"
+      height="55vh"
+      flexDirection="column"
+      alignItems="center"
+    >
       {findings.length > 0 ? (
         <>
-          <Box display="flex">
+          <Box display="flex" mt={2}>
             <TextControl
               variant="outlined"
               placeholder="Search findings"
@@ -219,14 +217,14 @@ const Findings = ({ findings, setFindingsRows }) => {
 
           <Box
             overflow="auto"
-            height="35vh"
             display="flex"
             flexDirection="column"
+            width="90%"
           >
             {searchedFindings.map((finding, index) => (
               <Box key={index} mt={2} display="flex" flexDirection="column">
                 <Box display="flex" justifyContent="space-between">
-                  <Typography variant="body1">{finding.AUTHOR}</Typography>
+                  <Typography variant="body1">{finding.author}</Typography>
                   <IconButton
                     size="small"
                     onClick={(event) => handleMenuOpen(event, finding)}
@@ -234,14 +232,17 @@ const Findings = ({ findings, setFindingsRows }) => {
                     <Icon>more_horiz</Icon>
                   </IconButton>
                 </Box>
-                <Box
-                  display="flex"
-                  mt={2}
-                  mb={2}
-                  whiteSpace="pre-wrap"
-                  wordWrap="break-word"
-                >
-                  <Typography variant="body1">{finding.DESCRIPTION}</Typography>
+                <Box display="flex" mt={2} mb={2} maxWidth="274px">
+                  <Typography
+                    variant="body1"
+                    style={{
+                      whiteSpace: "pre-wrap",
+                      wordBreak: "break-word",
+                      overflowWrap: "break-word",
+                    }}
+                  >
+                    {finding.description}
+                  </Typography>
                 </Box>
                 <Divider />
               </Box>

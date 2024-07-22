@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { Box, Typography, Divider } from "@mui/material";
-import useLoading from "../../Utils/Hooks/useLoading";
 import ReviewTable from "../SecurityReview/ReviewTable";
 import ReviewFilters from "../../../assets/data/VendorManagement/SecurityReview/ReviewFilters";
 import { review_columns } from "../../../assets/data/VendorManagement/SecurityReview/ReviewColumns";
@@ -13,7 +12,7 @@ const SecurityReview = ({
   securityReviewList,
   reload,
 }) => {
-  const { params, changeParams, deleteParams } = useParams("review");
+  const { params, changeParams, deleteParams } = useParams("review", "risk");
   const [reviewRows, setReviewRows] = useState([]);
   const [matchedCell, setMatchedCell] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
@@ -24,7 +23,7 @@ const SecurityReview = ({
       const list = securityReviewList.map((s) => {
         const vendor = vendorList.find((v) => v.id === s.vendor);
         const review = {
-          id: s.id,
+          id: vendor.id,
           owner: s.security_owner,
           review: {
             due_date: s.last_review_date,
@@ -51,8 +50,36 @@ const SecurityReview = ({
   }, [isLoading, securityReviewList]);
 
   const [filterDropdowns, setFilterDropdowns] = useState(ReviewFilters);
+
+  const extractUniqueValues = (rows, key) => {
+    const uniqueValues = [...new Set(rows.map(row => row[key]))];
+    return uniqueValues.map((value, index) => ({ id: index, text: value }));
+  };
+
+  const updateFilterDropdowns = (rows) => {
+    setFilterDropdowns((prev) => ({
+      ...prev,
+      securityOwner: {
+        name: "owner",
+        text: "Security owner",
+        order: 3,
+        options: [
+          { id: 0, text: "Owned by me" },
+          { id: 1, text: "Owner unassigned" },
+          { id: 2, text: "Owner offboarded" },
+          ...extractUniqueValues(rows, "SECURITY OWNER"),
+        ],
+      },
+    }));
+  }; 
+
+  useEffect(() => {
+    console.log(reviewRows)
+    updateFilterDropdowns(reviewRows);
+  }, [reviewRows]);
+
   const [filters, setFilters] = useState({
-    risk: [],
+    risk: params.risk ? params.risk.split(",") : [],
     owner: [],
     review: params.review ? params.review.split(",") : [],
     date: [],
@@ -66,7 +93,13 @@ const SecurityReview = ({
         review: params.review.split(","),
       }));
     }
-  }, [params.review]);
+    if (params.risk) {
+      setFilters((prev) => ({
+        ...prev,
+        risk: params.risk.split(","),
+      }));
+    }
+  }, [params.review, params.risk]);
 
   const changeFilters = (filterName, itemText) => {
     const updatedFilterTexts = filters[filterName].includes(itemText)

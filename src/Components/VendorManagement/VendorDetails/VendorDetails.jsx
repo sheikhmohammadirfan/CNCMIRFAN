@@ -9,6 +9,7 @@ import {
   Tooltip,
   Icon,
   Button,
+  Grid,
 } from "@material-ui/core";
 import ChevronRightIcon from "@material-ui/icons/ChevronRight";
 import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
@@ -22,12 +23,18 @@ import TabPanel from "../TabPanel";
 import Info from "./Info";
 import Findings from "./Findings";
 import {
-  getReviewFindings,
-  getReviewReferences,
-} from "../../../Service/VendorManagement/Review.service";
+  listFindings,
+  createFinding,
+  updateFinding,
+  deleteFinding,
+  listReferences,
+  createReferences,
+  updateReferences,
+  deleteReference,
+} from "../../../Service/VendorManagement/VendorManagement.service";
 import { useStyle } from "../Utils";
 
-const VendorDetails = ({ isLoading, vendorList }) => {
+const VendorDetails = ({ isLoading, vendorList, securityReviewList, reload }) => {
   const classes = useStyle();
   const { vendorId } = useParams();
   const [vendorData, setVendorData] = useState([]);
@@ -36,6 +43,7 @@ const VendorDetails = ({ isLoading, vendorList }) => {
   const [activeDetailsTab, setActiveDetailsTab] = useState(0);
   const [findingsRows, setFindingsRows] = useState([]);
   const [referencesRows, setReferencesRows] = useState([]);
+  const [reviewId, setReviewId] = useState(0);
 
   const handleChange = (event, newValue) => {
     setActiveTab(newValue);
@@ -52,33 +60,74 @@ const VendorDetails = ({ isLoading, vendorList }) => {
   useEffect(() => {
     if (!isLoading()) {
       (async () => {
-        const allRows = vendorList;
+        const allRows = vendorList.filter((vendor) => vendor.managed === true);
         let data = allRows.find(({ id }) => id == vendorId);
         const [findingsRes, referencesRes] = await Promise.all([
-          getReviewFindings(),
-          getReviewReferences(),
+          listFindings(),
+          listReferences(),
         ]);
-
-        let findings = findingsRes.data.filter((finding) => finding.ID === vendorId);
-        let references = referencesRes.data.filter(
-          (reference) => reference.ID === vendorId
-        );
-
+        const review = securityReviewList.find((review) => review.vendor == vendorId);
+        let findings = review ? findingsRes.data.filter((finding) => finding.review == review.id) : null;
+        let references = review ? referencesRes.data.filter((reference) => reference.id == review.id) : null;
+        if (review) setReviewId(review.id);
+        
         const combinedData = {
           ...data,
           findings,
           references,
         };
-
-        setFindingsRows(findings);
-        setReferencesRows(references);
+        setFindingsRows(findings || []);
+        setReferencesRows(references || []);
         setVendorData(combinedData);
+        console.log(vendorData, "vendordata")
       })();
     }
   }, [isLoading, vendorList]);
 
   if (!vendorData || !vendorData.vendor_name) {
     return <CircularProgress />;
+  }
+
+  const handleCreateFinding = async (desc) => {
+    const payload = {
+      "review": reviewId,
+      "description": desc,
+    }
+    let res = await createFinding(payload);
+    if (res.status) {
+      reload();
+      return;
+    }
+  };
+
+  const handleEditFinding = async (id, newDesc) => {
+    const payload = {
+      "description": newDesc,
+    };
+    let res = await updateFinding(id, payload);
+    if (res.status) {
+      reload();
+      return;
+    }
+  }
+
+  const handleDeleteFinding = async (id) => {
+    let res = await deleteFinding(id);
+    if (res.status) {
+      reload();
+      return;
+    }
+  }
+
+  const handleFindings = async (action, data) => {
+    if (action === "add") {
+      return handleCreateFinding(data);
+    } else if (action === "edit") {
+      const { id, description } = data;
+      return handleEditFinding(id, description);
+    } else if (action === "delete") {
+      return handleDeleteFinding(data);
+    }
   }
 
   return (
@@ -99,20 +148,19 @@ const VendorDetails = ({ isLoading, vendorList }) => {
                 {vendorData.inherent_risk} inherent risk
               </Typography>
             </Box>
-            {/*This needs Security Review api*/}
-            {/* <Box>
+            <Box>
               <Typography variant="body2">
-                {vendorData["SECURITY REVIEW"].due_date
-                  ? `Security review due ${vendorData["SECURITY REVIEW"].due_date}`
+                {vendorData.review && vendorData.review.due_date
+                  ? `Security review due ${vendorData.review.due_date}`
                   : "No due date"}
               </Typography>
-            </Box> */}
+            </Box>
           </Box>
         </Box>
         <Box p={2}>
           <Box display="flex" mt={2}>
             <Box mr={4}>
-              <Button variant="outlined" color="primary">
+              <Button variant="outlined" color="primary" className={classes.button}>
                 Configure inherent risk
               </Button>
             </Box>
@@ -125,8 +173,8 @@ const VendorDetails = ({ isLoading, vendorList }) => {
         </Box>
       </Box>
       <Divider />
-      <Box display="flex" flexDirection="row" justifyContent="space-between">
-        <Box className={sidebarOpen ? classes.tableOpen : classes.tableClose}>
+      <Grid container className={classes.vdContainer}>
+        <Grid item xs={sidebarOpen ? 9 : 11}>
           <VendorTabs activeTab={activeTab} handleChange={handleChange} />
           <TabPanel activeTab={activeTab} index={0}>
             <Overview
@@ -148,18 +196,16 @@ const VendorDetails = ({ isLoading, vendorList }) => {
           <TabPanel activeTab={activeTab} index={3}>
             <LinkedApps vendorData={vendorData} />
           </TabPanel>
-        </Box>
-        <Box
-          className={sidebarOpen ? classes.sidebarOpen : classes.sidebarClose}
-        >
-          <Box display="flex">
-            <Box display="flex" justifyContent="space-between" width={"100%"}>
+        </Grid>
+        <Grid item xs={sidebarOpen ? 2.4 : 0}>
+          <Box className={sidebarOpen ? classes.sidebarOpen : classes.sidebarClose}>
+            <Box display="flex" justifyContent="space-between">
               {sidebarOpen && (
                 <Box ml={2} mt={2}>
                   <Typography variant="h6">Additional details</Typography>
                 </Box>
               )}
-              <Box mt={1} position="fixed" right={0}>
+              <Box mt={1} align="right">
                 <Tooltip title={sidebarOpen ? "Collapse" : "Expand"}>
                   <IconButton onClick={toggleSidebar}>
                     {sidebarOpen ? <ChevronRightIcon /> : <ChevronLeftIcon />}
@@ -167,31 +213,31 @@ const VendorDetails = ({ isLoading, vendorList }) => {
                 </Tooltip>
               </Box>
             </Box>
-          </Box>
-          {sidebarOpen && (
-            <Box mt={1}>
-              <Divider />
-              <Box ml={2}>
-                <OverviewTabs
-                  activeTab={activeDetailsTab}
-                  handleChange={detailsChange}
-                />
-              </Box>
-              <Box ml={2} m={2}>
-                <TabPanel activeTab={activeDetailsTab} index={0}>
-                  <Info vendorData={vendorData} />
-                </TabPanel>
-                <TabPanel activeTab={activeDetailsTab} index={1}>
-                  <Findings
-                    findings={findingsRows}
-                    setFindingsRows={setFindingsRows}
+            {sidebarOpen && (
+              <>
+                <Divider />
+                <Box>
+                  <OverviewTabs
+                    activeTab={activeDetailsTab}
+                    handleChange={detailsChange}
                   />
-                </TabPanel>
-              </Box>
-            </Box>
-          )}
-        </Box>
-      </Box>
+                </Box>
+                <Box ml={2} mt={2}>
+                  <TabPanel activeTab={activeDetailsTab} index={0}>
+                    <Info vendorData={vendorData} />
+                  </TabPanel>
+                  <TabPanel activeTab={activeDetailsTab} index={1}>
+                    <Findings
+                      findings={findingsRows}
+                      setFindingsRows={handleFindings}
+                    />
+                  </TabPanel>
+                </Box>
+              </>
+            )}
+          </Box>
+        </Grid>
+      </Grid>
     </Box>
   );
 };

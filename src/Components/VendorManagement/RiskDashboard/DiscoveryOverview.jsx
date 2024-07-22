@@ -33,10 +33,7 @@ const useStyles = makeStyles({
 });
 
 const DiscoveryOverview = ({
-  handleDiscoveryCriticalClick,
-  handleDiscoveryHighClick,
-  handleDiscoveryMediumClick,
-  handleDiscoveryLowClick,
+  handleDiscoveryRiskClick,
   handleDiscoveryVendorClick,
   vendorList
 }) => {
@@ -62,7 +59,7 @@ const DiscoveryOverview = ({
             <Button
               fullWidth
               className={classes.button}
-              onClick={handleDiscoveryHighClick}
+              onClick={() => handleDiscoveryRiskClick(level)}
             >
               <Box display="flex" flexDirection="column">
                 <Box display="flex" alignItems="center">
@@ -152,7 +149,7 @@ const DiscoveryOverview = ({
           variant="outlined"
           color="primary"
           component={Link}
-          to="/vendor_management/requirement_analysis"
+          to="/vendor-management/requirement-analysis"
         >
           Show all
         </Button>

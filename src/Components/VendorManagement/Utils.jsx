@@ -173,7 +173,6 @@ export const useStyle = makeStyles((theme) => ({
     height: "75vh",
     backgroundColor: "#f5f5f5",
     border: "1px solid #ddd",
-    maxWidth: "300px",
   },
   sidebarClose: {
     display: "flex",
@@ -183,7 +182,12 @@ export const useStyle = makeStyles((theme) => ({
     height: "70vh",
     backgroundColor: "#f5f5f5",
     border: "1px solid #ddd",
-    maxWidth: "300px",
+  },
+  vdContainer: {
+    width: '100%',
+    margin: 0,
+    flexWrap: 'nowrap',
+    justifyContent: 'space-between',
   },
 
   //Table container style
@@ -200,6 +204,9 @@ export const useStyle = makeStyles((theme) => ({
     width: "100%",
   },
   
+  button: {
+    textTransform: "none",
+  },
 }));
 
 // Colors for the risk cells

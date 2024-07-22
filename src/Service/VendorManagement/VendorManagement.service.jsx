@@ -37,3 +37,35 @@ export async function createSecurityReview(payload) {
 export async function getSecurityReview() {
   return await get("/vendor/security-reviews/");
 }
+
+export async function listFindings() {
+  return await get("/vendor/findings/");
+}
+
+export async function createFinding(payload) {
+  return await post("/vendor/findings/create/", payload);
+}
+
+export async function updateFinding(id, data) {
+  return await put(`/vendor/findings/update/${id}/`, data);
+}
+
+export async function deleteFinding(id) {
+  return await deletes(`/vendor/findings/delete/${id}/`);
+}
+
+export async function listReferences() {
+  return await get("/vendor/references/");
+}
+
+export async function createReferences(payload) {
+  return await post("/vendor/references/create/", payload);
+}
+
+export async function updateReferences(id, data) {
+  return await put(`/vendor/references/update/${id}`, data);
+}
+
+export async function deleteReference(id) {
+  return await deletes(`vendor/references/${id}`);
+}

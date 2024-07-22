@@ -54,16 +54,38 @@ const Discovery = ({ isLoading, vendorList, reload }) => {
     if (!isLoading()) {
       (async () => {
         const unmanagedVendors = vendorList.filter(
-          (vendor) => vendor.managed === false && vendor.website !== "archived"
+          (vendor) => vendor.managed === false
         );
-        setNeedsReviewRows(unmanagedVendors.filter(v => v.website !== "ignore" && v.website !== "reject"));
-        setIgnoredRows(unmanagedVendors.filter(v => v.website === "ignore"));
-        setRejectedRows(unmanagedVendors.filter(v => v.website === "reject"));
+        setNeedsReviewRows(unmanagedVendors.filter(v => v.unmanaged_location === "Review"));
+        setIgnoredRows(unmanagedVendors.filter(v => v.unmanaged_location === "Ignored"));
+        setRejectedRows(unmanagedVendors.filter(v => v.unmanaged_location === "Rejected"));
       })();
     }
   }, [vendorList, isLoading]);
 
   const [filterDropdowns, setFilterDropdowns] = useState(DiscoveryFilters);
+
+  const extractUniqueValues = (rows, key) => {
+    const uniqueValues = [...new Set(rows.map(row => row[key]))];
+    return uniqueValues.map((value, index) => ({ id: index, text: value }));
+  };
+
+  const updateFilterDropdowns = (rows) => {
+    setFilterDropdowns((prev) => ({
+      ...prev,
+      source: {
+        name: "source",
+        text: "Source",
+        order: 1,
+        options: extractUniqueValues(rows, "source"),
+      },
+    }));
+  }; 
+
+  useEffect(() => {
+    updateFilterDropdowns(getFilteredRowsForActiveTab());
+  }, [needsReviewRows, ignoredRows, rejectedRows, activeTab]);
+
   const [filters, setFilters] = useState({
     source: [],
     risk: params.risk ? params.risk.split(",") : [],
@@ -87,20 +109,33 @@ const Discovery = ({ isLoading, vendorList, reload }) => {
     }
   }, [params.searchValue]);
 
-  const changeFilters = (filterName, itemText) => {
-    const updatedFilterTexts = filters[filterName].includes(itemText)
-      ? filters[filterName].filter((text) => text !== itemText)
-      : [...filters[filterName], itemText];
+  const changeFilters = (filterName, itemValue) => {
+    if (filterName === "accounts") {
+      const newArray = Array.from({ length: itemValue }, (_, i) => i + 1);
+      setFilters((prev) => ({
+        ...prev,
+        [filterName]: newArray,
+      }));
+      if (itemValue === 0) {
+        deleteParams(filterName);
+      } else {
+        changeParams({ [filterName]: newArray.length });
+      }
+    }  else {
+      const updatedFilterTexts = filters[filterName].includes(itemValue)
+        ? filters[filterName].filter((text) => text !== itemValue)
+        : [...filters[filterName], itemValue];
 
-    setFilters((prev) => ({
-      ...prev,
-      [filterName]: updatedFilterTexts,
-    }));
-    
-    if (updatedFilterTexts.length === 0) {
-      deleteParams(filterName);
-    } else {
-      changeParams({ [filterName]: updatedFilterTexts.join(",") });
+      setFilters((prev) => ({
+        ...prev,
+        [filterName]: updatedFilterTexts,
+      }));
+      
+      if (updatedFilterTexts.length === 0) {
+        deleteParams(filterName);
+      } else {
+        changeParams({ [filterName]: updatedFilterTexts.join(",") });
+      }
     }
   };
 
@@ -132,10 +167,20 @@ const Discovery = ({ isLoading, vendorList, reload }) => {
         if (activeFilterValues.length === 0) {
           return true;
         }
-        return (
-          activeFilterValues.includes(row.source) ||
-          activeFilterValues.includes(row.inherent_risk)
-        );
+  
+        if (filterName === "accounts") {
+          return row.number_of_accounts >= activeFilterValues.length;
+        }
+  
+        if (filterName === "risk") {
+          return activeFilterValues.includes(row.inherent_risk);
+        }
+  
+        if (filterName === "source") {
+          return activeFilterValues.includes(row.source);
+        }
+  
+        return activeFilterValues.includes(row[filterName]);
       });
 
       return matchesSearch && matchesFilters;
@@ -182,14 +227,14 @@ const Discovery = ({ isLoading, vendorList, reload }) => {
     const list = getFilteredRowsForActiveTab();
     const row = list.find((_,idx) => idx === rows[0]);
     if (targetTab === 1) {
-      const res = await updateVendor(row.id, { website: "ignore", organization: getUser().organization_id });
+      const res = await updateVendor(row.id, { unmanaged_location: "Ignored", organization: getUser().organization_id });
       updateLoader(false);
       if (res.status) {
           reload();
           return;
       }
     } else if (targetTab === 2) {
-      const res = await updateVendor(row.id, { website: "reject", organization: getUser().organization_id });
+      const res = await updateVendor(row.id, { unmanaged_location: "Rejected", organization: getUser().organization_id });
       updateLoader(false);
       if (res.status) {
           reload();
@@ -207,7 +252,7 @@ const Discovery = ({ isLoading, vendorList, reload }) => {
       }
       let res = await createSecurityReview(payload);
       if (res.status) {
-        res = await updateVendor(row.id, { managed: true, website: "temp", organization: getUser().organization_id });
+        res = await updateVendor(row.id, { managed: true, archived: false, organization: getUser().organization_id });
         updateLoader(false);
         if (res.status) {
             reload();

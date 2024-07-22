@@ -8,10 +8,13 @@ import {
   Icon,
   List,
   ListItem,
+  Slider,
   Tooltip,
   makeStyles,
+  Input,
 } from "@material-ui/core";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { DateControl } from "../Utils/Control";
 
 const useStyles = makeStyles((theme) => ({
   customTooltip: {
@@ -88,6 +91,14 @@ const useStyles = makeStyles((theme) => ({
     height: "39px",
     whiteSpace: "nowrap",
   },
+  sliderContainer: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  input: {
+    width: 60,
+  },
 }));
 
 const FilterDropdown = ({
@@ -101,11 +112,43 @@ const FilterDropdown = ({
   const classes = useStyles();
 
   const [open, setOpen] = useState(false);
+  const [sliderValue, setSliderValue] = useState(0);
+
+  useEffect(() => {
+    if (filterName === "accounts" && activeFilters.length === 0) {
+      setSliderValue(0);
+    }
+  }, [activeFilters, filterName]);
+
   const handleClose = () => setOpen(false);
 
   // Handling checkbox clicks and changing filters
   const handleCheckboxClick = (filterItem_id, filterItem_text) => {
     changeFilters(filterName, filterItem_text);
+  };
+
+  // Handling slider changes
+  const handleSliderChange = (event, newValue) => {
+    setSliderValue(newValue);
+    changeFilters(filterName, newValue);
+  };
+
+  // Handling input changes
+  const handleInputChange = (event) => {
+    let value = event.target.value === '' ? '' : Number(event.target.value);
+    if (value > 100) value = 100;
+    setSliderValue(value);
+    changeFilters(filterName, [value]);
+  };
+
+  // Handling input blur
+  const handleBlur = () => {
+    if (sliderValue > 100) {
+      setSliderValue(100);
+      changeFilters(filterName, 100);
+    } else {
+      changeFilters(filterName, sliderValue);
+    }
   };
 
   // Checking if filters are active, if yes then how many?
@@ -122,26 +165,68 @@ const FilterDropdown = ({
         <Box>
           <ClickAwayListener onClickAway={handleClose}>
             <Box>
-              <List disablePadding className={classes.customList}>
-                {filterOptions.map((filterItem, index) => (
-                  <ListItem key={index} className={classes.listItem}>
-                    <FormControlLabel
-                      className={classes.checkboxLabel}
-                      control={
-                        <Checkbox
-                          size="small"
-                          checked={activeFilters.includes(filterItem.text)}
-                          onChange={() =>
-                            handleCheckboxClick(filterItem.id, filterItem.text)
-                          }
-                          className={classes.checkbox}
-                        />
-                      }
-                      label={filterItem.text}
+              {filterName === "accounts" ? (
+                <Box px={2} py={2} className={classes.sliderContainer}>
+                  <Box width={150} mr={4}>
+                    <Slider
+                      value={sliderValue}
+                      onChange={handleSliderChange}
+                      valueLabelDisplay="auto"
+                      min={0}
+                      max={100}
+                      marks={[
+                        { value: 0, label: '0' },
+                        { value: 100, label: '100+' },
+                      ]}
                     />
-                  </ListItem>
-                ))}
-              </List>
+                  </Box>
+                  <Box>
+                    <Input
+                      className={classes.input}
+                      value={sliderValue}
+                      margin="dense"
+                      onChange={handleInputChange}
+                      onBlur={handleBlur}
+                      inputProps={{
+                        step: 1,
+                        min: 0,
+                        max: 100,
+                        type: 'number',
+                      }}
+                    />
+                  </Box>
+                </Box>
+              )  : filterName === "date" ? (
+                <Box px={2} py={2}>
+                  <DateControl
+                    name="date"
+                    label="Date"
+                    variant='outlined'
+                    fullWidth
+                  />
+                </Box>
+              ) : (
+                <List disablePadding className={classes.customList}>
+                  {filterOptions.map((filterItem, index) => (
+                    <ListItem key={index} className={classes.listItem}>
+                      <FormControlLabel
+                        className={classes.checkboxLabel}
+                        control={
+                          <Checkbox
+                            size="small"
+                            checked={activeFilters.includes(filterItem.text)}
+                            onChange={() =>
+                              handleCheckboxClick(filterItem.id, filterItem.text)
+                            }
+                            className={classes.checkbox}
+                          />
+                        }
+                        label={filterItem.text}
+                      />
+                    </ListItem>
+                  ))}
+                </List>
+              )}
               <Divider />
               <Box
                 className={classes.clearButtonBox}

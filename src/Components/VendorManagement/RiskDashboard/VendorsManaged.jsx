@@ -56,11 +56,7 @@ function getRandomColor() {
 
 
 const VendorsManaged = ({
-  handleManagedUnknownClick,
-  handleManagedCriticalClick,
-  handleManagedHighClick,
-  handleManagedMediumClick,
-  handleManagedLowClick,
+  handleManagedRiskClick,
   handleCategoryClick,
   isLoading,
   vendorList
@@ -77,8 +73,8 @@ const VendorsManaged = ({
     return [Math.round((rC / managedVendors.length) * 100) || 0, rC];
   });
 
-  const labels = Array.from(new Set(vendorList.map(v => v.category)));
-  const values = labels.map(l => vendorList.filter(v => v.category === l).length);
+  const labels = Array.from(new Set(managedVendors.map(v => v.category)));
+  const values = labels.map(l => managedVendors.filter(v => v.category === l).length);
   const backgroundColor = labels.map(getRandomColor);
   const hoverColor = backgroundColor.map(c => colorShader(c, 0.75));
 
@@ -138,7 +134,7 @@ const VendorsManaged = ({
               <Button
                 fullWidth
                 className={classes.button}
-                onClick={handleManagedUnknownClick}
+                onClick={() => handleManagedRiskClick(level)}
               >
                 <Box display="flex" flexDirection="column">
                   <Box display="flex" alignItems="center">

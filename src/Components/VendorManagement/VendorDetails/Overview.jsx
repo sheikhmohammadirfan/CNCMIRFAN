@@ -4,11 +4,29 @@ import { useStyle } from "../Utils";
 
 const Overview = ({ findings, isLoading, sidebarOpen }) => {
   const classes = useStyle();
-  const column_names = ["Finding", "Author"];
+  const column_names = [
+    "Finding",
+    "Treatment plan",
+    "Mitigation status",
+    "Task status",
+    "Linked risks",
+  ];
 
-  const findings_columns = ["DESCRIPTION", "AUTHOR"];
+  const findings_columns = [
+    "description",
+    "treatment_plan",
+    "mitigation_status",
+    "task_status",
+    "linked_risks",
+  ];
 
-  const rows = [findings];
+  const rows = findings ? findings.map(finding => {
+    return {
+      id: finding.id,
+      author: finding.author,
+      description: finding.description
+    };
+  }) : [];
 
   return (
     <Box className={classes.table}>

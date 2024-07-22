@@ -48,12 +48,12 @@ const AddVendorForm = ({
         data.inherentRisk === "Select an option"
           ? "Unknown"
           : data.inherentRisk,
-      number_of_accounts: 10,
+      number_of_accounts: 102,
       date_discovered: new Date(),
       website: data.website ? data.website : "Unknown",
       auth_method: "SSO",
       linked_apps: null,
-      managed: false,
+      managed: true,
     };
     const status = await onSubmit(formattedData);
     if (status) {

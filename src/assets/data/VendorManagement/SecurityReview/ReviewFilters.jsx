@@ -26,7 +26,7 @@ const ReviewFilters = {
     text: "Review status",
     order: 3,
     options: [
-      { id: 0, text: "Up To Date" },
+      { id: 0, text: "Up to Date" },
       { id: 1, text: "Need Review" },
       { id: 2, text: "Need Update" },
       { id: 3, text: "Not Required" },
