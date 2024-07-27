@@ -9,21 +9,21 @@ export async function getReviewEntities(id) {
   const data = {
     review_id: id
   }
-  return await get("/access/get-review-entities", data)
+  return await get("/access/get-review-entities/", data)
 }
 
 export async function getReviewAccessList(id) {
   const data = {
     review_id: id
   }
-  return await get(`/access/get-review-list`, data)
+  return await get(`/access/get-review-list/`, data)
 }
 
 export async function getDecisions(id) {
   const data = {
     review_entity_id: id
   }
-  return await get(`/access/get-review-list-by-review-entity`, data)
+  return await get(`/access/get-review-list-by-review-entity/`, data)
 }
 
 export async function getEntities() {
