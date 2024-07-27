@@ -20,7 +20,12 @@ const DiscoveryFilters = {
     name: "date",
     text: "Date discovered",
     order: 3,
-    options: [],
+    options: [
+      { id: 0, text: "This month" },
+      { id: 1, text: "This quarter" },
+      { id: 2, text: "This year"},
+      { id: 3, text: "Custom", showDateRange: true},
+    ],
   },
   accounts: {
     name: "accounts",

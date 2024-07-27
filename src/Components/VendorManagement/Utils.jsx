@@ -207,6 +207,20 @@ export const useStyle = makeStyles((theme) => ({
   button: {
     textTransform: "none",
   },
+  
+  // Style for loader
+  backdrop: {
+    zIndex: 1000000,
+    display: "flex",
+    flexDirection: "column",
+    color: "white",
+    "&  .backdrop-label": {
+      marginTop: 10,
+      fontWeight: "bold",
+      letterSpacing: 1,
+      fontStyle: "italic",
+    },
+  },
 }));
 
 // Colors for the risk cells

@@ -21,7 +21,7 @@ import UploadFileDialog from "../../Utils/UploadFileDialog";
 import XLSX from "xlsx";
 import useParams from "../../Utils/Hooks/useParams";
 import { COLUMN_DESCRIPTION_MAP, REQUIRED_COLUMNS, OPTIONAL_COLUMNS } from "../../../assets/data/VendorManagement/VendorAssessment/ImportCols";
-import { createVendor, deleteVendor, updateVendor } from "../../../Service/VendorManagement/VendorManagement.service.jsx";
+import { createVendor, deleteVendor, updateVendor, createSecurityReview } from "../../../Service/VendorManagement/VendorManagement.service.jsx";
 import { getUser } from "../../../Service/UserFactory.jsx";
 
 const useStyles = makeStyles({
@@ -42,7 +42,7 @@ const useStyles = makeStyles({
   }
 });
 
-const VendorAssessment = ({ isLoading, vendorList, securityReviewList, reload }) => {
+const VendorAssessment = ({ isLoading, vendorList, securityReviewList, ownersList, reload }) => {
   const classes = useStyles();
   const [matchedCell, setMatchedCell] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
@@ -63,6 +63,14 @@ const VendorAssessment = ({ isLoading, vendorList, securityReviewList, reload })
   useEffect(() => {
     if (!isLoading()) {
       (async () => {
+        const formatDate = (dateString) => {
+          const date = new Date(dateString);
+          return new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).format(date);
+        };
+        const ownersLookup = {};
+        ownersList.forEach((owner) => {
+          ownersLookup[owner.email] = `${owner.first_name} ${owner.last_name}`;
+        });
         const activeVendors = vendorList
                             .filter((vendor) => vendor.managed === true && vendor.archived === false)
                             .map(vendor => {
@@ -70,11 +78,11 @@ const VendorAssessment = ({ isLoading, vendorList, securityReviewList, reload })
                               const review = securityReviewList.find(s => s.vendor === res.id);
                               if (review) {
                                 res.review = {
-                                  due_date: review.last_review_date,
+                                  due_date: formatDate(review.last_review_date),
                                   status: review.review_status_reason,
                                 };
-                                res.last_date = review.last_review_date;
-                                res.owner = review.security_owner;
+                                res.last_date = formatDate(review.last_review_date);
+                                res.owner = ownersLookup[review.security_owner];
                               } else {
                                   res.review = {
                                     status: "Not Required"
@@ -161,6 +169,15 @@ const VendorAssessment = ({ isLoading, vendorList, securityReviewList, reload })
     date: [],
   });
 
+  const [filterMetadata, setFilterMetadata] = useState({
+    date: {
+      3: {
+        fromDate: null,
+        toDate: null,
+      },
+    },
+  });
+
   // Update filters when URL params change
   useEffect(() => {
     if (params.risk) {
@@ -175,22 +192,59 @@ const VendorAssessment = ({ isLoading, vendorList, securityReviewList, reload })
         category: params.category.split(","),
       }));
     }
-  }, [params.risk, params.category]);
+    if (params.date_fromDate && params.date_toDate) {
+      setFilterMetadata((prev) => ({
+        ...prev,
+        date: {
+          3: {
+            fromDate: new Date(params.date_fromDate),
+            toDate: new Date(params.date_toDate),
+          },
+        },
+      }));
+      setFilters((prev) => ({
+        ...prev,
+        date: ["Custom"],
+      }));
+    }
+  }, [params.risk, params.category, params.date_fromDate, params.date_toDate]);
 
-  const changeFilters = (filterName, itemText) => {
-    const updatedFilterTexts = filters[filterName].includes(itemText)
+  const changeFilters = (filterName, itemText, dateInput) => {
+    const updatedFilterIds = filters[filterName].includes(itemText)
       ? filters[filterName].filter((text) => text !== itemText)
       : [...filters[filterName], itemText];
 
     setFilters((prev) => ({
       ...prev,
-      [filterName]: updatedFilterTexts,
+      [filterName]: updatedFilterIds,
     }));
 
-    if (updatedFilterTexts.length === 0) {
+    if (filterName === "date" && updatedFilterIds.includes("Custom")) {
+      if (dateInput && dateInput[0] && dateInput[1]) {
+        setFilterMetadata((prev) => ({
+          ...prev,
+          date: {
+            3: {
+              fromDate: dateInput[0],
+              toDate: dateInput[1],
+            },
+          },
+        }));
+  
+        changeParams({
+          [`${filterName}_fromDate`]: dateInput[0].toISOString(),
+          [`${filterName}_toDate`]: dateInput[1].toISOString(),
+        });
+      }
+    } else {
+      deleteParams(`${filterName}_fromDate`);
+      deleteParams(`${filterName}_toDate`);
+    }
+
+    if (updatedFilterIds.length === 0) {
       deleteParams(filterName);
     } else {
-      changeParams({ [filterName]: updatedFilterTexts.join(",") });
+      changeParams({ [filterName]: updatedFilterIds.join(",") });
     }
   };
 
@@ -199,6 +253,21 @@ const VendorAssessment = ({ isLoading, vendorList, securityReviewList, reload })
       ...prev,
       [filterName]: [],
     }));
+  
+    if (filterName === "date") {
+      setFilterMetadata((prev) => ({
+        ...prev,
+        date: {
+          3: {
+            fromDate: null,
+            toDate: null,
+          },
+        },
+      }));
+      deleteParams(`${filterName}_fromDate`);
+      deleteParams(`${filterName}_toDate`);
+    }
+  
     deleteParams(filterName);
   };
 
@@ -208,6 +277,7 @@ const VendorAssessment = ({ isLoading, vendorList, securityReviewList, reload })
       risk: "inherent_risk",
       owner: "owner",
       review: "review.status",
+      date: "review.due_date",
     };
 
     return rows.filter((row) => {
@@ -220,6 +290,29 @@ const VendorAssessment = ({ isLoading, vendorList, securityReviewList, reload })
         if (activeFilterValues.length === 0) {
           return true;
         }
+
+        if (filterName === "date") {
+          const currentDate = new Date();
+          const reviewDueDate = new Date(row.review.due_date);
+  
+          switch (activeFilterValues[0]) {
+            case "This year":
+              return reviewDueDate.getFullYear() === currentDate.getFullYear();
+            case "This quarter":
+              const currentQuarter = Math.floor(currentDate.getMonth() / 3);
+              const reviewQuarter = Math.floor(reviewDueDate.getMonth() / 3);
+              return reviewDueDate.getFullYear() === currentDate.getFullYear() && reviewQuarter === currentQuarter;
+            case "This month":
+              return reviewDueDate.getFullYear() === currentDate.getFullYear() && reviewDueDate.getMonth() === currentDate.getMonth();
+            case "Custom":
+              const fromDate = filterMetadata.date[3].fromDate;
+              const toDate = filterMetadata.date[3].toDate;
+              return reviewDueDate >= fromDate && reviewDueDate <= toDate;
+            default:
+              return true;
+          }
+        }
+
         const rowField = filterMapping[filterName];
         const fieldPath = rowField.split('.');
         const fieldValue = fieldPath.reduce((acc, field) => acc && acc[field], row);

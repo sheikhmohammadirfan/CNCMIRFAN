@@ -9,7 +9,7 @@ import {
   Select,
   MenuItem,
 } from "@material-ui/core";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import AccessTimeIcon from "@material-ui/icons/AccessTime";
 import FlagIcon from "@material-ui/icons/Flag";
 import CheckCircleIcon from "@material-ui/icons/CheckCircle";
@@ -39,28 +39,65 @@ const SecurityReviewProgress = ({
   const classes = useStyles();
   const [dateRange, setDateRange] = useState("This month");
   const [dueReviews, setDueReviews] = useState([]);
+  const [highRiskVendorsWithReviews, setHighRiskVendorsWithReviews] = useState([]);
+  const [notCompletedVendors, setNotCompletedVendors] = useState([]);
 
   const handleChange = (event) => {
-    setDateRange(event.target.value);
+    const selectedRange = event.target.value;
+    setDateRange(selectedRange);
+    filterReviewsByDateRange(selectedRange);
   };
 
-  const highRiskVendors = vendorList.filter(vendor => vendor.inherent_risk === "High");
+  const filterReviewsByDateRange = (selectedRange) => {
+    const currentDate = new Date();
 
-  const highRiskVendorsWithReviews = highRiskVendors.map(vendor => {
-    const reviews = securityReviewList.filter(review => review.vendor == vendor.id);
-    if (reviews.length > 0) {
-        return { ...vendor, reviews: reviews };
-    }
-    return null;
-  }).filter(vendor => vendor !== null);
+    const isWithinSelectedRange = (reviewDueDate) => {
+      const reviewDate = new Date(reviewDueDate);
+      switch (selectedRange) {
+        case "This year":
+          return reviewDate.getFullYear() === currentDate.getFullYear();
+        case "This quarter":
+          const currentQuarter = Math.floor(currentDate.getMonth() / 3);
+          const reviewQuarter = Math.floor(reviewDate.getMonth() / 3);
+          return reviewDate.getFullYear() === currentDate.getFullYear() && reviewQuarter === currentQuarter;
+        case "This month":
+          return reviewDate.getFullYear() === currentDate.getFullYear() && reviewDate.getMonth() === currentDate.getMonth();
+        default:
+          return false;
+      }
+    };
 
-  const notCompletedVendors = highRiskVendorsWithReviews.map(vendor => {
-      const reviews = vendor.reviews.filter(review => review.review_status === false);
+    const highRiskVendors = vendorList.filter(vendor => vendor.inherent_risk === "High");
+
+    const highRiskVendorsWithReviews = highRiskVendors.map(vendor => {
+      const reviews = securityReviewList.filter(review =>
+        review.vendor === vendor.id
+      ).map(review => ({
+        ...review,
+        last_review_date: review.last_review_date
+      })).filter(review => isWithinSelectedRange(review.last_review_date));
+      
       if (reviews.length > 0) {
-          return { ...vendor, reviews: reviews };
+        return { ...vendor, reviews: reviews };
       }
       return null;
-  }).filter(vendor => vendor !== null);
+    }).filter(vendor => vendor !== null);
+
+    const notCompletedVendors = highRiskVendorsWithReviews.map(vendor => {
+      const reviews = vendor.reviews.filter(review => review.review_status === false);
+      if (reviews.length > 0) {
+        return { ...vendor, reviews: reviews };
+      }
+      return null;
+    }).filter(vendor => vendor !== null);
+
+    setHighRiskVendorsWithReviews(highRiskVendorsWithReviews);
+    setNotCompletedVendors(notCompletedVendors);
+  };
+
+  useEffect(() => {
+    filterReviewsByDateRange(dateRange);
+  }, [vendorList, securityReviewList]);
 
   const needsUpdateVendors = vendorList.filter(vendor =>
     securityReviewList.some(review => review.vendor === vendor.id && review.review_status_reason === "Need Update")
@@ -177,7 +214,7 @@ const SecurityReviewProgress = ({
         </FormControl>
       </Box>
       {dueReviews ? (
-        <Button fullWidth className={classes.button} onClick={handleProgressClick}>
+        <Button fullWidth className={classes.button} onClick={() => handleProgressClick(dateRange)}>
           <Box width="100%" display="flex" flexDirection="column" p={1}>
             <Typography align="left" variant="h6">
               High risk vendors

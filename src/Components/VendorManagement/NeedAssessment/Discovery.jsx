@@ -56,9 +56,18 @@ const Discovery = ({ isLoading, vendorList, reload }) => {
         const unmanagedVendors = vendorList.filter(
           (vendor) => vendor.managed === false
         );
-        setNeedsReviewRows(unmanagedVendors.filter(v => v.unmanaged_location === "Review"));
-        setIgnoredRows(unmanagedVendors.filter(v => v.unmanaged_location === "Ignored"));
-        setRejectedRows(unmanagedVendors.filter(v => v.unmanaged_location === "Rejected"));
+        const formatDate = (dateString) => {
+          const date = new Date(dateString);
+          return new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).format(date);
+        };
+        const formattedUnmanagedVendors = unmanagedVendors.map((vendor) => ({
+          ...vendor,
+          date_discovered: formatDate(vendor.date_discovered),
+        }));
+        console.log(formattedUnmanagedVendors)
+        setNeedsReviewRows(formattedUnmanagedVendors.filter(v => v.unmanaged_location === "Review"));
+        setIgnoredRows(formattedUnmanagedVendors.filter(v => v.unmanaged_location === "Ignored"));
+        setRejectedRows(formattedUnmanagedVendors.filter(v => v.unmanaged_location === "Rejected"));
       })();
     }
   }, [vendorList, isLoading]);
@@ -93,6 +102,15 @@ const Discovery = ({ isLoading, vendorList, reload }) => {
     accounts: [],
   });
 
+  const [filterMetadata, setFilterMetadata] = useState({
+    date: {
+      3: {
+        fromDate: null,
+        toDate: null,
+      },
+    },
+  });
+
   // Update filters when URL params change
   useEffect(() => {
     if (params.risk) {
@@ -101,7 +119,22 @@ const Discovery = ({ isLoading, vendorList, reload }) => {
         risk: params.risk.split(","),
       }));
     }
-  }, [params.risk]);
+    if (params.date_fromDate && params.date_toDate) {
+      setFilterMetadata((prev) => ({
+        ...prev,
+        date: {
+          3: {
+            fromDate: new Date(params.date_fromDate),
+            toDate: new Date(params.date_toDate),
+          },
+        },
+      }));
+      setFilters((prev) => ({
+        ...prev,
+        date: ["Custom"],
+      }));
+    }
+  }, [params.risk, params.date_fromDate, params.date_toDate]);
 
   useEffect(() => {
     if (params.searchValue) {
@@ -109,7 +142,38 @@ const Discovery = ({ isLoading, vendorList, reload }) => {
     }
   }, [params.searchValue]);
 
-  const changeFilters = (filterName, itemValue) => {
+  const changeFilters = (filterName, itemValue, dateInput) => {
+    const updatedFilterTexts = filters[filterName].includes(itemValue)
+        ? filters[filterName].filter((text) => text !== itemValue)
+        : [...filters[filterName], itemValue];
+
+    setFilters((prev) => ({
+      ...prev,
+      [filterName]: updatedFilterTexts,
+    }));
+
+    if (filterName === "date" && updatedFilterTexts.includes("Custom")) {
+      if (dateInput && dateInput[0] && dateInput[1]) {
+        setFilterMetadata((prev) => ({
+          ...prev,
+          date: {
+            3: {
+              fromDate: dateInput[0],
+              toDate: dateInput[1],
+            },
+          },
+        }));
+  
+        changeParams({
+          [`${filterName}_fromDate`]: dateInput[0].toISOString(),
+          [`${filterName}_toDate`]: dateInput[1].toISOString(),
+        });
+      }
+    } else {
+      deleteParams(`${filterName}_fromDate`);
+      deleteParams(`${filterName}_toDate`);
+    }
+    
     if (filterName === "accounts") {
       const newArray = Array.from({ length: itemValue }, (_, i) => i + 1);
       setFilters((prev) => ({
@@ -121,7 +185,7 @@ const Discovery = ({ isLoading, vendorList, reload }) => {
       } else {
         changeParams({ [filterName]: newArray.length });
       }
-    }  else {
+    } else {
       const updatedFilterTexts = filters[filterName].includes(itemValue)
         ? filters[filterName].filter((text) => text !== itemValue)
         : [...filters[filterName], itemValue];
@@ -144,6 +208,21 @@ const Discovery = ({ isLoading, vendorList, reload }) => {
       ...prev,
       [filterName]: [],
     }));
+
+    if (filterName === "date") {
+      setFilterMetadata((prev) => ({
+        ...prev,
+        date: {
+          3: {
+            fromDate: null,
+            toDate: null,
+          },
+        },
+      }));
+      deleteParams(`${filterName}_fromDate`);
+      deleteParams(`${filterName}_toDate`);
+    }
+
     deleteParams(filterName);
   };
 
@@ -167,7 +246,27 @@ const Discovery = ({ isLoading, vendorList, reload }) => {
         if (activeFilterValues.length === 0) {
           return true;
         }
-  
+        if (filterName === 'date') {
+          const currentDate = new Date();
+          const reviewDueDate = new Date(row.date_discovered);
+          switch (activeFilterValues[0]) {
+            case "This year":
+              return reviewDueDate.getFullYear() === currentDate.getFullYear();
+            case "This quarter":
+              const currentQuarter = Math.floor(currentDate.getMonth() / 3);
+              const reviewQuarter = Math.floor(reviewDueDate.getMonth() / 3);
+              return reviewDueDate.getFullYear() === currentDate.getFullYear() && reviewQuarter === currentQuarter;
+            case "This month":
+              return reviewDueDate.getFullYear() === currentDate.getFullYear() && reviewDueDate.getMonth() === currentDate.getMonth();
+            case "Custom":
+              const fromDate = filterMetadata.date[3].fromDate;
+              const toDate = filterMetadata.date[3].toDate;
+              return reviewDueDate >= fromDate && reviewDueDate <= toDate;
+            default:
+              return true;
+          }
+        }
+
         if (filterName === "accounts") {
           return row.number_of_accounts >= activeFilterValues.length;
         }

@@ -55,7 +55,12 @@ const AssessmentFilters = {
     name: "date",
     text: "Security review due date",
     order: 6,
-    options: [],
+    options: [
+      { id: 0, text: "This month" },
+      { id: 1, text: "This quarter" },
+      { id: 2, text: "This year"},
+      { id: 3, text: "Custom", showDateRange: true},
+    ],
   },
 };
 

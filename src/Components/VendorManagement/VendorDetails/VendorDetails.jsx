@@ -10,6 +10,7 @@ import {
   Icon,
   Button,
   Grid,
+  Backdrop,
 } from "@material-ui/core";
 import ChevronRightIcon from "@material-ui/icons/ChevronRight";
 import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
@@ -34,7 +35,7 @@ import {
 } from "../../../Service/VendorManagement/VendorManagement.service";
 import { useStyle } from "../Utils";
 
-const VendorDetails = ({ isLoading, vendorList, securityReviewList, reload }) => {
+const VendorDetails = ({ isLoading, vendorList, securityReviewList, ownersList, reload }) => {
   const classes = useStyle();
   const { vendorId } = useParams();
   const [vendorData, setVendorData] = useState([]);
@@ -43,7 +44,8 @@ const VendorDetails = ({ isLoading, vendorList, securityReviewList, reload }) =>
   const [activeDetailsTab, setActiveDetailsTab] = useState(0);
   const [findingsRows, setFindingsRows] = useState([]);
   const [referencesRows, setReferencesRows] = useState([]);
-  const [reviewId, setReviewId] = useState(0);
+  const [reviewId, setReviewId] = useState(0)
+  const [showLoader, updateLoader] = useState(false);
 
   const handleChange = (event, newValue) => {
     setActiveTab(newValue);
@@ -58,7 +60,7 @@ const VendorDetails = ({ isLoading, vendorList, securityReviewList, reload }) =>
   };
 
   useEffect(() => {
-    if (!isLoading()) {
+    if (!isLoading() && vendorList.length > 0 && securityReviewList.length > 0) {
       (async () => {
         const allRows = vendorList.filter((vendor) => vendor.managed === true);
         let data = allRows.find(({ id }) => id == vendorId);
@@ -75,6 +77,9 @@ const VendorDetails = ({ isLoading, vendorList, securityReviewList, reload }) =>
           ...data,
           findings,
           references,
+          last_review: review.last_review_date,
+          security_owner: review.security_owner,
+          due_date: review.due_date, // For future due_date flag in security review api
         };
         setFindingsRows(findings || []);
         setReferencesRows(references || []);
@@ -82,29 +87,36 @@ const VendorDetails = ({ isLoading, vendorList, securityReviewList, reload }) =>
         console.log(vendorData, "vendordata")
       })();
     }
-  }, [isLoading, vendorList]);
+  }, [isLoading, vendorList, securityReviewList]);
 
   if (!vendorData || !vendorData.vendor_name) {
     return <CircularProgress />;
   }
 
   const handleCreateFinding = async (desc) => {
+    updateLoader(true);
     const payload = {
       "review": reviewId,
       "description": desc,
     }
     let res = await createFinding(payload);
+    setTimeout(() => {
+      updateLoader(false);
+    }, 8000)
     if (res.status) {
       reload();
       return;
     }
   };
 
-  const handleEditFinding = async (id, newDesc) => {
+  const handleEditFinding = async (id, newDesc, reviewId) => {
+    updateLoader(true);
     const payload = {
       "description": newDesc,
+      "review": reviewId,
     };
     let res = await updateFinding(id, payload);
+    updateLoader(false);
     if (res.status) {
       reload();
       return;
@@ -112,7 +124,9 @@ const VendorDetails = ({ isLoading, vendorList, securityReviewList, reload }) =>
   }
 
   const handleDeleteFinding = async (id) => {
+    updateLoader(true);
     let res = await deleteFinding(id);
+    updateLoader(false);
     if (res.status) {
       reload();
       return;
@@ -123,12 +137,22 @@ const VendorDetails = ({ isLoading, vendorList, securityReviewList, reload }) =>
     if (action === "add") {
       return handleCreateFinding(data);
     } else if (action === "edit") {
-      const { id, description } = data;
-      return handleEditFinding(id, description);
+      const { id, description, review } = data;
+      return handleEditFinding(id, description, review);
     } else if (action === "delete") {
       return handleDeleteFinding(data);
     }
   }
+
+  const owners = ownersList.reduce((acc, owner) => {
+    acc[owner.email] = `${owner.first_name} ${owner.last_name}`;
+    return acc;
+  }, {});
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).format(date);
+  };
 
   return (
     <Box>
@@ -224,7 +248,7 @@ const VendorDetails = ({ isLoading, vendorList, securityReviewList, reload }) =>
                 </Box>
                 <Box ml={2} mt={2}>
                   <TabPanel activeTab={activeDetailsTab} index={0}>
-                    <Info vendorData={vendorData} />
+                    <Info vendorData={vendorData} owners={owners} formatDate={formatDate} />
                   </TabPanel>
                   <TabPanel activeTab={activeDetailsTab} index={1}>
                     <Findings
@@ -238,6 +262,12 @@ const VendorDetails = ({ isLoading, vendorList, securityReviewList, reload }) =>
           </Box>
         </Grid>
       </Grid>
+      <Backdrop className={classes.backdrop} open={showLoader}>
+        <CircularProgress color="inherit" />
+        <Typography className="backdrop-label" variant="h5">
+          Please wait...
+        </Typography>
+      </Backdrop>
     </Box>
   );
 };

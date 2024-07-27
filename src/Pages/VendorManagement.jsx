@@ -13,6 +13,7 @@ import VendorDetails from "../Components/VendorManagement/VendorDetails/VendorDe
 import { useState, useEffect } from "react";
 import useLoading from "../Components/Utils/Hooks/useLoading";
 import { getSecurityReview, listVendors } from "../Service/VendorManagement/VendorManagement.service";
+import { getOwners } from "../Service/RiskManagement/RiskManagement.service.jsx";
 
 const VendorManagement = ({ title }) => {
   DocumentTitle(title);
@@ -22,19 +23,28 @@ const VendorManagement = ({ title }) => {
 
   const [vendorList, setVendorList] = useState([]);
   const [securityReviewList, setSecurityReviewList] = useState([]);
+  const [ownersList, setOwnersList] = useState([]);
   const { isLoading, startLoading, stopLoading } = useLoading();
   
   // Fetch the list of vendors and reviews.
   useEffect(() => {
     (async () => {
+      const payload = {
+        page_no: 1,
+        page_size: 1000,
+      }
       startLoading();
-      let res= await listVendors();
+      let res = await listVendors(payload);
       if (res.status) {
-        setVendorList(res.data);
+        setVendorList(res.data.vendors);
       }
       res = await getSecurityReview();
       if (res.status) {
         setSecurityReviewList(res.data);
+      }
+      res = await getOwners();
+      if (res.status) {
+        setOwnersList(res.data);
       }
       stopLoading();
     })();
@@ -65,6 +75,7 @@ const VendorManagement = ({ title }) => {
             isLoading={isLoading}
             vendorList={vendorList}
             securityReviewList={securityReviewList}
+            ownersList={ownersList}
             reload={reload}
           />
         </Route>
@@ -79,6 +90,7 @@ const VendorManagement = ({ title }) => {
             isLoading={isLoading}
             vendorList={vendorList}
             securityReviewList={securityReviewList}
+            ownersList={ownersList}
             reload={reload}
             />
         </Route>
@@ -93,6 +105,7 @@ const VendorManagement = ({ title }) => {
             isLoading={isLoading}
             vendorList={vendorList}
             securityReviewList={securityReviewList}            
+            ownersList={ownersList}
             reload={reload}
           />
         </Route>

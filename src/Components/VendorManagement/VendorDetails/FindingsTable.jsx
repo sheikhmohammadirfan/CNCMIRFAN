@@ -123,7 +123,7 @@ const FindingsTable = ({ isLoading, allColumns, columns, rows }) => {
           </Box>
         </Box>
       ) : (
-        <Box display="inline-flex">
+        <Box display="inline-flex" className={classes.tableContainer}>
           <Grid container spacing={1} className={classes.gridContainer}>
             <Grid item xs={12}>
               <Box display="flex" alignItems="center">

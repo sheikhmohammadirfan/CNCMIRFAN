@@ -22,8 +22,14 @@ const VendorRiskDashboard = ({ isLoading, vendorList, securityReviewList }) => {
     history.push("/vendor-management/security-review?review=Up+to+Date");
   };
 
-  const handleProgressClick = () => {
-    history.push("/vendor-management/security-review?risk=High")
+  const handleProgressClick = (dateRange) => {
+    if (dateRange === "This month") {
+      history.push("/vendor-management/security-review?risk=High&date=This+month");
+    } else if (dateRange === "This quarter") {
+      history.push("/vendor-management/security-review?risk=High&date=This+quarter");
+    } else {
+      history.push("/vendor-management/security-review?risk=High&date=This+year");
+    }
   }
 
   // Discovery methods

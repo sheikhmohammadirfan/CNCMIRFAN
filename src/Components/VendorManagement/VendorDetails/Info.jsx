@@ -1,6 +1,6 @@
 import { Box, Typography, Divider } from "@material-ui/core";
 
-const Info = ({ vendorData }) => {
+const Info = ({ vendorData, owners, formatDate }) => {
   return (
     <Box
       mt={2}
@@ -30,7 +30,7 @@ const Info = ({ vendorData }) => {
         <Box width="50%">
           <Typography variant="body2">Security Owner: </Typography>
         </Box>
-        <Typography variant="body2">{vendorData.security_owner}</Typography>
+        <Typography variant="body2">{owners[vendorData.security_owner]}</Typography>
       </Box>
       <Divider />
       <Box mt={2}>
@@ -41,7 +41,7 @@ const Info = ({ vendorData }) => {
         <Box width="50%">
           <Typography variant="body2">Last Review: </Typography>
         </Box>
-        <Typography variant="body2">{vendorData.last_review}</Typography>
+        <Typography variant="body2">{formatDate(vendorData.last_review)}</Typography>
         <Divider />
       </Box>
     </Box>

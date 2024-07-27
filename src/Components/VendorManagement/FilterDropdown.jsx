@@ -12,7 +12,9 @@ import {
   Tooltip,
   makeStyles,
   Input,
+  Grid,
 } from "@material-ui/core";
+import colorShader from '../Utils/ColorShader';
 import React, { useState, useEffect } from "react";
 import { DateControl } from "../Utils/Control";
 
@@ -61,20 +63,27 @@ const useStyles = makeStyles((theme) => ({
       color: theme.palette.primary.main,
     },
   },
-  clearButtonBox: {
-    display: "flex",
-    justifyContent: "center",
-    padding: "10px",
-  },
-  clearButton: {
-    backgroundColor: theme.palette.primary.main,
-    color: "white",
-    textTransform: "none",
+  actionButton: {
+    textTransform: 'none',
     height: 25,
     width: "100%",
+  },
+  secondaryActionBtn: {
+    backgroundColor: colorShader(theme.palette.primary.main, 0.15),
+    '&:hover': {
+      backgroundColor: colorShader(theme.palette.primary.main, 0.2),
+    }
+  },
+  submitButton: {
+    backgroundColor: theme.palette.primary.main,
+    color: "white",
     "&:hover": {
-      backgroundColor: "rgba(68, 119, 206, 0.85)",
+      backgroundColor: colorShader(theme.palette.primary.main, 0.85)
     },
+    "&:disabled": {
+      color: "white",
+      opacity: 0.75
+    }
   },
   filterButtonIcon: {
     rotate: "90deg",
@@ -99,6 +108,28 @@ const useStyles = makeStyles((theme) => ({
   input: {
     width: 60,
   },
+  dateContainer: {
+    paddingBottom: 12,
+    gap: 12,
+    display: "flex",
+    flexDirection: "column",
+    "& .MuiInputBase-root": {
+      fontSize: "inherit",
+      marginTop: 0
+    },
+    "& .MuiInputAdornment-root .material-icons": {
+      fontSize: 16
+    },
+    "& .MuiFormLabel-root": {
+      display: "none"
+    },
+    "& .showLabel .MuiInputBase-root": {
+      marginTop: 16
+    },
+    "& .showLabel .MuiFormLabel-root": {
+      display: "initial"
+    }
+  },
 }));
 
 const FilterDropdown = ({
@@ -108,23 +139,29 @@ const FilterDropdown = ({
   activeFilters = [],
   changeFilters,
   clearFilters,
+  filterMetadata = {},
 }) => {
   const classes = useStyles();
 
   const [open, setOpen] = useState(false);
   const [sliderValue, setSliderValue] = useState(0);
+  const [dateInput, setDateInput] = useState([null, null]);
 
   useEffect(() => {
     if (filterName === "accounts" && activeFilters.length === 0) {
       setSliderValue(0);
     }
-  }, [activeFilters, filterName]);
+    if (filterMetadata?.date?.[3]) {
+      const { fromDate, toDate } = filterMetadata.date[3];
+      setDateInput([fromDate, toDate]);
+    }
+  }, [filterMetadata, activeFilters, filterName]);
 
   const handleClose = () => setOpen(false);
 
   // Handling checkbox clicks and changing filters
   const handleCheckboxClick = (filterItem_id, filterItem_text) => {
-    changeFilters(filterName, filterItem_text);
+    changeFilters(filterName, filterItem_text, dateInput, sliderValue);
   };
 
   // Handling slider changes
@@ -147,11 +184,27 @@ const FilterDropdown = ({
       setSliderValue(100);
       changeFilters(filterName, 100);
     } else {
-      changeFilters(filterName, sliderValue);
+      clearFilters(filterName);
     }
+  };  
+
+  const handleClearBtnClick = () => {
+    if (filterName === "date") {
+      setDateInput([null, null]);
+      clearFilters(filterName);
+    } else if (filterName === "accounts") {
+      setSliderValue([0, 100]);
+      clearFilters(filterName);
+    } else {
+      clearFilters(filterName);
+    }
+  };  
+
+  const handleSubmitBtnClick = () => {
+    changeFilters(filterName, activeFilters, dateInput);
+    handleClose();
   };
 
-  // Checking if filters are active, if yes then how many?
   let isFiltersActive = activeFilters.length !== 0;
   let activeFiltersCount = activeFilters.length;
 
@@ -165,7 +218,54 @@ const FilterDropdown = ({
         <Box>
           <ClickAwayListener onClickAway={handleClose}>
             <Box>
-              {filterName === "accounts" ? (
+              {filterName === "date" ? (
+                <Box>
+                  <List disablePadding className={classes.customList}>
+                    {filterOptions.map((filterItem, index) => (
+                      <ListItem key={index} className={classes.listItem}>
+                        <FormControlLabel
+                          className={classes.checkboxLabel}
+                          control={
+                            <Checkbox
+                              size="small"
+                              checked={activeFilters.includes(filterItem.text)}
+                              onChange={() =>
+                                handleCheckboxClick(filterItem.id, filterItem.text)
+                              }
+                              className={classes.checkbox}
+                            />
+                          }
+                          label={filterItem.text}
+                        />
+                      </ListItem>
+                    ))}
+                  </List>
+                  {activeFilters.includes("Custom") && (
+                    <Box px={1} className={classes.dateContainer}>
+                      <DateControl
+                        size="small"
+                        name="fromDate"
+                        label="From"
+                        placeholder="From Date"
+                        value={dateInput[0]}
+                        onChange={(v) => setDateInput([v, dateInput[1]])}
+                        maxDate={dateInput[1] || undefined}
+                        clearable={true}
+                      />
+                      <DateControl
+                        size="small"
+                        name="toDate"
+                        label="To"
+                        placeholder="To Date"
+                        value={dateInput[1]}
+                        onChange={(v) => setDateInput([dateInput[0], v])}
+                        minDate={dateInput[0] || undefined}
+                        clearable={true}
+                      />
+                    </Box>
+                  )}
+                </Box>
+              ) : filterName === "accounts" ? (
                 <Box px={2} py={2} className={classes.sliderContainer}>
                   <Box width={150} mr={4}>
                     <Slider
@@ -228,17 +328,39 @@ const FilterDropdown = ({
                 </List>
               )}
               <Divider />
-              <Box
-                className={classes.clearButtonBox}
-              >
-                <Button
-                  size="small"
-                  className={classes.clearButton}
-                  onClick={() => clearFilters(filterName)}
-                >
-                  Clear
-                </Button>
-              </Box>
+              <Grid container spacing={1} style={{ padding: '10px' }}>
+                <Grid item xs={6}>
+                  <Button
+                    color="primary"
+                    size="small"
+                    className={`${classes.actionButton} ${classes.secondaryActionBtn}`}
+                    onClick={handleClearBtnClick}
+                  >
+                    Clear
+                  </Button>
+                </Grid>
+                <Grid item xs={6}>
+                  <Button
+                    color="primary"
+                    size="small"
+                    className={`${classes.actionButton} ${classes.secondaryActionBtn}`}
+                    onClick={handleClose}
+                  >
+                    Cancel
+                  </Button>
+                </Grid>
+                {filterName === "date" && (
+                  <Grid item xs={12}>
+                    <Button
+                      size="small"
+                      className={`${classes.actionButton} ${classes.submitButton}`}
+                      onClick={handleSubmitBtnClick}
+                    >
+                      Apply
+                    </Button>
+                    </Grid>
+                )}
+              </Grid>
             </Box>
           </ClickAwayListener>
         </Box>

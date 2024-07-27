@@ -6,8 +6,8 @@ export async function createVendor(data) {
 }
 
 /* Method to list all Vendors */
-export async function listVendors() {
-  return await get("/vendor/vendors/");
+export async function listVendors(payload) {
+  return await post("/vendor/vendors/", payload);
 }
 
 /* Method to fetch a specific Vendor by ID */

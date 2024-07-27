@@ -101,7 +101,7 @@ const Findings = ({ findings = [], setFindingsRows }) => {
   };
 
   const handleSaveEdit = async () => {
-    const res = await setFindingsRows("edit", { id: selectedFinding.id, description: newFinding });
+    const res = await setFindingsRows("edit", { id: selectedFinding.id, description: newFinding, review: selectedFinding.review});
     if (res && res.status) {
       setNewFinding("");
       setIsEditing(false);
