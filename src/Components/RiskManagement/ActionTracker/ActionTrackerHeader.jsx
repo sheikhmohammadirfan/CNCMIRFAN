@@ -4,6 +4,7 @@ import FilterDropdown from '../../Utils/DataTable/FilterDropdown';
 import { TextControl } from '../../Utils/Control';
 import colorShader from '../../Utils/ColorShader';
 import jira from "../../../assets/img/jira-brands.svg"
+import { FILTER_HANDLERS } from './ActionTrackerUtils';
 
 // Generate Styles
 const useStyle = makeStyles((theme) => ({
@@ -88,6 +89,7 @@ const ActionTrackerHeader = ({
   openAddActionForm,
   openDeleteConfirmationDialog,
   onSearch,
+  openExportDialog
 }) => {
 
   // State to control search value
@@ -222,7 +224,7 @@ const ActionTrackerHeader = ({
             startIcon={<Icon>arrow_downward</Icon>}
             className={classes.outlineButton}
           // disabled={selectedRows.length !== 1}
-          // onClick={editHandler}
+            onClick={openExportDialog}
           >
             Export CSV
           </Button>
@@ -271,6 +273,7 @@ const ActionTrackerHeader = ({
                 changeFilters={changeFilters}
                 clearFilters={clearFilters}
                 trigger={triggerFilters}
+                filterHandlerMap={FILTER_HANDLERS}
               />
             ))}
         </Box>

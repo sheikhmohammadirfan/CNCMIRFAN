@@ -114,7 +114,7 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     flexDirection: "column",
     "& .MuiInputBase-root": {
-      fontSize: "inherit",
+      fontSize: "0.8rem",
       marginTop: 0
     },
     "& .MuiInputAdornment-root .material-icons": {

@@ -310,7 +310,8 @@ const RiskLibrary = () => {
         </Grid>
       }
 
-      <RiskFormDialog
+      {addRiskForm &&
+        <RiskFormDialog
         open={addRiskForm}
         closeHandler={closeRiskForm}
         rowIndex={getCurrentIndex()}
@@ -320,7 +321,7 @@ const RiskLibrary = () => {
         getSliderValue={{ getLikelihoodSliderValue, getImpactSliderValue }}
         scores={scores}
         onFormSubmit={onAddFormSubmit}
-      />
+      />}
     </Box>
   )
 }

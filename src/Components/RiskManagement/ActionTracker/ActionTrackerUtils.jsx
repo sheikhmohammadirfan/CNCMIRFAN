@@ -116,6 +116,19 @@ export const useStyle = makeStyles(theme => ({
     borderRadius: "50px",
   },
 
+  // Backdrop style when export is loading
+  backdrop: {
+    zIndex: 1000,
+    display: "flex",
+    flexDirection: "column",
+    color: "white",
+    "&  .backdrop-label": {
+      marginTop: 10,
+      fontWeight: "bold",
+      letterSpacing: 1,
+      fontStyle: "italic",
+    },
+  },
 }))
 
 /* Header cell component */
@@ -252,4 +265,12 @@ const getCellValue = (row, colName, register, owners) => {
     return `${owner.first_name} ${owner.last_name}`
   }
   else return row[colName]
+}
+
+export const FILTER_HANDLERS = {
+  internal_status: (currentFilters, checkedId) => {
+    return (currentFilters.includes(checkedId))
+      ? []
+      : [checkedId]
+  }
 }

@@ -1,5 +1,5 @@
 import { Box, Chip, FormControl, FormControlLabel, Grid, Radio, RadioGroup, Typography } from '@mui/material'
-import React, { useContext, useMemo, useState } from 'react'
+import React, { useContext, useEffect, useMemo, useState } from 'react'
 import SettingsHeader from './SettingsHeader'
 import { HeaderCell, generateRows, mapDataToHeader, useStyle } from './SettingsUtils'
 import DataTable from '../../Utils/DataTable/DataTable'
@@ -10,13 +10,19 @@ import RiskManagementContext from '../RiskManagementContext'
 const Settings = () => {
 
   // Using context to get values
-  const { categories: { categories }, scores: { likelihoodScores, impactScores }, scoreGroups: { riskScoreGroups } } = useContext(RiskManagementContext);
+  const { categories: { categories, setCategories }, scores: { likelihoodScores, impactScores }, scoreGroups: { riskScoreGroups } } = useContext(RiskManagementContext);
+
+  const [categoryList, setCategoryList] = useState([]);
+  useEffect(() => {
+    setCategoryList(categories);
+  }, [categories]);
+
 
   const [likelihoodSelectedRow, setLikelihoodSelectedRow] = useState([])
   const [impactSelectedRow, setImpactSelectedRow] = useState([])
   const [scoreGroupSelectedRow, setScoreGroupSelectedRow] = useState([]);
 
-  const [matchedCell, setMatchedCell] = useState([])
+  const [matchedCell, setMatchedCell] = useState([]);
 
   const preferenceOptions = useMemo(() => {
     return [
@@ -95,7 +101,13 @@ const Settings = () => {
       </Box>
 
       <Box>
-        <SettingsHeader title="Custom Categories" showActionButtons={true} />
+        <SettingsHeader
+          title="Custom Categories"
+          showActionButtons={true}
+          categoryList={categoryList}
+          setCategoryList={setCategoryList}
+          setCategories={setCategories}
+        />
         <Box
           p={2}
           border={1}
@@ -108,17 +120,8 @@ const Settings = () => {
           gap={1}
         >
           {categories.map((cat, index) => (
-            <Chip key={index} className={classes.categoryChip} label={cat.category_name} onDelete={handleCategoryClick} />
+            <Chip key={index} className={classes.categoryChip} label={cat.category_name} />
           ))}
-          <Chip className={classes.categoryChip} label="Artificial Intelligence" onDelete={handleCategoryClick} />
-          <Chip className={classes.categoryChip} label="Artificial Intelligence" onDelete={handleCategoryClick} />
-          <Chip className={classes.categoryChip} label="Artificial Intelligence" onDelete={handleCategoryClick} />
-          <Chip className={classes.categoryChip} label="Artificial Intelligence" onDelete={handleCategoryClick} />
-          <Chip className={classes.categoryChip} label="Artificial Intelligence" onDelete={handleCategoryClick} />
-          <Chip className={classes.categoryChip} label="Artificial Intelligence" onDelete={handleCategoryClick} />
-          <Chip className={classes.categoryChip} label="Artificial Intelligence" onDelete={handleCategoryClick} />
-          <Chip className={classes.categoryChip} label="Artificial Intelligence" onDelete={handleCategoryClick} />
-          <Chip className={classes.categoryChip} label="Artificial Intelligence" onDelete={handleCategoryClick} />
         </Box>
       </Box>
 

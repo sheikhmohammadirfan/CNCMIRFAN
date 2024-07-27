@@ -49,6 +49,16 @@ const useStyle = makeStyles((theme) => ({
   },
   dropdownButton: {
     maxHeight: 32
+  },
+  columnContainer: {
+    position: "sticky",
+    right: 0,
+    boxShadow: ` 8px 0px white, 
+                -12px 0px #FFFFFF77,
+                -10px 0px #FFFFFF77,
+                 -8px 0px #FFFFFF77,
+                 -6px 0px #FFFFFF77,
+                 -4px 0px #FFFFFF77`
   }
 }))
 
@@ -65,9 +75,11 @@ const RiskRegisterHeader = ({
   filterMetadata,
   selectedRows,
   editHandler,
+  approveHandler,
   cols: { allColumns, visibleColumns, hideColumn, showColumn },
   openAddActionForm,
-  onSearch
+  onSearch,
+  row
 }) => {
 
   const classes = useStyle();
@@ -170,10 +182,6 @@ const RiskRegisterHeader = ({
   const openManageColsDropdown = () => setManageColsOpen(true);
   const closeManageColsDropdown = () => setManageColsOpen(false);
 
-  // State to manage md breakpoint
-  const theme = useTheme();
-  const aboveMd = useMediaQuery(theme.breakpoints.up('md'));
-
   return (
     <>
       {/* ADD SCENARIO, EDIT, JIRA, SEARCH, MORE, SHARE */}
@@ -223,6 +231,17 @@ const RiskRegisterHeader = ({
             onClick={editHandler}
           >
             Edit
+          </Button>
+
+          {/* Edit Button */}
+          <Button
+            // size='small'
+            startIcon={<Icon style={{ fontSize: '1rem' }}>verified</Icon>}
+            className={classes.actionButton}
+            disabled={contextLoading || selectedRows.length !== 1 || row?.["Approved"] !== false}
+            onClick={approveHandler}
+          >
+            Approve
           </Button>
 
           {/* Jira Button */}
@@ -363,20 +382,19 @@ const RiskRegisterHeader = ({
         paddingX={1}
         padding={1}
         border={1}
+        whiteSpace="nowrap"
         sx={{
           borderRadius: 10,
           borderBottomLeftRadius: 0,
           borderBottomRightRadius: 0,
           backgroundColor: '#fff',
           borderBottom: 'none',
-          '& .MuiButton-startIcon': {
-            marginRight: !aboveMd && 0,
-            marginLeft: !aboveMd && 0
-          },
           '& .MuiButton-root': {
-            padding: aboveMd && '6px 16px',
+            padding: '6px 16px',
           },
-          borderColor: '#d9d9d9'
+          borderColor: '#d9d9d9',
+          gap: 20,
+          overflowX: "auto"
         }}
       >
         {/* Filters */}
@@ -419,7 +437,7 @@ const RiskRegisterHeader = ({
         </Box>
 
         {/* Dropdown to show and hide columns */}
-        <Box>
+        <Box className={classes.columnContainer}>
           <ManageRegisterColumns
             open={ismanageColsOpen}
             handleClose={closeManageColsDropdown}
@@ -432,16 +450,10 @@ const RiskRegisterHeader = ({
               endIcon=<Icon>tune</Icon>
               className={classes.actionButton}
               style={{
-                // color: '#4477CE',
-                // textTransform: 'none',
-                // backgroundColor: '#F0F8F7',
-                // borderRadius: 10,
-                // paddingInline: 15,
-                width: !aboveMd && 50,
                 fontSize: "0.8rem"
               }}
             >
-              {aboveMd && 'Columns'}
+              Columns
             </Button>
           </ManageRegisterColumns>
         </Box>

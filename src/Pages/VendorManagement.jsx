@@ -10,7 +10,7 @@ import VendorOnboard from "../Components/VendorManagement/VendorOnboard/VendorOn
 import VendorComplianceReports from "../Components/VendorManagement/VendorComplianceReports/VendorComplianceReports";
 import SecurityReview from "../Components/VendorManagement/SecurityReview/SecurityReview";
 import VendorDetails from "../Components/VendorManagement/VendorDetails/VendorDetails";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import useLoading from "../Components/Utils/Hooks/useLoading";
 import { getSecurityReview, listVendors } from "../Service/VendorManagement/VendorManagement.service";
 import { getOwners } from "../Service/RiskManagement/RiskManagement.service.jsx";
@@ -25,6 +25,7 @@ const VendorManagement = ({ title }) => {
   const [securityReviewList, setSecurityReviewList] = useState([]);
   const [ownersList, setOwnersList] = useState([]);
   const { isLoading, startLoading, stopLoading } = useLoading();
+  const firstTime = useRef(true);
   
   // Fetch the list of vendors and reviews.
   useEffect(() => {
@@ -38,14 +39,17 @@ const VendorManagement = ({ title }) => {
       if (res.status) {
         setVendorList(res.data.vendors);
       }
-      res = await getSecurityReview();
-      if (res.status) {
-        setSecurityReviewList(res.data);
+      if (firstTime.current) {
+        res = await getSecurityReview();
+        if (res.status) {
+          setSecurityReviewList(res.data);
+        }
+        res = await getOwners();
+        if (res.status) {
+          setOwnersList(res.data);
+        }
       }
-      res = await getOwners();
-      if (res.status) {
-        setOwnersList(res.data);
-      }
+      firstTime.current = false;
       stopLoading();
     })();
   }, [load]);

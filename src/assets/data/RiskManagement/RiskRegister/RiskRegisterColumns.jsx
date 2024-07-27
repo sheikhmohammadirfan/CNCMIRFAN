@@ -14,8 +14,8 @@ export const risk_register_columns = [
   "Treatment",
   "Tasks",
   "Approved",
-  "Archived",
-  "Vendors",
+  // "Archived",
+  // "Vendors",
 ]
 
 // Default Column widths

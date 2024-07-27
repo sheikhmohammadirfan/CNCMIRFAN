@@ -1,8 +1,9 @@
-import { Box, Icon, Typography } from "@material-ui/core";
+import { Box, Icon, Tooltip, Typography } from "@material-ui/core";
 import { useStyle } from "../../../Components/RiskManagement/RiskRegister/RiskRegisterUtils";
 import { cia_categories } from "./RiskRegister/RiskRegisterFilters";
 import colorShader from "../../../Components/Utils/ColorShader";
 import { TREATMENT_ID_NAME_MAP } from "./RiskTreatments";
+import { useHistory } from "react-router-dom/cjs/react-router-dom";
 
 const CategoriesCell = ({ cellValue }) => {
   const classes = useStyle();
@@ -82,6 +83,24 @@ const IsApprovedCell = ({ cellValue }) => {
   )
 }
 
+const TaskCell = ({ cellValue }) => {
+  const classes = useStyle();
+  const history = useHistory();
+  return (
+    <Typography variant="body2" noWrap className={classes.actionContainer} >
+      {cellValue
+        .map((c, i) => 
+          <Tooltip  key={i} title={c.task.length > 17 ? c.task : ""}>
+            <button
+              onClick={() => history.push("/risk-management/action-tracker?id="+c.id)}>
+                {c.task}
+            </button>
+          </Tooltip>
+        )}
+    </Typography>
+  )
+}
+
 const SourceCell = ({ cellValue }) => {
   const classes = useStyle();
   return (
@@ -106,7 +125,8 @@ const columnToCellMap = {
   Approved: IsApprovedCell,
   Source: SourceCell,
   Range: RangeCell,
-  status: IsApprovedCell
+  status: IsApprovedCell,
+  Tasks: TaskCell
 }
 
 export default columnToCellMap;

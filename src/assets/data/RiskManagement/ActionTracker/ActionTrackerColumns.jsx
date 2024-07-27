@@ -5,11 +5,11 @@ export const ACTION_TRACKER_COLUMNS = [
   "Owner",
   "Due Date",
   "Status",
-  "Source",
-  "Source URL",
+  // "Source",
+  // "Source URL",
   "Notes",
-  "Creation Date",
-  "Completion Date"
+  // "Creation Date",
+  // "Completion Date"
 ]
 
 export const ACTION_TABLE_COL_WIDTHS = [

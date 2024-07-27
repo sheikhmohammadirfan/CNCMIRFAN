@@ -1,6 +1,9 @@
-import { Button, Icon, makeStyles, Box, Typography, useMediaQuery, useTheme } from '@material-ui/core';
-import React from 'react'
+import { Button, Icon, makeStyles, Box, Typography, useMediaQuery, useTheme, TextField } from '@material-ui/core';
+import React, { useRef, useState } from 'react'
 import colorShader from '../../Utils/ColorShader';
+import { notification } from '../../Utils/Utils';
+import { createCategory } from '../../../Service/RiskManagement/RiskRegister.service';
+import { getUser } from '../../../Service/UserFactory';
 
 const useStyle = makeStyles(theme => ({
   actionButton: {
@@ -29,11 +32,43 @@ const useStyle = makeStyles(theme => ({
   }
 }))
 
-const SettingsHeader = ({ title, showActionButtons }) => {
+const SettingsHeader = ({ title, showActionButtons, categoryList, setCategoryList, setCategories }) => {
 
   // State to manage md breakpoint
   const theme = useTheme();
   const aboveMd = useMediaQuery(theme.breakpoints.up('md'));
+
+  const [isLoading, setLoading] = useState(false);
+
+
+  const inputRef = useRef("");
+  const onAdd = async () => {
+    const value  = inputRef.current.value.trim();
+    if (!value) {
+      notification("categories", "Please type category name first!", "error");
+      return;
+    }
+
+    const isPresent = categoryList.find(c => c.category_name.toLowerCase() === value.toLowerCase());
+    if (isPresent) {
+      notification("categories", "A category with same name already exists!", "error");
+      return;
+    }
+
+    setLoading(true);
+    const {data, status} = await createCategory(value);
+    if (status) {
+      const newCat = {
+        id: data.id,
+        category_name: value,
+        category_source: 1,
+        organization_id: getUser().organization_id
+      };
+      setCategories(p => [...p, newCat]);
+    }
+    setLoading(false);
+    inputRef.current.value = "";
+  }
 
   const classes = useStyle();
 
@@ -62,8 +97,8 @@ const SettingsHeader = ({ title, showActionButtons }) => {
       }}
     >
       <Typography color="primary" style={{ fontSize: '1rem', fontWeight: 'bolder' }}>{title}</Typography>
-      <Box display={showActionButtons ? "flex" : "none"} gridColumnGap={8}>
-        <Button
+      <Box display={showActionButtons ? "flex" : "none"} gridColumnGap={12}>
+        {/* <Button
           size='small'
           disableElevation
           color='primary'
@@ -71,15 +106,22 @@ const SettingsHeader = ({ title, showActionButtons }) => {
           className={classes.actionButton}
         >
           Edit
-        </Button>
+        </Button> */}
+        <TextField
+          placeholder='New Category'
+          variant='outlined'
+          size='small'
+          inputRef={inputRef} />
         <Button
           size='small'
           disableElevation
           color='primary'
-          startIcon={<Icon>add</Icon>}
+          startIcon={isLoading ? <Icon>hourglass_top</Icon> : <Icon>add</Icon>}
           className={classes.actionButton}
+          onClick={onAdd}
+          disabled={isLoading}
         >
-          Add
+          {isLoading ? "Adding" : "Add"}
         </Button>
       </Box>
     </Box>

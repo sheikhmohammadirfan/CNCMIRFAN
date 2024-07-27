@@ -11,7 +11,10 @@ const SliderControl = ({ name, control, rules, marks, classes, isCreateForm, ...
       render={({ field: { value, onChange }, fieldState: { error } }) => {
         return (
           <>
-            <Box display={!isCreateForm && "flex"} gridColumnGap={30}>
+            <Box
+              display={!isCreateForm && "flex"}
+              gridColumnGap={30}
+              className={value === null ? classes.noValue : ""}>
               <Slider
                 step={null}
                 marks={marks}
@@ -21,7 +24,7 @@ const SliderControl = ({ name, control, rules, marks, classes, isCreateForm, ...
                 className={classes.customSlider}
               />
               <Divider flexItem orientation='vertical' className={classes.sliderDivider} />
-              <Box flex={1}>
+              <Box flex={1} className="description">
                 {error
                   ?
                   <Typography style={{ color: "red" }}>{error.message}</Typography>

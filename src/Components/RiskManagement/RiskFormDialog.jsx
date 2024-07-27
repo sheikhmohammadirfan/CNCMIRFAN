@@ -149,12 +149,22 @@ const RiskFormDialog = ({
         ),
       // Setting default slider values of residual risk scores to 1 (One) 
       // Here it is assumed first score object is the lowest score
-      residual_likelihood: getLikelihoodSliderValue(
-        scores.likelihoodScores.find(score => score.id === row["Residual Risk Likelihood Id"])?.score || scores.likelihoodScores[0].score
-      ),
-      residual_impact: getImpactSliderValue(
-        scores.impactScores.find(score => score.id === row["Residual Risk Impact Id"])?.score || scores.impactScores[0].score
-      ),
+      residual_likelihood: row["Residual Risk Likelihood Id"] === null
+        ? null
+        : getLikelihoodSliderValue(
+            scores.likelihoodScores
+                .find(score => score.id === row["Residual Risk Likelihood Id"])
+                ?.score
+            || scores.likelihoodScores[0].score
+          ),
+      residual_impact: row["Residual Risk Impact Id"] === null
+        ? null
+        : getImpactSliderValue(
+            scores.impactScores
+              .find(score => score.id === row["Residual Risk Impact Id"])
+              ?.score
+            || scores.impactScores[0].score
+          ),
       notes: "Notes" in row ? row["Notes"] : "",
       customId: "Custom Id" in row ? row["Custom Id"] : "",
       identified_date: row["Identified Date"] || null,

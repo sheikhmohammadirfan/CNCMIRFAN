@@ -282,6 +282,19 @@ export const useStyle = makeStyles(theme => ({
     }
   },
 
+  noValue: {
+    "& .MuiSlider-thumb": {
+      opacity: 0,
+    },
+    "& .MuiSlider-markLabelActive": {
+      color: theme.palette.grey[600]
+    },
+    "& .description": {
+      opacity: 0,
+      pointerEvents: "none"
+    }
+  },
+
   // Horizontal divider after slider
   sliderDivider: {
     // backgroundColor: theme.palette.primary.main
@@ -362,6 +375,25 @@ export const useStyle = makeStyles(theme => ({
       fontStyle: "italic",
     },
   },
+
+  actionContainer: {
+    "& button": {
+      display: "block",
+      background: "transparent",
+      border: "none",
+      fontSize: "inherit",
+      color: theme.palette.primary.dark,
+      cursor: "pointer",
+      textAlign:"start",
+      overflow: "hidden",
+      textOverflow: "ellipsis",
+      width: "100%",
+      "&:hover": {
+        color: theme.palette.primary.light,
+        textDecoration: "underline"
+      }
+    }
+  }
 }))
 
 /* Header cell component */

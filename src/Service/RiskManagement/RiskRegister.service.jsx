@@ -61,3 +61,7 @@ export async function importRisk(file) {
 export async function exportRisk() {
   return await get("/risk/export/");
 }
+
+export async function createCategory(name) {
+  return await post("/risk/categories/", { name })
+}

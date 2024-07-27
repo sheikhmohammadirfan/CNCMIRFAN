@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useRef, useState } from 'react'
 import { Backdrop, Box, CircularProgress, Grid, Typography } from '@material-ui/core'
 import RiskRegisterHeader from './RiskRegisterHeader'
 import DataTable from '../../Utils/DataTable/DataTable'
-import { HeaderCell, generateRows, mapDataToHeader, useStyle } from './RiskRegisterUtils'
+import { HeaderCell, generateRows, getRowIndex, mapDataToHeader, useStyle } from './RiskRegisterUtils'
 import { HEADER_TABLE_COLS_MAP, risk_register_columns, risk_register_columns_width } from '../../../assets/data/RiskManagement/RiskRegister/RiskRegisterColumns'
 import { getRegister, createRisk, updateRegister, importRisk, exportRisk } from '../../../Service/RiskManagement/RiskRegister.service'
 import useLoading from '../../Utils/Hooks/useLoading'
@@ -74,7 +74,7 @@ const RiskRegister = () => {
     status: [],
     identified: [],
     vendor: []
-  })
+  });
 
   const [filterMetadata, setFilterMetadata] = useState({
     identified: {
@@ -227,7 +227,7 @@ const RiskRegister = () => {
         controls: [],
         status: r.treatment
       }),
-      Tasks: [],
+      Tasks: r.actions,
       "Approved": r.is_approved,
       "Archived": false,
       Vendors: []
@@ -235,6 +235,7 @@ const RiskRegister = () => {
     // if signal is not aborted, that means no new reqs were fired. so we can safely stop loading and set the state.
     if (!signal.aborted) {
       setRegister(data);
+      resetPageState();
       setPagination({ ...paginationData })
       stopLoading("register");
     }
@@ -327,6 +328,17 @@ const RiskRegister = () => {
   }
   const openEditForm = () => setScenarioDialog({ open: true, isViaLibrary: false })
 
+  const onApprove = async () => {
+    startLoading("backdrop");
+    const row = register[getCurrentIndex()];
+    const { status } = await updateRegister(row["ID"], { is_approved: true });
+    stopLoading("backdrop");
+    if (status) {
+      notification("risk-udpate-success", "Risk approved successfully!", 'success');
+      fetchandSetRegister(true);
+    }
+  };
+
   const addScenarioViaLibrary = () => {
     resetPageState();
     setScenarioDialog({ open: true, isViaLibrary: true })
@@ -350,12 +362,12 @@ const RiskRegister = () => {
   const openExportDialog = async () => {
     // Directly handling download without showing download dialog
 
-    startLoading("export")
+    startLoading("backdrop")
 
     const { data, status } = await exportRisk();
 
     if (!status) {
-      stopLoading("export");
+      stopLoading("backdrop");
       return;
     };
 
@@ -374,7 +386,7 @@ const RiskRegister = () => {
     XLSX.write(book, { bookType: 'xlsx', type: "binary" });
     XLSX.writeFile(book, `risks.xlsx`);
 
-    stopLoading("export")
+    stopLoading("backdrop")
 
     // setExportDialog(true);
   }
@@ -428,6 +440,7 @@ const RiskRegister = () => {
     const res = await put('risk/tasks/', payload);
     if (res.status) {
       closeAddActionForm();
+      fetchandSetRegister(true);
     }
   }
 
@@ -467,7 +480,8 @@ const RiskRegister = () => {
       const { status } = await createRisk(payload);
       if (status) {
         closeScenarioDialog();
-        notification("scenario-add-success", "Scenario Successfully Created !", 'success')
+        notification("scenario-add-success", "Scenario Successfully Created !", 'success');
+        resetPageState();
         return fetchandSetRegister(true);
       }
 
@@ -485,6 +499,7 @@ const RiskRegister = () => {
       if (status) {
         closeScenarioDialog();
         notification("risk-add-success", "Risk Successfully Created !", 'success')
+        resetPageState();
         return fetchandSetRegister(true);
       }
     }
@@ -547,20 +562,28 @@ const RiskRegister = () => {
 
       const il = scores.likelihoodScores.find(score => score.score === getLikelihoodScore(val.inherent_likelihood)).id;
       if (il !== row["Inherent Risk Impact Id"]) {
-        payload.inherent_likelihood = il;
+        payload.inherent_risk_likelihood_id = il;
       }
       const ii = scores.impactScores.find(score => score.score === getImpactScore(val.inherent_impact)).id;
-      if (il !== row["Inherent Risk Impact Id"]) {
-        payload.inherent_impact = ii;
+      if (ii !== row["Inherent Risk Impact Id"]) {
+        payload.inherent_risk_impact_id = ii;
       }
 
-      const rl = scores.likelihoodScores.find(score => score.score === getLikelihoodScore(val.residual_likelihood)).id;
+      const rl = val.residual_likelihood === null
+        ? null
+        : scores.likelihoodScores
+            .find(score => score.score === getLikelihoodScore(val.residual_likelihood))
+            .id;
       if (rl !== row["Residual Risk Likelihood Id"]) {
-        payload.residual_likelihood = rl;
+        payload.residual_risk_likelihood_id = rl;
       }
-      const ri = scores.impactScores.find(score => score.score === getImpactScore(val.residual_impact)).id;
+      const ri = val.residual_impact === null
+      ? null
+      : scores.impactScores
+          .find(score => score.score === getImpactScore(val.residual_impact))
+          .id;
       if (ri !== row["Residual Risk Impact Id"]) {
-        payload.residual_impact = ri;
+        payload.residual_risk_impact_id = ri;
       }
 
       if (val.treatment_plan !== (row["Treatment"] ? (JSON.parse(row["Treatment"]).type || -1) : -1)) {
@@ -571,9 +594,12 @@ const RiskRegister = () => {
         const { status } = await updateRegister(row["ID"], payload);
         if (status) {
           closeScenarioDialog();
-          notification("risk-udpate-success", "Risk Successfully Updated !", 'success')
+          notification("risk-udpate-success", "Risk Successfully Updated !", 'success');
+          resetPageState();
           return fetchandSetRegister(true);
         }
+      } else {
+        notification("risk-udpate-success", "No fields modified!", 'error');
       }
     }
   }
@@ -647,10 +673,12 @@ const RiskRegister = () => {
           selectedRows={selectedRow}
           // Edit button click handler
           editHandler={openEditForm}
+          approveHandler={onApprove}
           cols={{ allColumns, visibleColumns, hideColumn, showColumn }}
           // open add action form
           openAddActionForm={() => setActionDialog(true)}
           onSearch={onSearch}
+          row={register[getCurrentIndex()]}
         />
 
         {isLoading("register")
@@ -696,7 +724,8 @@ const RiskRegister = () => {
         }
       </Box>
 
-      <RiskFormDialog
+      {scenarioDialog.open && 
+        <RiskFormDialog
         open={scenarioDialog.open}
         closeHandler={closeScenarioDialog}
         rowIndex={getCurrentIndex()}
@@ -707,9 +736,10 @@ const RiskRegister = () => {
         getSliderValue={{ getLikelihoodSliderValue, getImpactSliderValue }}
         scores={scores}
         onFormSubmit={onRegisterFormSubmit}
-      />
+      />}
 
-      <AddActionDialog
+      {actionDialog && 
+        <AddActionDialog
         open={actionDialog}
         closeHandler={closeAddActionForm}
         risks={getRegisterOptions()}
@@ -717,7 +747,7 @@ const RiskRegister = () => {
         isCreateAction={true}
         riskVal={register[getCurrentIndex()]}
         onFormSubmit={handleAddActionFormSubmit}
-      />
+      />}
 
       <UploadFileDialog
         open={uploadCsv}
@@ -730,10 +760,10 @@ const RiskRegister = () => {
       />
 
       {/* For loading when export is done */}
-      <Backdrop className={classes.backdrop} open={isLoading("export")}>
+      <Backdrop className={classes.backdrop} open={isLoading("backdrop")}>
         <CircularProgress color="inherit" />
         <Typography className="backdrop-label" variant="h5">
-          Fetching data...
+          Please wait...
         </Typography>
       </Backdrop>
 
