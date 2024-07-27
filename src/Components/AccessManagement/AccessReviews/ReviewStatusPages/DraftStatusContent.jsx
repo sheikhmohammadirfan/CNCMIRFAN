@@ -9,11 +9,11 @@ import {
   Button
 } from "@material-ui/core";
 import Chip from "@mui/material/Chip";
-import { tableMockData } from "../Accounts/AccountsColumns";
-import DataTable from "../../Utils/DataTable/DataTable";
-import SystemCards from "./SystemCards";
-import FiltersOption from "./FiltersOption";
-import DoughnutChart from "./DoughnutChart";
+import { tableMockData } from "../../Accounts/AccountsColumns";
+import DataTable from "../../../Utils/DataTable/DataTable";
+import SystemCards from "../SystemCards";
+import FiltersOption from "../FiltersOption";
+import DoughnutChart from "../DoughnutChart";
 
 const useStyle = makeStyles((theme) => ({
   usersContainer: {

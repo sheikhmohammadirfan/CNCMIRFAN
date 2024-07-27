@@ -9,16 +9,17 @@ import {
   IconButton,
 } from "@material-ui/core";
 import Chip from "@mui/material/Chip";
-import { tableMockData } from "../Accounts/AccountsColumns";
-import DataTable from "../../Utils/DataTable/DataTable";
-import SystemCards from "./SystemCards";
-import FiltersOption from "./FiltersOption";
+import { tableMockData } from "../../Accounts/AccountsColumns";
+import DataTable from "../../../Utils/DataTable/DataTable";
+import SystemCards from "../SystemCards";
+import FiltersOption from "../FiltersOption";
 import Tab from "@mui/material/Tab";
 import TabContext from "@material-ui/lab/TabContext";
 import TabList from "@material-ui/lab/TabList";
 import TabPanel from "@material-ui/lab/TabPanel";
-import { TextControl } from "../../Utils/Control";
-import OptionDropdown from "../../RiskManagement/RiskRegister/OptionDropdown";
+import { TextControl } from "../../../Utils/Control";
+import OptionDropdown from "../../../RiskManagement/RiskRegister/OptionDropdown";
+import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
 
 const useStyle = makeStyles((theme) => ({
   usersContainer: {
@@ -159,6 +160,7 @@ function CompletedStatusContent() {
   const [selectedSystem, setSelectedSystem] = useState("");
   const [reviewerOpen, setReviewerOpen] = useState(false);
   const [selectedReviewer, setSelectedReviewer] = useState("");
+  const history = useHistory();
 
   useEffect(() => {
     const filtered = tableMockData.filter((item) => item.status === "Completed");
@@ -172,6 +174,14 @@ function CompletedStatusContent() {
   const handleDropdownChange = (setter) => (value) => {
     setter(value);
   };
+
+  const handleRowClick = (index) => {
+    const selectedItem = filteredData[index]
+    console.log(selectedItem);
+    history.push(`/access-management/reviews/completed/review-decisions/${index}`, {
+      data: selectedItem,
+    });
+  }
 
   return (
     <Box sx={{ width: "100%", typography: "body1" }} style={{ marginTop: "20px" }}>
@@ -206,7 +216,7 @@ function CompletedStatusContent() {
             />
           </Box>
 
-          <FiltersOption/>
+          <FiltersOption />
 
           <Grid container spacing={1} className={classes.dataTableContainer}>
             <Grid item xs={12}>
@@ -235,7 +245,7 @@ function CompletedStatusContent() {
                         text: getStatusChip(item.status),
                       },
                     ],
-                    // props: { onClick: () => handleRowClick(index) }, // Adding onClick here
+                    props: { onClick: () => handleRowClick(index) }, // Adding onClick here
                   })),
                 }}
                 minCellWidth={[300, 300, 300, 250]}

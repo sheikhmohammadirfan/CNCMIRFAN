@@ -33,7 +33,7 @@ import TabList from "@material-ui/lab/TabList";
 import TabPanel from "@material-ui/lab/TabPanel";
 import SystemCards from "./SystemCards";
 import DoughnutChart from "./DoughnutChart";
-import CompletedStatusContent from "./CompletedStatusContent";
+import CompletedStatusContent from "./ReviewStatusPages/CompletedStatusContent";
 
 const useStyle = makeStyles((theme) => ({
   usersContainer: {
@@ -134,150 +134,150 @@ const useStyle = makeStyles((theme) => ({
 
 function FiltersOption() {
 
-    const classes = useStyle();
-    const [value, setValue] = useState("1");
-    const [searchValue, setSearchValue] = useState("");
-    const [statusOpen, setStatusOpen] = useState(false);
-    const [reviewerOpen, setReviewerOpen] = useState(false);
-    const [selectedStatus, setSelectedStatus] = useState("");
-    const [selectedReviewer, setSelectedReviewer] = useState("");
-    const [systemOpen, setSystemOpen] = useState(false);
-    const [selectedSystem, setSelectedSytem] = useState("");
-    const [filteredData, setFilteredData] = useState(tableMockData);
-    const [anchorEl, setAnchorEl] = useState(null);
+  const classes = useStyle();
+  const [value, setValue] = useState("1");
+  const [searchValue, setSearchValue] = useState("");
+  const [statusOpen, setStatusOpen] = useState(false);
+  const [reviewerOpen, setReviewerOpen] = useState(false);
+  const [selectedStatus, setSelectedStatus] = useState("");
+  const [selectedReviewer, setSelectedReviewer] = useState("");
+  const [systemOpen, setSystemOpen] = useState(false);
+  const [selectedSystem, setSelectedSytem] = useState("");
+  const [filteredData, setFilteredData] = useState(tableMockData);
+  const [anchorEl, setAnchorEl] = useState(null);
 
 
 
 
-    const handleDropdownChange = (setter) => (value) => {
-        setter(value);
-      };
+  const handleDropdownChange = (setter) => (value) => {
+    setter(value);
+  };
 
   return (
     <>
 
-<Box
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  margin: "20px 0",
-                  gap: "30px",
-                }}
-              >
-                <Box display="flex" gridColumnGap={15} alignItems="center">
-                  <TextControl
-                    variant="outlined"
-                    placeholder="Search"
-                    size="small"
-                    gutter={false}
-                    label=" "
-                    className={classes.searchInput}
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          <IconButton size="small">
-                            <Icon>search</Icon>
-                          </IconButton>
-                        </InputAdornment>
-                      ),
-                    }}
-                    value={searchValue}
-                    onChange={(e) => setSearchValue(e.target.value)}
-                  />
-                </Box>
+      <Box
+        style={{
+          display: "flex",
+          alignItems: "center",
+          margin: "20px 0",
+          gap: "30px",
+        }}
+      >
+        <Box display="flex" gridColumnGap={15} alignItems="center">
+          <TextControl
+            variant="outlined"
+            placeholder="Search"
+            size="small"
+            gutter={false}
+            label=" "
+            className={classes.searchInput}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <IconButton size="small">
+                    <Icon>search</Icon>
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
+            value={searchValue}
+            onChange={(e) => setSearchValue(e.target.value)}
+          />
+        </Box>
 
-                <Box display="flex" alignItems="center" gridColumnGap={10}>
-                  <OptionDropdown
-                    open={statusOpen}
-                    handleClose={() => setStatusOpen(false)}
-                    placement="bottom-start"
-                    options={[
-                      {
-                        text: "Draft",
-                        clickHandler: () =>
-                          handleDropdownChange(setSelectedStatus)("Draft"),
-                      },
-                      {
-                        text: "Completed",
-                        clickHandler: () =>
-                          handleDropdownChange(setSelectedStatus)("Completed"),
-                      },
-                      {
-                        text: "Clear",
-                        clickHandler: () =>
-                          handleDropdownChange(setSelectedStatus)(""),
-                      },
-                    ]}
-                  >
-                    <Button
-                      size="medium"
-                      endIcon={
-                        <Icon style={{ rotate: "90deg" }}>
-                          arrow_forward_ios
-                        </Icon>
-                      }
-                      className={classes.dropdownButton}
-                      style={{
-                        backgroundColor: "transparent",
-                        color: "#4477CE",
-                        textTransform: "none",
-                        paddingInline: 10,
-                        border: "none",
-                      }}
-                      onClick={() => setStatusOpen((prev) => !prev)}
-                    >
-                      {selectedStatus || "Status"}
-                    </Button>
-                  </OptionDropdown>
-                  <OptionDropdown
-                    open={reviewerOpen}
-                    handleClose={() => setReviewerOpen(false)}
-                    placement="bottom-start"
-                    options={[
-                      {
-                        text: "Reviwer 1",
-                        clickHandler: () =>
-                          handleDropdownChange(setSelectedReviewer)(
-                            "Reviwer 1"
-                          ),
-                      },
-                      {
-                        text: "Reviwer 2",
-                        clickHandler: () =>
-                          handleDropdownChange(setSelectedReviewer)(
-                            "Reviwer 2"
-                          ),
-                      },
-                      {
-                        text: "Clear",
-                        clickHandler: () =>
-                          handleDropdownChange(setSelectedReviewer)(""),
-                      },
-                    ]}
-                  >
-                    <Button
-                      size="medium"
-                      endIcon={
-                        <Icon style={{ rotate: "90deg" }}>
-                          arrow_forward_ios
-                        </Icon>
-                      }
-                      className={classes.dropdownButton}
-                      style={{
-                        backgroundColor: "transparent",
-                        color: "#4477CE",
-                        textTransform: "none",
-                        paddingInline: 10,
-                        border: "none",
-                      }}
-                      onClick={() => setReviewerOpen((prev) => !prev)}
-                    >
-                      {selectedReviewer || "Reviewer"}
-                    </Button>
-                  </OptionDropdown>
-                </Box>
-              </Box>
-      
+        <Box display="flex" alignItems="center" gridColumnGap={10}>
+          <OptionDropdown
+            open={statusOpen}
+            handleClose={() => setStatusOpen(false)}
+            placement="bottom-start"
+            options={[
+              {
+                text: "Draft",
+                clickHandler: () =>
+                  handleDropdownChange(setSelectedStatus)("Draft"),
+              },
+              {
+                text: "Completed",
+                clickHandler: () =>
+                  handleDropdownChange(setSelectedStatus)("Completed"),
+              },
+              {
+                text: "Clear",
+                clickHandler: () =>
+                  handleDropdownChange(setSelectedStatus)(""),
+              },
+            ]}
+          >
+            <Button
+              size="medium"
+              endIcon={
+                <Icon style={{ rotate: "90deg" }}>
+                  arrow_forward_ios
+                </Icon>
+              }
+              className={classes.dropdownButton}
+              style={{
+                backgroundColor: "transparent",
+                color: "#4477CE",
+                textTransform: "none",
+                paddingInline: 10,
+                border: "none",
+              }}
+              onClick={() => setStatusOpen((prev) => !prev)}
+            >
+              {selectedStatus || "Status"}
+            </Button>
+          </OptionDropdown>
+          <OptionDropdown
+            open={reviewerOpen}
+            handleClose={() => setReviewerOpen(false)}
+            placement="bottom-start"
+            options={[
+              {
+                text: "Reviwer 1",
+                clickHandler: () =>
+                  handleDropdownChange(setSelectedReviewer)(
+                    "Reviwer 1"
+                  ),
+              },
+              {
+                text: "Reviwer 2",
+                clickHandler: () =>
+                  handleDropdownChange(setSelectedReviewer)(
+                    "Reviwer 2"
+                  ),
+              },
+              {
+                text: "Clear",
+                clickHandler: () =>
+                  handleDropdownChange(setSelectedReviewer)(""),
+              },
+            ]}
+          >
+            <Button
+              size="medium"
+              endIcon={
+                <Icon style={{ rotate: "90deg" }}>
+                  arrow_forward_ios
+                </Icon>
+              }
+              className={classes.dropdownButton}
+              style={{
+                backgroundColor: "transparent",
+                color: "#4477CE",
+                textTransform: "none",
+                paddingInline: 10,
+                border: "none",
+              }}
+              onClick={() => setReviewerOpen((prev) => !prev)}
+            >
+              {selectedReviewer || "Reviewer"}
+            </Button>
+          </OptionDropdown>
+        </Box>
+      </Box>
+
     </>
   )
 }

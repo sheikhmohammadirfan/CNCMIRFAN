@@ -15,6 +15,7 @@ import {
   useMediaQuery,
   useTheme,
 } from "@material-ui/core";
+import ReviewDecisions from "../Components/AccessManagement/AccessReviews/ReviewDecision/ReviewDecisions";
 
 const useStyle = makeStyles((theme) => ({
   accessManagementContainer: {
@@ -35,7 +36,16 @@ function AccessManagement() {
           <Route exact path="/access-management/reviews">
             <AccessReviews />
           </Route>
-          <Route path="/access-management/reviews/user-details/:id" component={UserDetails} />
+          <Route exact path="/access-management/reviews/in-review/:id" component={UserDetails} />
+          <Route exact path="/access-management/reviews/completed/:id" component={UserDetails} />
+          
+          <Route exact path="/access-management/reviews/in-review/review-decisions/:id">
+            <ReviewDecisions />
+          </Route>
+          <Route exact path="/access-management/reviews/completed/review-decisions/:id">
+            <ReviewDecisions />
+          </Route>
+
         </Switch>
       </Box>
     </>

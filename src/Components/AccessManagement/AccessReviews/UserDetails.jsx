@@ -33,9 +33,9 @@ import TabList from "@material-ui/lab/TabList";
 import TabPanel from "@material-ui/lab/TabPanel";
 import SystemCards from "./SystemCards";
 import DoughnutChart from "./DoughnutChart";
-import CompletedStatusContent from "./CompletedStatusContent";
-import InReviewStatusContent from "./InReviewStatusContent";
-import DraftStatusContent from "./DraftStatusContent";
+import CompletedStatusContent from "./ReviewStatusPages/CompletedStatusContent";
+import InReviewStatusContent from "./ReviewStatusPages/InReviewStatusContent";
+import DraftStatusContent from "./ReviewStatusPages/DraftStatusContent";
 
 const useStyle = makeStyles((theme) => ({
   usersContainer: {
@@ -317,6 +317,8 @@ function UserDetails() {
   const { id } = useParams();
   const { data } = location.state || {};
 
+  data["status"] = "In Review";
+
   let activeStep = 0;
   if (data) {
     if (data.status === "Draft") {
@@ -567,7 +569,7 @@ function UserDetails() {
                 </Stepper>
               </Box>
               {renderHeaderButtons()}
-              {renderHeaderButtons()}
+              {/* {renderHeaderButtons()} */}
             </Box>
           </Box>
         </Box>

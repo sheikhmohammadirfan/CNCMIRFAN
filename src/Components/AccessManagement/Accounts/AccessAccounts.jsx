@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Box,
   Button,
@@ -22,6 +22,10 @@ import {
   mfaOptions,
 } from "../Accounts/AccountsColumns";
 import AccessTable from "./AccessTable";
+import { fetchAccounts, getAccounts } from "../../../Service/AccessManagement/Accounts";
+import { post } from "../../../Service/CrudFactory";
+import SkeletonBox from "../../Utils/SkeletonBox";
+import { obj_to_yyyy_mm_dd } from "../../Utils/DateFormatConverter";
 
 const useStyle = makeStyles((theme) => ({
   tableStyle: {
@@ -156,13 +160,15 @@ function AccessAccounts() {
   const [statusOpen, setStatusOpen] = useState(false);
   const [mfaOpen, setMfaOpen] = useState(false);
 
-  const [filteredData, setFilteredData] = useState(mockData);
+  const [filteredData, setFilteredData] = useState([]);
   const [searchValue, setSearchValue] = useState("");
   const [selectedService, setSelectedService] = useState("");
   const [selectedOwner, setSelectedOwner] = useState("");
   const [selectedType, setSelectedType] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("");
   const [selectedMfa, setSelectedMfa] = useState("");
+
+  const [loading, setLoading] = useState(false);
 
   const handleFilter = () => {
     let data = mockData;
@@ -198,6 +204,19 @@ function AccessAccounts() {
     setter(value);
   };
 
+  const fetchAccountsData = useCallback(async () => {
+    setLoading(true);
+    const { data, status } = await fetchAccounts();
+    if (status) {
+      setFilteredData(data)
+    }
+    setLoading(false);
+  }, [])
+
+  useEffect(() => {
+    fetchAccountsData()
+  }, [fetchAccountsData])
+
   const classes = useStyle();
   return (
     <>
@@ -210,11 +229,11 @@ function AccessAccounts() {
               alignItems="center"
               style={{
                 borderBottom: "1px solid #989898",
-                padding: "5px 0 20px 0",
+                padding: "5px 0 10px 0",
               }}
             >
               <Box>
-                <Typography noWrap variant="h5" className={classes.titleStyle}>
+                <Typography noWrap variant="h6" className={classes.titleStyle}>
                   Accounts
                 </Typography>
                 <Typography noWrap variant="body2">
@@ -224,14 +243,14 @@ function AccessAccounts() {
               <Box className={classes.buttonContainer}>
                 <Button
                   variant="contained"
-                  size="medium"
+                  size="small"
                   className={classes.ImportbuttonStyle}
                 >
                   Import access data
                 </Button>
                 <Button
                   variant="outlined"
-                  size="medium"
+                  size="small"
                   className={classes.exportbuttonStyle}
                 >
                   Export access data
@@ -452,43 +471,47 @@ function AccessAccounts() {
             </IconButton>
           </Box>
         </Box>
-        <Grid container spacing={1} className={classes.dataTableContainer}>
-          <Grid item xs={12}>
-            <DataTable
-              className={classes.tableStyle}
-              checkbox={false}
-              serialNo={false}
-              stickyHeader={true}
-              verticalBorder={true}
-              resizeTable={true}
-              header={{
-                data: [
-                  { text: "Account Name" },
-                  { text: "Owner" },
-                  { text: "Groups" },
-                  { text: "Type" },
-                  { text: "Status" },
-                  { text: "MFA" },
-                  { text: "Created" },
-                ],
-              }}
-              rowList={{
-                rowData: filteredData.map((item) => ({
+
+        {loading ?
+          <SkeletonBox text="Loading Accounts..." height='60vh' width='100%' /> :
+          <Grid container spacing={1} className={classes.dataTableContainer}>
+            <Grid item xs={12}>
+              <DataTable
+                className={classes.tableStyle}
+                checkbox={false}
+                serialNo={false}
+                stickyHeader={true}
+                verticalBorder={true}
+                resizeTable={true}
+                header={{
                   data: [
-                    { text: item.accountName },
-                    { text: item.owner },
-                    { text: item.groups },
-                    { text: item.type },
-                    { text: item.status },
-                    { text: item.mfa },
-                    { text: item.created },
+                    { text: "Account Name" },
+                    { text: "Owner" },
+                    { text: "Groups" },
+                    { text: "Type" },
+                    { text: "Status" },
+                    { text: "MFA" },
+                    { text: "Created" },
                   ],
-                })),
-              }}
-              minCellWidth={[350, 200, 150, 250, 150, 150, 150]}
-            />
+                }}
+                rowList={{
+                  rowData: filteredData.map((item) => ({
+                    data: [
+                      { text: item.account_name },
+                      { text: item.account_owner },
+                      { text: "No group in response" },
+                      { text: "No type in response" },
+                      { text: item.status },
+                      { text: item.mfa },
+                      { text: obj_to_yyyy_mm_dd(new Date(item.date_added)) },
+                    ],
+                  })),
+                }}
+                minCellWidth={[350, 200, 150, 250, 150, 150, 150]}
+              />
+            </Grid>
           </Grid>
-        </Grid>
+        }
       </Box>
     </>
   );

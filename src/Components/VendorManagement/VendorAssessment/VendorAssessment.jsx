@@ -21,7 +21,7 @@ import UploadFileDialog from "../../Utils/UploadFileDialog";
 import XLSX from "xlsx";
 import useParams from "../../Utils/Hooks/useParams";
 import { COLUMN_DESCRIPTION_MAP, REQUIRED_COLUMNS, OPTIONAL_COLUMNS } from "../../../assets/data/VendorManagement/VendorAssessment/ImportCols";
-import { createVendor, deleteVendor, updateVendor, createSecurityReview } from "../../../Service/VendorManagement/VendorManagement.service.jsx";
+import { createSecurityReview, createVendor, deleteVendor, updateVendor } from "../../../Service/VendorManagement/VendorManagement.service.jsx";
 import { getUser } from "../../../Service/UserFactory.jsx";
 
 const useStyles = makeStyles({
