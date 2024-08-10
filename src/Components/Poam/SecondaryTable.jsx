@@ -1,4 +1,4 @@
-import { Box, Grid, Typography, Zoom } from "@material-ui/core";
+import { Box, Grid, makeStyles, Typography, Zoom } from "@material-ui/core";
 import React from "react";
 import CloseButton from "../Utils/CloseButton";
 import DataTable from "../Utils/DataTable/DataTable";
@@ -6,6 +6,14 @@ import DataTable from "../Utils/DataTable/DataTable";
 const Link = ({ text, href = "#" }) => <a href={href}>{text}</a>;
 const Seperator = () => <span>,&nbsp;</span>;
 const Span = ({ text }) => <span>{text}</span>;
+
+const useStyle = makeStyles(theme => ({
+  tableContainer: {
+    '& table': {
+      gridTemplateColumns: '40% 60% !important'
+    }
+  }
+}))
 
 /* SECONDARY TALBE COMPONENT */
 function SecondaryTable({ data, columnsList, currentRow, closeTable }) {
@@ -52,7 +60,6 @@ function SecondaryTable({ data, columnsList, currentRow, closeTable }) {
           {
             text: <Cell text={title} />,
             css: {
-              width: "40%",
               paddingTop: "6px",
               paddingBottom: "6px",
               background: "white",
@@ -63,7 +70,6 @@ function SecondaryTable({ data, columnsList, currentRow, closeTable }) {
           {
             text: <Cell text={text} />,
             css: {
-              width: "60%",
               paddingTop: "6px",
               paddingBottom: "6px",
               verticalAlign: "top",
@@ -91,13 +97,15 @@ function SecondaryTable({ data, columnsList, currentRow, closeTable }) {
           </Box>
         ),
         params: { colSpan: 2 },
-        css: { paddingTop: "6px", paddingBottom: "6px" },
+        css: { paddingTop: "6px", paddingBottom: "6px", gridColumn: '1/span 2' },
       },
     ],
   });
 
   // Wrap mapped rows in rowData
   const rows = () => ({ rowData: mapDataToRow() });
+
+  const classes = useStyle()
 
   return (
     <Grid item xs={3}>
@@ -107,6 +115,7 @@ function SecondaryTable({ data, columnsList, currentRow, closeTable }) {
           header={header()}
           rowList={rows()}
           serialNo={false}
+          className={classes.tableContainer}
         />
       </Zoom>
     </Grid>

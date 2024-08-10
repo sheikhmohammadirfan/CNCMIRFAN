@@ -7,8 +7,10 @@ import TableHead from './TableHead';
 import ReviewDecisionTableFilters from '../../../../assets/data/AccessManagement/ReviewDecisions/TableFilters';
 import DataTable from '../../../Utils/DataTable/DataTable';
 import { DECISION_COLUMNS, DECISION_COLUMNS_WIDTHS, HEADER_MAP } from '../../../../assets/data/AccessManagement/ReviewDecisions/Columns';
-import { approveReview, getDecisions } from '../../../../Service/AccessManagement/Reviews';
+import { approveReview, flagReview, getDecisions, submitReviewEntity } from '../../../../Service/AccessManagement/Reviews';
 import SkeletonBox from '../../../Utils/SkeletonBox';
+import { notification } from '../../../Utils/Utils';
+import { Button, Stack } from '@mui/material';
 
 const riskData = {
   labels: ["Access Appropriate", "Changes Required", "Need Review"],
@@ -45,9 +47,10 @@ const ReviewDecisions = () => {
   const [columns, setColumns] = useState(DECISION_COLUMNS);
 
   const [decisions, setDecisions] = useState([]);
+  const [decisionBtnLoad, setDecisionBtnLoad] = useState(false);
 
   const fetchSetDecisions = useCallback(async (id) => {
-    setLoading(true)
+    !loading && setLoading(true)
     const { status, data } = await getDecisions(id);
     if (status) setDecisions(data);
     setLoading(false)
@@ -65,8 +68,9 @@ const ReviewDecisions = () => {
     if (typeof decision === 'number' && !isNaN(decision)) return;
     const payload = {
       reviewlist_id_list: [row.id],
-      flag: decision
+      flag: `${decision}`
     }
+    setDecisionBtnLoad(true)
     try {
       const res = await approveReview(payload);
       if (res) fetchSetDecisions(reviewEntityId)
@@ -74,9 +78,32 @@ const ReviewDecisions = () => {
     catch (err) {
       console.log(err)
     }
+    finally {
+      setDecisionBtnLoad(false);
+    }
   }
 
   const classes = useStyle();
+
+  const handleFlagClick = async (id, flagged) => {
+    console.log(id, flagged)
+    const payload = {
+      reviewlist_id_list: [id],
+      flag: `${!flagged}`
+    }
+    setLoading(true);
+    const { data, status } = await flagReview(payload);
+    if (status) return fetchSetDecisions(reviewEntityId);
+    setLoading(false);
+  }
+
+  const submitEntity = async () => {
+    const payload = {
+      review_entity_id: reviewEntityId
+    }
+    const { status } = await submitReviewEntity(payload)
+    
+  }
 
   const getMappedColumns = () => columns.map(column => HEADER_MAP[column])
 
@@ -89,7 +116,9 @@ const ReviewDecisions = () => {
     generateRows(
       decisions,
       getMappedColumns(),
+      handleFlagClick,
       changeDecision,
+      decisionBtnLoad,
       isReviewCompleted,
       selectedRows,
       matchedCell,
@@ -98,7 +127,20 @@ const ReviewDecisions = () => {
 
   return (
     <Box className={classes.reviewDecisionContainer}>
-      <Box mt={2} style={{ display: "flex", justifyContent: "space-between" }}>
+      <Stack direction='row' justifyContent='space-between' alignItems='center'>
+        <Typography variant='h5'>
+          Entity Name
+        </Typography>
+        <Button
+          variant='contained'
+          size='small'
+          disableElevation
+          onClick={submitEntity}
+        >
+          Submit Review Entity
+        </Button>
+      </Stack>
+      <Box mt={4} style={{ display: "flex", justifyContent: "space-between" }}>
         <Grid container spacing={2}>
           <Grid item xs={6}>
             <Box style={{ border: `1px solid ${borderColor}` }}>

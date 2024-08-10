@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
+  useHistory,
   useLocation,
   useParams,
 } from "react-router-dom/cjs/react-router-dom.min";
@@ -36,6 +37,8 @@ import DoughnutChart from "./DoughnutChart";
 import CompletedStatusContent from "./ReviewStatusPages/CompletedStatusContent";
 import InReviewStatusContent from "./ReviewStatusPages/InReviewStatusContent";
 import DraftStatusContent from "./ReviewStatusPages/DraftStatusContent";
+import { getReviewEntities, startReview, submitReview, uploadAccessFile } from "../../../Service/AccessManagement/Reviews";
+import { notification } from "../../Utils/Utils";
 
 const useStyle = makeStyles((theme) => ({
   usersContainer: {
@@ -99,15 +102,15 @@ const useStyle = makeStyles((theme) => ({
       },
       "&.asc::before": {
         content: "'\\2193'",
-        color: "#4477CE",
+        color: theme.palette.primary.main,
       },
       "&.dsc::after": {
         content: "'\\2191'",
-        color: "#4477CE",
+        color: theme.palette.primary.main,
       },
     },
     "& tr.Mui-selected td:nth-child(1)": {
-      boxShadow: "inset 4px 0 0 0 #4477CE",
+      boxShadow: `inset 4px 0 0 0 ${theme.palette.primary.main}`,
     },
     "& tr.Mui-selected td": {
       background: "#e6f6f4 !important",
@@ -116,7 +119,7 @@ const useStyle = makeStyles((theme) => ({
     "& tbody td:nth-child(2)": {
       borderRight: `1px solid ${theme.palette.grey[300]}`,
     },
-    "& tbody td[data-searched='true']": { border: "2px solid #4477CE" },
+    "& tbody td[data-searched='true']": { border: `2px solid ${theme.palette.primary.main}` },
 
     cursor: "pointer",
   },
@@ -314,34 +317,38 @@ const DraftContent = ({ data }) => (
 function UserDetails() {
   const classes = useStyle();
   const location = useLocation();
+  const history = useHistory();
   const { id } = useParams();
   const { data } = location.state || {};
 
-  data["status"] = "In Review";
+  const [loading, setLoading] = useState(false);
+  const [reviewAccessData, setReviewAccessData] = useState([]);
+
+  const fetchReviewEntities = useCallback(async (id) => {
+    setLoading(true);
+    const { data, status } = await getReviewEntities(id)
+    if (status) setReviewAccessData(data)
+    setLoading(false)
+  }, [])
+
+  useEffect(() => {
+    fetchReviewEntities(data.id)
+  }, [fetchReviewEntities])
+
+  const fetcher = () => fetchReviewEntities(data.id)
 
   let activeStep = 0;
   if (data) {
-    if (data.status === "Draft") {
+    if (data.status === 0) {
       activeStep = 0;
-    } else if (data.status === "In Review") {
+    } else if (data.status === 1) {
       activeStep = 1;
-    } else if (data.status === "Completed") {
+    } else if (data.status === 2) {
       activeStep = 2;
     }
   }
 
-  const [value, setValue] = useState("1");
-  const [searchValue, setSearchValue] = useState("");
-  const [statusOpen, setStatusOpen] = useState(false);
-  const [reviewerOpen, setReviewerOpen] = useState(false);
-  const [selectedStatus, setSelectedStatus] = useState("");
-  const [selectedReviewer, setSelectedReviewer] = useState("");
-  const [systemOpen, setSystemOpen] = useState(false);
-  const [selectedSystem, setSelectedSytem] = useState("");
-  const [filteredData, setFilteredData] = useState(tableMockData);
   const [anchorEl, setAnchorEl] = useState(null);
-
-
 
   const handleMoreClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -351,41 +358,43 @@ function UserDetails() {
     setAnchorEl(null);
   };
 
-  const handleChange = (event, newValue) => {
-    setValue(newValue);
-  };
+  const uploadAccess = async (e, row) => {
+    e.stopPropagation();
+    const fileExtension = e.target.files[0].name.split(".").pop();
+    if (!["xls", "xlsx", "xlsm", "csv"].includes(fileExtension)) {
+      notification('id', "Please select an excel file", 'error')
+      return;
+    }
 
-  const handleDropdownChange = (setter) => (value) => {
-    setter(value);
-  };
-  const handleFilter = () => {
-    let data = tableMockData;
-    if (selectedStatus)
-      data = data.filter((item) => item.status.includes(selectedStatus));
-    if (searchValue)
-      data = data.filter((item) =>
-        item.name.toLowerCase().includes(searchValue.toLowerCase())
-      );
-    setFilteredData(data);
-  };
+    let formData = new FormData();
+    formData.append('entity_id', row.id)
+    formData.append('file', e.target.files[0])
 
-  // const handleRowClick = (rowId) => {
-  //   console.log("Row Clicked");
-  //   const selectedItem = filteredData[rowId];
-  //   history.push(`/access_management/reviews/user-details//${rowId}`, {
-  //     data: selectedItem,
-  //   });
-  // };
+    const { status } = await uploadAccessFile(formData);
+    if (status) {
+      notification('success_id', "Successfully uploaded access file", 'success');
+      return fetcher();
+    }
+  }
 
-  useEffect(() => {
-    handleFilter();
-  }, [selectedStatus, searchValue]);
+  const moveReview = async () => {
+    if (data.status === 0) {
+      const payload = {
+        review_id: parseInt(id)
+      }
+      const { status } = await startReview(payload);
+      if (true) {
+        history.replace(`/access-management/reviews/in-review/${id}`, { data: { ...data, status: 1 } })
+      }
+    }
+
+  }
 
   const renderContent = () => {
     switch (data.status) {
-      case "Completed":
-        return <CompletedStatusContent />;
-      case "In Review":
+      case 2:
+        return <CompletedStatusContent data={reviewAccessData} loading={loading} uploadAccess={uploadAccess} />;
+      case 1:
         const data = {
           labels: ["Not started", "In progress", "Completed"],
           datasets: [
@@ -397,8 +406,8 @@ function UserDetails() {
             },
           ],
         };
-        return <InReviewStatusContent />;
-      case "Draft":
+        return <InReviewStatusContent data={reviewAccessData} loading={loading} uploadAccess={uploadAccess} />;
+      case 0:
         const data2 = {
           labels: [
             "Systems requiring access file",
@@ -414,14 +423,14 @@ function UserDetails() {
             },
           ],
         };
-        return <DraftStatusContent />;
+        return <DraftStatusContent data={reviewAccessData} loading={loading} uploadAccess={uploadAccess} />;
       default:
         return null;
     }
   };
 
   const renderHeaderButtons = () => {
-    if (data.status == "Completed") {
+    if (data.status === 2) {
       return (
         <Box className={classes.buttonContainer}>
           <Button
@@ -442,7 +451,7 @@ function UserDetails() {
           </Button>
         </Box>
       );
-    } else if (data.status == "In review") {
+    } else if (data.status === 1) {
       return (
         <Box className={classes.buttonContainer}>
           <Button
@@ -485,8 +494,8 @@ function UserDetails() {
                 variant="outlined"
                 size="small"
                 startIcon={<Icon>check</Icon>}
-                disabled
                 className={classes.exp_Del_Button}
+                onClick={moveReview}
               >
                 Complete
               </Button>
@@ -529,8 +538,8 @@ function UserDetails() {
             variant="outlined"
             size="small"
             startIcon={<Icon>check</Icon>}
-            disabled
             className={classes.exp_Del_Button}
+            onClick={moveReview}
           >
             Start review
           </Button>

@@ -14,6 +14,11 @@ import DataTable from "../../../Utils/DataTable/DataTable";
 import SystemCards from "../SystemCards";
 import FiltersOption from "../FiltersOption";
 import DoughnutChart from "../DoughnutChart";
+import { REVIEW_STATUS_MAP } from "../../../../assets/data/AccessManagement/ReviewDecisions/ValuesMap";
+import SkeletonBox from "../../../Utils/SkeletonBox";
+import UploadFileCell from "./UploadFileCell";
+import { notification } from "../../../Utils/Utils";
+import { uploadAccessFile } from "../../../../Service/AccessManagement/Reviews";
 
 const useStyle = makeStyles((theme) => ({
   usersContainer: {
@@ -113,20 +118,20 @@ const useStyle = makeStyles((theme) => ({
 
 
 const data2 = {
-    labels: [
-      "Systems requiring access file",
-      "Systems requiring connection",
-      "Systems ready to review",
-    ],
-    datasets: [
-      {
-        data: [4, 3, 7],
-        backgroundColor: ["#A9A9A9", "#FF6384", "#4BC0C0"],
-        borderColor: ["#A9A9A9", "#FF6384", "#4BC0C0"],
-        borderWidth: 1,
-      },
-    ],
-  };
+  labels: [
+    "Systems requiring access file",
+    "Systems requiring connection",
+    "Systems ready to review",
+  ],
+  datasets: [
+    {
+      data: [4, 3, 7],
+      backgroundColor: ["#A9A9A9", "#FF6384", "#4BC0C0"],
+      borderColor: ["#A9A9A9", "#FF6384", "#4BC0C0"],
+      borderWidth: 1,
+    },
+  ],
+};
 
 const getStatusChip = (status) => {
   switch (status) {
@@ -164,64 +169,68 @@ const getStatusChip = (status) => {
 
 
 
-function DraftStatusContent() {
+function DraftStatusContent({ data, loading, uploadAccess }) {
   const classes = useStyle();
-  const [filteredData, setFilteredData] = useState([]);
-
-  useEffect(() => {
-    const filtered = tableMockData.filter((item) => item.status === "Draft");
-    setFilteredData(filtered);
-  }, []);
 
   return (
     <>
       <Grid container>
-    <Grid item xs={12} md={12} lg={12}>
-      <Box border={1} p={2}>
-        <Typography variant="h6">Access review progress</Typography>
-      </Box>
-      <Box borderBottom={1} borderRight={1} borderLeft={1} p={2}>
-        <DoughnutChart data={data2} />
-      </Box>
-    </Grid>
-  </Grid>
-
-      <FiltersOption/>
-
-      <Grid container spacing={1} className={classes.dataTableContainer}>
-        <Grid item xs={12}>
-          <DataTable
-            className={classes.tableStyle}
-            checkbox={false}
-            serialNo={false}
-            stickyHeader={true}
-            verticalBorder={true}
-            resizeTable={true}
-            header={{
-              data: [
-                { text: "System" },
-                { text: "Reviewer" },
-                { text: "Access Data" },
-                { text: "Status" },
-              ],
-            }}
-            rowList={{
-              rowData: filteredData.map((item, index) => ({
-                data: [
-                  { text: item.name },
-                  { text: item.reviewer },
-                  { text: item.dateStarted },
-                  {
-                    text: getStatusChip(item.status),
-                  },
-                ],
-                // props: { onClick: () => handleRowClick(index) }, // Adding onClick here
-              })),
-            }}
-            minCellWidth={[300, 300, 300, 250]}
-          />
+        <Grid item xs={12} md={12} lg={12}>
+          <Box border={1} p={2}>
+            <Typography variant="h6">Access review progress</Typography>
+          </Box>
+          <Box borderBottom={1} borderRight={1} borderLeft={1} p={2}>
+            <DoughnutChart data={data2} />
+          </Box>
         </Grid>
       </Grid>
+
+      <FiltersOption />
+
+      {loading ?
+        <SkeletonBox width='100%' height='30vh' text="Loading Entities..." /> :
+        <Grid container spacing={1} className={classes.dataTableContainer}>
+          <Grid item xs={12}>
+            <DataTable
+              className={classes.tableStyle}
+              checkbox={false}
+              serialNo={false}
+              stickyHeader={true}
+              verticalBorder={true}
+              resizeTable={true}
+              header={{
+                data: [
+                  { text: "System" },
+                  { text: "Reviewer" },
+                  { text: "Access Data" },
+                  { text: "Status" },
+                ],
+              }}
+              rowList={{
+                rowData: data.map((item, index) => ({
+                  data: [
+                    { text: item.entity },
+                    { text: item.reviewer },
+                    {
+                      text:
+                        <UploadFileCell
+                          uploaded={item.uploaded}
+                          row={item}
+                          handleFileInputChange={uploadAccess}
+                        />
+                    },
+                    {
+                      text: getStatusChip(REVIEW_STATUS_MAP[item.status]),
+                    },
+                  ],
+                  // props: { onClick: () => handleRowClick(index) }, // Adding onClick here
+                })),
+              }}
+              minCellWidth={[300, 300, 300, 250]}
+            />
+          </Grid>
+        </Grid>
+      }
     </>
   );
 }

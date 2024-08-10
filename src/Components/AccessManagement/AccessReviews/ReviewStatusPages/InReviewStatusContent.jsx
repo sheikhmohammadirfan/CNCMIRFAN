@@ -17,6 +17,8 @@ import DoughnutChart from "../DoughnutChart";
 import { useHistory, useLocation } from "react-router-dom/cjs/react-router-dom.min";
 import { getReviewAccessList, getReviewEntities } from "../../../../Service/AccessManagement/Reviews";
 import SkeletonBox from "../../../Utils/SkeletonBox";
+import { REVIEW_STATUS_MAP } from "../../../../assets/data/AccessManagement/ReviewDecisions/ValuesMap";
+import UploadFileCell from "./UploadFileCell";
 
 const useStyle = makeStyles((theme) => ({
   usersContainer: {
@@ -163,27 +165,13 @@ const getStatusChip = (status) => {
 
 
 
-function InReviewStatusContent() {
+function InReviewStatusContent({ data, loading, uploadAccess }) {
   const classes = useStyle();
   const history = useHistory();
   const location = useLocation();
-  const [reviewAccessData, setReviewAccessData] = useState([]);
-
-  const [loading, setLoading] = useState(false)
-
-  const fetchReviewEntities = useCallback(async (id) => {
-    setLoading(true);
-    const { data, status } = await getReviewEntities(id)
-    if (status) setReviewAccessData(data)
-    setLoading(false)
-  }, [])
-
-  useEffect(() => {
-    fetchReviewEntities(location.state.data.id)
-  }, [fetchReviewEntities])
 
   const handleRowClick = (index) => {
-    const selectedReview = reviewAccessData[index]
+    const selectedReview = data[index]
     history.push(`/access-management/reviews/in-review/review-decisions/${index}`, {
       data: selectedReview,
     });
@@ -315,17 +303,20 @@ function InReviewStatusContent() {
                 ],
               }}
               rowList={{
-                rowData: reviewAccessData.map((item, index) => ({
+                rowData: data.map((item, index) => ({
                   data: [
                     { text: `${item.entity} (Coming from entity)` },
                     { text: item.reviewer },
                     {
-                      text: item.uploaded
-                        ? "Synced (Coming from 'uploaded' flag)"
-                        : "Not Synced (Coming from 'uploaded' flag)"
+                      text:
+                        <UploadFileCell
+                          uploaded={item.uploaded}
+                          row={item}
+                          handleFileInputChange={uploadAccess}
+                        />
                     },
                     {
-                      text: getStatusChip(item.status),
+                      text: getStatusChip(REVIEW_STATUS_MAP[item.status]),
                     },
                   ],
                   props: { onClick: () => handleRowClick(index) }, // Adding onClick here

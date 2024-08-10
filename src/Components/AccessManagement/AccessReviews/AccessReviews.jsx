@@ -31,6 +31,9 @@ import { obj_to_yyyy_mm_dd } from "../../Utils/DateFormatConverter";
 import SkeletonBox from "../../Utils/SkeletonBox";
 import { useStyle } from "./AccessReviewsUtils";
 import CreateReviewDialog from "./CreateReviewDialog";
+import { REVIEW_STATUS_MAP } from "../../../assets/data/AccessManagement/ReviewDecisions/ValuesMap";
+import { getOwners } from "../../../Service/RiskManagement/RiskManagement.service";
+import { notification } from "../../Utils/Utils";
 
 const getStatusChip = (status) => {
   switch (status) {
@@ -87,6 +90,19 @@ function AccessReviews() {
     if (data) setFilteredData(data);
     setLoading(false);
   }, [])
+
+  const [usersLoading, setUsersLoading] = useState(false);
+  const [users, setUsers] = useState([]);
+  const fetchSetUsers = useCallback(async () => {
+    setUsersLoading(true)
+    const { data, status } = await getOwners();
+    if (status) setUsers(data);
+    setUsersLoading(false)
+  }, [])
+
+  useEffect(() => {
+    fetchSetUsers()
+  }, [fetchSetUsers])
 
   useEffect(() => {
     fetchReviews()
@@ -174,11 +190,18 @@ function AccessReviews() {
   };
 
   const handleReviewSubmit = async (formValues, entities, selectedEntities) => {
+
+    if (selectedEntities.length === 0) {
+      notification("any", "Select an Entity to Review", 'error');
+      return;
+    }
+
     let futureDate = new Date();
     futureDate.setFullYear(futureDate.getFullYear() + 2);
 
     const payload = {
       name: formValues.name,
+      reviewer_id_list: Array(selectedEntities.length).fill(formValues.reviewer),
       status: 0,
       start_date: new Date(),
       end_date: futureDate,
@@ -487,7 +510,7 @@ function AccessReviews() {
                     { text: item.start_date && obj_to_yyyy_mm_dd(new Date(item.start_date)) },
                     { text: item.end_date && obj_to_yyyy_mm_dd(new Date(item.end_date)) },
                     {
-                      text: getStatusChip(item.status)
+                      text: getStatusChip(REVIEW_STATUS_MAP[item.status])
                     },
                   ],
                   props: { onClick: () => handleRowClick(item.id) }, // Adding onClick here
@@ -507,6 +530,8 @@ function AccessReviews() {
         inherentRiskOptions={inherentRiskOptions}
         accessIntegrationOptions={accessIntegrationOptions}
         filteredData={filteredData}
+        users={users}
+        usersLoading={usersLoading}
         handleReviewSubmit={handleReviewSubmit}
       />
 

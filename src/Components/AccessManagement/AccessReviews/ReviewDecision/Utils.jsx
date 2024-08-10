@@ -1,6 +1,7 @@
 import { Box, Button, Icon, makeStyles, Typography } from "@material-ui/core";
 import colorShader from "../../../Utils/ColorShader";
 import { MultipePills } from "../../../Utils/DataTable/Cells";
+import FlagCell from "./FlagCell";
 
 export const useStyle = makeStyles((theme) => ({
   reviewDecisionContainer: {
@@ -148,8 +149,33 @@ export const useStyle = makeStyles((theme) => ({
 
   decisionButton: {
     fontSize: '0.875rem',
-    textTransform: 'none'
+    textTransform: 'none',
+  },
+
+  approveBtnOutlineDisabled: {
+    '&.Mui-disabled': {
+      borderColor: `${colorShader('#098228', 0.6)} !important`,
+      color: `${colorShader('#098228', 0.6)} !important`
+    }
+  },
+  approveBtnContainedDisabled: {
+    '&.Mui-disabled': {
+      backgroundColor: `${colorShader('#098228', 0.4)} !important`
+    }
+  },
+
+  denyBtnOutlineDisabled: {
+    '&.Mui-disabled': {
+      borderColor: `${colorShader('#C93C46', 0.6)} !important`,
+      color: `${colorShader('#C93C46', 0.6)} !important`
+    }
+  },
+  denyBtnContainedDisabled: {
+    '&.Mui-disabled': {
+      backgroundColor: `${colorShader('#C93C46', 0.4)} !important`
+    }
   }
+
 }))
 
 export const mapDataToHeader = (columns, sorting, updateSort) => ({
@@ -199,7 +225,9 @@ export const RowCell = ({ text }) => {
 export const generateRows = (
   data,
   columns,
+  handleFlagClick,
   changeDecision,
+  decisionLoad,
   isReviewCompleted,
   selectedList,
   matchedCell,
@@ -220,8 +248,10 @@ export const generateRows = (
         data[i],
         i,
         columns,
+        handleFlagClick,
         isReviewCompleted,
         changeDecision,
+        decisionLoad,
         matchedCell,
       ),
       props: {
@@ -242,10 +272,10 @@ export const generateRows = (
   };
 }
 
-const mapDataToRow = (row, rowIndex, columns, isReviewCompleted, changeDecision, matchedCell) => (
+const mapDataToRow = (row, rowIndex, columns, handleFlagClick, isReviewCompleted, changeDecision, decisionLoad, matchedCell) => (
   columns.map(colName => {
     // let CellComponent = colName in columnToCellMap && columnToCellMap[colName]
-    let cellValue = getCellValue(row, colName, isReviewCompleted, changeDecision);
+    let cellValue = getCellValue(row, colName, handleFlagClick, isReviewCompleted, changeDecision, decisionLoad);
     return {
       text: <RowCell text={cellValue} />,
       params:
@@ -281,9 +311,9 @@ const cellComponents = {
   role: MultipePills
 }
 
-const getCellValue = (row, colName, isReviewCompleted, changeDecision) => {
+const getCellValue = (row, colName, handleFlagClick, isReviewCompleted, changeDecision, decisionLoad) => {
   if (colName === 'flag') {
-    return `${row['flagged']}`
+    return <FlagCell id={row['id']} flagged={row['flagged']} clickHandler={handleFlagClick} />
   }
   else if (colName === 'account_name') {
     return row['access'].account_name;
@@ -296,20 +326,24 @@ const getCellValue = (row, colName, isReviewCompleted, changeDecision) => {
     return <cellComponents.role cellValue={cellValue} />
   }
   else if (colName === 'decision') {
-    return <DecisionButtons row={row} reviewDone={isReviewCompleted} changeDecision={changeDecision} />
+    return <DecisionButtons row={row} reviewDone={isReviewCompleted} changeDecision={changeDecision} decisionLoad={decisionLoad} />
   }
   return row[colName]
 }
 
-function DecisionButtons({ row, reviewDone, changeDecision }) {
+function DecisionButtons({ row, reviewDone, changeDecision, decisionLoad }) {
 
   const classes = useStyle();
-  console.log(row.access.account_name, row.approved)
+  const btnDisabled = reviewDone || decisionLoad
+
   return (
     <Box sx={{ display: 'flex', alignItems: 'center', gridColumnGap: '16px' }}>
       <Button
         size="small"
-        className={classes.decisionButton}
+        className={`
+          ${classes.decisionButton} 
+          ${!row.approved ? classes.approveBtnOutlineDisabled : classes.approveBtnContainedDisabled}
+        `}
         startIcon={<Icon>check</Icon>}
         variant={row.approved ? "contained" : "outlined"}
         style={{
@@ -317,14 +351,17 @@ function DecisionButtons({ row, reviewDone, changeDecision }) {
           border: !row.approved ? '1px solid #098228' : 'none',
           color: row.approved ? "white" : '#098228',
         }}
-        disabled={reviewDone}
-        onClick={() => changeDecision(row, true)}
+        disabled={btnDisabled}
+        onClick={() => !row.approved && changeDecision(row, true)}
       >
         Approve
       </Button>
       <Button
         size="small"
-        className={classes.decisionButton}
+        className={`
+          ${classes.decisionButton} 
+          ${row.approved ? classes.denyBtnOutlineDisabled : classes.denyBtnContainedDisabled}
+        `}
         startIcon={<Icon>block</Icon>}
         variant={!row.approved ? "contained" : "outlined"}
         style={{
@@ -332,8 +369,8 @@ function DecisionButtons({ row, reviewDone, changeDecision }) {
           border: row.approved ? '1px solid #C93C46' : 'none',
           color: !row.approved ? "white" : '#C93C46',
         }}
-        disabled={reviewDone}
-        onClick={() => changeDecision(row, false)}
+        disabled={btnDisabled}
+        onClick={() => row.approved && changeDecision(row, false)}
       >
         Deny
       </Button>

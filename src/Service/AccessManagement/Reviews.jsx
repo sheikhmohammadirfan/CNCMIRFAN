@@ -37,3 +37,23 @@ export async function postReview(data) {
 export async function approveReview(data) {
   return await post("/access/approve-review-list/", data);
 }
+
+export async function uploadAccessFile(data) {
+  return await post("/access/upload-access/", data);
+}
+
+export async function flagReview(data) {
+  return await post('/access/flag-review-list/', data);
+}
+
+export async function startReview(data) {
+  return await post('/access/start-review', data);
+}
+
+export async function submitReview(data) {
+  return await post('/access/submit-review/', data)
+}
+
+export async function submitReviewEntity(data) {
+  return await post('/access/submit-review-entity/', data)
+}

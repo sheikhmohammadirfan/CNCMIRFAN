@@ -20,6 +20,9 @@ import TabPanel from "@material-ui/lab/TabPanel";
 import { TextControl } from "../../../Utils/Control";
 import OptionDropdown from "../../../RiskManagement/RiskRegister/OptionDropdown";
 import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
+import { REVIEW_STATUS_MAP } from "../../../../assets/data/AccessManagement/ReviewDecisions/ValuesMap";
+import SkeletonBox from "../../../Utils/SkeletonBox";
+import UploadFileCell from "./UploadFileCell";
 
 const useStyle = makeStyles((theme) => ({
   usersContainer: {
@@ -151,9 +154,8 @@ const getStatusChip = (status) => {
   }
 };
 
-function CompletedStatusContent() {
+function CompletedStatusContent({ data, loading, uploadAccess }) {
   const classes = useStyle();
-  const [filteredData, setFilteredData] = useState([]);
   const [value, setValue] = useState("1");
   const [searchValue, setSearchValue] = useState("");
   const [systemOpen, setSystemOpen] = useState(false);
@@ -161,11 +163,6 @@ function CompletedStatusContent() {
   const [reviewerOpen, setReviewerOpen] = useState(false);
   const [selectedReviewer, setSelectedReviewer] = useState("");
   const history = useHistory();
-
-  useEffect(() => {
-    const filtered = tableMockData.filter((item) => item.status === "Completed");
-    setFilteredData(filtered);
-  }, []);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -176,8 +173,7 @@ function CompletedStatusContent() {
   };
 
   const handleRowClick = (index) => {
-    const selectedItem = filteredData[index]
-    console.log(selectedItem);
+    const selectedItem = data[index]
     history.push(`/access-management/reviews/completed/review-decisions/${index}`, {
       data: selectedItem,
     });
@@ -218,40 +214,50 @@ function CompletedStatusContent() {
 
           <FiltersOption />
 
-          <Grid container spacing={1} className={classes.dataTableContainer}>
-            <Grid item xs={12}>
-              <DataTable
-                className={classes.tableStyle}
-                checkbox={false}
-                serialNo={false}
-                stickyHeader={true}
-                verticalBorder={true}
-                resizeTable={true}
-                header={{
-                  data: [
-                    { text: "System" },
-                    { text: "Reviewer" },
-                    { text: "Access Data" },
-                    { text: "Status" },
-                  ],
-                }}
-                rowList={{
-                  rowData: filteredData.map((item, index) => ({
+          {loading ?
+            <SkeletonBox width='100%' height='30vh' text="Loading Entities..." /> :
+            <Grid container spacing={1} className={classes.dataTableContainer}>
+              <Grid item xs={12}>
+                <DataTable
+                  className={classes.tableStyle}
+                  checkbox={false}
+                  serialNo={false}
+                  stickyHeader={true}
+                  verticalBorder={true}
+                  resizeTable={true}
+                  header={{
                     data: [
-                      { text: item.name },
-                      { text: item.reviewer },
-                      { text: item.dateStarted },
-                      {
-                        text: getStatusChip(item.status),
-                      },
+                      { text: "System" },
+                      { text: "Reviewer" },
+                      { text: "Access Data" },
+                      { text: "Status" },
                     ],
-                    props: { onClick: () => handleRowClick(index) }, // Adding onClick here
-                  })),
-                }}
-                minCellWidth={[300, 300, 300, 250]}
-              />
+                  }}
+                  rowList={{
+                    rowData: data.map((item, index) => ({
+                      data: [
+                        { text: item.entity },
+                        { text: item.reviewer },
+                        {
+                          text:
+                            <UploadFileCell
+                              uploaded={item.uploaded}
+                              row={item}
+                              handleFileInputChange={uploadAccess}
+                            />
+                        },
+                        {
+                          text: getStatusChip(REVIEW_STATUS_MAP[item.status]),
+                        },
+                      ],
+                      props: { onClick: () => handleRowClick(index) }, // Adding onClick here
+                    })),
+                  }}
+                  minCellWidth={[300, 300, 300, 250]}
+                />
+              </Grid>
             </Grid>
-          </Grid>
+          }
         </TabPanel>
         <TabPanel value="2">
           <Box
@@ -400,7 +406,7 @@ function CompletedStatusContent() {
                   ],
                 }}
                 rowList={{
-                  rowData: filteredData.map((item, index) => ({
+                  rowData: data.map((item, index) => ({
                     data: [
                       { text: item.system },
                       { text: item.accountName },

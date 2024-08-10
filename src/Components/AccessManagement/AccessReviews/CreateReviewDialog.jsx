@@ -1,11 +1,12 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import { useStyle } from './AccessReviewsUtils'
 import { Box, Button, Chip, Dialog, DialogContent, DialogTitle, Grid, Icon, IconButton, InputAdornment, InputLabel, TextField, Typography } from '@material-ui/core';
-import { Form, TextControl } from '../../Utils/Control';
+import { Form, SelectControl, TextControl } from '../../Utils/Control';
 import OptionDropdown from '../../RiskManagement/RiskRegister/OptionDropdown';
 import DataTable from '../../Utils/DataTable/DataTable';
 import { getEntities } from '../../../Service/AccessManagement/Reviews';
 import { useForm } from 'react-hook-form';
+import { Divider } from '@mui/material';
 
 const getRiskChip = (risk) => {
   switch (risk) {
@@ -60,6 +61,8 @@ const CreateReviewDialog = ({
   inherentRiskOptions,
   accessIntegrationOptions,
   filteredData,
+  users,
+  usersLoading,
   handleReviewSubmit
 }) => {
 
@@ -87,7 +90,8 @@ const CreateReviewDialog = ({
   const { handleSubmit, control, formState: { errors } } = useForm();
 
   const validation = {
-    name: { required: "This field is required." }
+    name: { required: "This field is required." },
+    reviewer: { required: "This field is required." }
   }
 
   const [selectedRows, setSelectedRows] = useState([]);
@@ -135,7 +139,7 @@ const CreateReviewDialog = ({
         </DialogTitle>
         <DialogContent>
           <Box className={classes.createRevContainer}>
-            <Box style={{ marginTop: 10, display: "flex", flexDirection: "column", gap: "10px", borderBottom: "1px solid #989898", paddingBottom: "20px" }}>
+            <Box sx={{ mb: 2 }} style={{ marginTop: 10, display: "flex", flexDirection: "column", gap: "10px" }}>
               <FormInput
                 name="name"
                 label="Review Name"
@@ -143,6 +147,20 @@ const CreateReviewDialog = ({
               />
             </Box>
 
+            <Box
+              sx={{ mb: 3 }}
+            >
+              <SelectControl
+                name="reviewer"
+                label="Reviewer"
+                variant="outlined"
+                options={users.map(o => ({ val: o.id, text: `${o.first_name} ${o.last_name}` }))}
+                styleProps={{ fullWidth: true, }}
+                loading={usersLoading}
+              />
+            </Box>
+
+            <Divider />
             <Box
               style={{
                 display: "flex",
@@ -173,30 +191,6 @@ const CreateReviewDialog = ({
               </Box>
 
               <Box display="flex" alignItems="center" gridColumnGap={10}>
-                <OptionDropdown
-                  open={reviewerOpen}
-                  handleClose={() => setReviewerOpen(false)}
-                  placement="bottom-start"
-                  options={reviewerOptions.map((option) => ({
-                    text: option.text,
-                    clickHandler: () => handleDropdownChange(setSelectedReviewer)(option.value),
-                  }))}
-                >
-                  <Button
-                    size="medium"
-                    endIcon={<Icon style={{ transform: 'rotate(90deg)' }}>arrow_forward_ios</Icon>}
-                    style={{
-                      backgroundColor: 'transparent',
-                      color: '#4477CE',
-                      textTransform: 'none',
-                      paddingInline: 10,
-                      border: 'none',
-                    }}
-                    onClick={() => setReviewerOpen((prev) => !prev)}
-                  >
-                    {selectedReviewer || 'Reviewer'}
-                  </Button>
-                </OptionDropdown>
 
                 <OptionDropdown
                   open={inherentRiskOpen}
