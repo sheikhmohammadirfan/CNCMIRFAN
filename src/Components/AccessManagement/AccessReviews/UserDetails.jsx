@@ -37,7 +37,7 @@ import DoughnutChart from "./DoughnutChart";
 import CompletedStatusContent from "./ReviewStatusPages/CompletedStatusContent";
 import InReviewStatusContent from "./ReviewStatusPages/InReviewStatusContent";
 import DraftStatusContent from "./ReviewStatusPages/DraftStatusContent";
-import { getReviewEntities, startReview, submitReview, uploadAccessFile } from "../../../Service/AccessManagement/Reviews";
+import { getEntities, getReviewEntities, startReview, submitReview, uploadAccessFile } from "../../../Service/AccessManagement/Reviews";
 import { notification } from "../../Utils/Utils";
 
 const useStyle = makeStyles((theme) => ({
@@ -319,15 +319,48 @@ function UserDetails() {
   const location = useLocation();
   const history = useHistory();
   const { id } = useParams();
-  const { data } = location.state || {};
+  const { data, owner, entities } = location.state || { data: {}, owner: {}, entities: {} };
+
+  const getRowReviewer = (id) => {
+    if (!id) return "";
+    const reviewer = owner.find(u => u.id === id);
+    if (!reviewer) return "";
+    return `${reviewer.first_name} ${reviewer.last_name}`;
+  }
+
+  const getRowEntity = (id, _entities) => {
+    if (!id) return "";
+    const entity = _entities.find(u => u.id === id);
+    if (!entity) return "";
+    return entity.app_name;
+  }
 
   const [loading, setLoading] = useState(false);
   const [reviewAccessData, setReviewAccessData] = useState([]);
 
+  
+  const fetchEntities = useCallback(async () => {
+    const { data, status } = await getEntities();
+    if (status) return data;
+    return [];
+  }, []);
+
   const fetchReviewEntities = useCallback(async (id) => {
     setLoading(true);
-    const { data, status } = await getReviewEntities(id)
-    if (status) setReviewAccessData(data)
+    let _entities = entities;
+    if (!_entities?.length) {
+      _entities = await fetchEntities();
+    }
+    const { data, status } = await getReviewEntities(id);
+    if (status) {
+      setReviewAccessData(data.map(en => ({
+        ...en,
+        reviewer_id: en.reviewer,
+        reviewer: getRowReviewer(en.reviewer),
+        entity_id: en.entity,
+        entity: getRowEntity(en.entity, _entities)
+      })))
+    }
     setLoading(false)
   }, [])
 
@@ -367,8 +400,8 @@ function UserDetails() {
     }
 
     let formData = new FormData();
-    formData.append('entity_id', row.id)
-    formData.append('file', e.target.files[0])
+    formData.append('entity_id', row.entity_id);
+    formData.append('file', e.target.files[0]);
 
     const { status } = await uploadAccessFile(formData);
     if (status) {
@@ -383,7 +416,7 @@ function UserDetails() {
         review_id: parseInt(id)
       }
       const { status } = await startReview(payload);
-      if (true) {
+      if (status) {
         history.replace(`/access-management/reviews/in-review/${id}`, { data: { ...data, status: 1 } })
       }
     }
@@ -395,17 +428,6 @@ function UserDetails() {
       case 2:
         return <CompletedStatusContent data={reviewAccessData} loading={loading} uploadAccess={uploadAccess} />;
       case 1:
-        const data = {
-          labels: ["Not started", "In progress", "Completed"],
-          datasets: [
-            {
-              data: [0, 1, 0],
-              backgroundColor: ["#A9A9A9", "#FF6384", "#4BC0C0"],
-              borderColor: ["#A9A9A9", "#FF6384", "#4BC0C0"],
-              borderWidth: 1,
-            },
-          ],
-        };
         return <InReviewStatusContent data={reviewAccessData} loading={loading} uploadAccess={uploadAccess} />;
       case 0:
         const data2 = {

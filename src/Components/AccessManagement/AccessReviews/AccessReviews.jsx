@@ -26,7 +26,7 @@ import OptionDropdown from "../../RiskManagement/RiskRegister/OptionDropdown";
 import MenuItem from "@mui/material/MenuItem";
 import { tableMockData } from "../Accounts/AccountsColumns";
 import DoughnutChart from "./DoughnutChart";
-import { getReviews, postReview } from "../../../Service/AccessManagement/Reviews";
+import { getEntities, getReviews, postReview } from "../../../Service/AccessManagement/Reviews";
 import { obj_to_yyyy_mm_dd } from "../../Utils/DateFormatConverter";
 import SkeletonBox from "../../Utils/SkeletonBox";
 import { useStyle } from "./AccessReviewsUtils";
@@ -81,6 +81,7 @@ function AccessReviews() {
   const [filteredData, setFilteredData] = useState([]);
   const [showCreateReview, setShowCreateReview] = useState(false);
   const [open, setOpen] = useState(false);
+  const [entities, setEntities] = useState([]);
 
   const [loading, setLoading] = useState(false);
 
@@ -105,8 +106,17 @@ function AccessReviews() {
   }, [fetchSetUsers])
 
   useEffect(() => {
-    fetchReviews()
-  }, [fetchReviews])
+    fetchReviews();
+  }, [fetchReviews]);
+
+  const fetchEntities = useCallback(async () => {
+    const { data, status } = await getEntities();
+    if (status) setEntities(data);
+  }, []);
+
+  useEffect(() => {
+    fetchEntities();
+  }, [fetchEntities])
 
   //Dropdown options data
   const reviewerOptions = [
@@ -140,6 +150,13 @@ function AccessReviews() {
     ],
   };
 
+  const getRowOwner = (id) => {
+    if (!id) return "";
+    const owner = users.find(u => u.id === id);
+    if (!owner) return "";
+    return `${owner.first_name} ${owner.last_name}`;
+  }
+
   // const handleFilter = () => {
   //   let data = tableMockData;
   //   if (selectedStatus)
@@ -170,6 +187,8 @@ function AccessReviews() {
     // else if (selectedItem.status === "Completed") url = `/access-management/reviews/completed/${reviewId}`
     history.push(url, {
       data: selectedItem,
+      owner: users,
+      entities
     });
   };
 
@@ -506,7 +525,7 @@ function AccessReviews() {
                 rowData: filteredData.map((item, index) => ({
                   data: [
                     { text: item.name },
-                    { text: item.reviewer },
+                    { text: getRowOwner(item.creator) },
                     { text: item.start_date && obj_to_yyyy_mm_dd(new Date(item.start_date)) },
                     { text: item.end_date && obj_to_yyyy_mm_dd(new Date(item.end_date)) },
                     {
@@ -533,6 +552,7 @@ function AccessReviews() {
         users={users}
         usersLoading={usersLoading}
         handleReviewSubmit={handleReviewSubmit}
+        entities={entities}
       />
 
     </Box>

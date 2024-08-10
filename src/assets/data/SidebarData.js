@@ -240,7 +240,7 @@ export const SidebarData = [
       {
         title: "Settings",
         component: Link,
-        to: "//access-management/settings",
+        to: "/access-management/settings",
         icon: "settings"
       }
     ]

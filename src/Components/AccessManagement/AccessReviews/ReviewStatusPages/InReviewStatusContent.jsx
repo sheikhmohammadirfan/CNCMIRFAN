@@ -185,7 +185,17 @@ function InReviewStatusContent({ data, loading, uploadAccess }) {
             <Typography variant="h6">Access review progress</Typography>
           </Box>
           <Box borderBottom={1} borderRight={1} borderLeft={1} p={2}>
-            <DoughnutChart data={data} />
+            <DoughnutChart data={{
+              labels: ["Not started", "In progress", "Completed"],
+              datasets: [
+                {
+                  data: [0, 1, 0],
+                  backgroundColor: ["#A9A9A9", "#FF6384", "#4BC0C0"],
+                  borderColor: ["#A9A9A9", "#FF6384", "#4BC0C0"],
+                  borderWidth: 1,
+                },
+              ],
+            }} />
           </Box>
         </Grid>
         <Grid item xs={6} md={6} lg={6}>
@@ -305,7 +315,7 @@ function InReviewStatusContent({ data, loading, uploadAccess }) {
               rowList={{
                 rowData: data.map((item, index) => ({
                   data: [
-                    { text: `${item.entity} (Coming from entity)` },
+                    { text: item.entity },
                     { text: item.reviewer },
                     {
                       text:

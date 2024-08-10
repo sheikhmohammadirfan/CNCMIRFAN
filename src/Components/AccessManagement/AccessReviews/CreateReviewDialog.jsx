@@ -63,7 +63,8 @@ const CreateReviewDialog = ({
   filteredData,
   users,
   usersLoading,
-  handleReviewSubmit
+  handleReviewSubmit,
+  entities: _entities
 }) => {
 
   const [reviewerOpen, setReviewerOpen] = useState(false)
@@ -74,7 +75,7 @@ const CreateReviewDialog = ({
   const [selectedAccessIntegration, setSelectedAccessIntegration] = useState("")
 
   const [loading, setLoading] = useState(false);
-  const [entities, setEntities] = useState([])
+  const [entities, setEntities] = useState(_entities || []);
 
   const fetchEntities = useCallback(async () => {
     setLoading(true);

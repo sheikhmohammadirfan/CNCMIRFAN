@@ -399,7 +399,7 @@ export default function PoamHeader({
               <Button
                 id="edit-row-btn"
                 className={classes.actionButton}
-                disabled={selectedRow.length !== 1}
+                disabled={selectedRow.length !== 1 || !isOpenPoam}
                 onClick={openEditFrom}
                 startIcon={<Icon>edit</Icon>}
               >
