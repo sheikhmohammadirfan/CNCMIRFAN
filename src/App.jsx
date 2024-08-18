@@ -26,6 +26,7 @@ import RiskManagement from "./Pages/RiskManagement";
 import React from "react";
 import AccessManagement from "./Pages/AccessManagement";
 import VendorManagement from "./Pages/VendorManagement";
+import Rbac from "./Pages/Rbac";
 
 // Custom values
 const sidebarSmall = 50;
@@ -155,6 +156,9 @@ function App() {
                     </Route>
                     <Route path="/access-management/">
                       <AccessManagement title="Access Management" />
+                    </Route>
+                    <Route path="/rbac/">
+                      <Rbac title="Rbac" />
                     </Route>
                     
                   </div>

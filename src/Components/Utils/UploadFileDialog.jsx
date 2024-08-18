@@ -76,7 +76,7 @@ const UploadFileDialog = ({
   onClose,
   onImport,
   requiredColumns,
-  optionalColumns,
+  optionalColumns = [],
   col_TooltipDesc_Map,
   getPlainFile = false
 }) => {
@@ -286,18 +286,22 @@ const UploadFileDialog = ({
               </ListItem>
             ))}
           </List>
-          <Typography variant="body2" className={classes.listHead}>OPTIONAL COLUMNS</Typography>
-          <Divider />
-          <List className={classes.columnNamesList} dense >
-            {optionalColumns.map((column, index) => (
-              <ListItem key={index} disableGutters>
-                <ListItemText primary={column} />
-                <InfoIconWithTooltip
-                  title={col_TooltipDesc_Map[column] || ""}
-                />
-              </ListItem>
-            ))}
-          </List>
+          {optionalColumns.length > 0 &&
+            <>
+              <Typography variant="body2" className={classes.listHead}>OPTIONAL COLUMNS</Typography>
+              <Divider />
+              <List className={classes.columnNamesList} dense >
+                {optionalColumns.map((column, index) => (
+                  <ListItem key={index} disableGutters>
+                    <ListItemText primary={column} />
+                    <InfoIconWithTooltip
+                      title={col_TooltipDesc_Map[column] || ""}
+                    />
+                  </ListItem>
+                ))}
+              </List>
+            </>
+          }
           <Divider style={{ marginTop: 10 }} />
           <DialogActions style={{ justifyContent: 'start', paddingLeft: 0 }}>
             <Box>

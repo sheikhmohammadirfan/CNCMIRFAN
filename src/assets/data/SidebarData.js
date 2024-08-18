@@ -236,13 +236,31 @@ export const SidebarData = [
         to: "/access-management/reviews",
         icon: "list"
       },
-
       {
         title: "Settings",
         component: Link,
         to: "/access-management/settings",
         icon: "settings"
       }
+    ]
+  },
+
+  {
+    icon: "shield_person",
+    title: "Role based access control",
+    collapseMenu: [
+      {
+        title: "Users",
+        component: Link,
+        to: "/rbac/users",
+        icon: "manage_accounts"
+      },
+      {
+        title: "Roles",
+        component: Link,
+        to: "/rbac/roles",
+        icon: "key"
+      },
     ]
   }
 
