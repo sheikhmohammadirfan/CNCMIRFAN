@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef, useState } from 'react'
+import React, { useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { Backdrop, Box, CircularProgress, Grid, Typography } from '@material-ui/core'
 import RiskRegisterHeader from './RiskRegisterHeader'
 import DataTable from '../../Utils/DataTable/DataTable'
@@ -21,8 +21,19 @@ import { notification } from '../../Utils/Utils'
 import ExportFile from '../../Utils/ExportFile'
 import XLSX from "xlsx";
 import { obj_to_yyyy_mm_dd } from '../../Utils/DateFormatConverter'
+import { getUser } from '../../../Service/UserFactory'
 
 const RiskRegister = () => {
+
+  const hasEditRiskAccess = useMemo(() => {
+    const user = getUser()
+    return Boolean(user.roles[0].permissions.find(p => p.permission_name === 'edit_risk'))
+  }, [])
+
+  const hasEditActionAccess = useMemo(() => {
+    const user = getUser()
+    return Boolean(user.roles[0].permissions.find(p => p.permission_name === 'edit_action'))
+  }, [])
 
   // React state to maintain loading status
   const { isLoading, startLoading, stopLoading } = useLoading({
@@ -169,7 +180,7 @@ const RiskRegister = () => {
 
       let dateRange = last_n_months === 0
         ? [filterMetadata.identified[3].fromDate.toDate(),
-            filterMetadata.identified[3].toDate.toDate()]
+        filterMetadata.identified[3].toDate.toDate()]
         : [date_from, new Date()]
 
       payload.filters["identified_date"] = [obj_to_yyyy_mm_dd(dateRange[0]), obj_to_yyyy_mm_dd(dateRange[1])];
@@ -283,8 +294,8 @@ const RiskRegister = () => {
       })
     })
     if (filterName === "identified"
-          && updatedFilterIds[0] === 3
-          && identifiedDates) {
+      && updatedFilterIds[0] === 3
+      && identifiedDates) {
       setFilterMetadata({
         identified: {
           3: {
@@ -302,17 +313,17 @@ const RiskRegister = () => {
         [filterName]: []
       }));
       if (filterName === "identified") {
-        setFilterMetadata({identified: {3: {fromDate: null, toDate: null}}});
+        setFilterMetadata({ identified: { 3: { fromDate: null, toDate: null } } });
       }
     } else {
       setFilters(prev => {
         const obj = {};
-        for(const key in prev) {
+        for (const key in prev) {
           obj[key] = [];
         }
         return obj;
       });
-      setFilterMetadata({identified: {3: {fromDate: null, toDate: null}}});
+      setFilterMetadata({ identified: { 3: { fromDate: null, toDate: null } } });
     }
   }
 
@@ -572,14 +583,14 @@ const RiskRegister = () => {
       const rl = val.residual_likelihood === null
         ? null
         : scores.likelihoodScores
-            .find(score => score.score === getLikelihoodScore(val.residual_likelihood))
-            .id;
+          .find(score => score.score === getLikelihoodScore(val.residual_likelihood))
+          .id;
       if (rl !== row["Residual Risk Likelihood Id"]) {
         payload.residual_risk_likelihood_id = rl;
       }
       const ri = val.residual_impact === null
-      ? null
-      : scores.impactScores
+        ? null
+        : scores.impactScores
           .find(score => score.score === getImpactScore(val.residual_impact))
           .id;
       if (ri !== row["Residual Risk Impact Id"]) {
@@ -724,30 +735,32 @@ const RiskRegister = () => {
         }
       </Box>
 
-      {scenarioDialog.open && 
+      {scenarioDialog.open &&
         <RiskFormDialog
-        open={scenarioDialog.open}
-        closeHandler={closeScenarioDialog}
-        rowIndex={getCurrentIndex()}
-        row={register[getCurrentIndex()]}
-        viaLibrary={scenarioDialog.isViaLibrary}
-        library={library}
-        autocompleteOptions={{ categories, owners: filterDropdowns.owners.options }}
-        getSliderValue={{ getLikelihoodSliderValue, getImpactSliderValue }}
-        scores={scores}
-        onFormSubmit={onRegisterFormSubmit}
-      />}
+          hasAccess={hasEditRiskAccess}
+          open={scenarioDialog.open}
+          closeHandler={closeScenarioDialog}
+          rowIndex={getCurrentIndex()}
+          row={register[getCurrentIndex()]}
+          viaLibrary={scenarioDialog.isViaLibrary}
+          library={library}
+          autocompleteOptions={{ categories, owners: filterDropdowns.owners.options }}
+          getSliderValue={{ getLikelihoodSliderValue, getImpactSliderValue }}
+          scores={scores}
+          onFormSubmit={onRegisterFormSubmit}
+        />}
 
-      {actionDialog && 
+      {actionDialog &&
         <AddActionDialog
-        open={actionDialog}
-        closeHandler={closeAddActionForm}
-        risks={getRegisterOptions()}
-        owners={owners.map(owner => ({ val: owner.id, text: `${owner.first_name} ${owner.last_name}` }))}
-        isCreateAction={true}
-        riskVal={register[getCurrentIndex()]}
-        onFormSubmit={handleAddActionFormSubmit}
-      />}
+          hasAccess={hasEditActionAccess}
+          open={actionDialog}
+          closeHandler={closeAddActionForm}
+          risks={getRegisterOptions()}
+          owners={owners.map(owner => ({ val: owner.id, text: `${owner.first_name} ${owner.last_name}` }))}
+          isCreateAction={true}
+          riskVal={register[getCurrentIndex()]}
+          onFormSubmit={handleAddActionFormSubmit}
+        />}
 
       <UploadFileDialog
         open={uploadCsv}

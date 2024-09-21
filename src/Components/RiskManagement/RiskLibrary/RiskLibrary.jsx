@@ -1,5 +1,5 @@
 import { Box, Grid, Typography } from '@material-ui/core'
-import React, { useCallback, useContext, useEffect, useRef, useState } from 'react'
+import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { HeaderCell, RowCell, generateRows, mapDataToHeader, useStyle } from './RiskLibraryUtils'
 import RiskLibraryHeader from './RiskLibraryHeader';
 import RiskLibraryFilters from '../../../assets/data/RiskManagement/RiskLibrary/RiskLibraryFilters';
@@ -14,8 +14,14 @@ import { createRisk } from '../../../Service/RiskManagement/RiskRegister.service
 import RiskManagementContext from '../RiskManagementContext';
 import useSlider from '../../Utils/Hooks/useSlider';
 import { notification } from '../../Utils/Utils';
+import { getUser } from '../../../Service/UserFactory';
 
 const RiskLibrary = () => {
+
+  const hasEditRiskAccess = useMemo(() => {
+    const user = getUser()
+    return Boolean(user.roles[0].permissions.find(p => p.permission_name === 'edit_risk'))
+  }, [])
 
   // React state to maintain loading status
   const { isLoading, startLoading, stopLoading } = useLoading();
@@ -39,7 +45,7 @@ const RiskLibrary = () => {
     total_pages: null,
   });
   const [loader, setLoader] = useState(0);
-  const reload = () => setLoader(p => p === 100 ? 0 : p+1);
+  const reload = () => setLoader(p => p === 100 ? 0 : p + 1);
   const updatePageSize = (size) => {
     setPagination(prev => ({ ...prev, page_no: 1, page_size: size }));
     reload();
@@ -185,7 +191,7 @@ const RiskLibrary = () => {
     } else {
       setFilters(prev => {
         const obj = {};
-        for(const key in prev) {
+        for (const key in prev) {
           obj[key] = [];
         }
         return obj;
@@ -312,16 +318,17 @@ const RiskLibrary = () => {
 
       {addRiskForm &&
         <RiskFormDialog
-        open={addRiskForm}
-        closeHandler={closeRiskForm}
-        rowIndex={getCurrentIndex()}
-        row={library[getCurrentIndex()]}
-        isLibraryRow={true}
-        autocompleteOptions={{ categories }}
-        getSliderValue={{ getLikelihoodSliderValue, getImpactSliderValue }}
-        scores={scores}
-        onFormSubmit={onAddFormSubmit}
-      />}
+          hasAccess={hasEditRiskAccess}
+          open={addRiskForm}
+          closeHandler={closeRiskForm}
+          rowIndex={getCurrentIndex()}
+          row={library[getCurrentIndex()]}
+          isLibraryRow={true}
+          autocompleteOptions={{ categories }}
+          getSliderValue={{ getLikelihoodSliderValue, getImpactSliderValue }}
+          scores={scores}
+          onFormSubmit={onAddFormSubmit}
+        />}
     </Box>
   )
 }

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import actionTrackerFilters from "../../../assets/data/RiskManagement/ActionTracker/ActionTrackerFilters";
 import { Backdrop, Box, CircularProgress, Grid, Typography } from "@material-ui/core";
 import ActionTrackerHeader from "./ActionTrackerHeader";
@@ -25,9 +25,15 @@ import RiskManagementContext from "../RiskManagementContext";
 import { useHistory } from "react-router-dom/cjs/react-router-dom";
 import XLSX from "xlsx";
 import ExportFile from "../../Utils/ExportFile";
+import { getUser } from "../../../Service/UserFactory";
 
 const ActionTracker = () => {
   const history = useHistory();
+
+  const hasEditActionAccess = useMemo(() => {
+    const user = getUser()
+    return Boolean(user.roles[0].permissions.find(p => p.permission_name === 'edit_action'))
+  }, [])
 
   // React state to maintain loading status
   const { isLoading, startLoading, stopLoading } = useLoading({
@@ -225,9 +231,9 @@ const ActionTracker = () => {
   const getRegisterOptions = () =>
     register.length !== 0
       ? register.map((row) => ({
-          val: row.id,
-          text: row.scenario.scenario,
-        }))
+        val: row.id,
+        text: row.scenario.scenario,
+      }))
       : [];
 
   const handleAddActionFormSubmit = async (values, isCreateAction) => {
@@ -347,6 +353,7 @@ const ActionTracker = () => {
   return (
     <Box className={classes.actionTrackerContainer}>
       <ActionTrackerHeader
+        hasAccess={hasEditActionAccess}
         tableFilters={filterDropdowns}
         filters={{ filters, changeFilters, clearFilters }}
         triggerFilters={filterTrigger}
@@ -406,6 +413,7 @@ const ActionTracker = () => {
 
       {actionDialog && (
         <AddActionDialog
+          hasAccess={hasEditActionAccess}
           open={actionDialog}
           closeHandler={closeAddActionForm}
           risks={getRegisterOptions()}

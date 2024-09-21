@@ -5,7 +5,6 @@ import { useStyle } from './utils';
 import { Form, TextControl } from '../../Utils/Control';
 import { Controller, useForm } from 'react-hook-form';
 import useLoading from '../../Utils/Hooks/useLoading';
-import AutocompleteControl from '../../Utils/Control/Autocomplete.control';
 import colorShader from '../../Utils/ColorShader';
 
 // Custom input compoent
@@ -14,7 +13,6 @@ const FormInput = ({ ...rest }) => (
     variant="outlined"
     gutter={false}
     fullWidth
-    multiline
     {...rest}
   />
 );
@@ -34,47 +32,43 @@ const LoadingStatus = (loading) => ({
 });
 
 // MAIN COMPONENT
-const UserForm = ({
+const OrgForm = ({
   open,
   closeHandler,
-  rowIndex,
   row,
-  rolesList,
   onFormSubmit
 }) => {
 
   // Get loading status
-  const { isLoading, startLoading, stopLoading } = useLoading({
-    roles: false,
-  });
+  const { isLoading, startLoading, stopLoading } = useLoading();
 
   // Loading status for dialog
   const [isFormLoading, setisFormLoading] = useState(false);
 
   const validation = {
+    name: { required: "This field is required." },
     first_name: { required: "This field is required." },
     last_name: { required: "This field is required." },
     email: { required: "This field is required." },
-    role: { required: "This field is required" },
     status: { required: "This field is required" }
   };
 
   const formValues = (row) ? {
-    first_name: row.first_name,
-    last_name: row.last_name,
-    email: row.email,
-    role: { id: row.roles[0]?.id, label: row.roles[0]?.name },
-    status: `${row.status}`
+    name: row.name,
+    first_name: row.admin[0].first_name,
+    last_name: row.admin[0].last_name,
+    email: row.admin[0].email,
+    status: `${row.admin[0].status}`
   } : {}
 
-  const { handleSubmit, getValues, setValue, control, reset, formState: { errors } } = useForm({
+  const { handleSubmit, control, formState: { errors } } = useForm({
     defaultValues: formValues,
   });
 
   // <-------------------------------- HANDLE FORM SUBMIT -------------------------------->
   const onSubmit = async (values) => {
     setisFormLoading(true);
-    await onFormSubmit(values, row && row.id);
+    await onFormSubmit(values, row && row.admin[0].id);
     setisFormLoading(false);
   }
 
@@ -86,7 +80,7 @@ const UserForm = ({
       close={closeHandler}
       title={
         <Typography style={{ fontWeight: "bold" }}>
-          {row ? "Edit User" : "Create New User"}
+          {row ? "Edit Organization" : "Create New Organization"}
         </Typography>
       }
       loading={isFormLoading}
@@ -95,12 +89,19 @@ const UserForm = ({
       content={
         <Box>
           <Form
-            id="user-form"
+            id="org-form"
             control={control}
             rules={validation}
             onSubmit={handleSubmit(onSubmit)}
           >
             <Grid container spacing={1}>
+              <Grid item xs={12}>
+                <FormInput
+                  name="name"
+                  label="Organization Name"
+                  rows={1}
+                />
+              </Grid>
               <Grid item xs={6}>
                 <FormInput
                   name="first_name"
@@ -121,17 +122,6 @@ const UserForm = ({
                   label="Email"
                   disabled={Boolean(row)}
                   rows={1}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <AutocompleteControl
-                  name='role'
-                  label='Role'
-                  control={control}
-                  rules={validation}
-                  multiple={false}
-                  optionList={rolesList}
-                  disabled={false}
                 />
               </Grid>
               {row &&
@@ -174,7 +164,7 @@ const UserForm = ({
           variant="contained"
           color="primary"
           size="large"
-          form="user-form"
+          form="org-form"
           type="submit"
           disabled={isFormLoading || isLoading()}
         >
@@ -185,4 +175,4 @@ const UserForm = ({
   )
 }
 
-export default UserForm
+export default OrgForm

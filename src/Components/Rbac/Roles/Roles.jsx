@@ -1,13 +1,15 @@
 import { Box, Grid } from '@mui/material'
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import Header from './Header'
 import useLoading from '../../Utils/Hooks/useLoading';
 import { generateRows, HeaderCell, mapDataToHeader, useStyle } from './utils';
-import { HEADER_NAME_MAP, ROLE_COL_WIDTHS, ROLE_COLS } from '../../../assets/data/Rbac/Roles/columns';
+import { HEADER_NAME_MAP, ROLE_COLS } from '../../../assets/data/Rbac/Roles/columns';
 import { ROLES_MOCK } from '../../../assets/data/Rbac/Roles/datamock';
 import SkeletonBox from '../../Utils/SkeletonBox';
 import DataTable from '../../Utils/DataTable/DataTable';
 import RoleForm from './RoleForm';
+import { addRole, deleteRole, editRole, getPermissions, getRoles } from '../../../Service/Rbac/Roles';
+import DeleteConfirmationDialog from '../../Utils/DeleteConfirmationDialog';
 
 const Roles = () => {
 
@@ -21,14 +23,30 @@ const Roles = () => {
     return selectedRows[0];
   }
 
-  const [columns, setColumns] = useState(ROLE_COLS);
+  // COLUMNS FETCH
+  const [columns, setColumns] = useState([]);
+
+  useEffect(() => {
+    async function fetchSetColumns() {
+      const { status, data } = await getPermissions();
+      if (status) setColumns(data);
+    }
+    fetchSetColumns();
+  }, [])
+
+  const columnWidths = useMemo(() => {
+    const permissionCellWidths = Array(columns.length).fill(250);
+    const temp = [300, ...permissionCellWidths];
+    return temp;
+
+  }, [columns])
 
   const [roles, setRoles] = useState([]);
 
   const fetchSetRoles = useCallback(async () => {
     startLoading();
-    await new Promise(res => setTimeout(res, 1000));
-    setRoles(ROLES_MOCK)
+    const { status, data } = await getRoles()
+    setRoles(data)
     stopLoading();
   }, [])
 
@@ -39,13 +57,17 @@ const Roles = () => {
   const [matchedCell, setMatchedCell] = useState([]);
 
   // <-------------------------------- Table data mappers -------------------------------->
-  const mapTableHeader = () => mapDataToHeader(columns)
+  // Making consistent objects with two keys, 'id' and 'name'
+  const columnsMapped = useMemo(() => ([
+    { id: 0, name: "Name" },
+    ...columns.map(col => ({ id: col.id, name: col.permission_name }))
+  ]), [columns])
 
-  const getCols = () => columns.map(col => HEADER_NAME_MAP[col])
+  const mapTableHeader = () => mapDataToHeader(columnsMapped)
   const mapTableBody = () =>
     generateRows(
       roles,
-      getCols(),
+      columnsMapped,
       selectedRows,
       matchedCell,
       // sortingMap
@@ -61,8 +83,52 @@ const Roles = () => {
   }
   const openEditForm = () => setRoleForm(true)
 
-  const roleFormSubmit = async (values) => {
-    console.log(values)
+  const roleFormSubmit = async (values, roleId) => {
+    const { name, ...permissions } = values;
+    const permissionIds = Object.keys(permissions)
+      .map(key => permissions[key])
+      .filter(p => Boolean(p))
+      .filter(p => p.checked)
+      .map(p => p.id)
+
+    const payload = {
+      name: name,
+      permissions: permissionIds
+    }
+
+    try {
+      let resStatus = false;
+      if (getCurrentIndex() === -1) {
+        const { status } = await addRole(payload);
+        resStatus = status
+      }
+      else {
+        const { status } = await editRole(roleId, payload)
+        resStatus = status
+      }
+      if (resStatus) {
+        setRoleForm(false);
+        fetchSetRoles();
+      }
+    }
+    catch (e) {
+      console.log(e)
+    }
+  }
+
+  const [deleteForm, setDeleteForm] = useState(false);
+
+  const confirmDeleteRole = async (roleId) => {
+    try {
+      const { status } = await deleteRole(roleId);
+      if (status) return fetchSetRoles();
+    }
+    catch (e) {
+      console.log(e)
+    }
+    finally {
+      setDeleteForm(false);
+    }
   }
 
   const classes = useStyle();
@@ -74,6 +140,7 @@ const Roles = () => {
         selectedRows={selectedRows}
         openAddForm={openAddForm}
         openEditForm={openEditForm}
+        openDeleteForm={() => setDeleteForm(true)}
       />
 
       {isLoading()
@@ -104,8 +171,8 @@ const Roles = () => {
               headerWrapper={(text) => <HeaderCell text={text} />}
               // rowWrapper={(text, colName) => <RowCell text={text} column={colName} />}
               style={{ borderRadius: 5, borderTopLeftRadius: 0, borderTopRightRadius: 0 }}
-              minCellWidth={ROLE_COLS.map(
-                (name) => ROLE_COL_WIDTHS[ROLE_COLS.indexOf(name)]
+              minCellWidth={columnsMapped.map(
+                (name) => columnWidths[columnsMapped.indexOf(name)]
               )}
 
             // Pagination props
@@ -123,10 +190,24 @@ const Roles = () => {
         <RoleForm
           open={roleForm}
           closeHandler={() => setRoleForm(false)}
+          permissionsArray={columns}
           row={roles[getCurrentIndex()]}
           onFormSubmit={roleFormSubmit}
         />
       }
+
+      {deleteForm &&
+        <DeleteConfirmationDialog
+          open={deleteForm}
+          closeHandler={() => setDeleteForm(false)}
+          deleteState={roles[getCurrentIndex()].id}
+          title='Delete Role ?'
+          bodyText='Deleting a role is a permanent action and cannot be done. Please understand that if this role is associated with any user, they will lose it.'
+          confirmBtnText='Delete'
+          confirmHandler={confirmDeleteRole}
+        />
+      }
+
     </Box>
   )
 }

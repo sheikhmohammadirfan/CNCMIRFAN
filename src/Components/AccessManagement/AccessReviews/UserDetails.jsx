@@ -39,6 +39,9 @@ import InReviewStatusContent from "./ReviewStatusPages/InReviewStatusContent";
 import DraftStatusContent from "./ReviewStatusPages/DraftStatusContent";
 import { getEntities, getReviewEntities, startReview, submitReview, uploadAccessFile } from "../../../Service/AccessManagement/Reviews";
 import { notification } from "../../Utils/Utils";
+import { getUser } from "../../../Service/UserFactory";
+import RestrictedPage from "../../Rbac/RestrictedPage";
+import checkPermissionById from "../../Utils/checkPermission";
 
 const useStyle = makeStyles((theme) => ({
   usersContainer: {
@@ -174,147 +177,15 @@ const getStatusChip = (status) => {
 
 const steps = ["Draft", "In review", "Completed"];
 
-const CompletedContent = ({ classes }) => (
-  <>
-    <Box className={classes.systemsContainer} width="100%">
-      <SystemCards
-        iconName="fact_check"
-        title="# of systems reviewed"
-        count="1"
-      />
-      <SystemCards
-        iconName="how_to_reg"
-        title="# of accounts reviewed"
-        count="163"
-      />
-      <SystemCards iconName="warning" title="# of accounts flagged" count="0" />
-      <SystemCards
-        iconName="manage_accounts"
-        title="# of access changes"
-        count="12"
-      />
-    </Box>
-  </>
-);
-
-const InReviewContent = ({ data }) => (
-  <Grid container spacing={2}>
-    <Grid item xs={6} md={6} lg={6}>
-      <Box border={1} p={2}>
-        <Typography variant="h6">Access review progress</Typography>
-      </Box>
-      <Box borderBottom={1} borderRight={1} borderLeft={1} p={2}>
-        <DoughnutChart data={data} />
-      </Box>
-    </Grid>
-    <Grid item xs={6} md={6} lg={6}>
-      <Box border={1} p={2}>
-        <Typography variant="h6">Accounts flagged by Falcon</Typography>
-      </Box>
-      <Box
-        borderBottom={1}
-        borderRight={1}
-        borderLeft={1}
-        p={2}
-        overflow="auto"
-        height="183px"
-      >
-        <Button fullWidth>
-          <Box
-            display="flex"
-            alignContent="center"
-            justifyContent="space-between"
-            width="100%"
-            sx={{ textTransform: "none" }}
-          >
-            <Box
-              display="flex"
-              justifyContent="space-between"
-              flexDirection="column"
-            >
-              <Box>
-                <Typography align="left">Project Sigma</Typography>
-              </Box>
-              <Box>
-                <Typography>hanz@cncmllc.com</Typography>
-              </Box>
-            </Box>
-            <Box p={2}>
-              <Typography>Owner terminated</Typography>
-            </Box>
-          </Box>
-        </Button>
-        <Divider />
-        <Button fullWidth>
-          <Box
-            display="flex"
-            alignContent="center"
-            justifyContent="space-between"
-            width="100%"
-            sx={{ textTransform: "none" }}
-          >
-            <Box
-              display="flex"
-              justifyContent="space-between"
-              flexDirection="column"
-            >
-              <Box>
-                <Typography align="left">Project Sigma</Typography>
-              </Box>
-              <Box>
-                <Typography>hanz@cncmllc.com</Typography>
-              </Box>
-            </Box>
-            <Box p={2}>
-              <Typography>Owner group changed</Typography>
-            </Box>
-          </Box>
-        </Button>
-        <Divider />
-        <Button fullWidth>
-          <Box
-            display="flex"
-            alignContent="center"
-            justifyContent="space-between"
-            width="100%"
-            sx={{ textTransform: "none" }}
-          >
-            <Box
-              display="flex"
-              justifyContent="space-between"
-              flexDirection="column"
-            >
-              <Box>
-                <Typography align="left">Project Sigma</Typography>
-              </Box>
-              <Box>
-                <Typography>hanz@cncmllc.com</Typography>
-              </Box>
-            </Box>
-            <Box p={2}>
-              <Typography>Owner group changed</Typography>
-            </Box>
-          </Box>
-        </Button>
-      </Box>
-    </Grid>
-  </Grid>
-);
-
-const DraftContent = ({ data }) => (
-  <Grid container>
-    <Grid item xs={12} md={12} lg={12}>
-      <Box border={1} p={2}>
-        <Typography variant="h6">Access review progress</Typography>
-      </Box>
-      <Box borderBottom={1} borderRight={1} borderLeft={1} p={2}>
-        <DoughnutChart data={data} />
-      </Box>
-    </Grid>
-  </Grid>
-);
-
+// <----------------------------- COMPONENT ----------------------------->
 function UserDetails() {
+
+  const requiredViewEntityPermissionId = 10;
+  const userHasViewEntityPermission = checkPermissionById(requiredViewEntityPermissionId);
+
+  const requiredEditReviewEntityPerm = 9;
+  const userHasEditReviewEntityPerm = checkPermissionById(requiredEditReviewEntityPerm);
+
   const classes = useStyle();
   const location = useLocation();
   const history = useHistory();
@@ -338,7 +209,7 @@ function UserDetails() {
   const [loading, setLoading] = useState(false);
   const [reviewAccessData, setReviewAccessData] = useState([]);
 
-  
+
   const fetchEntities = useCallback(async () => {
     const { data, status } = await getEntities();
     if (status) return data;
@@ -426,26 +297,11 @@ function UserDetails() {
   const renderContent = () => {
     switch (data.status) {
       case 2:
-        return <CompletedStatusContent data={reviewAccessData} loading={loading} uploadAccess={uploadAccess} />;
+        return <CompletedStatusContent data={reviewAccessData} loading={loading} hasEditPermission={userHasEditReviewEntityPerm} uploadAccess={uploadAccess} />;
       case 1:
-        return <InReviewStatusContent data={reviewAccessData} loading={loading} uploadAccess={uploadAccess} />;
+        return <InReviewStatusContent data={reviewAccessData} loading={loading} hasEditPermission={userHasEditReviewEntityPerm} uploadAccess={uploadAccess} />;
       case 0:
-        const data2 = {
-          labels: [
-            "Systems requiring access file",
-            "Systems requiring connection",
-            "Systems ready to review",
-          ],
-          datasets: [
-            {
-              data: [4, 3, 7],
-              backgroundColor: ["#A9A9A9", "#FF6384", "#4BC0C0"],
-              borderColor: ["#A9A9A9", "#FF6384", "#4BC0C0"],
-              borderWidth: 1,
-            },
-          ],
-        };
-        return <DraftStatusContent data={reviewAccessData} loading={loading} uploadAccess={uploadAccess} />;
+        return <DraftStatusContent data={reviewAccessData} loading={loading} hasEditPermission={userHasEditReviewEntityPerm} uploadAccess={uploadAccess} />;
       default:
         return null;
     }
@@ -476,15 +332,24 @@ function UserDetails() {
     } else if (data.status === 1) {
       return (
         <Box className={classes.buttonContainer}>
-          <Button
-            onClick={handleMoreClick}
-            variant="outlined"
-            size="small"
-            startIcon={<Icon>arrow_drop_down</Icon>}
-            className={classes.exp_Del_Button}
+          <Tooltip
+            placement="bottom-end"
+            title={!userHasEditReviewEntityPerm && "You don't have edit access"}
           >
-            More
-          </Button>
+            <span>
+              <Button
+                onClick={handleMoreClick}
+                variant="outlined"
+                size="small"
+                style={{ width: '100%' }}
+                startIcon={<Icon>arrow_drop_down</Icon>}
+                className={classes.exp_Del_Button}
+                disabled={!userHasEditReviewEntityPerm}
+              >
+                More
+              </Button>
+            </span>
+          </Tooltip>
           <Menu
             anchorEl={anchorEl}
             keepMounted
@@ -510,7 +375,14 @@ function UserDetails() {
               <Typography className={classes.menuText}>Delete</Typography>
             </MenuItem>
           </Menu>
-          <Tooltip title="To complete the review, please ensure all reviews are submitted and all remediation evidence is added under the 'Access changes' tab.">
+          <Tooltip
+            placement="bottom-end"
+            title={
+              userHasEditReviewEntityPerm
+                ? "To complete the review, please ensure all reviews are submitted and all remediation evidence is added under the 'Access changes' tab."
+                : "You don't have edit access"
+            }
+          >
             <span>
               <Button
                 variant="outlined"
@@ -518,6 +390,7 @@ function UserDetails() {
                 startIcon={<Icon>check</Icon>}
                 className={classes.exp_Del_Button}
                 onClick={moveReview}
+                disabled={!userHasEditReviewEntityPerm}
               >
                 Complete
               </Button>
@@ -572,41 +445,44 @@ function UserDetails() {
 
   return (
     <>
-      <Box className={classes.usersContainer}>
-        <Box display="flex" justifyContent="space-between" alignItems="center">
-          <Box width="100%">
-            <Box
-              display="flex"
-              justifyContent="space-between"
-              alignItems="center"
-              style={{
-                borderBottom: "1px solid #989898",
-                padding: "5px 0 20px 0",
-              }}
-            >
-              <Box>
-                <Typography noWrap variant="h5" className={classes.titleStyle}>
-                  {data.name} {data.dateStarted}{" "}
-                  <Chip label={data.status} variant="outlined" />
-                </Typography>
+      {!userHasViewEntityPermission
+        ? <RestrictedPage /> :
+        <Box className={classes.usersContainer}>
+          <Box display="flex" justifyContent="space-between" alignItems="center">
+            <Box width="100%">
+              <Box
+                display="flex"
+                justifyContent="space-between"
+                alignItems="center"
+                style={{
+                  borderBottom: "1px solid #989898",
+                  padding: "5px 0 20px 0",
+                }}
+              >
+                <Box>
+                  <Typography noWrap variant="h5" className={classes.titleStyle}>
+                    {data.name} {data.dateStarted}{" "}
+                    <Chip label={data.status} variant="outlined" />
+                  </Typography>
+                </Box>
+                <Box sx={{ width: "40%" }}>
+                  <Stepper activeStep={activeStep} alternativeLabel>
+                    {steps.map((label) => (
+                      <Step key={label}>
+                        <StepLabel>{label}</StepLabel>
+                      </Step>
+                    ))}
+                  </Stepper>
+                </Box>
+                {renderHeaderButtons()}
+                {/* {renderHeaderButtons()} */}
               </Box>
-              <Box sx={{ width: "40%" }}>
-                <Stepper activeStep={activeStep} alternativeLabel>
-                  {steps.map((label) => (
-                    <Step key={label}>
-                      <StepLabel>{label}</StepLabel>
-                    </Step>
-                  ))}
-                </Stepper>
-              </Box>
-              {renderHeaderButtons()}
-              {/* {renderHeaderButtons()} */}
             </Box>
           </Box>
-        </Box>
 
-        {renderContent()}
-      </Box>
+          {renderContent()}
+        </Box>
+      }
     </>
   );
 }

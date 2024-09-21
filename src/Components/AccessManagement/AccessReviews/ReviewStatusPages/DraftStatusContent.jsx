@@ -169,7 +169,7 @@ const getStatusChip = (status) => {
 
 
 
-function DraftStatusContent({ data, loading, uploadAccess }) {
+function DraftStatusContent({ data, loading, hasEditPermission, uploadAccess }) {
   const classes = useStyle();
 
   return (
@@ -217,6 +217,7 @@ function DraftStatusContent({ data, loading, uploadAccess }) {
                           uploaded={item.uploaded}
                           row={item}
                           handleFileInputChange={uploadAccess}
+                          disabled={!hasEditPermission}
                         />
                     },
                     {

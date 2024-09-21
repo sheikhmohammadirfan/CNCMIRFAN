@@ -27,6 +27,7 @@ import React from "react";
 import AccessManagement from "./Pages/AccessManagement";
 import VendorManagement from "./Pages/VendorManagement";
 import Rbac from "./Pages/Rbac";
+import RestrictedRoutes from "./Components/Utils/Routers/RestrictedRoutes";
 
 // Custom values
 const sidebarSmall = 50;
@@ -133,34 +134,40 @@ function App() {
                 >
                   <Header scrollTarget={scrollTarget} />
                   <div className={classes.wrapper}>
+
                     <Route exact path="/">
                       <Home title="HOME" />
                     </Route>
-                    <Route exact path="/verify">
-                      <Verify title="VERIFY" />
-                    </Route>
-                    <Route exact path="/poam">
-                      <Poam title="POA&M" />
-                    </Route>
-                    <Route exact path="/profile">
-                      <Profile title="PROFILE" />
-                    </Route>
-                    <Route exact path="/Integrated-Platforms">
-                      <Integrate title="Integrated Platforms" />
-                    </Route>
-                    <Route path="/vendor-management">
-                      <VendorManagement title="Vendor Management" />
-                    </Route>
-                    <Route path="/risk-management">
-                      <RiskManagement title="Risk Management" />
-                    </Route>
-                    <Route path="/access-management/">
-                      <AccessManagement title="Access Management" />
-                    </Route>
-                    <Route path="/rbac/">
-                      <Rbac title="Rbac" />
-                    </Route>
-                    
+
+                    <RestrictedRoutes>
+
+                      <Route exact path="/verify">
+                        <Verify title="VERIFY" />
+                      </Route>
+                      <Route exact path="/poam">
+                        <Poam title="POA&M" />
+                      </Route>
+                      <Route exact path="/profile">
+                        <Profile title="PROFILE" />
+                      </Route>
+                      <Route exact path="/Integrated-Platforms">
+                        <Integrate title="Integrated Platforms" />
+                      </Route>
+                      <Route path="/vendor-management">
+                        <VendorManagement title="Vendor Management" />
+                      </Route>
+                      <Route path="/risk-management">
+                        <RiskManagement title="Risk Management" />
+                      </Route>
+                      <Route path="/access-management/">
+                        <AccessManagement title="Access Management" />
+                      </Route>
+                      <Route path="/rbac/">
+                        <Rbac title="Rbac" />
+                      </Route>
+
+                    </RestrictedRoutes>
+
                   </div>
                 </Box>
               </Box>

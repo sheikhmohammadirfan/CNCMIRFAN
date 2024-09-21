@@ -1,9 +1,11 @@
 export const REQUIRED_COLUMNS = [
-  "Name",
-  "Email",
+  "first_name",
+  "last_name",
+  "email"
 ]
 
 export const COL_TOOLTIP_MAP = {
-  "Name": "Name of the user",
-  "Email": "Email address of user",
+  "first_name": "First name of the user",
+  "last_name": "Last name of user",
+  "email": "Email address of user",
 }

@@ -19,5 +19,9 @@ export const BreadcrumbMapper = {
   'settings': "Settings",
   'access-management': "Acess Management",
   'accounts': "Accounts",
-  'reviews': "Reviews"
+  'reviews': "Reviews",
+  'rbac': 'Role Based Access Control',
+  'users': 'Users',
+  'roles': 'Roles',
+  'organization': 'Organization'
 };

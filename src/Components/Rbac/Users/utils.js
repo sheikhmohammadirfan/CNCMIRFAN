@@ -1,6 +1,6 @@
 import { makeStyles } from "@material-ui/core";
 import { Typography } from "@mui/material";
-import { HEADER_NAME_MAP } from "../../../assets/data/Rbac/Users/columns";
+import { HEADER_NAME_MAP, SORT_NAME_MAP } from "../../../assets/data/Rbac/Users/columns";
 import columnCellMap from "./cellMap";
 import colorShader from "../../Utils/ColorShader";
 
@@ -114,14 +114,14 @@ export const useStyle = makeStyles(theme => ({
         fontSize: 18,
         width: 10
       },
-      "&::before": {
+      "&:not(.hide-sort)::before": {
         content: "'\\2193'",
         color: theme.palette.grey[400],
         display: 'flex',
         top: 8,
         right: 3
       },
-      "&::after": {
+      "&:not(.hide-sort)::after": {
         content: "'\\2191'",
         color: theme.palette.grey[400],
         top: 8,
@@ -180,6 +180,12 @@ export const useStyle = makeStyles(theme => ({
       padding: "24px"
     }
   },
+
+  inviteDialog: {
+    '& .MuiPaper-root': {
+      minWidth: '600px'
+    }
+  },
 }))
 
 /* Header cell component */
@@ -206,8 +212,11 @@ export const mapDataToHeader = (columns, sorting, updateSort) => ({
   data: columns.map((text) => ({
     text,
     params: {
-      onClick: true ? () => { } : () => updateSort(text),
-      className: sorting && sorting.sort_by === HEADER_NAME_MAP[text] ? (sorting.sort_order === 1 ? 'asc' : 'dsc') : "",
+      onClick: () => COLS_SORTABLE.includes(text) && updateSort(text),
+      className:
+        sorting && sorting.sort_by === SORT_NAME_MAP[text]
+          ? (sorting.sort_order === 1 ? 'asc' : 'dsc')
+          : (COLS_SORTABLE.includes(text)) ? "" : "hide-sort",
     },
   })),
   cellStyle: {
@@ -295,6 +304,16 @@ const mapDataToRow = (row, rowIndex, columns, matchedCell) => (
 )
 
 const getCellValue = (row, colName) => {
-  if (colName === 'role') return JSON.parse(row['role']).map(role => role.label).join(", ")
+  if (colName === 'name') return `${row['first_name']} ${row['last_name']}`
+  if (colName === 'role') return row['roles'].map(role => ({ text: role.name }))
+  if (colName === 'status') return STATUS_MAP[row['status']]
   return row[colName]
+}
+
+const COLS_SORTABLE = ['Name', 'Email']
+
+const STATUS_MAP = {
+  0: "Inactive", 
+  1: "Active", 
+  2: "Invited"
 }

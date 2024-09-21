@@ -43,7 +43,7 @@ export function PillCell({ showColorDot, dotColor, cellValue }) {
 export function MultipePills({ cellValue }) {
   const classes = useStyle();
   return (
-    <Box display="flex" gridColumnGap={5}>
+    <Box display="flex" gridGap={10} flexWrap='wrap'>
       {cellValue.length > 0 && cellValue.map((val, index) => (
         <Typography key={index} variant="body1" noWrap className={classes.cellLabel}>{val.text || "Keys not proper"}</Typography>
       ))}

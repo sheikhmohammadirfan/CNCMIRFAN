@@ -2,6 +2,7 @@ import { Box, Button, Icon, makeStyles, Typography } from "@material-ui/core";
 import colorShader from "../../../Utils/ColorShader";
 import { MultipePills } from "../../../Utils/DataTable/Cells";
 import FlagCell from "./FlagCell";
+import checkPermissionById from "../../../Utils/checkPermission";
 
 export const useStyle = makeStyles((theme) => ({
   reviewDecisionContainer: {
@@ -333,8 +334,11 @@ const getCellValue = (row, colName, handleFlagClick, isReviewCompleted, changeDe
 
 function DecisionButtons({ row, reviewDone, changeDecision, decisionLoad }) {
 
+  const requiredEditAccessListPerm = 11;
+  const userHasEditAccessListPerm = checkPermissionById(requiredEditAccessListPerm)
+  
   const classes = useStyle();
-  const btnDisabled = reviewDone || decisionLoad
+  const btnDisabled = reviewDone || decisionLoad || !userHasEditAccessListPerm
 
   return (
     <Box sx={{ display: 'flex', alignItems: 'center', gridColumnGap: '16px' }}>

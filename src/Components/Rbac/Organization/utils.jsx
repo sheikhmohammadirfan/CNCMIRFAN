@@ -1,14 +1,20 @@
 import { makeStyles } from "@material-ui/core";
-import { Typography } from "@mui/material";
-import { HEADER_NAME_MAP } from "../../../assets/data/Rbac/Users/columns";
-import columnCellMap from "./cellMap";
 import colorShader from "../../Utils/ColorShader";
+import { Typography } from "@mui/material";
+import columnCellMap from "./cellMap";
+import { SORT_NAME_MAP } from "../../../assets/data/Rbac/Organization/columns";
 
 export const useStyle = makeStyles(theme => ({
-  headerContainer: {
+  actionsContainer: {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
+  },
+
+  tableFilterContainer: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     padding: 16,
     backgroundColor: 'white',
     borderRadius: 10,
@@ -17,6 +23,12 @@ export const useStyle = makeStyles(theme => ({
     border: '1px solid',
     borderColor: '#d9d9d9',
     borderBottom: 'none'
+  },
+
+  filterDropdownsContainer: {
+    display: 'flex',
+    alignItems: 'center',
+    columnGap: 8,
   },
 
   // Style for table container
@@ -41,7 +53,7 @@ export const useStyle = makeStyles(theme => ({
       borderRadius: 7,
       // borderTopRightRadius: 0,
       // borderBottomRightRadius: 0,
-      // height: 35
+      height: 35
     },
     // overflow: "hidden"
   },
@@ -49,7 +61,8 @@ export const useStyle = makeStyles(theme => ({
   headerBtn: {
     '&.MuiButtonBase-root.MuiButton-root': {
       textTransform: 'none'
-    }
+    },
+    height: 34,
   },
 
   whiteBtn: {
@@ -101,27 +114,27 @@ export const useStyle = makeStyles(theme => ({
         fontSize: 18,
         width: 10
       },
-      // "&::before": {
-      //   content: "'\\2193'",
-      //   color: theme.palette.grey[400],
-      //   display: 'flex',
-      //   top: 8,
-      //   right: 3
-      // },
-      // "&::after": {
-      //   content: "'\\2191'",
-      //   color: theme.palette.grey[400],
-      //   top: 8,
-      //   right: 10
-      // },
-      // "&.asc::before": {
-      //   content: "'\\2193'",
-      //   color: '#4477CE'
-      // },
-      // "&.dsc::after": {
-      //   content: "'\\2191'",
-      //   color: '#4477CE'
-      // },
+      "&:not(.hide-sort)::before": {
+        content: "'\\2193'",
+        color: theme.palette.grey[400],
+        display: 'flex',
+        top: 8,
+        right: 3
+      },
+      "&:not(.hide-sort)::after": {
+        content: "'\\2191'",
+        color: theme.palette.grey[400],
+        top: 8,
+        right: 10
+      },
+      "&.asc::before": {
+        content: "'\\2193'",
+        color: '#4477CE'
+      },
+      "&.dsc::after": {
+        content: "'\\2191'",
+        color: '#4477CE'
+      },
     },
 
     // Giving box shadow on left side to First cell on select
@@ -163,22 +176,14 @@ export const useStyle = makeStyles(theme => ({
 
   // Risk Create/Edit form Container
   formContainer: {
-    '& .MuiPaper-root': {
-      maxWidth: 'none',
-      width: '800px'
-    },
     "& .MuiDialogContent-root": {
-      padding: "24px",
+      padding: "24px"
     }
   },
 
-  permissionLabel: {
-    "& .MuiFormControlLabel-label": {
-      color: "rgba(0, 0, 0, 0.8)",
-      fontSize: "0.9rem",
-    },
-    '& svg': {
-      fontSize: '1.3rem'
+  inviteDialog: {
+    '& .MuiPaper-root': {
+      minWidth: '600px'
     }
   },
 }))
@@ -204,11 +209,13 @@ export const RowCell = ({ text }) => {
 };
 
 export const mapDataToHeader = (columns, sorting, updateSort) => ({
-  data: columns.map((col) => ({
-    text: col.name,
+  data: columns.map((text) => ({
+    text,
     params: {
-      onClick: true ? () => { } : () => updateSort(col.name),
-      className: sorting && sorting.sort_by === HEADER_NAME_MAP[col.name] ? (sorting.sort_order === 1 ? 'asc' : 'dsc') : "",
+      onClick: () => COLS_SORTABLE.includes(text) && updateSort(text),
+      className: sorting && sorting.sort_by === SORT_NAME_MAP[text]
+        ? (sorting.sort_order === 1 ? 'asc' : 'dsc')
+        : (COLS_SORTABLE.includes(text)) ? "" : "hide-sort",
     },
   })),
   cellStyle: {
@@ -265,9 +272,18 @@ export const generateRows = (
 
 const mapDataToRow = (row, rowIndex, columns, matchedCell) => (
   columns.map(colName => {
-    let cellValue = colName.id === 0 ? row['name'] : Boolean(row.permissions.find(p => p.id === colName.id))
+    let CellComponent = colName in columnCellMap && columnCellMap[colName]
+    let cellValue = getCellValue(row, colName);
     return {
-      text: colName.id !== 0 ? <columnCellMap.permission flag={cellValue} /> : <RowCell text={cellValue} />,
+      text: colName in columnCellMap ?
+        <CellComponent
+          cellValue={cellValue}
+          {...colName === 'status' && {
+            showColorDot: true,
+            dotColor: STATUS_MAP[row.admin[0].status].dotColor
+          }}
+        /> :
+        <RowCell text={cellValue} />,
       params: colName === "Id" ? {
         "sticky": "",
         "data-searched": Boolean(
@@ -295,5 +311,27 @@ const mapDataToRow = (row, rowIndex, columns, matchedCell) => (
 )
 
 const getCellValue = (row, colName) => {
+  if (colName === 'name') return row[colName]
+  if (colName === 'first_name') return row?.admin[0].first_name
+  if (colName === 'last_name') return row?.admin[0].last_name
+  if (colName === 'email') return row?.admin[0].email
+  if (colName === 'status') return STATUS_MAP[row.admin[0].status].text
   return row[colName]
+}
+
+const COLS_SORTABLE = ['Name', 'First Name', 'Admin First Name', 'Admin Last Name', 'Admin Email']
+
+const STATUS_MAP = {
+  0: {
+    text: "Inactive",
+    dotColor: "red"
+  },
+  1: {
+    text: "Active",
+    dotColor: "#4caf50"
+  },
+  2: {
+    text: "Invited",
+    dotColor: "#ffd54f"
+  }
 }

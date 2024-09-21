@@ -34,6 +34,8 @@ import CreateReviewDialog from "./CreateReviewDialog";
 import { REVIEW_STATUS_MAP } from "../../../assets/data/AccessManagement/ReviewDecisions/ValuesMap";
 import { getOwners } from "../../../Service/RiskManagement/RiskManagement.service";
 import { notification } from "../../Utils/Utils";
+import { Tooltip } from "@mui/material";
+import checkPermissionById from "../../Utils/checkPermission";
 
 const getStatusChip = (status) => {
   switch (status) {
@@ -70,6 +72,10 @@ const getStatusChip = (status) => {
 };
 
 function AccessReviews() {
+
+  const requiredEditReviewPermission = 13;
+  const userHasEditReviewPermission = checkPermissionById(requiredEditReviewPermission);
+
   const classes = useStyle();
   const history = useHistory();
   const createBtnRef = useRef(null);
@@ -183,8 +189,11 @@ function AccessReviews() {
   const handleRowClick = (reviewId) => {
     const selectedItem = filteredData.find(review => review.id === reviewId);
     let url = `/access-management/reviews/in-review/${reviewId}`
-    // if (selectedItem.status === "In Review") url = `/access-management/reviews/in-review/${reviewId}`;
-    // else if (selectedItem.status === "Completed") url = `/access-management/reviews/completed/${reviewId}`
+
+    if (selectedItem.status === 0) url = `/access-management/reviews/draft/${reviewId}`;
+    else if (selectedItem.status === 1) url = `/access-management/reviews/in-review/${reviewId}`;
+    else if (selectedItem.status === 2) url = `/access-management/reviews/completed/${reviewId}`
+
     history.push(url, {
       data: selectedItem,
       owner: users,
@@ -255,16 +264,21 @@ function AccessReviews() {
               </Typography>
             </Box>
             <Box className={classes.buttonContainer}>
-              <Button
-                // onClick={handleShowCreateReview}
-                onClick={handleClickOpen}
-                size="small"
-                variant="contained"
-                color="primary"
-                startIcon={<Icon>add</Icon>}
-              >
-                Create Review
-              </Button>
+              <Tooltip title={!userHasEditReviewPermission && "You don't have edit access"} placement="bottom-end">
+                <span>
+                  <Button
+                    // onClick={handleShowCreateReview}
+                    onClick={handleClickOpen}
+                    size="small"
+                    variant="contained"
+                    color="primary"
+                    startIcon={<Icon>add</Icon>}
+                    disabled={!userHasEditReviewPermission}
+                  >
+                    Create Review
+                  </Button>
+                </span>
+              </Tooltip>
             </Box>
           </Box>
         </Box>

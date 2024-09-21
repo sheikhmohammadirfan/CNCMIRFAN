@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import useLoading from '../../Utils/Hooks/useLoading';
 import { Controller, useForm } from 'react-hook-form';
 import { useStyle } from './utils';
@@ -37,9 +37,11 @@ const LoadingStatus = (loading) => ({
 const RoleForm = ({
   open,
   closeHandler,
+  permissionsArray,
   row,
   onFormSubmit
 }) => {
+
   const { isLoading, startLoading, stopLoading } = useLoading({
     roles: false,
   });
@@ -53,12 +55,20 @@ const RoleForm = ({
 
   const { name, id, ...permissions } = row || {};
 
-  const formValues = row ? {
-    name: row.name,
-    ...permissions
-  }
-    : {};
-  
+  const formValues = useMemo(() => {
+    const values = {}
+    if (!row) return values;
+    for (const p of permissions.permissions) {
+      values[p.permission_name] = {
+        id: p.id,
+        permission_name: p.permission_name,
+        checked: true,
+      }
+    }
+    values['name'] = name;
+    return values;
+  }, [row])
+
   const { handleSubmit, control } = useForm({
     defaultValues: formValues,
   });
@@ -66,7 +76,7 @@ const RoleForm = ({
   // <-------------------------------- HANDLE FORM SUBMIT -------------------------------->
   const onSubmit = async (values) => {
     setisFormLoading(true);
-    await onFormSubmit(values);
+    await onFormSubmit(values, row?.id || -1);
     setisFormLoading(false);
   }
 
@@ -78,7 +88,7 @@ const RoleForm = ({
       close={closeHandler}
       title={
         <Typography style={{ fontWeight: "bold" }}>
-          {"Create New Role"}
+          {row ? 'Edit Role' : "Create New Role"}
         </Typography>
       }
       loading={isFormLoading}
@@ -108,25 +118,30 @@ const RoleForm = ({
                   This role will be able to:
                 </Typography>
                 <Grid container>
-                  {PERMISSIONS_MOCK.map((permission, index) => (
+                  {permissionsArray && permissionsArray.map((permission, index) => (
                     <Grid
                       key={index}
                       item
                       xs={4}
                     >
                       <FormControlLabel
-                        label={permission.text}
+                        label={permission.permission_name}
                         className={classes.permissionLabel}
                         control={
                           <Controller
-                            name={permission.permission}
+                            name={permission.permission_name}
                             control={control}
                             render={({ field: { value, onChange } }) => {
                               return (
                                 <Checkbox
-                                  checked={value || false}
-                                  onChange={(e, newVal) => onChange(newVal)}
-
+                                  checked={value?.checked || false}
+                                  onChange={(e, newVal) => {
+                                    onChange({
+                                      id: permission.id,
+                                      permission_name: permission.permission_name,
+                                      checked: e.target.checked,
+                                    })
+                                  }}
                                 />
                               )
                             }}
@@ -160,7 +175,7 @@ const RoleForm = ({
           type="submit"
           disabled={isFormLoading || isLoading()}
         >
-          {"ADD"}
+          {row ? 'EDIT' : "ADD"}
         </Button>,
       ]}
     />

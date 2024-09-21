@@ -5,7 +5,7 @@ import { DateControl, Form, RadioControl, SelectControl, TextControl } from '../
 import { Controller, useForm } from 'react-hook-form';
 import CustomAccordion from '../Utils/CustomAccordion';
 import { useStyle } from './RiskRegister/RiskRegisterUtils';
-import { Autocomplete } from '@mui/material';
+import { Autocomplete, Tooltip } from '@mui/material';
 import { source_options } from '../../assets/data/RiskManagement/RiskRegister/RiskRegisterFilters';
 import SelectCategories from './RiskRegister/SelectCategories';
 import { cia_categories } from '../../assets/data/RiskManagement/RiskRegister/RiskRegisterFilters';
@@ -40,6 +40,7 @@ const LoadingStatus = (loading) => ({
 
 // DEFAULT EXPORT FUNCTION
 const RiskFormDialog = ({
+  hasAccess,
   open,
   closeHandler,
   rowIndex,
@@ -152,19 +153,19 @@ const RiskFormDialog = ({
       residual_likelihood: row["Residual Risk Likelihood Id"] === null
         ? null
         : getLikelihoodSliderValue(
-            scores.likelihoodScores
-                .find(score => score.id === row["Residual Risk Likelihood Id"])
-                ?.score
-            || scores.likelihoodScores[0].score
-          ),
+          scores.likelihoodScores
+            .find(score => score.id === row["Residual Risk Likelihood Id"])
+            ?.score
+          || scores.likelihoodScores[0].score
+        ),
       residual_impact: row["Residual Risk Impact Id"] === null
         ? null
         : getImpactSliderValue(
-            scores.impactScores
-              .find(score => score.id === row["Residual Risk Impact Id"])
-              ?.score
-            || scores.impactScores[0].score
-          ),
+          scores.impactScores
+            .find(score => score.id === row["Residual Risk Impact Id"])
+            ?.score
+          || scores.impactScores[0].score
+        ),
       notes: "Notes" in row ? row["Notes"] : "",
       customId: "Custom Id" in row ? row["Custom Id"] : "",
       identified_date: row["Identified Date"] || null,
@@ -202,12 +203,14 @@ const RiskFormDialog = ({
     inherent_impact: { required: "Select a number" },
     customId: { required: "This field is required." },
     uncategorized: {
-      validate: { invalid: () => {
-        return getValues("uncategorized")
-                || getValues("confidentiality")
-                || getValues("integrity")
-                || getValues("availability");
-      } },
+      validate: {
+        invalid: () => {
+          return getValues("uncategorized")
+            || getValues("confidentiality")
+            || getValues("integrity")
+            || getValues("availability");
+        }
+      },
     }
   };
 
@@ -311,11 +314,12 @@ const RiskFormDialog = ({
                     loading={isLoading("library")}
                     options={library.map(row => ({ val: row.id, text: row.scenario })) || []}
                     styleProps={{ fullWidth: true, }}
+                    disabled={!hasAccess}
                   /> :
                   <FormInput
                     name="scenario"
                     label="Scenario"
-                    disabled={isLibraryRow}
+                    disabled={!hasAccess || isLibraryRow}
                     maxRows={5}
                   />
                 }
@@ -331,7 +335,7 @@ const RiskFormDialog = ({
                     rules={validation}
                     optionList={categories}
                     className={classes.customAutocomplete}
-                    disabled={isLibraryRow}
+                    disabled={!hasAccess || isLibraryRow}
                   />
                 </Grid>}
               {/* Not showing owner, source, identified and modified date fields if it is not a create risk  */}
@@ -359,6 +363,7 @@ const RiskFormDialog = ({
                       variant="outlined"
                       options={owners.map(o => ({ val: o.id, text: o.text }))}
                       styleProps={{ fullWidth: true, }}
+                      disabled={!hasAccess}
                     />
                   </Grid>
                   <Grid item xs={6}>
@@ -392,6 +397,7 @@ const RiskFormDialog = ({
                       label="Identified Date"
                       variant='outlined'
                       fullWidth
+                      disabled={!hasAccess}
                     />
                   </Grid>
                   <Grid item xs={6}>
@@ -443,6 +449,7 @@ const RiskFormDialog = ({
                                   inputProps={{
                                     'data-id': category.id
                                   }}
+                                  disabled={!hasAccess}
                                 />
                               )
                             }}
@@ -456,9 +463,9 @@ const RiskFormDialog = ({
                   <Typography
                     variant='caption'
                     className={`${classes.subInputSubtitle} ${classes.errorText}`}>
-                      Select atleast one CIA Categories
+                    Select atleast one CIA Categories
                   </Typography>}
-                </Grid>
+              </Grid>
               <Grid item xs={12}>
                 <Box className={classes.subInputsContainer}>
                   <Typography className={classes.inputSubtitle}>Inherent Risk</Typography>
@@ -474,6 +481,7 @@ const RiskFormDialog = ({
                         marks={getSliderMarks(true)}
                         classes={classes}
                         isCreateForm={isCreateForm()}
+                        disabled={!hasAccess}
                       />
                     </Box>
                     <Typography className={classes.subInputSubtitle}>Impact Score</Typography>
@@ -486,6 +494,7 @@ const RiskFormDialog = ({
                         marks={getSliderMarks(false)}
                         classes={classes}
                         isCreateForm={isCreateForm()}
+                        disabled={!hasAccess}
                       />
                     </Box>
                   </Box>
@@ -506,6 +515,7 @@ const RiskFormDialog = ({
                           marks={getSliderMarks(true)}
                           classes={classes}
                           isCreateForm={isCreateForm()}
+                          disabled={!hasAccess}
                         />
                       </Box>
                       <Typography className={classes.subInputSubtitle}>Impact</Typography>
@@ -516,6 +526,7 @@ const RiskFormDialog = ({
                           marks={getSliderMarks(false)}
                           classes={classes}
                           isCreateForm={isCreateForm()}
+                          disabled={!hasAccess}
                         />
                       </Box>
                     </Box>
@@ -526,11 +537,12 @@ const RiskFormDialog = ({
                 <FormInput
                   name="notes"
                   rows={3}
+                  disabled={!hasAccess}
                 />
               </Grid>
               {(!isCreateForm()) &&
                 <Grid item xs={12}>
-                  <Box className={classes.subInputsContainer}>
+                  <Box className={classes.subInputsContainer} sx={{ pb: 2 }}>
                     <Typography className={classes.inputSubtitle}>Treatment Plan</Typography>
                     <Box className={classes.treatmentInputContainer}>
                       <RadioControl
@@ -539,9 +551,12 @@ const RiskFormDialog = ({
                         direction="column"
                         options={treatmentOptions}
                         styleProps={{ className: classes.radioControl }}
+                        radioProps={{
+                          disabled: !hasAccess
+                        }}
                       />
                     </Box>
-                    <Typography className={classes.inputSubtitle}>Controls</Typography>
+                    {/* <Typography className={classes.inputSubtitle}>Controls</Typography> */}
                     <Box>
 
                     </Box>
@@ -552,6 +567,7 @@ const RiskFormDialog = ({
                 <FormInput
                   name="customId"
                   rows={1}
+                  disabled={!hasAccess}
                 />
               </Grid>
             </Grid>
@@ -569,16 +585,22 @@ const RiskFormDialog = ({
         >
           CANCEL
         </Button>,
-        <Button
-          variant="contained"
-          color="primary"
-          size="large"
-          form="risk-form"
-          type="submit"
-          disabled={isFormLoading || isLoading()}
+        <Tooltip
+          placement="top-end"
+          arrow
+          title={!hasAccess && "You don't have write access!"}
         >
-          {(isCreateForm()) ? "ADD" : "UPDATE"}
-        </Button>,
+          <Button
+            variant="contained"
+            color="primary"
+            size="large"
+            form="risk-form"
+            type="submit"
+            disabled={(!hasAccess) || (isFormLoading || isLoading())}
+          >
+            {(isCreateForm()) ? "ADD" : "UPDATE"}
+          </Button>,
+        </Tooltip>
       ]}
     >
 

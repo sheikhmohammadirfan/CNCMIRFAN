@@ -1,6 +1,7 @@
 import { Typography, makeStyles } from "@material-ui/core";
 import columnToCellMap from "../../../assets/data/RiskManagement/TableColCellMap";
 import { HEADER_TABLE_COLS_MAP } from "../../../assets/data/RiskManagement/RiskRegister/RiskRegisterColumns";
+import colorShader from "../../Utils/ColorShader";
 
 export const useStyle = makeStyles(theme => ({
 
@@ -222,7 +223,10 @@ export const useStyle = makeStyles(theme => ({
     color: "rgba(0, 0, 0, 0.3)",
     "&.Mui-checked": {
       color: theme.palette.primary.main,
-    }
+    },
+    "&.Mui-checked.Mui-disabled": {
+      color: colorShader('000000', 0.4),
+    },
   },
 
   // Risk Sliders Container
@@ -272,6 +276,8 @@ export const useStyle = makeStyles(theme => ({
     },
     "& .MuiSlider-thumb": {
       marginTop: "-4px",
+      width: '12px',
+      height: '12px'
       // borderRadius: "0",
     },
     "& .MuiSlider-mark": {

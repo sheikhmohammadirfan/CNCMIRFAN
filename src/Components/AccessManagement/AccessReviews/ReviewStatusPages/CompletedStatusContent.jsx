@@ -154,7 +154,7 @@ const getStatusChip = (status) => {
   }
 };
 
-function CompletedStatusContent({ data, loading, uploadAccess }) {
+function CompletedStatusContent({ data, loading, hasEditPermission, uploadAccess }) {
   const classes = useStyle();
   const [value, setValue] = useState("1");
   const [searchValue, setSearchValue] = useState("");
@@ -244,6 +244,7 @@ function CompletedStatusContent({ data, loading, uploadAccess }) {
                               uploaded={item.uploaded}
                               row={item}
                               handleFileInputChange={uploadAccess}
+                              disabled={!hasEditPermission}
                             />
                         },
                         {

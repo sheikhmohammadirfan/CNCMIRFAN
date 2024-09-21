@@ -5,6 +5,7 @@ import { TextControl } from '../../Utils/Control';
 import colorShader from '../../Utils/ColorShader';
 import jira from "../../../assets/img/jira-brands.svg"
 import { FILTER_HANDLERS } from './ActionTrackerUtils';
+import { Tooltip } from '@mui/material';
 
 // Generate Styles
 const useStyle = makeStyles((theme) => ({
@@ -82,6 +83,7 @@ const useStyle = makeStyles((theme) => ({
 }))
 
 const ActionTrackerHeader = ({
+  hasAccess,
   tableFilters,
   filters: { filters, changeFilters, clearFilters },
   triggerFilters,
@@ -140,17 +142,25 @@ const ActionTrackerHeader = ({
             Edit
           </Button>
 
-          <Button
-            size='small'
-            variant='outlined'
-            color='primary'
-            startIcon={<Icon>delete</Icon>}
-            className={classes.outlineButton}
-            disabled={selectedRows.length !== 1}
-            onClick={() => openDeleteConfirmationDialog()}
+          <Tooltip
+            placement="bottom-start"
+            title={!hasAccess && "You don't have write access!"}
           >
-            Delete
-          </Button>
+            <span>
+              <Button
+                size='small'
+                variant='outlined'
+                color='primary'
+                startIcon={<Icon>delete</Icon>}
+                className={classes.outlineButton}
+                disabled={!hasAccess || selectedRows.length !== 1}
+                onClick={() => openDeleteConfirmationDialog()}
+                style={{ height: '100%' }}
+              >
+                Delete
+              </Button>
+            </span>
+          </Tooltip>
         </Box>
         {/* Search field and 'add task', 'download csv' button */}
         <Box
@@ -223,7 +233,7 @@ const ActionTrackerHeader = ({
             color='primary'
             startIcon={<Icon>arrow_downward</Icon>}
             className={classes.outlineButton}
-          // disabled={selectedRows.length !== 1}
+            // disabled={selectedRows.length !== 1}
             onClick={openExportDialog}
           >
             Export CSV

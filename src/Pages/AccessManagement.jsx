@@ -36,9 +36,13 @@ function AccessManagement() {
           <Route exact path="/access-management/reviews">
             <AccessReviews />
           </Route>
+          <Route exact path="/access-management/reviews/draft/:id" component={UserDetails} />
           <Route exact path="/access-management/reviews/in-review/:id" component={UserDetails} />
           <Route exact path="/access-management/reviews/completed/:id" component={UserDetails} />
           
+          <Route exact path="/access-management/reviews/draft/review-decisions/:id">
+            <ReviewDecisions />
+          </Route>
           <Route exact path="/access-management/reviews/in-review/review-decisions/:id">
             <ReviewDecisions />
           </Route>

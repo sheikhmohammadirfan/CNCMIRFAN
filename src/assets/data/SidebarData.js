@@ -261,6 +261,12 @@ export const SidebarData = [
         to: "/rbac/roles",
         icon: "key"
       },
+      {
+        title: "Organization",
+        component: Link,
+        to: "/rbac/organization",
+        icon: "home"
+      },
     ]
   }
 

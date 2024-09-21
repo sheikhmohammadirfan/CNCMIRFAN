@@ -1,21 +1,19 @@
-import { Box, Button, Icon, IconButton, InputAdornment, Stack } from '@mui/material'
+import { Box, Button, Icon, IconButton, InputAdornment, Stack } from '@mui/material';
 import React from 'react'
-import { useStyle } from './utils'
+import { useStyle } from './utils';
 import { TextControl } from '../../Utils/Control';
 import FilterDropdown from '../../Utils/DataTable/FilterDropdown';
-import FILTER_HANDLERS from './FilterHandler';
 
 const Header = ({
-  openAddForm,
-  openEditForm,
-  openUpload,
-  openInvite,
-  handleSearch,
   tableFilters,
   activeFilters,
   changeFilters,
   clearFilters,
   selectedRows,
+  openAddForm,
+  openEditForm,
+  openInviteForm,
+  handleSearch
 }) => {
 
   const classes = useStyle();
@@ -30,12 +28,12 @@ const Header = ({
             variant='contained'
             size='medium'
             disableElevation
-            onClick={openAddForm}
             startIcon={
               <Icon>add</Icon>
             }
+            onClick={openAddForm}
           >
-            Add User
+            Add Organization
           </Button>
           <Button
             className={`${classes.headerBtn} ${classes.whiteBtn}`}
@@ -43,12 +41,13 @@ const Header = ({
             size='medium'
             disableElevation
             disabled={selectedRows.length !== 1}
-            onClick={openEditForm}
+            // onClick={openEditForm}
             startIcon={
               <Icon>edit</Icon>
             }
+            onClick={openEditForm}
           >
-            Edit User
+            Edit Organization
           </Button>
         </Stack>
 
@@ -63,22 +62,9 @@ const Header = ({
             }
             disableElevation
             disabled={selectedRows.length < 1}
-            onClick={openInvite}
+            onClick={openInviteForm}
           >
-            Invite User
-          </Button>
-          <Button
-            variant='contained'
-            size='medium'
-            color='primary'
-            className={`${classes.headerBtn} ${classes.whiteBtn}`}
-            startIcon={
-              <Icon>upload</Icon>
-            }
-            disableElevation
-            onClick={openUpload}
-          >
-            Upload Users
+            Invite Client Admin
           </Button>
         </Stack>
 
@@ -97,8 +83,8 @@ const Header = ({
                 activeFilters={activeFilters[filter.name]}
                 changeFilters={changeFilters}
                 clearFilters={clearFilters}
-                // contextLoading={contextLoading}
-                filterHandlerMap={FILTER_HANDLERS}
+              // contextLoading={contextLoading}
+              // filterHandlerMap={FILTER_HANDLERS}
               // filterMetadata={filterMetadata}
               />
             ))}

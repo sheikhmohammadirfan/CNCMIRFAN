@@ -102,7 +102,7 @@ const UploadFileDialog = ({
     XLSX.writeFile(workbook, "template.xlsx");
   };
 
-  const handleFileUpload = (event) => {
+  const handleFileUpload = async (event) => {
     const file = event.target.files[0];
 
     if (
@@ -114,8 +114,10 @@ const UploadFileDialog = ({
     ) {
       setUploading(true);
       if (getPlainFile) {
+        const res = await onImport(file);
+        if (res !== undefined && !res) setError(true)
         setUploading(false);
-        return onImport(file);
+        return;
       }
       const reader = new FileReader();
       reader.onload = (e) => {

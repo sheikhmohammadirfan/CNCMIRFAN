@@ -22,6 +22,7 @@ const SliderControl = ({ name, control, rules, marks, classes, isCreateForm, ...
                 onChange={(e, val) => onChange(val)}
                 style={{ width: isCreateForm ? "100%" : "70%" }}
                 className={classes.customSlider}
+                {...props}
               />
               <Divider flexItem orientation='vertical' className={classes.sliderDivider} />
               <Box flex={1} className="description">

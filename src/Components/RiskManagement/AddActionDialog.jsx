@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import DialogBox from '../Utils/DialogBox'
 import { FormHelperText, TextField, Typography } from '@material-ui/core'
 import { useStyle } from './RmUtils';
-import { Autocomplete, Box, Button, Grid } from '@mui/material';
+import { Autocomplete, Box, Button, Grid, Tooltip } from '@mui/material';
 import { DateControl, Form, SelectControl, TextControl } from '../Utils/Control';
 import { Controller, useForm } from 'react-hook-form';
 import { getRegister } from '../../Service/RiskManagement/RiskRegister.service';
@@ -37,6 +37,7 @@ const LoadingStatus = (loading) => ({
 });
 
 const AddActionDialog = ({
+  hasAccess,
   open,
   closeHandler,
   risks,
@@ -74,7 +75,7 @@ const AddActionDialog = ({
     notes: { required: 'This field is required' },
   };
 
-  const disabled = Boolean(actionVal) || Boolean(riskVal)
+  const disabled = !hasAccess || Boolean(actionVal) || Boolean(riskVal)
 
   let formValues = {
     risk: (
@@ -168,7 +169,7 @@ const AddActionDialog = ({
                   options={owners}
                   loading={isLoading('owner')}
                   styleProps={{ fullWidth: true, }}
-                  disabled={(riskVal || actionVal) ? true : false}
+                  disabled={(!hasAccess || riskVal || actionVal) ? true : false}
                 />
               </Grid>
               <Grid item xs={6}>
@@ -177,18 +178,21 @@ const AddActionDialog = ({
                   label="Due Date"
                   variant='outlined'
                   fullWidth
+                  disabled={!hasAccess}
                 />
               </Grid>
               <Grid item xs={12}>
                 <FormInput
                   name="action"
                   label="Action"
+                  disabled={!hasAccess}
                 />
               </Grid>
               <Grid item xs={12}>
                 <FormInput
                   name="notes"
                   label="Notes"
+                  disabled={!hasAccess}
                 />
               </Grid>
             </Grid>
@@ -206,16 +210,22 @@ const AddActionDialog = ({
         >
           CANCEL
         </Button>,
-        <Button
-          variant="contained"
-          color="primary"
-          size="large"
-          form="add-action-form"
-          type="submit"
-          disabled={isFormLoading || isLoading()}
+        <Tooltip
+          placement="top-end"
+          arrow
+          title={!hasAccess && "You don't have write access!"}
         >
-          {isCreateAction ? 'ADD' : 'UPDATE'}
-        </Button>,
+          <Button
+            variant="contained"
+            color="primary"
+            size="large"
+            form="add-action-form"
+            type="submit"
+            disabled={!hasAccess || isFormLoading || isLoading()}
+          >
+            {isCreateAction ? 'ADD' : 'UPDATE'}
+          </Button>,
+        </Tooltip>
       ]}
     >
 

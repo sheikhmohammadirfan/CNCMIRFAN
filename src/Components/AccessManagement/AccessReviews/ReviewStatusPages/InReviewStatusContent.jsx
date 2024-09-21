@@ -165,7 +165,7 @@ const getStatusChip = (status) => {
 
 
 
-function InReviewStatusContent({ data, loading, uploadAccess }) {
+function InReviewStatusContent({ data, loading, hasEditPermission, uploadAccess }) {
   const classes = useStyle();
   const history = useHistory();
   const location = useLocation();
@@ -323,6 +323,7 @@ function InReviewStatusContent({ data, loading, uploadAccess }) {
                           uploaded={item.uploaded}
                           row={item}
                           handleFileInputChange={uploadAccess}
+                          disabled={!hasEditPermission}
                         />
                     },
                     {
