@@ -21,37 +21,39 @@ import { TextControl } from "../Utils/Control";
 import jira from "../../assets/img/jira-brands.svg";
 import { useEffect } from "react";
 
-
 // Style generator
 const useStyle = makeStyles((theme) => ({
   // Style for tab switching button
   tabButtonGroup: {
-    textTransform: 'none',
+    textTransform: "none",
     // paddingBottom: 0,
     borderBottomLeftRadius: 0,
     borderBottomRightRadius: 0,
     "& > .MuiButton-root": {
       color: "#b3b3b3",
-      borderColor: '#d9d9d9',
-      border: 'none',
-      borderBottom: '3px solid #d9d9d9',
+      borderColor: "#d9d9d9",
+      border: "none",
+      borderBottom: "3px solid #d9d9d9",
       "&:nth-child(1)": { borderRadius: "4px 0 0 0" },
       "&:nth-child(2)": { borderRadius: "0 4px 0 0" },
-      "&:disabled": { color: '#4477CE', borderColor: theme.palette.primary.main },
+      "&:disabled": {
+        color: "#4477CE",
+        borderColor: theme.palette.primary.main,
+      },
     },
   },
 
   tabButton: {
     fontWeight: 600,
-    '&:hover': {
-      backgroundColor: '#f4f4f4'
-    }
+    "&:hover": {
+      backgroundColor: "#f4f4f4",
+    },
   },
 
   // Apply style on search container
   searchContainer: {
     justifyContent: "flex-end",
-    "& > *": { width: 40, height: 'fit-content' },
+    "& > *": { width: 40, height: "fit-content" },
   },
 
   // Search input style
@@ -72,10 +74,10 @@ const useStyle = makeStyles((theme) => ({
 
   searchInput: {
     width: 300,
-    '@media (max-width: 960px)': {
+    "@media (max-width: 960px)": {
       flexGrow: 1,
     },
-    backgroundColor: 'white',
+    backgroundColor: "white",
     borderRadius: 7,
     borderRight: 0,
     "& .MuiOutlinedInput-adornedStart": {
@@ -86,31 +88,31 @@ const useStyle = makeStyles((theme) => ({
       borderRadius: 7,
       // borderTopRightRadius: 0,
       // borderBottomRightRadius: 0,
-      height: 36
+      height: 36,
     },
     // overflow: "hidden"
   },
 
   actionButton: {
-    '&.Mui-disabled': {
-      border: 'none'
+    "&.Mui-disabled": {
+      border: "none",
     },
-    border: 'none',
+    border: "none",
     borderRadius: 5,
     color: theme.palette.primary.main,
-    textTransform: 'none',
-    '&.MuiButton-root': {
-      '@media (max-width: 960px)': {
-        minWidth: '50px',
-      }
+    textTransform: "none",
+    "&.MuiButton-root": {
+      "@media (max-width: 960px)": {
+        minWidth: "50px",
+      },
     },
-    '& .MuiButton-endIcon': {
-      '@media (max-width: 960px)': {
+    "& .MuiButton-endIcon": {
+      "@media (max-width: 960px)": {
         marginLeft: 0,
         marginRight: 0,
-      }
-    }
-  }
+      },
+    },
+  },
 }));
 
 /* POA&M HEADER COMPONENT */
@@ -124,9 +126,15 @@ export default function PoamHeader({
   manageRow: { openEditFrom, openCreateForm, openJustify },
   manageSheet: { isOpenPoam, showOpenPoam, showClosePoam },
   manageJira: { containIssue, showCreateIssue, showUpdateIssue },
-  search: { matchedCell, setMatched, searchSelected, setSelected, setSearchTerm },
+  manageTask: { showTaskTracker },
+  search: {
+    matchedCell,
+    setMatched,
+    searchSelected,
+    setSelected,
+    setSearchTerm,
+  },
 }) {
-
   const classes = useStyle();
 
   // hook to Jira open / close status of Jira column
@@ -178,10 +186,11 @@ export default function PoamHeader({
         console.log(e);
       }
     }
-    setSelected(-1);       // Temporary reset to trigger useEffect in PoamTable every time searchValue gets changed
-    setTimeout(() => {     // To make sure setSelected(-1) above gets recognized
+    setSelected(-1); // Temporary reset to trigger useEffect in PoamTable every time searchValue gets changed
+    setTimeout(() => {
+      // To make sure setSelected(-1) above gets recognized
       if (matches.length) {
-        setSelected(0);    // Set back to first match if there is a match
+        setSelected(0); // Set back to first match if there is a match
       }
     }, 0);
     setMatched(matches);
@@ -190,11 +199,11 @@ export default function PoamHeader({
 
   // State to manage md breakpoint
   const theme = useTheme();
-  const aboveMd = useMediaQuery(theme.breakpoints.up('md'));
+  const aboveMd = useMediaQuery(theme.breakpoints.up("md"));
 
   return (
     <>
-      {'poamData' && (
+      {"poamData" && (
         <>
           {/* 1st Box: Had poam file details and Zoom/Download buttons (Removed) */}
 
@@ -204,7 +213,7 @@ export default function PoamHeader({
             alignItems={aboveMd && "flex-end"}
             justifyContent="space-between"
             mt={0}
-            flexDirection={!aboveMd && 'column'}
+            flexDirection={!aboveMd && "column"}
             gridGap={!aboveMd && 10}
           >
             <Box>
@@ -262,7 +271,10 @@ export default function PoamHeader({
                     </InputAdornment>
                   ),
                   endAdornment: (
-                    <InputAdornment position="absolute" style={{ position: 'absolute', right: -6 }}>
+                    <InputAdornment
+                      position="absolute"
+                      style={{ position: "absolute", right: -6 }}
+                    >
                       {searchValue && (
                         <>
                           <IconButton
@@ -309,10 +321,10 @@ export default function PoamHeader({
                       background: "#4477CE",
                       color: "white",
                       borderRadius: 7,
-                      borderColor: '#4477CE',
+                      borderColor: "#4477CE",
                       height: 36,
                       marginLeft: 10,
-                      paddingInline: 15
+                      paddingInline: 15,
                     }}
                   >
                     New
@@ -325,8 +337,8 @@ export default function PoamHeader({
           {/* 3rd Box: action buttons and manage columns button */}
           <Box
             mt={2}
-            display={'flex'}
-            justifyContent={'space-between'}
+            display={"flex"}
+            justifyContent={"space-between"}
             paddingY={1}
             paddingX={1}
             padding={1}
@@ -335,20 +347,19 @@ export default function PoamHeader({
               borderRadius: 10,
               borderBottomLeftRadius: 0,
               borderBottomRightRadius: 0,
-              backgroundColor: '#fff',
-              borderBottom: 'none',
-              '& .MuiButton-startIcon': {
+              backgroundColor: "#fff",
+              borderBottom: "none",
+              "& .MuiButton-startIcon": {
                 marginRight: !aboveMd && 0,
-                marginLeft: !aboveMd && 0
+                marginLeft: !aboveMd && 0,
               },
-              '& .MuiButton-root': {
-                padding: aboveMd && '6px 16px',
+              "& .MuiButton-root": {
+                padding: aboveMd && "6px 16px",
               },
-              borderColor: '#d9d9d9'
+              borderColor: "#d9d9d9",
             }}
           >
-            <Box marginY={'auto'}>
-
+            <Box marginY={"auto"}>
               <ManageJira
                 isOpen={isJiraOpen}
                 closeMenu={closeJira}
@@ -367,10 +378,12 @@ export default function PoamHeader({
                     style={{
                       height: "20px",
                       marginRight: aboveMd ? 8 : 0,
-                      opacity: !(isOpenPoam && selectedRow.length >= 1) ? 0.4 : 1,
+                      opacity: !(isOpenPoam && selectedRow.length >= 1)
+                        ? 0.4
+                        : 1,
                     }}
                   />
-                  {aboveMd && 'Jira'}
+                  {aboveMd && "Jira"}
                 </Button>
               </ManageJira>
 
@@ -384,16 +397,24 @@ export default function PoamHeader({
                   <img
                     alt="move-close"
                     src="https://img.icons8.com/ios-filled/24/000000/move-right.png"
-                    style={{ opacity: selectedRow.length !== 1 ? 0.4 : 1, marginRight: aboveMd ? 8 : 0, color: 'white' }}
+                    style={{
+                      opacity: selectedRow.length !== 1 ? 0.4 : 1,
+                      marginRight: aboveMd ? 8 : 0,
+                      color: "white",
+                    }}
                   />
                 ) : (
                   <img
                     alt="move-open"
                     src="https://img.icons8.com/ios-filled/24/000000/move-left.png"
-                    style={{ opacity: selectedRow.length !== 1 ? 0.4 : 1, marginRight: aboveMd ? 8 : 0, color: 'white' }}
+                    style={{
+                      opacity: selectedRow.length !== 1 ? 0.4 : 1,
+                      marginRight: aboveMd ? 8 : 0,
+                      color: "white",
+                    }}
                   />
                 )}
-                {aboveMd && ((isOpenPoam) ? 'Move to Close' : 'Move to Open')}
+                {aboveMd && (isOpenPoam ? "Move to Close" : "Move to Open")}
               </Button>
 
               <Button
@@ -403,7 +424,7 @@ export default function PoamHeader({
                 onClick={openEditFrom}
                 startIcon={<Icon>edit</Icon>}
               >
-                {aboveMd && 'Edit'}
+                {aboveMd && "Edit"}
               </Button>
 
               <Button
@@ -411,7 +432,9 @@ export default function PoamHeader({
                 id="poam-zoom-btn"
                 className={classes.actionButton}
                 onClick={isZoomed() ? zoomOut : zoomIn}
-                startIcon={<Icon>{isZoomed() ? "zoom_in_map" : "zoom_out_map"}</Icon>}
+                startIcon={
+                  <Icon>{isZoomed() ? "zoom_in_map" : "zoom_out_map"}</Icon>
+                }
               >
                 {aboveMd && (isZoomed() ? "Zoom Out" : "Zoom In")}
               </Button>
@@ -422,9 +445,17 @@ export default function PoamHeader({
                 onClick={openDownload}
                 startIcon={<Icon>file_download</Icon>}
               >
-                {aboveMd && 'Download'}
+                {aboveMd && "Download"}
               </Button>
 
+              <Button
+                id="download-file-btn"
+                className={classes.actionButton}
+                onClick={showTaskTracker}
+                startIcon={<Icon>timeline</Icon>}
+              >
+                {aboveMd && "Action Tracker"}
+              </Button>
             </Box>
             <Box>
               <ManageColumns
@@ -439,19 +470,18 @@ export default function PoamHeader({
                   endIcon=<Icon>tune</Icon>
                   className={classes.actionButton}
                   style={{
-                    color: '#4477CE',
-                    textTransform: 'none',
-                    backgroundColor: '#F0F8F7',
+                    color: "#4477CE",
+                    textTransform: "none",
+                    backgroundColor: "#F0F8F7",
                     borderRadius: 10,
                     paddingInline: 15,
                     width: !aboveMd && 50,
                   }}
                 >
-                  {aboveMd && 'Show Columns'}
+                  {aboveMd && "Show Columns"}
                 </Button>
               </ManageColumns>
             </Box>
-
           </Box>
 
           {/* Edit Actions POPUP Box */}

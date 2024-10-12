@@ -112,3 +112,11 @@ export async function moveRow(fileID, data, isOpen, rowIndex, newIndex) {
   //   ? moveToClose(fileID, data, rowIndex, newIndex)
   //   : moveToOpen(fileID, data, rowIndex, newIndex));
 }
+
+export async function getActions(options, signal) {
+  return await post('/poam/tasks/', options, signal)
+}
+
+export async function exportAction() {
+  return await get('/risk/tasks/export/')
+}

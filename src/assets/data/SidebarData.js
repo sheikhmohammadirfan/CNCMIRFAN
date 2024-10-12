@@ -197,27 +197,27 @@ export const SidebarData = [
         title: "Risk Library",
         component: Link,
         to: "/risk-management/risk-library",
-        icon: "menu_book"
+        icon: "menu_book",
       },
       {
         title: "Risk Register",
         component: Link,
         to: "/risk-management/risk-register",
-        icon: "list"
+        icon: "list",
       },
       {
         title: "Action Tracker",
         component: Link,
         to: "/risk-management/action-tracker",
-        icon: "timeline"
+        icon: "timeline",
       },
       {
         title: "Settings",
         component: Link,
         to: "/risk-management/settings",
-        icon: "settings"
-      }
-    ]
+        icon: "settings",
+      },
+    ],
   },
 
   {
@@ -228,13 +228,13 @@ export const SidebarData = [
         title: "Accounts",
         component: Link,
         to: "/access-management/accounts",
-        icon: "menu_book"
+        icon: "menu_book",
       },
       {
         title: "Reviews",
         component: Link,
         to: "/access-management/reviews",
-        icon: "list"
+        icon: "list",
       },
       {
         title: "Settings",
@@ -269,5 +269,4 @@ export const SidebarData = [
       },
     ]
   }
-
 ];

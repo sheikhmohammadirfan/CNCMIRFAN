@@ -138,7 +138,6 @@ function App() {
                     <Route exact path="/">
                       <Home title="HOME" />
                     </Route>
-
                     <RestrictedRoutes>
 
                       <Route exact path="/verify">

@@ -1,4 +1,4 @@
-import { Box, Button, Grid, Icon, makeStyles, Typography } from "@material-ui/core";
+import { Box } from "@material-ui/core";
 import React, { useEffect, useState } from "react";
 import { FullScreen, useFullScreenHandle } from "react-full-screen";
 import {
@@ -10,25 +10,17 @@ import {
 } from "../../assets/data/PoamData";
 import FormDialog from "./FormDialog";
 import JustificationDialog from "./JustificationDialog";
-import PoamHeader from "./PoamHeader";
-import SecondaryTable from "./SecondaryTable";
-import DataTable from "../Utils/DataTable/DataTable";
-import SkeletonBox from "../Utils/SkeletonBox";
 import {
   addRow,
   getData,
   moveRow,
-  moveToClose,
-  moveToOpen,
   updateRow,
 } from "../../Service/Poam.service";
 import useParams from "../Utils/Hooks/useParams";
 import useLoading from "../Utils/Hooks/useLoading";
-import { setFullScreenID, copyObject, isEmpty } from "../Utils/Utils";
+import { setFullScreenID, isEmpty } from "../Utils/Utils";
 import {
-  HeaderCell,
   mapDataToHeader,
-  RowCell,
   generateRows,
   useStyle,
   getRowIndex,
@@ -41,8 +33,8 @@ import {
   getPoamID_data,
   getSortingMap,
 } from "./PoamUtils";
-import PoamDetails from "./PoamDetails";
-import jira from "../../assets/img/jira-brands.svg";
+import ActionTracker from "./ActionTracker/ActionTracker";
+import PoamDataTable from "./ActionTracker/PoamDataTable";
 
 /* POA&M TABLE COMPONENT */
 export default function PoamTable({ fileID }) {
@@ -118,6 +110,10 @@ export default function PoamTable({ fileID }) {
   const openCreateForm = () => resetPageState() & setFormOpen(true);
   const closeFormDialog = () => setFormOpen(false);
 
+  const [isTaskVisible, setTaskVisible] = useState(false);
+  const showTaskTracker = () => setTaskVisible(true);
+  const hideTaskTracker = () => setTaskVisible(false);
+
   //? ----------> USE-EFFECT & FETCH
 
   // Method to reset state
@@ -172,12 +168,13 @@ export default function PoamTable({ fileID }) {
     return getRowIndex(getPoam(), selectedRow[0] + offset, sortingMap);
   };
 
-
-  //Method to get multiple Rows Index 
+  //Method to get multiple Rows Index
   const getCurrentIndexes = () => {
     if (selectedRow.length === 0) return [];
     const offset = isOpenPoam ? 2 : 0;
-    return selectedRow.map(row => getRowIndex(getPoam(), row + offset, sortingMap));
+    return selectedRow.map((row) =>
+      getRowIndex(getPoam(), row + offset, sortingMap)
+    );
   };
 
   // Map data to header
@@ -195,7 +192,7 @@ export default function PoamTable({ fileID }) {
       setSecondaryOpen,
       matchedCell,
       sortingMap,
-      searchTerm,
+      searchTerm
     );
 
   // ? ----------> ROW MANUPULATION METHODS
@@ -208,13 +205,13 @@ export default function PoamTable({ fileID }) {
     // Creating mapping for response format from new to old
     const mappedDataNewToOld = {};
     Object.values(poam_header_response_map).map((val, index) => {
-      mappedDataNewToOld[val] = {}
-    })
+      mappedDataNewToOld[val] = {};
+    });
     data.map((row, index) => {
       Object.keys(row).map((col, colIndex) => {
         mappedDataNewToOld[poam_header_response_map[col]][newIndex] = row[col];
-      })
-    })
+      });
+    });
 
     // Passing the mappedData to updatePoamRow method
     if (status)
@@ -241,7 +238,8 @@ export default function PoamTable({ fileID }) {
     });
 
     // passing mapped data to updatePoamRow method instead of data which is in new format
-    if (status) updatePoamRow(setPoamData, getPoam, mappedDataNewToOld, rowIndex);
+    if (status)
+      updatePoamRow(setPoamData, getPoam, mappedDataNewToOld, rowIndex);
   };
 
   // Method to call on submiting form
@@ -285,10 +283,16 @@ export default function PoamTable({ fileID }) {
     // Adding multiple selected rowIds in params, so that it can be accessed by CreateIssue component, to send it to backend.
     const rowIndexes = getCurrentIndexes();
     if (rowIndexes.length > 0) {
-      const rowIds = rowIndexes.map(index => getPoam()["id"][index]).join(",");
-      return changeParams({ rowIndex: rowIndexes, createIssue: true, rowId: rowIds });
+      const rowIds = rowIndexes
+        .map((index) => getPoam()["id"][index])
+        .join(",");
+      return changeParams({
+        rowIndex: rowIndexes,
+        createIssue: true,
+        rowId: rowIds,
+      });
     }
-  }
+  };
 
   // Method to set issue details in param and show updateIssue dialog
   const showUpdateIssue = () =>
@@ -311,10 +315,13 @@ export default function PoamTable({ fileID }) {
     );
     setTimeout(() => {
       const active = document.activeElement;
-      document.querySelector("td[data-searched='true']")?.scrollIntoView({
-        block: 'center',    // Ensures vertical centering of the cell
-        inline: 'center'    // Ensures horizontal centering of the cell
-      })?.focus();
+      document
+        .querySelector("td[data-searched='true']")
+        ?.scrollIntoView({
+          block: "center", // Ensures vertical centering of the cell
+          inline: "center", // Ensures horizontal centering of the cell
+        })
+        ?.focus();
       if (active.tagName === "INPUT") {
         active.focus();
       }
@@ -355,75 +362,57 @@ export default function PoamTable({ fileID }) {
       handle={fullScreenHandler}
       onChange={(state) => setFullScreenID(state, "poam-root")}
     >
-      <Box
-        id="poam-root"
-        className={`${classes.poamContainer} ${isZoomed() ? "zoomed" : ""}`}
-      >
-        <PoamHeader
-          selectedRow={selectedRow}
-          zoom={{ isZoomed, zoomIn, zoomOut }}
-          details={{ fileID }}
+      {isTaskVisible ? (
+        <ActionTracker
+          poamContainer={classes.poamContainer}
+          isZoomed={isZoomed}
+          closeTasktracker={hideTaskTracker}
           poamData={poamData}
-          cols={{ allColumns, secondaryColumns, hiddenColumns, visibleColumns }}
-          manageCol={{ moveToPrimary, moveToSecondary }}
+        />
+      ) : (
+        <PoamDataTable
+          classes={classes}
+          fullScreen={{ isZoomed, zoomIn, zoomOut }}
+          data={{
+            selectedRow,
+            setSelectedRow,
+            fileID,
+            poamData,
+            getPoam,
+            setSecondaryOpen,
+            getRowIndex,
+            sortingMap,
+            poamDetails,
+            isLoading,
+          }}
+          manageCol={{
+            allColumns,
+            secondaryColumns,
+            hiddenColumns,
+            visibleColumns,
+            moveToPrimary,
+            moveToSecondary,
+          }}
           manageRow={{ openEditFrom, openCreateForm, openJustify }}
           manageSheet={{ isOpenPoam, showOpenPoam, showClosePoam }}
           manageJira={{ containIssue, showCreateIssue, showUpdateIssue }}
+          manageTask={{ isTaskVisible, showTaskTracker, hideTaskTracker }}
           search={{
             matchedCell,
             setMatched,
             searchSelected,
             setSelected,
             setSearchTerm,
+            searchTerm,
+          }}
+          manageTable={{
+            secondaryOpen,
+            mapTableHeader,
+            mapTableBody,
+            columns_width,
           }}
         />
-
-        <PoamDetails
-          poamDetails={poamDetails}
-          loading={isLoading()}
-        />
-
-        {isLoading() ? (
-          <SkeletonBox text="Loading.." height="60vh" width="100%" />
-        ) : (
-          <Grid
-            container
-            spacing={1}
-            className={`${classes.gridContainer} ${isZoomed() ? "zoomed" : ""}`}
-          >
-            <Grid item xs={secondaryOpen !== -1 ? 9 : 12}>
-              <DataTable
-                className={`poam-table ${classes.tableStyle} ${isOpenPoam ? "o" : ""}`}
-                verticalBorder={true}
-                header={mapTableHeader()}
-                rowList={mapTableBody()}
-                checkbox={true}
-                serialNo={false}
-                resizeTable={true}
-                resizeAfterColumns={1}
-                selectedRows={selectedRow}
-                setSelectedRows={setSelectedRow}
-                headerWrapper={(text) => <HeaderCell text={text} />}
-                rowWrapper={(text) => <RowCell text={text} />}
-                style={{ borderRadius: 5, borderTopLeftRadius: 0, borderTopRightRadius: 0 }}
-                minCellWidth={visibleColumns.map(
-                  (name) => columns_width[allColumns.indexOf(name)]
-                )}
-                searchTerm={searchTerm}
-              />
-            </Grid>
-
-            <SecondaryTable
-              data={getPoam()}
-              currentRow={getRowIndex(getPoam(), secondaryOpen, sortingMap)}
-              columnsList={secondaryColumns.filter(
-                (name) => !hiddenColumns.includes(name)
-              )}
-              closeTable={() => setSecondaryOpen(-1)}
-            />
-          </Grid>
-        )}
-      </Box>
+      )}
 
       <FormDialog
         poamID_data={getPoamID_data(poamData)}
