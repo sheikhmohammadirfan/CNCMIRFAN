@@ -259,6 +259,9 @@ const ActionTracker = ({
   };
 
   const getRegisterOptions = () => {
+    if (!poamData || !Object.entries(poamData)) {
+      return [];
+    }
     const openOptions = Object.entries(poamData.open["POAM ID"]).map((val) => {
       const idx = val[0];
       const poamId = val[1];
@@ -323,7 +326,7 @@ const ActionTracker = ({
     generateRows(
       actions,
       getColumns(),
-      register,
+      getRegisterOptions(),
       owners,
       selectedRows,
       matchedCell

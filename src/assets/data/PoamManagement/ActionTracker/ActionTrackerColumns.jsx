@@ -23,7 +23,7 @@ export const HEADER_TABLE_COLS_MAP = {
   Owner: "owner",
   "Due Date": "due_date",
   Status: "status",
-  Source: "source_id",
+  Source: "task_type",
   "Source URL": "source_url",
   Notes: "notes",
   // files: string[],

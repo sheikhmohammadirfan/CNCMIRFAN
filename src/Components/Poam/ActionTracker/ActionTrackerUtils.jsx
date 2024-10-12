@@ -130,11 +130,11 @@ export const useStyle = makeStyles((theme) => ({
       fontStyle: "italic",
     },
   },
-	
-	formContainer: {
+
+  formContainer: {
     "& .MuiDialogContent-root": {
-      padding: "24px"
-    }
+      padding: "24px",
+    },
   },
 }));
 
@@ -271,12 +271,10 @@ const mapDataToRow = (row, rowIndex, register, owners, columns, matchedCell) =>
 const getCellValue = (row, colName, register, owners) => {
   if (colName === "risk") {
     if (register.length === 0) return "load";
-    else
-      return register.find((risk) => risk.id === row["risk"].id).scenario
-        .scenario;
+    else return register.find((r) => r.val === row.poam_row)?.text || "-";
   } else if (colName === "owner") {
     if (owners.length === 0) return "load";
-    let owner = owners.find((owner) => owner.id === row.risk.owner);
+    let owner = owners.find((owner) => owner.id === row.assignee);
     return `${owner.first_name} ${owner.last_name}`;
   } else return row[colName];
 };
