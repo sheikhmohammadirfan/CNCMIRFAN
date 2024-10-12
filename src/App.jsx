@@ -69,7 +69,7 @@ const useStyles = makeStyles((theme) => ({
   wrapper: {
     height: `calc(100vh - ${headerHeight}px)`,
     minHeight: `calc(100vh - ${headerHeight}px)`,
-    overflow: "hidden",
+    overflow: "auto",
     position: 'relative',
     [theme.breakpoints.down("xs")]: { paddingLeft: sidebarSmall },
     backgroundColor: '#F4F4F4'
@@ -105,7 +105,7 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Box height="100vh" width="100vw" overflow="auto" ref={updateTarget}>
+      <Box height="100vh" width="100vw" overflow="hidden" ref={updateTarget}>
         <Router>
           <Switch>
             <Route path="/login" exact>
