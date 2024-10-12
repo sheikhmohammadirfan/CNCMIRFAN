@@ -1,33 +1,54 @@
-import { Box, Grid, Typography } from '@material-ui/core'
-import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
-import { HeaderCell, RowCell, generateRows, mapDataToHeader, useStyle } from './RiskLibraryUtils'
-import RiskLibraryHeader from './RiskLibraryHeader';
-import RiskLibraryFilters from '../../../assets/data/RiskManagement/RiskLibrary/RiskLibraryFilters';
-import useLoading from '../../Utils/Hooks/useLoading';
-import SkeletonBox from '../../Utils/SkeletonBox';
-import DataTable from '../../Utils/DataTable/DataTable';
-import { getLibrary } from '../../../Service/RiskManagement/RiskLibrary.service';
-import { HEADER_TABLE_NAME_MAP, LibraryColumns, librayColumnWidths } from '../../../assets/data/RiskManagement/RiskLibrary/LibraryColumns';
-import RiskFormDialog from '../RiskFormDialog';
-import { cia_categories } from '../../../assets/data/RiskManagement/RiskRegister/RiskRegisterFilters';
-import { createRisk } from '../../../Service/RiskManagement/RiskRegister.service';
-import RiskManagementContext from '../RiskManagementContext';
-import useSlider from '../../Utils/Hooks/useSlider';
-import { notification } from '../../Utils/Utils';
-import { getUser } from '../../../Service/UserFactory';
+import { Box, Grid, Typography } from "@material-ui/core";
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import {
+  HeaderCell,
+  RowCell,
+  generateRows,
+  mapDataToHeader,
+  useStyle,
+} from "./RiskLibraryUtils";
+import RiskLibraryHeader from "./RiskLibraryHeader";
+import RiskLibraryFilters from "../../../assets/data/RiskManagement/RiskLibrary/RiskLibraryFilters";
+import useLoading from "../../Utils/Hooks/useLoading";
+import SkeletonBox from "../../Utils/SkeletonBox";
+import DataTable from "../../Utils/DataTable/DataTable";
+import { getLibrary } from "../../../Service/RiskManagement/RiskLibrary.service";
+import {
+  HEADER_TABLE_NAME_MAP,
+  LibraryColumns,
+  librayColumnWidths,
+} from "../../../assets/data/RiskManagement/RiskLibrary/LibraryColumns";
+import RiskFormDialog from "../RiskFormDialog";
+import { cia_categories } from "../../../assets/data/RiskManagement/RiskRegister/RiskRegisterFilters";
+import { createRisk } from "../../../Service/RiskManagement/RiskRegister.service";
+import RiskManagementContext from "../RiskManagementContext";
+import useSlider from "../../Utils/Hooks/useSlider";
+import { notification } from "../../Utils/Utils";
+import { getUser } from "../../../Service/UserFactory";
 
 const RiskLibrary = () => {
-
   const hasEditRiskAccess = useMemo(() => {
-    const user = getUser()
-    return Boolean(user.roles[0].permissions.find(p => p.permission_name === 'edit_risk'))
-  }, [])
+    const user = getUser();
+    return Boolean(
+      user.roles[0].permissions.find((p) => p.permission_name === "edit_risk")
+    );
+  }, []);
 
   // React state to maintain loading status
   const { isLoading, startLoading, stopLoading } = useLoading();
 
   // Get categories and risk scores from RiskManagementContext, and populate it in our filterdropdown state
-  const { categories: { categories }, scores } = useContext(RiskManagementContext);
+  const {
+    categories: { categories },
+    scores,
+  } = useContext(RiskManagementContext);
 
   const prevPayload = useRef("");
   const searchedValue = useRef("");
@@ -35,7 +56,7 @@ const RiskLibrary = () => {
     categories: [],
     register: [],
     // source: [],
-  })
+  });
 
   // State to store page size, and function to update page size. function will be called from DataTable
   const [pagination, setPagination] = useState({
@@ -45,15 +66,15 @@ const RiskLibrary = () => {
     total_pages: null,
   });
   const [loader, setLoader] = useState(0);
-  const reload = () => setLoader(p => p === 100 ? 0 : p + 1);
+  const reload = () => setLoader((p) => (p === 100 ? 0 : p + 1));
   const updatePageSize = (size) => {
-    setPagination(prev => ({ ...prev, page_no: 1, page_size: size }));
+    setPagination((prev) => ({ ...prev, page_no: 1, page_size: size }));
     reload();
-  }
+  };
   const updatePageNumber = (page) => {
-    setPagination(prev => ({ ...prev, page_no: page }));
+    setPagination((prev) => ({ ...prev, page_no: page }));
     reload();
-  }
+  };
 
   // SORTING
   const [sorting, setSorting] = useState(null);
@@ -62,11 +83,15 @@ const RiskLibrary = () => {
     if (sorting) {
       currSort = { ...sorting };
     }
-    if (currSort.sort_by === HEADER_TABLE_NAME_MAP[colName]) {
+    const sortName =
+      HEADER_TABLE_NAME_MAP[colName] === "description"
+        ? "scenario"
+        : HEADER_TABLE_NAME_MAP[colName];
+    if (currSort.sort_by === sortName) {
       currSort.sort_order = currSort.sort_order === 1 ? -1 : 1;
     } else {
       currSort = {
-        sort_by: HEADER_TABLE_NAME_MAP[colName],
+        sort_by: sortName,
         sort_order: 1,
       };
     }
@@ -83,7 +108,7 @@ const RiskLibrary = () => {
       search: searchedValue.current,
       page_size: pagination.page_size,
       page_no: pagination.page_no,
-      ...sorting
+      ...sorting,
     };
     if (filters.categories.length > 0) {
       payload.filters["categories"] = filters.categories;
@@ -121,37 +146,40 @@ const RiskLibrary = () => {
       page_no: data.page_no,
       page_size: data.page_size,
       total_items: data.total_items,
-      total_pages: data.total_pages
-    }
+      total_pages: data.total_pages,
+    };
     // if signal is not aborted, that means no new reqs were fired. so we can safely stop loading and set the state.
     if (!signal.aborted) {
       setLibrary({
         ...data,
-        scenarios: data.scenarios.map(x => ({
+        scenarios: data.scenarios.map((x) => ({
           ...x,
-          "Scenario": x.scenario,
-          "Categories": x.categories,
-          "Source": x.scenario_source === 0 ? "SYSTEM" : "CUSTOM"
-        }))
+          Scenario: x.scenario,
+          Categories: x.categories,
+          Source: x.scenario_source === 0 ? "SYSTEM" : "CUSTOM",
+        })),
       });
-      setPagination({ ...paginationData, page_no: pagination.page_no > data.total_pages ? 1 : pagination.page_no });
+      setPagination({
+        ...paginationData,
+        page_no: pagination.page_no > data.total_pages ? 1 : pagination.page_no,
+      });
       stopLoading();
     }
   };
 
   useEffect(() => {
     fetchLibrary();
-  }, [loader, sorting])
+  }, [loader, sorting]);
 
-  const filterStringified = useRef('');
+  const filterStringified = useRef("");
   // Whenever any filters are changed, set page to 1
   const filterTrigger = () => {
     // If filters haven't changed, return;
     if (filterStringified.current === JSON.stringify(filters)) return;
     filterStringified.current = JSON.stringify(filters);
-    setPagination(prev => ({ ...prev, page_no: 1 }));
+    setPagination((prev) => ({ ...prev, page_no: 1 }));
     reload();
-  }
+  };
 
   // Save library columns
   const [libraryColumns, setLibraryColumns] = useState(LibraryColumns);
@@ -161,64 +189,81 @@ const RiskLibrary = () => {
   const getCurrentIndex = () => {
     if (selectedRows.length === 0) return -1;
     return selectedRows[0];
-  }
+  };
 
   const [matchedCell, setMatchedCell] = useState([]);
 
   const [filterDropdowns, setFilterDropdowns] = useState(RiskLibraryFilters);
   useEffect(() => {
-    setFilterDropdowns(prev => ({
+    setFilterDropdowns((prev) => ({
       ...prev,
-      categories: { ...prev.categories, options: categories.map(c => ({ id: c.id, text: c.category_name })) }
-    }))
-  }, [categories])
-
+      categories: {
+        ...prev.categories,
+        options: categories.map((c) => ({ id: c.id, text: c.category_name })),
+      },
+    }));
+  }, [categories]);
 
   const changeFilters = (filterName, updatedFilterIds) => {
-    setFilters(prev => {
-      return ({
+    setFilters((prev) => {
+      return {
         ...prev,
-        [filterName]: updatedFilterIds
-      })
-    })
-  }
+        [filterName]: updatedFilterIds,
+      };
+    });
+  };
   const clearFilters = (filterName) => {
     if (filterName) {
-      setFilters(prev => ({
+      setFilters((prev) => ({
         ...prev,
-        [filterName]: []
+        [filterName]: [],
       }));
     } else {
-      setFilters(prev => {
+      setFilters((prev) => {
         const obj = {};
         for (const key in prev) {
           obj[key] = [];
         }
         return obj;
-      })
+      });
     }
-  }
+  };
 
   const [addRiskForm, setAddRiskForm] = useState(false);
   const closeRiskForm = () => setAddRiskForm(false);
 
-  const { getLikelihoodScore, getImpactScore, getLikelihoodSliderValue, getImpactSliderValue } = useSlider(scores)
+  const {
+    getLikelihoodScore,
+    getImpactScore,
+    getLikelihoodSliderValue,
+    getImpactSliderValue,
+  } = useSlider(scores);
 
   const onAddFormSubmit = async (val) => {
     const payload = {
       scenario_id: library[getCurrentIndex()].id,
-      likelihood_id: scores.likelihoodScores.find(score => score.score === getLikelihoodScore(val.inherent_likelihood)).id,
-      impact_id: scores.impactScores.find(score => score.score === getImpactScore(val.inherent_impact)).id,
+      likelihood_id: scores.likelihoodScores.find(
+        (score) => score.score === getLikelihoodScore(val.inherent_likelihood)
+      ).id,
+      impact_id: scores.impactScores.find(
+        (score) => score.score === getImpactScore(val.inherent_impact)
+      ).id,
       notes: val.notes,
-      cia: cia_categories.filter(cia => Boolean(val[cia.name])).map(cia => cia.id),
-      custom_id: val.customId
-    }
+      cia: cia_categories
+        .filter((cia) => Boolean(val[cia.name]))
+        .map((cia) => cia.id),
+      custom_id: val.customId,
+    };
     const { status } = await createRisk(payload);
     if (status) {
       closeRiskForm();
-      notification("risk-add-success", "Risk Successfully Created !", 'success')
+      notification(
+        "risk-add-success",
+        "Risk Successfully Created !",
+        "success"
+      );
     }
-  }
+  };
 
   // Map data to header
   const mapTableHeader = () =>
@@ -240,13 +285,14 @@ const RiskLibrary = () => {
   const onSearch = (val) => {
     searchedValue.current = val;
     fetchLibrary();
-  }
+  };
 
   return (
     <Box className={classes.libraryContainer}>
-
       <Box className={classes.libraryHead}>
-        <Typography className={classes.libraryTitle}>Falcon Risk Library</Typography>
+        <Typography className={classes.libraryTitle}>
+          Falcon Risk Library
+        </Typography>
         {/* <Typography className={classes.libraryCaption}>
           Select the risks that apply to your business and track them on your risk register.
         </Typography> */}
@@ -257,26 +303,22 @@ const RiskLibrary = () => {
         selectedRows={selectedRows}
         // Dropdown data for filters
         tableFilters={filterDropdowns}
-        filters={{ filters, changeFilters, clearFilters, triggerFilters: filterTrigger }}
+        filters={{
+          filters,
+          changeFilters,
+          clearFilters,
+          triggerFilters: filterTrigger,
+        }}
         // function to open add risk form on clicking add button
         openAddRiskForm={() => setAddRiskForm(true)}
         onSearch={onSearch}
-
       />
 
-      {isLoading()
-        ?
+      {isLoading() ? (
         <SkeletonBox text="Loading.." height="60vh" width="100%" />
-        :
-        <Grid
-          container
-          spacing={1}
-          className={classes.gridContainer}
-        >
-          <Grid
-            item
-            xs={12}
-          >
+      ) : (
+        <Grid container spacing={1} className={classes.gridContainer}>
+          <Grid item xs={12}>
             <DataTable
               className={classes.tableStyle}
               verticalBorder={true}
@@ -291,11 +333,14 @@ const RiskLibrary = () => {
               setSelectedRows={setSelectedRows}
               headerWrapper={(text) => <HeaderCell text={text} />}
               // rowWrapper={(text, colName) => <RowCell text={text} column={colName} />}
-              style={{ borderRadius: 5, borderTopLeftRadius: 0, borderTopRightRadius: 0 }}
+              style={{
+                borderRadius: 5,
+                borderTopLeftRadius: 0,
+                borderTopRightRadius: 0,
+              }}
               minCellWidth={libraryColumns.map(
                 (name) => librayColumnWidths[libraryColumns.indexOf(name)]
               )}
-
               // Pagination props
               currentPage={pagination.page_no}
               pageSize={pagination.page_size}
@@ -314,9 +359,9 @@ const RiskLibrary = () => {
           closeTable={() => setSecondaryOpen(-1)}
         /> */}
         </Grid>
-      }
+      )}
 
-      {addRiskForm &&
+      {addRiskForm && (
         <RiskFormDialog
           hasAccess={hasEditRiskAccess}
           open={addRiskForm}
@@ -328,9 +373,10 @@ const RiskLibrary = () => {
           getSliderValue={{ getLikelihoodSliderValue, getImpactSliderValue }}
           scores={scores}
           onFormSubmit={onAddFormSubmit}
-        />}
+        />
+      )}
     </Box>
-  )
-}
+  );
+};
 
-export default RiskLibrary
+export default RiskLibrary;
