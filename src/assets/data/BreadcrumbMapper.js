@@ -23,5 +23,7 @@ export const BreadcrumbMapper = {
   'rbac': 'Role Based Access Control',
   'users': 'Users',
   'roles': 'Roles',
-  'organization': 'Organization'
+  'organization': 'Organization',
+  'doc-compliance': 'Document Compliance',
+  'policies': 'Policies'
 };
