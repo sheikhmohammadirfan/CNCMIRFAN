@@ -1,7 +1,7 @@
 import { Box } from '@mui/material'
 import React from 'react'
 import { Route, Switch } from 'react-router-dom/cjs/react-router-dom.min';
-import Policies from '../Components/DocCompliance/Policies';
+import Policies from '../Components/DocCompliance/Policies/Policies';
 import { makeStyles } from '@material-ui/core';
 
 const useStyle = makeStyles((theme) => ({
