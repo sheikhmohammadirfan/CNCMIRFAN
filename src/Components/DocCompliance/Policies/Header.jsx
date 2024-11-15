@@ -86,7 +86,7 @@ const Header = ({
   filters: { filters, changeFilters, clearFilters },
   triggerFilters,
   selectedRows,
-  openAddActionForm,
+  openForm,
   onSearch,
 }) => {
 
@@ -222,7 +222,7 @@ const Header = ({
             color='primary'
             startIcon={<Icon>add</Icon>}
             className={classes.addActionButton}
-            onClick={openAddActionForm}
+            onClick={openForm}
           >
             Add
           </Button>

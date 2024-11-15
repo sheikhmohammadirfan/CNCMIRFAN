@@ -9,11 +9,12 @@ import SkeletonBox from '../../Utils/SkeletonBox';
 import DataTable from '../../Utils/DataTable/DataTable';
 import useLoading from '../../Utils/Hooks/useLoading';
 import POLICIES_MOCK from '../../../assets/data/DocCompliance/Policies/Mock';
+import Dialog from './Dialog';
 
 const Policies = () => {
 
   // <--------------------------- CHECK ACCESS --------------------------->
-  const hasEditActionAccess = useMemo(() => {
+  const hasEditPolicyAccess = useMemo(() => {
     // const user = getUser()
     // return Boolean(user.roles[0].permissions.find(p => p.permission_name === 'edit_action'))
     return true;
@@ -118,10 +119,13 @@ const Policies = () => {
   const [matchedCell, setMatchedCell] = useState([]);
 
   // <--------------------------- FORM THINGS --------------------------->
-  const [actionDialog, setActionDialog] = useState(false);
-  const openAddActionForm = () => setActionDialog(true);
-  const closeAddActionForm = () => setActionDialog(false);
+  const [dialog, setDialog] = useState(false);
+  const openForm = () => setDialog(true);
+  const closeForm = () => setDialog(false);
 
+  const handleFormSubmit = async (values) => {
+    console.log(values)
+  }
 
   // <--------------------------- TABLE DATA MAPPERS --------------------------->
   const [columns, setColumns] = useState(COLUMNS);
@@ -146,12 +150,12 @@ const Policies = () => {
   return (
     <Box className={classes.policiesContainer}>
       <Header
-        hasAccess={hasEditActionAccess}
+        hasAccess={hasEditPolicyAccess}
         tableFilters={filterDropdowns}
         filters={{ filters, changeFilters, clearFilters }}
         triggerFilters={filterTrigger}
         selectedRows={selectedRows}
-        openAddActionForm={openAddActionForm}
+        openForm={openForm}
         onSearch={onSearch}
       />
 
@@ -201,6 +205,16 @@ const Policies = () => {
         /> */}
         </Grid>
       )}
+
+      {dialog &&
+        <Dialog
+          open={dialog}
+          closeHandler={closeForm}
+          hasAccess={hasEditPolicyAccess}
+          isCreatePolicy={true}
+          onFormSubmit={handleFormSubmit}
+        />
+      }
     </Box>
   )
 }
