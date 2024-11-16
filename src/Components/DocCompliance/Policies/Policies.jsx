@@ -9,6 +9,7 @@ import SkeletonBox from '../../Utils/SkeletonBox';
 import DataTable from '../../Utils/DataTable/DataTable';
 import useLoading from '../../Utils/Hooks/useLoading';
 import POLICIES_MOCK from '../../../assets/data/DocCompliance/Policies/Mock';
+import { useHistory } from "react-router-dom";
 import Dialog from './Dialog';
 
 const Policies = () => {
@@ -136,12 +137,18 @@ const Policies = () => {
     const mappedCols = columns.map((colName) => HEADER_TABLE_COLS_MAP[colName]);
     return mappedCols;
   };
+
+  const history = useHistory();
+  const navigateToPolicyDetail = (id) => {
+    history.push(`/doc-compliance/policies/${id}`)
+  }
   const mapTableBody = () =>
     generateRows(
       policies,
       getColumns(),
       selectedRows,
-      matchedCell
+      matchedCell,
+      navigateToPolicyDetail
       // sortingMap
     );
 

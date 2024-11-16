@@ -150,6 +150,7 @@ export const generateRows = (
   columns,
   selectedList,
   matchedCell,
+  navigateToPolicyDetail,
   sortingMap
 ) => {
   // count of number of rows
@@ -171,6 +172,7 @@ export const generateRows = (
       ),
       props: {
         selected: selectedList.indexOf(i) !== -1,
+        onClick: (e) => navigateToPolicyDetail(data[i].id)
       },
     });
 
