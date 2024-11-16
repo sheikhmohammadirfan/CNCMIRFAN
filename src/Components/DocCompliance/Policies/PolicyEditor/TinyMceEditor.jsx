@@ -1,20 +1,13 @@
-import React, { useRef } from 'react'
+import React, { useRef, forwardRef } from 'react'
 import { Editor } from '@tinymce/tinymce-react';
 
-const TinyMceEditor = () => {
-
-  const editorRef = useRef(null);
-  const log = () => {
-    if (editorRef.current) {
-      console.log(editorRef.current.getContent());
-    }
-  };
+const TinyMceEditor = forwardRef((props, ref) => {
 
   return (
     <>
       <Editor
         apiKey='your-api-key'
-        onInit={(_evt, editor) => editorRef.current = editor}
+        onInit={(_evt, editor) => ref.current = editor}
         initialValue="<p>This is the initial content of the editor.</p>"
         init={{
           selector: 'textarea#open-source-plugins',
@@ -57,7 +50,7 @@ const TinyMceEditor = () => {
               callback('movie.mp4', { source2: 'alt.ogg', poster: 'https://www.google.com/logos/google.jpg' });
             }
           },
-          height: 600,
+          height: '100%',
           image_caption: true,
           quickbars_selection_toolbar: 'bold italic | quicklink h2 h3 blockquote quickimage quicktable',
           noneditable_class: 'mceNonEditable',
@@ -70,6 +63,6 @@ const TinyMceEditor = () => {
       />
     </>
   )
-}
+})
 
 export default TinyMceEditor

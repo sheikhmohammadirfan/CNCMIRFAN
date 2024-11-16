@@ -16,7 +16,6 @@ export const BreadcrumbMapper = {
   'risk-library': "Risk Library",
   'risk-register': "Risk Register",
   'action-tracker': "Action Tracker",
-  'settings': "Settings",
   'access-management': "Acess Management",
   'accounts': "Accounts",
   'reviews': "Reviews",
@@ -25,5 +24,6 @@ export const BreadcrumbMapper = {
   'roles': 'Roles',
   'organization': 'Organization',
   'doc-compliance': 'Document Compliance',
-  'policies': 'Policies'
+  'policies': 'Policies',
+  'editor': "Editor"
 };

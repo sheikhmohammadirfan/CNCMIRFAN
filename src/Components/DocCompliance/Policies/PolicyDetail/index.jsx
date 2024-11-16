@@ -1,5 +1,6 @@
 import { Box, Button, Icon, Stack, Tab, Tabs, Typography } from '@mui/material'
 import React, { useState } from 'react'
+import { useHistory, useLocation } from 'react-router-dom/cjs/react-router-dom.min';
 
 
 const CustomTab = ({ ...tabProps }) => (
@@ -48,6 +49,12 @@ const PolicyDetail = () => {
     };
   }
 
+  const location = useLocation();
+  const history = useHistory();
+  const handleEditClick = () => {
+    history.push(`${location.pathname}/editor`)
+  }
+
   return (
     <Box>
       <Box display="flex" alignItems="center" columnGap={1}>
@@ -82,7 +89,7 @@ const PolicyDetail = () => {
               </Stack>
             </Box>
             <Box>
-              <Button color='primary' variant='contained' sx={{ textTransform: 'none' }} disableElevation>
+              <Button color='primary' variant='outlined' sx={{ textTransform: 'none' }} disableElevation onClick={handleEditClick}>
                 Edit
               </Button>
             </Box>
