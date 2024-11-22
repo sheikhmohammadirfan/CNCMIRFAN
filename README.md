@@ -11,7 +11,7 @@ _Cloud Native Compliance Maven (CNCM) is a platform that automates the complianc
 - **Status :**
   Currently in the early development phase
 
-- **Live Working Model :** [check out](https://cncmllc.herokuapp.com/)
+- **Live Working Model :** [check out](https://dev-falcon.vercel.app/)
 
 ## Installation
 
