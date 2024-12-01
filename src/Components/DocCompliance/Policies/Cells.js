@@ -1,7 +1,8 @@
-import { TextWrapCell } from "../../Utils/DataTable/Cells"
+import { PillCell, TextWrapCell } from "../../Utils/DataTable/Cells"
 
 const CELLS = {
-  framework: TextWrapCell
+  framework: TextWrapCell,
+  policy_status: PillCell
 }
 
 export default CELLS

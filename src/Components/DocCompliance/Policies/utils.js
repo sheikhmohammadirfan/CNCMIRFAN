@@ -192,7 +192,15 @@ const mapDataToRow = (row, rowIndex, columns, matchedCell) => (
     let CellComponent = colName in CELLS && CELLS[colName]
     let cellValue = getCellValue(row, colName);
     return {
-      text: colName in CELLS ? <CellComponent cellValue={cellValue} /> : <RowCell text={cellValue} />,
+      text: colName in CELLS
+        ? <CellComponent
+          cellValue={cellValue}
+          {...colName === 'policy_status' && {
+            showColorDot: true,
+            dotColor: STATUS_MAP[row['policy_status']].dotColor
+          }}
+        />
+        : <RowCell text={cellValue} />,
       params:
         colName === "id"
           ? {
@@ -223,7 +231,7 @@ const mapDataToRow = (row, rowIndex, columns, matchedCell) => (
 )
 
 const getCellValue = (row, colName) => {
-  if (colName === 'policy_status') return STATUS_MAP[row['policy_status']]
+  if (colName === 'policy_status') return STATUS_MAP[row['policy_status']].text
   return row[colName]
 }
 
