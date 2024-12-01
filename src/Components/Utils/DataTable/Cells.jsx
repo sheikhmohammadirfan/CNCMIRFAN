@@ -1,4 +1,5 @@
-import { Box, makeStyles, Typography } from "@material-ui/core";
+import { makeStyles } from "@material-ui/core";
+import { Icon, Stack, Box, Typography } from "@mui/material";
 
 const useStyle = makeStyles((theme) => ({
   statusCell: {
@@ -48,5 +49,27 @@ export function MultipePills({ cellValue }) {
         <Typography key={index} variant="body1" noWrap className={classes.cellLabel}>{val.text || "Keys not proper"}</Typography>
       ))}
     </Box>
+  )
+}
+
+export function TextWrapCell({ cellValue }) {
+  const classes = useStyle();
+  return (
+    <Stack spacing={1}>
+      {cellValue.map((c, i) => (
+        <Box
+          key={i}
+          display="flex"
+          alignItems="center"
+        >
+          <Icon sx={{ "&.MuiIcon-root": { fontSize: '0.8rem', color: '#aaa', marginRight: 1 } }}>fiber_manual_record</Icon> {c}
+          <Typography
+            variant="body2"
+            style={{ color: '#444' }}
+          >
+          </Typography>
+        </Box>
+      ))}
+    </Stack>
   )
 }
