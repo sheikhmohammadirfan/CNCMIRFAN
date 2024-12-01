@@ -164,7 +164,7 @@ const Dialog = ({
                     label='Applicable Frameworks'
                     control={control}
                     rules={validation}
-                    multiple={false}
+                    multiple={true}
                     optionList={[
                       {
                         id: "hipaa",
@@ -178,7 +178,7 @@ const Dialog = ({
                     disabled={false}
                     onValueChange={(newVal) => setFramework(newVal)}
                   />
-                  {Boolean(framework) ? (
+                  {framework?.length > 0 ? (
                     <Box mt={2} px={1}>
                       <Box>
                         <Typography className={classes.controlListHead}>Corresponding controls:</Typography>

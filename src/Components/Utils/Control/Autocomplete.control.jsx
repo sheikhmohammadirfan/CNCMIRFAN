@@ -28,7 +28,7 @@ const AutocompleteControl = ({
           <Autocomplete
             size='medium'
             multiple={multiple}
-            value={value || null}
+            value={value || (multiple ? [] : null)}
             onChange={(e, newVal) => handleValueChange(newVal)}
             options={!disabled ? optionList : []}
             getOptionLabel={(option) => option.label || ''}
