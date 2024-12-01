@@ -1,10 +1,11 @@
 import React, { useState } from 'react'
 import DialogBox from '../../Utils/DialogBox'
 import { makeStyles, Typography } from '@material-ui/core'
-import { Box, Button, Grid, Tooltip } from '@mui/material';
-import { Form, TextControl } from '../../Utils/Control';
+import { Box, Button, Grid, Icon, List, ListItem, ListItemIcon, ListItemText, Tooltip } from '@mui/material';
+import { Form, SelectControl, TextControl } from '../../Utils/Control';
 import { useForm } from 'react-hook-form';
 import useLoading from '../../Utils/Hooks/useLoading';
+import AutocompleteControl from '../../Utils/Control/Autocomplete.control';
 
 // Custom input compoent
 const FormInput = ({ ...rest }) => (
@@ -27,6 +28,37 @@ const useStyle = makeStyles(theme => ({
       padding: "24px",
     }
   },
+  controlListContainer: {
+    padding: '18.5px 14px',
+    border: '1px solid rgba(0, 0, 0, 0.23)'
+  },
+  controlListHead: {
+    fontSize: '0.95rem',
+    color: '#444'
+  },
+  controlItem: {
+    '&.MuiListItem-root': {
+      paddingBlock: '2px',
+      paddingLeft: 0
+    },
+    '& .MuiListItemText-root': {
+      marginBlock: 0
+    },
+    '& .MuiTypography-root': {
+      fontSize: '0.9rem',
+      color: '#666'
+    }
+  },
+  controlItemIcon: {
+    '&.MuiListItemIcon-root': {
+      minWidth: 'auto',
+      marginRight: '8px',
+    },
+    '& .MuiIcon-root': {
+      fontSize: '1rem',
+      color: '#bababa'
+    }
+  }
 }))
 
 // Status text based on loading value
@@ -62,6 +94,7 @@ const Dialog = ({
   const validation = {
     title: { required: "This field is required" },
     description: { required: "This field is required" },
+    applicable_frameworks: { required: "This field is required" }
   };
 
   const disabled = !hasAccess
@@ -72,7 +105,7 @@ const Dialog = ({
   }
 
   // Get useForm Methods
-  const { handleSubmit, control, reset } = useForm({
+  const { handleSubmit, control, reset, getValues } = useForm({
     defaultValues: formValues,
   });
 
@@ -84,6 +117,8 @@ const Dialog = ({
   }
 
   const classes = useStyle();
+
+  console.log(getValues('applicable_frameworks'))
 
   return (
     <DialogBox
@@ -119,7 +154,99 @@ const Dialog = ({
                   name="description"
                   label="Description"
                   disabled={!hasAccess}
-                  minRows={6}
+                  minRows={4}
+                />
+              </Grid>
+
+              <Grid item xs={12}>
+                <Box className={classes.controlListContainer}>
+                  <AutocompleteControl
+                    name='applicable_frameworks'
+                    label='Applicable Frameworks'
+                    control={control}
+                    rules={validation}
+                    multiple={false}
+                    optionList={[
+                      {
+                        id: "hipaa",
+                        label: "HIPAA"
+                      },
+                      {
+                        id: "fedramp",
+                        label: "FedRAMP"
+                      },
+                    ]}
+                    disabled={false}
+                  />
+                  <Box mt={2} px={1}>
+                    <Box>
+                      <Typography className={classes.controlListHead}>Corresponding controls:</Typography>
+                    </Box>
+                    <Box>
+                      <List>
+                        <ListItem className={classes.controlItem}>
+                          <ListItemIcon className={classes.controlItemIcon}>
+                            <Icon>fiber_manual_record</Icon>
+                          </ListItemIcon>
+                          <ListItemText primary="AC-1 Policy and Procedures" />
+                        </ListItem>
+                        <ListItem className={classes.controlItem}>
+                          <ListItemIcon className={classes.controlItemIcon}>
+                            <Icon>fiber_manual_record</Icon>
+                          </ListItemIcon>
+                          <ListItemText primary="AC-2 Account Management" />
+                        </ListItem>
+                      </List>
+                    </Box>
+                  </Box>
+                </Box>
+              </Grid>
+
+              <Grid item xs={6}>
+                <SelectControl
+                  name="document_owner"
+                  label="Document Owner"
+                  variant="outlined"
+                  options={[
+                    {
+                      val: 0,
+                      text: "Affan Ansari"
+                    },
+                    {
+                      val: 1,
+                      text: "Saif Mulla"
+                    },
+                    {
+                      val: 0,
+                      text: "Irshad Siddiqui"
+                    },
+                  ]}
+                  styleProps={{ fullWidth: true, }}
+                  disabled={!hasAccess}
+                />
+              </Grid>
+
+              <Grid item xs={6}>
+                <SelectControl
+                  name="policy_owner"
+                  label="Policy Owner"
+                  variant="outlined"
+                  options={[
+                    {
+                      val: 0,
+                      text: "Affan Ansari"
+                    },
+                    {
+                      val: 1,
+                      text: "Saif Mulla"
+                    },
+                    {
+                      val: 0,
+                      text: "Irshad Siddiqui"
+                    },
+                  ]}
+                  styleProps={{ fullWidth: true, }}
+                  disabled={!hasAccess}
                 />
               </Grid>
             </Grid>
