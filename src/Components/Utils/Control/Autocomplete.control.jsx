@@ -11,6 +11,7 @@ const AutocompleteControl = ({
   optionList,
   disabled,
   loading = false,
+  onValueChange = () => { },
   ...rest
 }) => {
   return (
@@ -19,12 +20,16 @@ const AutocompleteControl = ({
       control={control}
       rules={rules[name]}
       render={({ field: { value, onChange }, fieldState: { error } }) => {
+        const handleValueChange = (newVal) => {
+          onValueChange(newVal);
+          !disabled && onChange(newVal)
+        }
         return (
           <Autocomplete
             size='medium'
             multiple={multiple}
             value={value || null}
-            onChange={(e, newVal) => !disabled && onChange(newVal)}
+            onChange={(e, newVal) => handleValueChange(newVal)}
             options={!disabled ? optionList : []}
             getOptionLabel={(option) => option.label || ''}
             filterSelectedOptions

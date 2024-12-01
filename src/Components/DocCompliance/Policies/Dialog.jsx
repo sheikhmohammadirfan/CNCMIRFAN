@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import DialogBox from '../../Utils/DialogBox'
-import { makeStyles, Typography } from '@material-ui/core'
-import { Box, Button, Grid, Icon, List, ListItem, ListItemIcon, ListItemText, Tooltip } from '@mui/material';
+import { makeStyles } from '@material-ui/core'
+import { Box, Button, Grid, Icon, List, ListItem, ListItemIcon, ListItemText, Tooltip, Typography } from '@mui/material';
 import { Form, SelectControl, TextControl } from '../../Utils/Control';
 import { useForm } from 'react-hook-form';
 import useLoading from '../../Utils/Hooks/useLoading';
@@ -109,6 +109,7 @@ const Dialog = ({
     defaultValues: formValues,
   });
 
+  const [framework, setFramework] = useState(null);
 
   const onSubmit = async (values) => {
     setisFormLoading(true);
@@ -117,8 +118,6 @@ const Dialog = ({
   }
 
   const classes = useStyle();
-
-  console.log(getValues('applicable_frameworks'))
 
   return (
     <DialogBox
@@ -177,28 +176,35 @@ const Dialog = ({
                       },
                     ]}
                     disabled={false}
+                    onValueChange={(newVal) => setFramework(newVal)}
                   />
-                  <Box mt={2} px={1}>
-                    <Box>
-                      <Typography className={classes.controlListHead}>Corresponding controls:</Typography>
+                  {Boolean(framework) ? (
+                    <Box mt={2} px={1}>
+                      <Box>
+                        <Typography className={classes.controlListHead}>Corresponding controls:</Typography>
+                      </Box>
+                      <Box>
+                        <List>
+                          <ListItem className={classes.controlItem}>
+                            <ListItemIcon className={classes.controlItemIcon}>
+                              <Icon>fiber_manual_record</Icon>
+                            </ListItemIcon>
+                            <ListItemText primary="AC-1 Policy and Procedures" />
+                          </ListItem>
+                          <ListItem className={classes.controlItem}>
+                            <ListItemIcon className={classes.controlItemIcon}>
+                              <Icon>fiber_manual_record</Icon>
+                            </ListItemIcon>
+                            <ListItemText primary="AC-2 Account Management" />
+                          </ListItem>
+                        </List>
+                      </Box>
                     </Box>
-                    <Box>
-                      <List>
-                        <ListItem className={classes.controlItem}>
-                          <ListItemIcon className={classes.controlItemIcon}>
-                            <Icon>fiber_manual_record</Icon>
-                          </ListItemIcon>
-                          <ListItemText primary="AC-1 Policy and Procedures" />
-                        </ListItem>
-                        <ListItem className={classes.controlItem}>
-                          <ListItemIcon className={classes.controlItemIcon}>
-                            <Icon>fiber_manual_record</Icon>
-                          </ListItemIcon>
-                          <ListItemText primary="AC-2 Account Management" />
-                        </ListItem>
-                      </List>
+                  ) : (
+                    <Box mt={2} px={1}>
+                      <Typography fontSize='0.95rem' color='#888'>Select a framework to see applicable controls</Typography>
                     </Box>
-                  </Box>
+                  )}
                 </Box>
               </Grid>
 
