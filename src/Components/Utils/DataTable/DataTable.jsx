@@ -14,6 +14,7 @@ import useRowSelect from "./useRowSelect";
 import PropTypes from "prop-types";
 import { propsRequiredIF, PropType_Component } from "../Utils";
 import useHeightResize from "./useHeightResize";
+import FilterDropdown from "./FilterDropdown";
 
 /** CSS classe generator */
 const useStyles = makeStyles((theme) => ({
@@ -149,6 +150,11 @@ function DataTable({
   minCheckboxWidth = 50,
   className = "",
   searchTerm = "",
+  // Filtering
+  columnFilters = {},
+  activeFilters = {},
+  changeFilters = () => { },
+  clearFilters = () => { },
   ...rest
 }) {
   const classes = useStyles();
@@ -280,6 +286,14 @@ function DataTable({
     ));
   };
 
+  const getfilterRow = () => {
+    const temp = [...header.data]
+    if (checkbox) {
+      temp.unshift({ text: "", params: {}, css: { position: "sticky", left: 0, zIndex: 3 } })
+    }
+    return temp;
+  }
+
   return (
     <TableContainer
       className={`${classes.root} ${verticalBorder && classes.border
@@ -321,6 +335,39 @@ function DataTable({
         </TableHead>
 
         <TableBody>
+
+          {/* FILTERS ROW (1st ROW) */}
+          <TableRow
+            data-test="datatable-row-container"
+          >
+            {getfilterRow().map((r, i) => (
+              <TableCell
+                key={i}
+                style={{ ...r.css }}
+                padding={
+                  checkbox && i === 0 ? "checkbox" : "normal"
+                }
+                data-test="datatable-row-cell"
+              >
+                {r.colName in columnFilters && (
+                  <FilterDropdown
+                    key={i}
+                    filterName={columnFilters[r.colName].name}
+                    buttonText={columnFilters[r.colName].text}
+                    filterOptions={columnFilters[r.colName].options}
+                    activeFilters={activeFilters[columnFilters[r.colName].name]}
+                    changeFilters={changeFilters}
+                    clearFilters={clearFilters}
+                    // contextLoading={contextLoading}
+                    filterHandlerMap={{}}
+                  // filterMetadata={filterMetadata}
+                  />
+                )}
+              </TableCell>
+            ))}
+          </TableRow>
+          {/* <----------------- FILER ROW END -----------------> */}
+
           {sliceRowLength(startIndex, rowsPerPage).map(
             ({ data = [], props = {}, style = {} }, rowIndex) => (
               <TableRow

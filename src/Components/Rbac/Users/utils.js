@@ -218,6 +218,7 @@ export const mapDataToHeader = (columns, sorting, updateSort) => ({
           ? (sorting.sort_order === 1 ? 'asc' : 'dsc')
           : (COLS_SORTABLE.includes(text)) ? "" : "hide-sort",
     },
+    colName: HEADER_NAME_MAP[text]
   })),
   cellStyle: {
     fontWeight: "bold",
@@ -313,7 +314,7 @@ const getCellValue = (row, colName) => {
 const COLS_SORTABLE = ['Name', 'Email']
 
 const STATUS_MAP = {
-  0: "Inactive", 
-  1: "Active", 
+  0: "Inactive",
+  1: "Active",
   2: "Invited"
 }
