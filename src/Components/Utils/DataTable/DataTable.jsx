@@ -15,6 +15,7 @@ import PropTypes from "prop-types";
 import { propsRequiredIF, PropType_Component } from "../Utils";
 import useHeightResize from "./useHeightResize";
 import FilterDropdown from "./FilterDropdown";
+import { TextControl } from "../Control";
 
 /** CSS classe generator */
 const useStyles = makeStyles((theme) => ({
@@ -115,6 +116,13 @@ const useStyles = makeStyles((theme) => ({
       },
     },
   },
+
+  searchFilter: {
+    width: '100%',
+    '& input': {
+      padding: '7px'
+    }
+  }
 
 }));
 
@@ -294,6 +302,8 @@ function DataTable({
     return temp;
   }
 
+  const hasFilterColumn = Boolean(getfilterRow().find(c => Boolean(c.filterType)))
+
   return (
     <TableContainer
       className={`${classes.root} ${verticalBorder && classes.border
@@ -337,35 +347,48 @@ function DataTable({
         <TableBody>
 
           {/* FILTERS ROW (1st ROW) */}
-          <TableRow
-            data-test="datatable-row-container"
-          >
-            {getfilterRow().map((r, i) => (
-              <TableCell
-                key={i}
-                style={{ ...r.css }}
-                padding={
-                  checkbox && i === 0 ? "checkbox" : "normal"
-                }
-                data-test="datatable-row-cell"
-              >
-                {r.colName in columnFilters && (
-                  <FilterDropdown
-                    key={i}
-                    filterName={columnFilters[r.colName].name}
-                    buttonText={columnFilters[r.colName].text}
-                    filterOptions={columnFilters[r.colName].options}
-                    activeFilters={activeFilters[columnFilters[r.colName].name]}
-                    changeFilters={changeFilters}
-                    clearFilters={clearFilters}
-                    // contextLoading={contextLoading}
-                    filterHandlerMap={{}}
-                  // filterMetadata={filterMetadata}
-                  />
-                )}
-              </TableCell>
-            ))}
-          </TableRow>
+          {hasFilterColumn && (
+            <TableRow
+              data-test="datatable-row-container"
+            >
+              {getfilterRow().map((r, i) => (
+                <TableCell
+                  key={i}
+                  style={{ ...r.css, display: 'flex', alignItems: 'center' }}
+                  padding={
+                    checkbox && i === 0 ? "checkbox" : "normal"
+                  }
+                  data-test="datatable-row-cell"
+                >
+                  {r.filterType && r.filterType === 'filter' && r.colName in columnFilters ?
+                    (
+                      <FilterDropdown
+                        key={i}
+                        filterName={columnFilters[r.colName].name}
+                        buttonText={columnFilters[r.colName].text}
+                        filterOptions={columnFilters[r.colName].options}
+                        activeFilters={activeFilters[columnFilters[r.colName].name]}
+                        changeFilters={changeFilters}
+                        clearFilters={clearFilters}
+                        // contextLoading={contextLoading}
+                        filterHandlerMap={{}}
+                      // filterMetadata={filterMetadata}
+                      />
+                    ) : r.filterType && r.filterType === 'text' ? (
+                      <TextControl
+                        variant="outlined"
+                        gutter={false}
+                        size="small"
+                        className={classes.searchFilter}
+                        InputProps={{
+                          placeholder: `${r.text}`
+                        }}
+                      />
+                    ) : <></>
+                  }
+                </TableCell>
+              ))}
+            </TableRow>)}
           {/* <----------------- FILER ROW END -----------------> */}
 
           {sliceRowLength(startIndex, rowsPerPage).map(

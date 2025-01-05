@@ -218,7 +218,8 @@ export const mapDataToHeader = (columns, sorting, updateSort) => ({
           ? (sorting.sort_order === 1 ? 'asc' : 'dsc')
           : (COLS_SORTABLE.includes(text)) ? "" : "hide-sort",
     },
-    colName: HEADER_NAME_MAP[text]
+    colName: HEADER_NAME_MAP[text],
+    filterType: ["Name", "Email"].includes(text) ? 'text' : 'filter'
   })),
   cellStyle: {
     fontWeight: "bold",
