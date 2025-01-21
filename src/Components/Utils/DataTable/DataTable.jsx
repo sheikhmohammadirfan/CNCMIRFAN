@@ -14,8 +14,8 @@ import useRowSelect from "./useRowSelect";
 import PropTypes from "prop-types";
 import { propsRequiredIF, PropType_Component } from "../Utils";
 import useHeightResize from "./useHeightResize";
-import FilterDropdown from "./FilterDropdown";
 import { TextControl } from "../Control";
+import AutocompleteFilter from "./AutocompleteFilter";
 
 /** CSS classe generator */
 const useStyles = makeStyles((theme) => ({
@@ -360,9 +360,7 @@ function DataTable({
                   }
                   data-test="datatable-row-cell"
                 >
-                  {r.filterType && r.filterType === 'filter' && r.colName in columnFilters ?
-                    (
-                      <FilterDropdown
+                  {/* <FilterDropdown
                         key={i}
                         filterName={columnFilters[r.colName].name}
                         buttonText={columnFilters[r.colName].text}
@@ -370,9 +368,15 @@ function DataTable({
                         activeFilters={activeFilters[columnFilters[r.colName].name]}
                         changeFilters={changeFilters}
                         clearFilters={clearFilters}
-                        // contextLoading={contextLoading}
+                        contextLoading={contextLoading}
                         filterHandlerMap={{}}
-                      // filterMetadata={filterMetadata}
+                      filterMetadata={filterMetadata}
+                      /> */}
+                  {r.filterType && r.filterType === 'filter' && r.colName in columnFilters ?
+                    (
+                      <AutocompleteFilter 
+                        name={columnFilters[r.colName]?.text}
+                        options={columnFilters[r.colName].options}
                       />
                     ) : r.filterType && r.filterType === 'text' ? (
                       <TextControl
