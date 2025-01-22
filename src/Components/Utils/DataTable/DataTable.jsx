@@ -16,6 +16,7 @@ import { propsRequiredIF, PropType_Component } from "../Utils";
 import useHeightResize from "./useHeightResize";
 import { TextControl } from "../Control";
 import AutocompleteFilter from "./AutocompleteFilter";
+import DataTableHeader from "./DataTableHeader";
 
 /** CSS classe generator */
 const useStyles = makeStyles((theme) => ({
@@ -310,6 +311,15 @@ function DataTable({
         } ${className}`}
       {...rest}
     >
+      <DataTableHeader
+        component={footerComponent}
+        pageSize={pageSize}
+        rowsPerPage={rowsPerPage}
+        handleRowsPerPageChange={handleRowsPerPageChange}
+        page={page}
+        onPageChange={handlePageChange}
+        count={totalItems}
+      />
       <Table
         className={classes.table}
         style={
@@ -374,7 +384,7 @@ function DataTable({
                       /> */}
                   {r.filterType && r.filterType === 'filter' && r.colName in columnFilters ?
                     (
-                      <AutocompleteFilter 
+                      <AutocompleteFilter
                         name={columnFilters[r.colName]?.text}
                         options={columnFilters[r.colName].options}
                       />
@@ -431,7 +441,7 @@ function DataTable({
         </TableBody>
 
       </Table>
-      <DataTableFooter
+      {/* <DataTableFooter
         component={footerComponent}
         pageSize={pageSize}
         rowsPerPage={rowsPerPage}
@@ -439,7 +449,7 @@ function DataTable({
         page={page}
         onPageChange={handlePageChange}
         count={totalItems}
-      />
+      /> */}
     </TableContainer>
   );
 }
