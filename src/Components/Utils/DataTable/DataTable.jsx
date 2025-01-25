@@ -436,7 +436,7 @@ function DataTable({
                 className={classes.tableRowHover}
                 style={{ ...rowStyle, ...style }}
                 data-test="datatable-row-container"
-                onClick={props.onClick}
+                onClick={props.onClick || ((e) => toggleRow(rowIndex, !isChecked(rowIndex)))}
               >
                 {addColsToRow(data, rowIndex).map(
                   ({ text = "", params = {}, css = {} }, colIndex) => (
