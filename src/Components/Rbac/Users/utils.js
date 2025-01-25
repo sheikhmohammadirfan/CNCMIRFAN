@@ -285,7 +285,16 @@ const mapDataToRow = (row, rowIndex, columns, matchedCell) => (
     let CellComponent = colName in columnCellMap && columnCellMap[colName]
     let cellValue = getCellValue(row, colName);
     return {
-      text: colName in columnCellMap ? <CellComponent cellValue={cellValue} /> : <RowCell text={cellValue} />,
+      text: colName in columnCellMap
+        ? (
+          <CellComponent
+            cellValue={cellValue}
+            {...colName === 'status' && {
+              showColorDot: true,
+              dotColor: STATUS_MAP[row.status].dotColor
+            }}
+          />
+        ) : <RowCell text={cellValue} />,
       params: colName === "Id" ? {
         "sticky": "",
         "data-searched": Boolean(
@@ -315,14 +324,23 @@ const mapDataToRow = (row, rowIndex, columns, matchedCell) => (
 const getCellValue = (row, colName) => {
   if (colName === 'name') return `${row['first_name']} ${row['last_name']}`
   if (colName === 'role') return row['roles'].map(role => ({ text: role.name }))
-  if (colName === 'status') return STATUS_MAP[row['status']]
+  if (colName === 'status') return STATUS_MAP[row['status']].text
   return row[colName]
 }
 
 const COLS_SORTABLE = ['Name', 'Email']
 
 const STATUS_MAP = {
-  0: "Inactive",
-  1: "Active",
-  2: "Invited"
+  0: {
+    text: "Inactive",
+    dotColor: "red"
+  },
+  1: {
+    text: "Active",
+    dotColor: "#4caf50"
+  },
+  2: {
+    text: "Invited",
+    dotColor: "#ffd54f"
+  }
 }

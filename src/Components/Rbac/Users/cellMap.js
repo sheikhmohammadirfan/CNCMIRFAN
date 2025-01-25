@@ -1,7 +1,8 @@
-import { MultipePills } from "../../Utils/DataTable/Cells";
+import { MultipePills, PillCell } from "../../Utils/DataTable/Cells";
 
 const columnCellMap = {
-  role: MultipePills
+  role: MultipePills,
+  status: PillCell
 }
 
 export default columnCellMap;
