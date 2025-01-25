@@ -83,7 +83,7 @@ const Header = ({
         </Stack>
 
       </Box>
-      <Box className={classes.tableFilterContainer}>
+      {/* <Box className={classes.tableFilterContainer}>
 
         <Box className={classes.filterDropdownsContainer}>
           {Object.values(tableFilters)
@@ -161,7 +161,7 @@ const Header = ({
           }}
         />
 
-      </Box>
+      </Box> */}
     </Box>
   )
 }

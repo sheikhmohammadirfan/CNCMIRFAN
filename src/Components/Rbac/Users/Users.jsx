@@ -275,7 +275,7 @@ const Users = () => {
               setSelectedRows={setSelectedRows}
               headerWrapper={(text) => <HeaderCell text={text} />}
               // rowWrapper={(text, colName) => <RowCell text={text} column={colName} />}
-              style={{ borderRadius: 5, borderTopLeftRadius: 0, borderTopRightRadius: 0 }}
+              // style={{ borderRadius: 5, borderTopLeftRadius: 0, borderTopRightRadius: 0 }}
               minCellWidth={USER_COLS.map(
                 (name) => USER_COL_WIDTHS[USER_COLS.indexOf(name)]
               )}

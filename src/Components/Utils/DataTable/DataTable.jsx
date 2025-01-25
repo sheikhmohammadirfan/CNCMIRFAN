@@ -24,7 +24,9 @@ const useStyles = makeStyles((theme) => ({
   root: {
     border: `1px solid #d9d9d9`,
     borderTop: 0,
-    borderRadius: theme.shape.borderRadius,
+    borderRadius: 10,
+    borderBottomLeftRadius: 0,
+    borderBottomRightRadius: 0,
     // maxHeight: "100%",
     // overflow: "auto",
     "& > table": { borderCollapse: "separate" },
