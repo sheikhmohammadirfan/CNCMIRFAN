@@ -8,15 +8,15 @@ import {
   TableCell,
   makeStyles,
 } from "@material-ui/core";
-import DataTableFooter from "./DataTableFooter";
 import useDragResize from "./useDragResize";
 import useRowSelect from "./useRowSelect";
 import PropTypes from "prop-types";
 import { propsRequiredIF, PropType_Component } from "../Utils";
 import useHeightResize from "./useHeightResize";
 import { TextControl } from "../Control";
-import AutocompleteFilter from "./AutocompleteFilter";
 import DataTableHeader from "./DataTableHeader";
+import { Box, Icon, InputAdornment } from "@mui/material";
+import FilterDropdown from "./FilterDropdown";
 
 /** CSS classe generator */
 const useStyles = makeStyles((theme) => ({
@@ -120,10 +120,13 @@ const useStyles = makeStyles((theme) => ({
 
   searchFilter: {
     width: '100%',
+    '& .MuiInputBase-root': {
+      paddingRight: '0'
+    },
     '& input': {
       padding: '7px'
     }
-  }
+  },
 
 }));
 
@@ -370,34 +373,51 @@ function DataTable({
                   }
                   data-test="datatable-row-cell"
                 >
-                  {/* <FilterDropdown
-                        key={i}
-                        filterName={columnFilters[r.colName].name}
-                        buttonText={columnFilters[r.colName].text}
-                        filterOptions={columnFilters[r.colName].options}
-                        activeFilters={activeFilters[columnFilters[r.colName].name]}
-                        changeFilters={changeFilters}
-                        clearFilters={clearFilters}
-                        contextLoading={contextLoading}
-                        filterHandlerMap={{}}
-                      filterMetadata={filterMetadata}
-                      /> */}
-                  {r.filterType && r.filterType === 'filter' && r.colName in columnFilters ?
+                  {r.filterType?.includes('text') ?
                     (
-                      <AutocompleteFilter
-                        name={columnFilters[r.colName]?.text}
-                        options={columnFilters[r.colName].options}
-                      />
-                    ) : r.filterType && r.filterType === 'text' ? (
                       <TextControl
                         variant="outlined"
                         gutter={false}
                         size="small"
                         className={classes.searchFilter}
                         InputProps={{
-                          placeholder: `${r.text}`
+                          placeholder: `${r.text}`,
+                          endAdornment: r.filterType.includes('filter') && r.colName in columnFilters && (
+                            <InputAdornment position="end">
+                              <FilterDropdown
+                                key={i}
+                                filterName={columnFilters[r.colName].name}
+                                buttonText={<Icon sx={{ fontSize: '1.2rem' }}>filter_alt</Icon>}
+                                filterOptions={columnFilters[r.colName].options}
+                                activeFilters={activeFilters[columnFilters[r.colName].name]}
+                                changeFilters={changeFilters}
+                                clearFilters={clearFilters}
+                                filterHandlerMap={{}}
+                                //   contextLoading={contextLoading}
+                                // filterMetadata={filterMetadata}
+                                dropdownPlacement="bottom-end"
+                              />
+                            </InputAdornment>
+                          )
                         }}
                       />
+                    ) : r.filterType?.includes('filter') && r.colName in columnFilters ? (
+                      <Box width='100%'>
+                        <FilterDropdown
+                          key={i}
+                          filterName={columnFilters[r.colName].name}
+                          buttonText={columnFilters[r.colName].text}
+                          filterOptions={columnFilters[r.colName].options}
+                          activeFilters={activeFilters[columnFilters[r.colName].name]}
+                          changeFilters={changeFilters}
+                          clearFilters={clearFilters}
+                          filterHandlerMap={{}}
+                          //   contextLoading={contextLoading}
+                          // filterMetadata={filterMetadata}
+                          dropdownPlacement="bottom-end"
+                          buttonStyles={{ width: '100%' }}
+                        />
+                      </Box>
                     ) : <></>
                   }
                 </TableCell>

@@ -123,7 +123,9 @@ const FilterDropdown = ({
   trigger = () => { },
   contextLoading = false,
   filterHandlerMap = {},
-  filterMetadata = {}
+  filterMetadata = {},
+  dropdownPlacement,
+  buttonStyles = {}
 }) => {
 
   const classes = useStyles();
@@ -141,7 +143,7 @@ const FilterDropdown = ({
     const dateFilterOption = filterOptions.find(f => !!f.showDateRange);
     if (dateFilterOption && internalActiveFilters.includes(dateFilterOption.id)) {
       if (filterMetadata?.[filterName]?.[dateFilterOption.id]) {
-        const {fromDate, toDate} = filterMetadata[filterName][dateFilterOption.id];
+        const { fromDate, toDate } = filterMetadata[filterName][dateFilterOption.id];
         setDateInput([fromDate, toDate]);
       }
     }
@@ -183,7 +185,7 @@ const FilterDropdown = ({
   return (
     <Tooltip
       interactive
-      placement='bottom-start'
+      placement={dropdownPlacement || 'bottom-start'}
       open={open}
       classes={{ tooltip: classes.customTooltip }}
       title={
@@ -209,8 +211,8 @@ const FilterDropdown = ({
                         }
                         label={filterItem.text}
                       />
-                      {!!filterItem.showDateRange && 
-                        internalActiveFilters.includes(filterItem.id) && 
+                      {!!filterItem.showDateRange &&
+                        internalActiveFilters.includes(filterItem.id) &&
                         <Box
                           display="flex"
                           flexDirection="column"
@@ -225,7 +227,7 @@ const FilterDropdown = ({
                             onChange={v => setDateInput([v, dateInput[1]])}
                             maxDate={dateInput[1] || undefined}
                             clearable={true}
-                            />
+                          />
                           <DateControl
                             size="small"
                             name="toDate"
@@ -233,10 +235,10 @@ const FilterDropdown = ({
                             placeholder="To Date"
                             className={dateInput[1] ? "showLabel" : ""}
                             value={dateInput[1]}
-                            onChange={v => setDateInput([ dateInput[0], v])}
+                            onChange={v => setDateInput([dateInput[0], v])}
                             minDate={dateInput[0] || undefined}
                             clearable={true}
-                            />
+                          />
                         </Box>}
                     </ListItem>
                   ))}
@@ -287,6 +289,7 @@ const FilterDropdown = ({
         onClick={() => setOpen(true)}
         data-active={isFiltersActive ? "true" : "false"}
         disabled={contextLoading}
+        style={{ ...buttonStyles }}
       >
         {buttonText}
         {isFiltersActive ? ` (${activeFiltersCount})` : ""}

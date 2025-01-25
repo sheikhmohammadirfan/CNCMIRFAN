@@ -208,6 +208,13 @@ export const RowCell = ({ text }) => {
   )
 };
 
+const COLUMN_FILTER_MAP = {
+  'Name': ['text'],
+  'Email': ['text'],
+  'Role': ['text', 'filter'],
+  'Status': ['filter']
+}
+
 export const mapDataToHeader = (columns, sorting, updateSort) => ({
   data: columns.map((text) => ({
     text,
@@ -219,7 +226,7 @@ export const mapDataToHeader = (columns, sorting, updateSort) => ({
           : (COLS_SORTABLE.includes(text)) ? "" : "hide-sort",
     },
     colName: HEADER_NAME_MAP[text],
-    filterType: ["Name", "Email"].includes(text) ? 'text' : 'filter'
+    filterType: COLUMN_FILTER_MAP[text] || []
   })),
   cellStyle: {
     fontWeight: "bold",
