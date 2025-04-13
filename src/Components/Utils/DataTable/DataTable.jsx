@@ -8,12 +8,15 @@ import {
   TableCell,
   makeStyles,
 } from "@material-ui/core";
-import DataTableFooter from "./DataTableFooter";
 import useDragResize from "./useDragResize";
 import useRowSelect from "./useRowSelect";
 import PropTypes from "prop-types";
 import { propsRequiredIF, PropType_Component } from "../Utils";
 import useHeightResize from "./useHeightResize";
+import { TextControl } from "../Control";
+import DataTableHeader from "./DataTableHeader";
+import { Box, Icon, InputAdornment } from "@mui/material";
+import FilterDropdown from "./FilterDropdown";
 
 /** CSS classe generator */
 const useStyles = makeStyles((theme) => ({
@@ -21,7 +24,9 @@ const useStyles = makeStyles((theme) => ({
   root: {
     border: `1px solid #d9d9d9`,
     borderTop: 0,
-    borderRadius: theme.shape.borderRadius,
+    borderRadius: 10,
+    borderBottomLeftRadius: 0,
+    borderBottomRightRadius: 0,
     // maxHeight: "100%",
     // overflow: "auto",
     "& > table": { borderCollapse: "separate" },
@@ -115,6 +120,16 @@ const useStyles = makeStyles((theme) => ({
     },
   },
 
+  searchFilter: {
+    width: '100%',
+    '& .MuiInputBase-root': {
+      paddingRight: '0'
+    },
+    '& input': {
+      padding: '7px'
+    }
+  },
+
 }));
 
 /** Main DataTable Component */
@@ -149,6 +164,11 @@ function DataTable({
   minCheckboxWidth = 50,
   className = "",
   searchTerm = "",
+  // Filtering
+  columnFilters = {},
+  activeFilters = {},
+  changeFilters = () => { },
+  clearFilters = () => { },
   ...rest
 }) {
   const classes = useStyles();
@@ -280,12 +300,31 @@ function DataTable({
     ));
   };
 
+  const getfilterRow = () => {
+    const temp = [...header.data]
+    if (checkbox) {
+      temp.unshift({ text: "", params: {}, css: { position: "sticky", left: 0, zIndex: 3 } })
+    }
+    return temp;
+  }
+
+  const hasFilterColumn = Boolean(getfilterRow().find(c => Boolean(c.filterType)))
+
   return (
     <TableContainer
       className={`${classes.root} ${verticalBorder && classes.border
         } ${className}`}
       {...rest}
     >
+      <DataTableHeader
+        component={footerComponent}
+        pageSize={pageSize}
+        rowsPerPage={rowsPerPage}
+        handleRowsPerPageChange={handleRowsPerPageChange}
+        page={page}
+        onPageChange={handlePageChange}
+        count={totalItems}
+      />
       <Table
         className={classes.table}
         style={
@@ -321,6 +360,73 @@ function DataTable({
         </TableHead>
 
         <TableBody>
+
+          {/* FILTERS ROW (1st ROW) */}
+          {hasFilterColumn && (
+            <TableRow
+              data-test="datatable-row-container"
+            >
+              {getfilterRow().map((r, i) => (
+                <TableCell
+                  key={i}
+                  style={{ ...r.css, display: 'flex', alignItems: 'center' }}
+                  padding={
+                    checkbox && i === 0 ? "checkbox" : "normal"
+                  }
+                  data-test="datatable-row-cell"
+                >
+                  {r.filterType?.includes('text') ?
+                    (
+                      <TextControl
+                        variant="outlined"
+                        gutter={false}
+                        size="small"
+                        className={classes.searchFilter}
+                        InputProps={{
+                          placeholder: `${r.text}`,
+                          endAdornment: r.filterType.includes('filter') && r.colName in columnFilters && (
+                            <InputAdornment position="end">
+                              <FilterDropdown
+                                key={i}
+                                filterName={columnFilters[r.colName].name}
+                                buttonText={<Icon sx={{ fontSize: '1.2rem' }}>filter_alt</Icon>}
+                                filterOptions={columnFilters[r.colName].options}
+                                activeFilters={activeFilters[columnFilters[r.colName].name]}
+                                changeFilters={changeFilters}
+                                clearFilters={clearFilters}
+                                filterHandlerMap={{}}
+                                //   contextLoading={contextLoading}
+                                // filterMetadata={filterMetadata}
+                                dropdownPlacement="bottom-end"
+                              />
+                            </InputAdornment>
+                          )
+                        }}
+                      />
+                    ) : r.filterType?.includes('filter') && r.colName in columnFilters ? (
+                      <Box width='100%'>
+                        <FilterDropdown
+                          key={i}
+                          filterName={columnFilters[r.colName].name}
+                          buttonText={columnFilters[r.colName].text}
+                          filterOptions={columnFilters[r.colName].options}
+                          activeFilters={activeFilters[columnFilters[r.colName].name]}
+                          changeFilters={changeFilters}
+                          clearFilters={clearFilters}
+                          filterHandlerMap={{}}
+                          //   contextLoading={contextLoading}
+                          // filterMetadata={filterMetadata}
+                          dropdownPlacement="bottom-end"
+                          buttonStyles={{ width: '100%' }}
+                        />
+                      </Box>
+                    ) : <></>
+                  }
+                </TableCell>
+              ))}
+            </TableRow>)}
+          {/* <----------------- FILER ROW END -----------------> */}
+
           {sliceRowLength(startIndex, rowsPerPage).map(
             ({ data = [], props = {}, style = {} }, rowIndex) => (
               <TableRow
@@ -330,7 +436,7 @@ function DataTable({
                 className={classes.tableRowHover}
                 style={{ ...rowStyle, ...style }}
                 data-test="datatable-row-container"
-                onClick={props.onClick}
+                onClick={props.onClick || ((e) => toggleRow(rowIndex, !isChecked(rowIndex)))}
               >
                 {addColsToRow(data, rowIndex).map(
                   ({ text = "", params = {}, css = {} }, colIndex) => (
@@ -357,7 +463,7 @@ function DataTable({
         </TableBody>
 
       </Table>
-      <DataTableFooter
+      {/* <DataTableFooter
         component={footerComponent}
         pageSize={pageSize}
         rowsPerPage={rowsPerPage}
@@ -365,7 +471,7 @@ function DataTable({
         page={page}
         onPageChange={handlePageChange}
         count={totalItems}
-      />
+      /> */}
     </TableContainer>
   );
 }

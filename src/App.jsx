@@ -28,6 +28,7 @@ import AccessManagement from "./Pages/AccessManagement";
 import VendorManagement from "./Pages/VendorManagement";
 import Rbac from "./Pages/Rbac";
 import RestrictedRoutes from "./Components/Utils/Routers/RestrictedRoutes";
+import DocCompliance from "./Pages/DocCompliance";
 
 // Custom values
 const sidebarSmall = 50;
@@ -163,6 +164,9 @@ function App() {
                       </Route>
                       <Route path="/rbac/">
                         <Rbac title="Rbac" />
+                      </Route>
+                      <Route path="/doc-compliance/">
+                        <DocCompliance title="Document Compliance" />
                       </Route>
 
                     </RestrictedRoutes>

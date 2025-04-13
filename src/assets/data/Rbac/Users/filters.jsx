@@ -1,6 +1,6 @@
 const USER_FILTERS = {
-  roles: {
-    name: "roles",
+  role: {
+    name: "role",
     text: "Roles",
     order: 1,
     options: []

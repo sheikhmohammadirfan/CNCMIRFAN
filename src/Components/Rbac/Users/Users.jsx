@@ -34,7 +34,7 @@ const Users = () => {
   // If this state has some key missing from RiskRegisterFilters.jsx in data folder, it will result in error.
   // That is why, all the keys in this state are predefined.
   const [filters, setFilters] = useState({
-    roles: [],
+    role: [],
     status: [1, 2],
   });
 
@@ -113,7 +113,7 @@ const Users = () => {
       payload['sort_order'] = appliedSort.sort_order
     }
 
-    if (filters.roles.length > 0) payload['filters'] = { roles: filters.roles }
+    if (filters.role.length > 0) payload['filters'] = { roles: filters.role }
     if (filters.status.length > 0) payload['status'] = filters.status
 
     startLoading();
@@ -143,7 +143,7 @@ const Users = () => {
       if (status) {
         setFilterDropdowns(prev => ({
           ...prev,
-          roles: { ...prev.roles, options: data.map(role => ({ id: role.id, text: role.name })) }
+          role: { ...prev.role, options: data.map(role => ({ id: role.id, text: role.name })) }
         }))
         setRoles(data)
       }
@@ -275,12 +275,17 @@ const Users = () => {
               setSelectedRows={setSelectedRows}
               headerWrapper={(text) => <HeaderCell text={text} />}
               // rowWrapper={(text, colName) => <RowCell text={text} column={colName} />}
-              style={{ borderRadius: 5, borderTopLeftRadius: 0, borderTopRightRadius: 0 }}
+              // style={{ borderRadius: 5, borderTopLeftRadius: 0, borderTopRightRadius: 0 }}
               minCellWidth={USER_COLS.map(
                 (name) => USER_COL_WIDTHS[USER_COLS.indexOf(name)]
               )}
+              // Filters
+              columnFilters={filterDropdowns}
+              activeFilters={filters}
+              changeFilters={changeFilters}
+              clearFilters={clearFilters}
 
-              Pagination props
+              // Pagination props
               currentPage={pagination.page_no}
               pageSize={pagination.page_size}
               totalItems={pagination.total_items}

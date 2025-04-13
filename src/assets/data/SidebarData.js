@@ -22,7 +22,7 @@ export const SidebarData = [
       {
         title: "Policies",
         component: Link,
-        to: "#",
+        to: "/doc-compliance/policies",
       },
       {
         title: "Procedures",

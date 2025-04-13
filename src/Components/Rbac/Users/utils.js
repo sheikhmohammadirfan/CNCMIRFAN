@@ -208,6 +208,13 @@ export const RowCell = ({ text }) => {
   )
 };
 
+const COLUMN_FILTER_MAP = {
+  'Name': ['text'],
+  'Email': ['text'],
+  'Role': ['text', 'filter'],
+  'Status': ['filter']
+}
+
 export const mapDataToHeader = (columns, sorting, updateSort) => ({
   data: columns.map((text) => ({
     text,
@@ -218,6 +225,8 @@ export const mapDataToHeader = (columns, sorting, updateSort) => ({
           ? (sorting.sort_order === 1 ? 'asc' : 'dsc')
           : (COLS_SORTABLE.includes(text)) ? "" : "hide-sort",
     },
+    colName: HEADER_NAME_MAP[text],
+    filterType: COLUMN_FILTER_MAP[text] || []
   })),
   cellStyle: {
     fontWeight: "bold",
@@ -276,7 +285,16 @@ const mapDataToRow = (row, rowIndex, columns, matchedCell) => (
     let CellComponent = colName in columnCellMap && columnCellMap[colName]
     let cellValue = getCellValue(row, colName);
     return {
-      text: colName in columnCellMap ? <CellComponent cellValue={cellValue} /> : <RowCell text={cellValue} />,
+      text: colName in columnCellMap
+        ? (
+          <CellComponent
+            cellValue={cellValue}
+            {...colName === 'status' && {
+              showColorDot: true,
+              dotColor: STATUS_MAP[row.status].dotColor
+            }}
+          />
+        ) : <RowCell text={cellValue} />,
       params: colName === "Id" ? {
         "sticky": "",
         "data-searched": Boolean(
@@ -306,14 +324,23 @@ const mapDataToRow = (row, rowIndex, columns, matchedCell) => (
 const getCellValue = (row, colName) => {
   if (colName === 'name') return `${row['first_name']} ${row['last_name']}`
   if (colName === 'role') return row['roles'].map(role => ({ text: role.name }))
-  if (colName === 'status') return STATUS_MAP[row['status']]
+  if (colName === 'status') return STATUS_MAP[row['status']].text
   return row[colName]
 }
 
 const COLS_SORTABLE = ['Name', 'Email']
 
 const STATUS_MAP = {
-  0: "Inactive", 
-  1: "Active", 
-  2: "Invited"
+  0: {
+    text: "Inactive",
+    dotColor: "red"
+  },
+  1: {
+    text: "Active",
+    dotColor: "#4caf50"
+  },
+  2: {
+    text: "Invited",
+    dotColor: "#ffd54f"
+  }
 }

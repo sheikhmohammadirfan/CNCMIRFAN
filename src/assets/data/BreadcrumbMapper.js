@@ -16,12 +16,14 @@ export const BreadcrumbMapper = {
   'risk-library': "Risk Library",
   'risk-register': "Risk Register",
   'action-tracker': "Action Tracker",
-  'settings': "Settings",
   'access-management': "Acess Management",
   'accounts': "Accounts",
   'reviews': "Reviews",
   'rbac': 'Role Based Access Control',
   'users': 'Users',
   'roles': 'Roles',
-  'organization': 'Organization'
+  'organization': 'Organization',
+  'doc-compliance': 'Document Compliance',
+  'policies': 'Policies',
+  'editor': "Editor"
 };
