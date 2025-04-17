@@ -14,7 +14,7 @@ const useStyle = makeStyles((theme) => ({
 
   cellLabel: {
     padding: "3px 10px",
-    fontSize: "0.875rem",
+    fontSize: "0.8rem !important",
     // backgroundColor: "rgba(0, 0, 0, 0.05)",
     color: "rgba(0, 0, 0, 0.75)",
     border: "1px solid rgba(0, 0, 0, 0.2)",

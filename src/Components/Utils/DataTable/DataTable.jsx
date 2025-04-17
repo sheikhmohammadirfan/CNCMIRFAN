@@ -17,6 +17,7 @@ import { TextControl } from "../Control";
 import DataTableHeader from "./DataTableHeader";
 import { Box, Icon, InputAdornment } from "@mui/material";
 import FilterDropdown from "./FilterDropdown";
+import { debounce } from 'lodash'
 
 /** CSS classe generator */
 const useStyles = makeStyles((theme) => ({
@@ -169,6 +170,7 @@ function DataTable({
   activeFilters = {},
   changeFilters = () => { },
   clearFilters = () => { },
+  handleColumnSearch = () => { },
   ...rest
 }) {
   const classes = useStyles();
@@ -303,7 +305,7 @@ function DataTable({
   const getfilterRow = () => {
     const temp = [...header.data]
     if (checkbox) {
-      temp.unshift({ text: "", params: {}, css: { position: "sticky", left: 0, zIndex: 3 } })
+      temp.unshift({ text: "", params: {}, css: { position: "sticky", left: 0, zIndex: 2 } })
     }
     return temp;
   }
@@ -402,6 +404,7 @@ function DataTable({
                             </InputAdornment>
                           )
                         }}
+                        onChange={debounce((e) => handleColumnSearch(r.colName, e.target.value), 2000)}
                       />
                     ) : r.filterType?.includes('filter') && r.colName in columnFilters ? (
                       <Box width='100%'>
