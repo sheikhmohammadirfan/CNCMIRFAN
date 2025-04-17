@@ -107,7 +107,7 @@ const ProfileMenu = () => {
                         </ListItemIcon>
                         <ListItemText sx={{ fontSize: '0.9rem' }}>Settings</ListItemText>
                       </MenuItem>
-                      <MenuItem onClick={logout}>
+                      <MenuItem onClick={() => { setOpen(false); logout() }}>
                         <ListItemIcon>
                           <Icon>logout</Icon>
                         </ListItemIcon>

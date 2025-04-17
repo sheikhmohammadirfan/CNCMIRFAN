@@ -20,6 +20,12 @@ const useStyle = makeStyles((theme) => ({
     border: "1px solid rgba(0, 0, 0, 0.2)",
     borderRadius: "50px",
   },
+
+  dateCell: {
+    overflow: 'hidden',
+    whiteSpace: 'pre',
+    textOverflow: 'ellipsis'
+  },
 }))
 
 export function PillCell({ showColorDot, dotColor, cellValue }) {
@@ -71,5 +77,25 @@ export function TextWrapCell({ cellValue }) {
         </Box>
       ))}
     </Stack>
+  )
+}
+
+export function DateCell({ cellValue }) {
+  const classes = useStyle()
+
+  const dateObj = new Date(cellValue);
+  const formatted = dateObj.toLocaleString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true,
+  });
+  const secondCommaIndex = formatted.split(',', 2).join(',').length;
+  const finalFormatted = formatted.substring(0, secondCommaIndex) + ' at ' + formatted.substring(secondCommaIndex + 'at'.length)
+
+  return (
+    <Typography variant="body2" className={classes.dateCell}>{Boolean(cellValue) ? finalFormatted : ''}</Typography>
   )
 }

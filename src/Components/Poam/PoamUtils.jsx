@@ -1,5 +1,6 @@
 import { makeStyles, Typography } from "@material-ui/core";
 import { copyObject } from "../Utils/Utils";
+import POAM_CELLS from "./CellMap";
 
 //! POA&M TABLE ----------------------------- STARTS
 
@@ -159,34 +160,41 @@ export const mapDataToHeader = (visibleColumns, sorting, updateSort) => ({
 
 /* Method to map a POA&M data to row dictionary */
 const mapDataToRow = (data, columns, rowIndex, matchedCell) =>
-  columns.map((columnName, index) => ({
-    text: data[columnName][rowIndex],
-    params:
-      columnName === "POAM ID"
-        ? {
-          "poam-id": "",
-          "data-searched": Boolean(
-            matchedCell.find(
-              (cell) =>
-                cell.column === columnName &&
-                cell.row == rowIndex &&
-                cell.selected === true
-            )
-          ),
-          tabindex: 0,
-        }
-        : {
-          "data-searched": Boolean(
-            matchedCell.find(
-              (cell) =>
-                cell.column === columnName &&
-                cell.row == rowIndex &&
-                cell.selected === true
-            )
-          ),
-          tabindex: 0,
-        },
-  }));
+  columns.map((columnName, index) => {
+    let CellComponent = columnName in POAM_CELLS && POAM_CELLS[columnName]
+    return ({
+      text: columnName in POAM_CELLS ? (
+        <CellComponent
+          cellValue={data[columnName][rowIndex]}
+        />
+      ) : data[columnName][rowIndex],
+      params:
+        columnName === "POAM ID"
+          ? {
+            "poam-id": "",
+            "data-searched": Boolean(
+              matchedCell.find(
+                (cell) =>
+                  cell.column === columnName &&
+                  cell.row == rowIndex &&
+                  cell.selected === true
+              )
+            ),
+            tabindex: 0,
+          }
+          : {
+            "data-searched": Boolean(
+              matchedCell.find(
+                (cell) =>
+                  cell.column === columnName &&
+                  cell.row == rowIndex &&
+                  cell.selected === true
+              )
+            ),
+            tabindex: 0,
+          },
+    })
+  });
 
 /* Method to convert 2D row data into table body format */
 export const generateRows = (
@@ -259,12 +267,12 @@ export const putIssueInData = (setter, getSheet, indexes, issueID) => {
       const temp = copyObject(prevData);
       let sheet = getSheet(temp);
       // Making empty object for Jira issue on the index of the row, and setting the issueId to true for that row
-      indexes.forEach(row=>{
+      indexes.forEach(row => {
         if (!sheet.jira_issues[row]) sheet.jira_issues[row] = {};
         sheet.jira_issues[row][issueID] = true;
       })
       return temp;
-      
+
     });
 };
 
