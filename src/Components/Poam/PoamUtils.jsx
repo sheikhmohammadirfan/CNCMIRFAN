@@ -96,7 +96,9 @@ export const useStyle = makeStyles((theme) => ({
     color: theme.palette.primary.main,
     fontSize: 12,
     textTransform: "uppercase",
-    fontWeight: 'bold'
+    fontWeight: 'bold',
+    overflowWrap: 'break-word',
+    wordWrap: 'break-word'
   },
 
   // Style to make all cell height of 3 line
@@ -124,10 +126,10 @@ export const HeaderCell = ({ text }) => {
 };
 
 /* Row cell component */
-export const RowCell = ({ text }) => {
+export const RowCell = ({ text, rowIndex, colIndex }) => {
   const classes = useStyle();
   return (
-    <Typography variant="body2" noWrap className={classes.tableCell}>
+    <Typography id={`${rowIndex}-${colIndex}`} variant="body2" className={classes.tableCell}>
       {text}
     </Typography>
   );
