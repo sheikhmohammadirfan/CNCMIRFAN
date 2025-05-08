@@ -474,7 +474,7 @@ function AccessAccounts() {
 
         {loading ?
           <SkeletonBox text="Loading Accounts..." height='60vh' width='100%' /> :
-          <Grid container spacing={1} className={classes.dataTableContainer}>
+          <Grid container spacing={1}>
             <Grid item xs={12}>
               <DataTable
                 className={classes.tableStyle}

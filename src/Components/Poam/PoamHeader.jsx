@@ -243,7 +243,33 @@ export default function PoamHeader({
               display="flex"
               alignItems="flex-end"
               justifyContent="space-between"
+              sx={{gap:"10px"}}
             >
+              <ButtonGroup
+                disableElevation
+                disableFocusRipple
+                aria-label="outlined primary button group"
+              >
+                {isOpenPoam && (
+                  <Button
+                    size="small"
+                    variant="outlined"
+                    onClick={openCreateForm}
+                    startIcon={<Icon>add</Icon>}
+                    style={{
+                      background: "#4477CE",
+                      color: "white",
+                      borderRadius: 7,
+                      borderColor: "#4477CE",
+                      height: 36,
+                      marginLeft: 10,
+                      // paddingInline: 15,
+                    }}
+                  >
+                    New
+                  </Button>
+                )}
+              </ButtonGroup>
               <TextControl
                 variant="outlined"
                 placeholder="Search here"
@@ -306,31 +332,6 @@ export default function PoamHeader({
                 value={searchValue}
                 onChange={updateSearch}
               />
-              <ButtonGroup
-                disableElevation
-                disableFocusRipple
-                aria-label="outlined primary button group"
-              >
-                {isOpenPoam && (
-                  <Button
-                    size="small"
-                    variant="outlined"
-                    onClick={openCreateForm}
-                    startIcon={<Icon>add</Icon>}
-                    style={{
-                      background: "#4477CE",
-                      color: "white",
-                      borderRadius: 7,
-                      borderColor: "#4477CE",
-                      height: 36,
-                      marginLeft: 10,
-                      paddingInline: 15,
-                    }}
-                  >
-                    New
-                  </Button>
-                )}
-              </ButtonGroup>
             </Box>
           </Box>
 

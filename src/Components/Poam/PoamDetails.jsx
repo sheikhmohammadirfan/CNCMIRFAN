@@ -20,14 +20,15 @@ const useStyles = makeStyles((theme) => ({
   },
   pill: {
     background: "#ffffff",
-    padding: "10px 30px",
-    borderRadius: "25px",
+    padding: "8px 10px",
+    borderRadius: "8px",
+    border:'1px solid #d9d9d9',
     display: "flex",
-    boxShadow: theme.shadows[1],
-    position: "fixed",
-    bottom: theme.spacing(2),
-    maxWidth: 900,
-    width: "70%",
+    // boxShadow: theme.shadows[1],
+    // position: "fixed",
+    // bottom: theme.spacing(2),
+    // maxWidth: 900,
+    width: "100%",
     transition: "width 0.3s ease-in-out",
     gap: theme.spacing(4),
     zIndex: 4,
@@ -44,7 +45,7 @@ const useStyles = makeStyles((theme) => ({
   },
   value: {
     color: theme.palette.grey[700],
-    fontWeight: "bold",
+    // fontWeight: "bold",
     overflow: "hidden",
     textOverflow: "ellipsis",
     whiteSpace: "nowrap",
@@ -63,7 +64,7 @@ const CustomTooltip = withStyles((theme) => ({
     backgroundColor: theme.palette.common.white,
     color: "rgba(0, 0, 0, 0.87)",
     boxShadow: theme.shadows[1],
-    fontSize: 20,
+    fontSize: 14,
     maxWidth: 300,
   },
 }))(Tooltip);
@@ -77,8 +78,8 @@ const PoamDetails = ({ poamDetails, loading }) => {
         <CustomTooltip className={classes.tip} title={poamDetails.cspName}>
           <Box className={classes.detail}>
             <CloudIcon className={classes.icon} />
-            <Typography className={classes.label}>CSP:</Typography>
-            <Typography className={classes.value}>
+            <Typography className={classes.label} variant="body2">CSP:</Typography>
+            <Typography className={classes.value} variant="body2">
               {loading ? "Loading..." : poamDetails.cspName}
             </Typography>
           </Box>
@@ -86,8 +87,8 @@ const PoamDetails = ({ poamDetails, loading }) => {
         <CustomTooltip title={poamDetails.systemName}>
           <Box className={classes.detail}>
             <ComputerIcon className={classes.icon} />
-            <Typography className={classes.label}>System:</Typography>
-            <Typography className={classes.value}>
+            <Typography className={classes.label} variant="body2">System:</Typography>
+            <Typography className={classes.value} variant="body2">
               {loading ? "Loading..." : poamDetails.systemName}
             </Typography>
           </Box>
@@ -95,8 +96,8 @@ const PoamDetails = ({ poamDetails, loading }) => {
         <CustomTooltip title={poamDetails.agencyName}>
           <Box className={classes.detail}>
             <BusinessIcon className={classes.icon} />
-            <Typography className={classes.label}>Agency:</Typography>
-            <Typography className={classes.value}>
+            <Typography className={classes.label} variant="body2">Agency:</Typography>
+            <Typography className={classes.value} variant="body2">
               {loading ? "Loading..." : poamDetails.agencyName}
             </Typography>
           </Box>
