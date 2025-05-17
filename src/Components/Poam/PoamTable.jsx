@@ -36,6 +36,7 @@ import {
 } from "./PoamUtils";
 import ActionTracker from "./ActionTracker/ActionTracker";
 import PoamDataTable from "./ActionTracker/PoamDataTable";
+import PoamDetails from "./PoamDetails";
 
 /* POA&M TABLE COMPONENT */
 export default function PoamTable({ fileID }) {
@@ -432,6 +433,7 @@ export default function PoamTable({ fileID }) {
           poamData={poamData}
         />
       ) : (
+        <>
         <PoamDataTable
           classes={classes}
           fullScreen={{ isZoomed, zoomIn, zoomOut }}
@@ -474,7 +476,7 @@ export default function PoamTable({ fileID }) {
             columns_width: columnWidths.length > 0 ? columnWidths : columns_width,
           }}
         />
-      )}
+      </>)}
 
       <FormDialog
         poamID_data={getPoamID_data(poamData)}

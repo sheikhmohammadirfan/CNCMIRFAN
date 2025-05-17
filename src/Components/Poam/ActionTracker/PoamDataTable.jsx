@@ -47,7 +47,11 @@ export default function PoamDataTable({
     <Box
       id="poam-root"
       className={`${classes.poamContainer} ${isZoomed() ? "zoomed" : ""}`}
+      // sx={{backgroundColor:'red'}}
     >
+      <Box sx={{width:'100%',height:'auto',mb:2}}>
+      <PoamDetails poamDetails={poamDetails} loading={isLoading()} />
+      </Box>
       <PoamHeader
         selectedRow={selectedRow}
         zoom={{ isZoomed, zoomIn, zoomOut }}
@@ -68,7 +72,7 @@ export default function PoamDataTable({
         }}
       />
 
-      <PoamDetails poamDetails={poamDetails} loading={isLoading()} />
+      {/* <PoamDetails poamDetails={poamDetails} loading={isLoading()} /> */}
 
       {isLoading() ? (
         <SkeletonBox text="Loading.." height="60vh" width="100%" />
