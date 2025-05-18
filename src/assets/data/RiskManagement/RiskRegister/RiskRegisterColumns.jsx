@@ -20,7 +20,7 @@ export const risk_register_columns = [
 
 // Default Column widths
 export const risk_register_columns_width = [
-  150, 200, 150, 250, 150, 150, 150, 250, 150, 150, 150, 150, 150, 150, 150, 250, 150
+  150, 200, 150, 250, 200, 150, 150, 250, 150, 150, 150, 150, 150, 150, 150, 250, 150
 ];
 
 // Used to map field names from api responses to names that are used in mapping headers of table
@@ -47,5 +47,21 @@ export const HEADER_TABLE_COLS_MAP = {
   "Archived": "is_archived",
   "Vendors": "vendors",
   // For mapping column names that are to be sent for sorting
-  
+
+}
+
+export const HEADER_TABLE_FILTERS_MAP = {
+  "ID": "id",
+  "Custom Id": "custom_id",
+  "Scenario": "scenario",
+  "Source": "source",
+  "Categories": "category",
+  "Owner": "owners",
+  "Identified Date": "identified_date",
+  "Modified Date": "modified_date",
+  "CIA": "ciaCategories",
+  "Inherent Risk": "inherentRisk",
+  "Residual Risk": "residualRisk",
+  "Treatment": "treatment",
+  "Approved": "status",
 }

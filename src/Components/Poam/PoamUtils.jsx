@@ -1,5 +1,6 @@
 import { makeStyles, Typography } from "@material-ui/core";
 import { copyObject } from "../Utils/Utils";
+import POAM_CELLS from "./CellMap";
 
 //! POA&M TABLE ----------------------------- STARTS
 
@@ -95,7 +96,9 @@ export const useStyle = makeStyles((theme) => ({
     color: theme.palette.primary.main,
     fontSize: 12,
     textTransform: "uppercase",
-    fontWeight: 'bold'
+    fontWeight: 'bold',
+    overflowWrap: 'break-word',
+    wordWrap: 'break-word'
   },
 
   // Style to make all cell height of 3 line
@@ -123,10 +126,10 @@ export const HeaderCell = ({ text }) => {
 };
 
 /* Row cell component */
-export const RowCell = ({ text }) => {
+export const RowCell = ({ text, rowIndex, colIndex }) => {
   const classes = useStyle();
   return (
-    <Typography variant="body2" noWrap className={classes.tableCell}>
+    <Typography id={`${rowIndex}-${colIndex}`} variant="body2" className={classes.tableCell}>
       {text}
     </Typography>
   );
@@ -159,34 +162,41 @@ export const mapDataToHeader = (visibleColumns, sorting, updateSort) => ({
 
 /* Method to map a POA&M data to row dictionary */
 const mapDataToRow = (data, columns, rowIndex, matchedCell) =>
-  columns.map((columnName, index) => ({
-    text: data[columnName][rowIndex],
-    params:
-      columnName === "POAM ID"
-        ? {
-          "poam-id": "",
-          "data-searched": Boolean(
-            matchedCell.find(
-              (cell) =>
-                cell.column === columnName &&
-                cell.row == rowIndex &&
-                cell.selected === true
-            )
-          ),
-          tabindex: 0,
-        }
-        : {
-          "data-searched": Boolean(
-            matchedCell.find(
-              (cell) =>
-                cell.column === columnName &&
-                cell.row == rowIndex &&
-                cell.selected === true
-            )
-          ),
-          tabindex: 0,
-        },
-  }));
+  columns.map((columnName, index) => {
+    let CellComponent = columnName in POAM_CELLS && POAM_CELLS[columnName]
+    return ({
+      text: columnName in POAM_CELLS ? (
+        <CellComponent
+          cellValue={data[columnName][rowIndex]}
+        />
+      ) : data[columnName][rowIndex],
+      params:
+        columnName === "POAM ID"
+          ? {
+            "poam-id": "",
+            "data-searched": Boolean(
+              matchedCell.find(
+                (cell) =>
+                  cell.column === columnName &&
+                  cell.row == rowIndex &&
+                  cell.selected === true
+              )
+            ),
+            tabindex: 0,
+          }
+          : {
+            "data-searched": Boolean(
+              matchedCell.find(
+                (cell) =>
+                  cell.column === columnName &&
+                  cell.row == rowIndex &&
+                  cell.selected === true
+              )
+            ),
+            tabindex: 0,
+          },
+    })
+  });
 
 /* Method to convert 2D row data into table body format */
 export const generateRows = (
@@ -259,12 +269,12 @@ export const putIssueInData = (setter, getSheet, indexes, issueID) => {
       const temp = copyObject(prevData);
       let sheet = getSheet(temp);
       // Making empty object for Jira issue on the index of the row, and setting the issueId to true for that row
-      indexes.forEach(row=>{
+      indexes.forEach(row => {
         if (!sheet.jira_issues[row]) sheet.jira_issues[row] = {};
         sheet.jira_issues[row][issueID] = true;
       })
       return temp;
-      
+
     });
 };
 

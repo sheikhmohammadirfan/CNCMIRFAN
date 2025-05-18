@@ -1,39 +1,15 @@
-import React, { useState, useEffect } from "react";
-import {
-  useLocation,
-  useParams,
-} from "react-router-dom/cjs/react-router-dom.min";
+import React, { useState } from "react";
 import {
   Box,
   Button,
-  Grid,
   Icon,
   IconButton,
   InputAdornment,
-  Typography,
-  Paper,
-  Popover,
   makeStyles,
-  Divider,
-  Tooltip,
-  Menu,
 } from "@material-ui/core";
-import Chip from "@mui/material/Chip";
 import { TextControl } from "../../Utils/Control";
-import DataTable from "../../Utils/DataTable/DataTable";
 import OptionDropdown from "../../RiskManagement/RiskRegister/OptionDropdown";
-import MenuItem from "@mui/material/MenuItem";
-import { tableMockData } from "../Accounts/AccountsColumns";
-import Stepper from "@mui/material/Stepper";
-import Step from "@mui/material/Step";
-import StepLabel from "@mui/material/StepLabel";
-import Tab from "@mui/material/Tab";
-import TabContext from "@material-ui/lab/TabContext";
-import TabList from "@material-ui/lab/TabList";
-import TabPanel from "@material-ui/lab/TabPanel";
-import SystemCards from "./SystemCards";
-import DoughnutChart from "./DoughnutChart";
-import CompletedStatusContent from "./ReviewStatusPages/CompletedStatusContent";
+
 
 const useStyle = makeStyles((theme) => ({
   usersContainer: {
@@ -135,16 +111,16 @@ const useStyle = makeStyles((theme) => ({
 function FiltersOption() {
 
   const classes = useStyle();
-  const [value, setValue] = useState("1");
+  // const [value, setValue] = useState("1");
   const [searchValue, setSearchValue] = useState("");
   const [statusOpen, setStatusOpen] = useState(false);
   const [reviewerOpen, setReviewerOpen] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState("");
   const [selectedReviewer, setSelectedReviewer] = useState("");
-  const [systemOpen, setSystemOpen] = useState(false);
-  const [selectedSystem, setSelectedSytem] = useState("");
-  const [filteredData, setFilteredData] = useState(tableMockData);
-  const [anchorEl, setAnchorEl] = useState(null);
+  // const [systemOpen, setSystemOpen] = useState(false);
+  // const [selectedSystem, setSelectedSytem] = useState("");
+  // const [filteredData, setFilteredData] = useState(tableMockData);
+  // const [anchorEl, setAnchorEl] = useState(null);
 
 
 

@@ -183,7 +183,7 @@ export default function Auth({ title }) {
             <li className={classes.listItems}>FISMA</li>
             <li className={classes.listItems}>CMMC</li>
             <li className={classes.listItems}>ISO 27001</li>
-            <li className={classes.listItems}>PSS DSS</li>
+            <li className={classes.listItems}>FedRAMP</li>
           </ul> 
           </Box>
           <Box style={{height:"max-content", width:"100%", display:"grid", placeItems:"center"}}><img src={dummyImg} style={{marginTop:"3rem",height:"400px", width:"400px"}}/></Box>

@@ -6,6 +6,7 @@ import {
   hidden_columns,
   poam_header,
   poam_header_response_map,
+  poam_header_reverse_map,
   secondary_columns,
 } from "../../assets/data/PoamData";
 import FormDialog from "./FormDialog";
@@ -195,6 +196,67 @@ export default function PoamTable({ fileID }) {
       sortingMap,
       searchTerm
     );
+
+  const [columnWidths, setColumnWidths] = useState([]);
+  useEffect(() => {
+
+    const timeout = setTimeout(() => {
+
+      if (!poamData?.open || !poamData?.close || visibleColumns.length === 0) return;
+      const columnWidthsMap = {}
+
+      const openPoams = poamData?.open
+      const closedPoams = poamData?.close
+
+      if (isOpenPoam) {
+        Object.keys(poam_header_reverse_map).forEach((column, colIndex) => {
+          let maxColumnValueSize = 0;
+          Object.values(openPoams[column]).forEach((rowValue, rowIndex) => {
+            const rowValueSize = [0, 1].includes(rowIndex) ? 0 : getElementWidth(`${rowIndex - 2}-${colIndex + 1}`, column);
+            const rowValueSizeReduced = 0.5 * rowValueSize
+            maxColumnValueSize = Math.max(maxColumnValueSize, rowValueSizeReduced)
+          });
+          const largestCellSize = maxColumnValueSize + 38
+          if (largestCellSize > columns_width[colIndex]) {
+            columnWidthsMap[column] = columns_width[colIndex];
+          }
+          else {
+            columnWidthsMap[column] = largestCellSize;
+          }
+          // columnWidthsMap[column] = Math.min(largestCellSize, columns_width[colIndex]);
+        })
+      }
+      else {
+        Object.keys(poam_header_reverse_map).forEach((column, colIndex) => {
+          let maxColumnValueSize = 0;
+          Object.values(closedPoams[column]).forEach((rowValue, rowIndex) => {
+            const rowValueSize = getElementWidth(`${rowIndex}-${colIndex + 1}`, column);
+            const rowValueSizeReduced = 0.5 * rowValueSize
+            maxColumnValueSize = Math.max(maxColumnValueSize, rowValueSizeReduced)
+          });
+          const largestCellSize = maxColumnValueSize + 38
+          if (largestCellSize > columns_width[colIndex]) {
+            columnWidthsMap[column] = columns_width[colIndex];
+          }
+          else {
+            columnWidthsMap[column] = largestCellSize;
+          }
+        })
+      }
+      // console.log(columnWidthsMap)
+      const widths = poam_header.map((h, i) => columnWidthsMap[h])
+      setColumnWidths(widths)
+
+    }, 0)
+
+    return () => clearTimeout(timeout)
+  }, [poamData, visibleColumns, isOpenPoam])
+
+  function getElementWidth(id, column) {
+    const el = document.getElementById(id);
+    if (!el) return 0;
+    return el.scrollWidth;
+  }
 
   // ? ----------> ROW MANUPULATION METHODS
 
@@ -411,7 +473,7 @@ export default function PoamTable({ fileID }) {
             secondaryOpen,
             mapTableHeader,
             mapTableBody,
-            columns_width,
+            columns_width: columnWidths.length > 0 ? columnWidths : columns_width,
           }}
         />
       </>)}

@@ -1,6 +1,6 @@
 import { Typography, makeStyles } from "@material-ui/core";
 import columnToCellMap from "../../../assets/data/RiskManagement/TableColCellMap";
-import { HEADER_TABLE_COLS_MAP } from "../../../assets/data/RiskManagement/RiskRegister/RiskRegisterColumns";
+import { HEADER_TABLE_COLS_MAP, HEADER_TABLE_FILTERS_MAP } from "../../../assets/data/RiskManagement/RiskRegister/RiskRegisterColumns";
 import colorShader from "../../Utils/ColorShader";
 
 export const useStyle = makeStyles(theme => ({
@@ -390,7 +390,7 @@ export const useStyle = makeStyles(theme => ({
       fontSize: "inherit",
       color: theme.palette.primary.dark,
       cursor: "pointer",
-      textAlign:"start",
+      textAlign: "start",
       overflow: "hidden",
       textOverflow: "ellipsis",
       width: "100%",
@@ -416,11 +416,24 @@ export const HeaderCell = ({ text }) => {
 export const RowCell = ({ text }) => {
   const classes = useStyle();
   return (
-    <Typography variant="body2" noWrap className={classes.tableCell}>
+    <Typography variant="body2" className={classes.tableCell}>
       {text}
     </Typography>
   )
 };
+
+const COLUMN_FILTER_MAP = {
+  'Scenario': ['text'],
+  "Source": ['filter'],
+  "Categories": ['text', 'filter'],
+  "Owner": ['text', 'filter'],
+  "Identified Date": ['filter'],
+  "CIA": ['filter'],
+  "Inherent Risk": ['filter'],
+  "Residual Risk": ['filter'],
+  "Treatment": ['filter'],
+  "Approved": ['filter'],
+}
 
 /* Method to map visible columns to header row */
 export const mapDataToHeader = (visibleColumns, sorting, updateSort) => ({
@@ -439,6 +452,13 @@ export const mapDataToHeader = (visibleColumns, sorting, updateSort) => ({
           onClick: () => updateSort(text),
           className: (sorting && sorting.sort_by === HEADER_TABLE_COLS_MAP[text]) ? (sorting.sort_order === 1 ? "asc" : "dsc") : "",
         },
+    colName: HEADER_TABLE_FILTERS_MAP[text],
+    filterType: COLUMN_FILTER_MAP[text] || [],
+    filterCellCss: text === "Custom Id" || text === "Scenario" ? {
+      position: 'sticky',
+      left: text === 'Custom Id' ? '50px' : text === "Scenario" ? '200px' : 0,
+      zIndex: 1
+    } : {}
   })),
   cellStyle: {
     fontWeight: "bold",

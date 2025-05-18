@@ -17,6 +17,7 @@ import { TextControl } from "../Control";
 import DataTableHeader from "./DataTableHeader";
 import { Box, Icon, InputAdornment } from "@mui/material";
 import FilterDropdown from "./FilterDropdown";
+import { debounce } from 'lodash'
 
 /** CSS classe generator */
 const useStyles = makeStyles((theme) => ({
@@ -169,6 +170,8 @@ function DataTable({
   activeFilters = {},
   changeFilters = () => { },
   clearFilters = () => { },
+  handleColumnSearch = () => { },
+  activeColumnsSearched = {},
   ...rest
 }) {
   const classes = useStyles();
@@ -303,7 +306,7 @@ function DataTable({
   const getfilterRow = () => {
     const temp = [...header.data]
     if (checkbox) {
-      temp.unshift({ text: "", params: {}, css: { position: "sticky", left: 0, zIndex: 3 } })
+      temp.unshift({ text: "", params: {}, css: { position: "sticky", left: 0, zIndex: 2 } })
     }
     return temp;
   }
@@ -369,7 +372,7 @@ function DataTable({
               {getfilterRow().map((r, i) => (
                 <TableCell
                   key={i}
-                  style={{ ...r.css, display: 'flex', alignItems: 'center' }}
+                  style={{ ...r.css, display: 'flex', alignItems: 'center', ...r.filterCellCss }}
                   padding={
                     checkbox && i === 0 ? "checkbox" : "normal"
                   }
@@ -378,6 +381,8 @@ function DataTable({
                   {r.filterType?.includes('text') ?
                     (
                       <TextControl
+                        defaultValue={activeColumnsSearched?.[r.colName]}
+                        type='search'
                         variant="outlined"
                         gutter={false}
                         size="small"
@@ -402,6 +407,7 @@ function DataTable({
                             </InputAdornment>
                           )
                         }}
+                        onChange={debounce((e) => handleColumnSearch(r.colName, e.target.value), 1000)}
                       />
                     ) : r.filterType?.includes('filter') && r.colName in columnFilters ? (
                       <Box width='100%'>
@@ -450,7 +456,7 @@ function DataTable({
                       }
                       data-test="datatable-row-cell"
                     >
-                      {rowWrapper(highlightSearchTerm(text), params.colname)}
+                      {rowWrapper(highlightSearchTerm(text), params.colname, rowIndex, colIndex)}
                       {resizeTable && colIndex === 0 && (
                         <HeightResizer index={rowIndex + 1} />
                       )}
