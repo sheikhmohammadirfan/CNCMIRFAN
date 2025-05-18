@@ -171,6 +171,7 @@ function DataTable({
   changeFilters = () => { },
   clearFilters = () => { },
   handleColumnSearch = () => { },
+  activeColumnsSearched = {},
   ...rest
 }) {
   const classes = useStyles();
@@ -371,7 +372,7 @@ function DataTable({
               {getfilterRow().map((r, i) => (
                 <TableCell
                   key={i}
-                  style={{ ...r.css, display: 'flex', alignItems: 'center' }}
+                  style={{ ...r.css, display: 'flex', alignItems: 'center', ...r.filterCellCss }}
                   padding={
                     checkbox && i === 0 ? "checkbox" : "normal"
                   }
@@ -380,6 +381,8 @@ function DataTable({
                   {r.filterType?.includes('text') ?
                     (
                       <TextControl
+                        defaultValue={activeColumnsSearched?.[r.colName]}
+                        type='search'
                         variant="outlined"
                         gutter={false}
                         size="small"
@@ -404,7 +407,7 @@ function DataTable({
                             </InputAdornment>
                           )
                         }}
-                        onChange={debounce((e) => handleColumnSearch(r.colName, e.target.value), 2000)}
+                        onChange={debounce((e) => handleColumnSearch(r.colName, e.target.value), 1000)}
                       />
                     ) : r.filterType?.includes('filter') && r.colName in columnFilters ? (
                       <Box width='100%'>
