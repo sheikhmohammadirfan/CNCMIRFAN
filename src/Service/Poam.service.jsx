@@ -120,3 +120,7 @@ export async function getActions(options, signal) {
 export async function exportAction() {
   return await get('/risk/tasks/export/')
 }
+
+export async function getControlsList () {
+  return await get('/poam/listcontrol')
+}

@@ -1,6 +1,6 @@
 export const poam_header = [
   "POAM ID",
-  "Controls",
+  "Control",
   "Weakness Name",
   "Weakness Description",
   "Weakness Detector Source",
@@ -49,6 +49,7 @@ export const poam_header_response_map = {
   "is_open": "is_open",
   "poam_id": "POAM ID",
   "controls": "Controls",
+  "control": "Control",
   "weakness_name": "Weakness Name",
   "weakness_description": "Weakness Description",
   "weakness_detector_source": "Weakness Detector Source",
