@@ -13,6 +13,7 @@ import FormDialog from "./FormDialog";
 import JustificationDialog from "./JustificationDialog";
 import {
   addRow,
+  getControlsList,
   getData,
   moveRow,
   updateRow,
@@ -126,6 +127,7 @@ export default function PoamTable({ fileID }) {
   };
 
   // fetch data on mounting component
+  // #region Fetch POAM
   useEffect(() => {
     (async () => {
       startLoading();
@@ -142,6 +144,21 @@ export default function PoamTable({ fileID }) {
       stopLoading();
     })();
   }, []);
+
+  // Fetch controls list
+  // #region Controls
+  const [controls, setControls] = useState([])
+  useEffect(() => {
+    async function fetchControls() {
+      startLoading();
+      // Fetch POA&M data
+      const { data, status } = await getControlsList(fileID);
+      if (!status) return stopLoading();
+      setControls(data)
+      stopLoading();
+    }
+    fetchControls()
+  }, [])
 
   // Reset page state on sheet change or data change
   useEffect(() => resetPageState(), [poamData, isOpenPoam]);
@@ -194,7 +211,7 @@ export default function PoamTable({ fileID }) {
       setSecondaryOpen,
       matchedCell,
       sortingMap,
-      searchTerm
+      controls
     );
 
   const [columnWidths, setColumnWidths] = useState([]);
@@ -434,49 +451,49 @@ export default function PoamTable({ fileID }) {
         />
       ) : (
         <>
-        <PoamDataTable
-          classes={classes}
-          fullScreen={{ isZoomed, zoomIn, zoomOut }}
-          data={{
-            selectedRow,
-            setSelectedRow,
-            fileID,
-            poamData,
-            getPoam,
-            setSecondaryOpen,
-            getRowIndex,
-            sortingMap,
-            poamDetails,
-            isLoading,
-          }}
-          manageCol={{
-            allColumns,
-            secondaryColumns,
-            hiddenColumns,
-            visibleColumns,
-            moveToPrimary,
-            moveToSecondary,
-          }}
-          manageRow={{ openEditFrom, openCreateForm, openJustify }}
-          manageSheet={{ isOpenPoam, showOpenPoam, showClosePoam }}
-          manageJira={{ containIssue, showCreateIssue, showUpdateIssue }}
-          manageTask={{ isTaskVisible, showTaskTracker, hideTaskTracker }}
-          search={{
-            matchedCell,
-            setMatched,
-            searchSelected,
-            setSelected,
-            setSearchTerm,
-            searchTerm,
-          }}
-          manageTable={{
-            secondaryOpen,
-            mapTableHeader,
-            mapTableBody,
-            columns_width: columnWidths.length > 0 ? columnWidths : columns_width,
-          }}
-        />
-      </>)}
+          <PoamDataTable
+            classes={classes}
+            fullScreen={{ isZoomed, zoomIn, zoomOut }}
+            data={{
+              selectedRow,
+              setSelectedRow,
+              fileID,
+              poamData,
+              getPoam,
+              setSecondaryOpen,
+              getRowIndex,
+              sortingMap,
+              poamDetails,
+              isLoading,
+            }}
+            manageCol={{
+              allColumns,
+              secondaryColumns,
+              hiddenColumns,
+              visibleColumns,
+              moveToPrimary,
+              moveToSecondary,
+            }}
+            manageRow={{ openEditFrom, openCreateForm, openJustify }}
+            manageSheet={{ isOpenPoam, showOpenPoam, showClosePoam }}
+            manageJira={{ containIssue, showCreateIssue, showUpdateIssue }}
+            manageTask={{ isTaskVisible, showTaskTracker, hideTaskTracker }}
+            search={{
+              matchedCell,
+              setMatched,
+              searchSelected,
+              setSelected,
+              setSearchTerm,
+              searchTerm,
+            }}
+            manageTable={{
+              secondaryOpen,
+              mapTableHeader,
+              mapTableBody,
+              columns_width: columnWidths.length > 0 ? columnWidths : columns_width,
+            }}
+          />
+        </>)}
 
       <FormDialog
         poamID_data={getPoamID_data(poamData)}
@@ -485,6 +502,7 @@ export default function PoamTable({ fileID }) {
         open={formOpen}
         onClose={closeFormDialog}
         onSubmit={onFormSubmit}
+        controls={controls}
       />
 
       <JustificationDialog

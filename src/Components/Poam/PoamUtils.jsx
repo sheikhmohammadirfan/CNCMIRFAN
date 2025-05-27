@@ -161,7 +161,7 @@ export const mapDataToHeader = (visibleColumns, sorting, updateSort) => ({
 });
 
 /* Method to map a POA&M data to row dictionary */
-const mapDataToRow = (data, columns, rowIndex, matchedCell) =>
+const mapDataToRow = (data, columns, rowIndex, matchedCell, controls) =>
   columns.map((columnName, index) => {
     let CellComponent = columnName in POAM_CELLS && POAM_CELLS[columnName]
     return ({
@@ -169,7 +169,7 @@ const mapDataToRow = (data, columns, rowIndex, matchedCell) =>
         <CellComponent
           cellValue={data[columnName][rowIndex]}
         />
-      ) : data[columnName][rowIndex],
+      ) : columnName === 'Control' ? (controls?.find(c => c.id === data['Control'][rowIndex])?.name || "") : data[columnName][rowIndex],
       params:
         columnName === "POAM ID"
           ? {
@@ -207,7 +207,8 @@ export const generateRows = (
   secondaryOpen,
   setSecondaryOpen,
   matchedCell,
-  sortingMap
+  sortingMap,
+  controls
 ) => {
   // count of number of rows
   const rowCount = Object.keys(data["POAM ID"] || {}).length;
@@ -226,7 +227,8 @@ export const generateRows = (
         data,
         columns,
         getRowIndex(data, i, sortingMap),
-        matchedCell
+        matchedCell,
+        controls
       ),
       props: {
         selected:
