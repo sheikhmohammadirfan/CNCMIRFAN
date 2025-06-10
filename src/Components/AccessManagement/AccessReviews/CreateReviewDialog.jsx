@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import { useStyle } from './AccessReviewsUtils'
-import { Box, Button, Chip, Dialog, DialogContent, DialogTitle, Grid, Icon, IconButton, InputAdornment, InputLabel, TextField, Typography } from '@material-ui/core';
+import { Box, Button, Chip, Dialog, DialogContent, DialogTitle, Grid, Icon, IconButton, InputAdornment, Typography } from '@material-ui/core';
 import { Form, SelectControl, TextControl } from '../../Utils/Control';
 import OptionDropdown from '../../RiskManagement/RiskRegister/OptionDropdown';
 import DataTable from '../../Utils/DataTable/DataTable';
@@ -67,14 +67,14 @@ const CreateReviewDialog = ({
   entities: _entities
 }) => {
 
-  const [reviewerOpen, setReviewerOpen] = useState(false)
-  const [selectedReviewer, setSelectedReviewer] = useState("")
+  // const [reviewerOpen, setReviewerOpen] = useState(false)
+  // const [selectedReviewer, setSelectedReviewer] = useState("")
   const [inherentRiskOpen, setInherentRiskOpen] = useState(false)
   const [selectedInherentRisk, setSelectedInherentRisk] = useState("")
   const [accessIntegrationOpen, setAccessIntegrationOpen] = useState(false)
   const [selectedAccessIntegration, setSelectedAccessIntegration] = useState("")
 
-  const [loading, setLoading] = useState(false);
+  const [, setLoading] = useState(false);
   const [entities, setEntities] = useState(_entities || []);
 
   const fetchEntities = useCallback(async () => {
@@ -88,7 +88,7 @@ const CreateReviewDialog = ({
     fetchEntities();
   }, [fetchEntities])
 
-  const { handleSubmit, control, formState: { errors } } = useForm();
+  const { handleSubmit, control } = useForm();
 
   const validation = {
     name: { required: "This field is required." },

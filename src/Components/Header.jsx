@@ -1,7 +1,9 @@
-import { Box, makeStyles, useScrollTrigger } from "@material-ui/core";
+import { makeStyles, useScrollTrigger } from "@material-ui/core";
+import { Box } from '@mui/material'
 import NotificationsIcon from "@material-ui/icons/Notifications";
 import Breadcrumbs from "./Breadcrumbs";
 import useParams from "./Utils/Hooks/useParams";
+import ProfileMenu from "./ProfileMenu";
 
 /** CSS class generator */
 const useStyles = makeStyles((theme) => ({
@@ -14,6 +16,7 @@ const useStyles = makeStyles((theme) => ({
     borderBottom: '1px solid #d9d9d9',
     padding: theme.spacing(1),
     paddingLeft: theme.spacing(1.5),
+    paddingRight: theme.spacing(2),
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
@@ -52,8 +55,9 @@ function Header({ scrollTarget }) {
     <>
       <Box className={classes.root} boxShadow={headerScrollTrigger ? 3 : 0}>
         <Breadcrumbs isPoamPage={isPoamSection && paramsHasFileDetails} />
-        <Box display="flex" alignItems="center">
+        <Box display="flex" alignItems="center" sx={{ columnGap: 1 }}>
           <NotificationsIcon style={{ cursor: "pointer" }} />
+          <ProfileMenu />
         </Box>
       </Box>
     </>

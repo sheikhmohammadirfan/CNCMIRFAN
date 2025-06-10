@@ -97,7 +97,7 @@ export default function PoamDataTable({
               selectedRows={selectedRow}
               setSelectedRows={setSelectedRow}
               headerWrapper={(text) => <HeaderCell text={text} />}
-              rowWrapper={(text) => <RowCell text={text} />}
+              rowWrapper={(text, colName, rowIndex, colIndex) => <RowCell text={text} rowIndex={rowIndex} colIndex={colIndex} />}
               style={{
                 borderRadius: 5,
                 borderTopLeftRadius: 0,

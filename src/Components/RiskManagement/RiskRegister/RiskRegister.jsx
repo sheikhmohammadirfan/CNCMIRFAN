@@ -140,7 +140,11 @@ const RiskRegister = () => {
   const fetchandSetRegister = async (reload, filterTrigger) => {
     const payload = {
       filters: {},
-      search: searchedValue.current,
+      search: {
+        scenario: colsSearchRef.current?.scenario || '',
+        category: colsSearchRef.current?.category || '',
+        owner: colsSearchRef.current?.owners || ''
+      },
       page_size: pagination.page_size,
       page_no: filterTrigger ? 1 : pagination.page_no,
       ...sorting
@@ -293,6 +297,7 @@ const RiskRegister = () => {
         [filterName]: updatedFilterIds
       })
     })
+    colsSearchRef.current[filterName] = ''
     if (filterName === "identified"
       && updatedFilterIds[0] === 3
       && identifiedDates) {
@@ -325,6 +330,16 @@ const RiskRegister = () => {
       });
       setFilterMetadata({ identified: { 3: { fromDate: null, toDate: null } } });
     }
+  }
+
+  const colsSearchRef = useRef({});
+  const handleColumnSearch = (col, searchVal) => {
+    colsSearchRef.current[col] = searchVal;
+    updatePageNumber(1);
+    setFilters(prev => ({
+      ...prev,
+      [col]: []
+    }));
   }
 
   // State to toggle dialog, for adding scenario manually, and editing it
@@ -723,6 +738,18 @@ const RiskRegister = () => {
                 minCellWidth={visibleColumns.map(
                   (name) => risk_register_columns_width[allColumns.indexOf(name)]
                 )}
+
+                // Filters
+                columnFilters={filterDropdowns}
+                activeFilters={filters}
+                changeFilters={(filterName, updatedFilterIds, identifiedDates) => {
+                  changeFilters(filterName, updatedFilterIds, identifiedDates)
+                  setTimeout(() => filterTrigger(), 0)
+                }}
+                clearFilters={clearFilters}
+                handleColumnSearch={handleColumnSearch}
+                activeColumnsSearched={colsSearchRef.current}
+
                 // Pagination props
                 currentPage={pagination.page_no}
                 pageSize={pagination.page_size}

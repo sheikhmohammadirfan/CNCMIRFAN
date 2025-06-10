@@ -53,6 +53,16 @@ const Users = () => {
     }));
   }
 
+  const colsSearchRef = useRef({});
+  const handleColumnSearch = (col, searchVal) => {
+    colsSearchRef.current[col] = searchVal;
+    updatePageNumber(1);
+    setFilters(prev => ({
+      ...prev,
+      [col]: []
+    }));
+  }
+
   const prevPayload = useRef("");
   const searchedValue = useRef("");
 
@@ -284,6 +294,7 @@ const Users = () => {
               activeFilters={filters}
               changeFilters={changeFilters}
               clearFilters={clearFilters}
+              handleColumnSearch={handleColumnSearch}
 
               // Pagination props
               currentPage={pagination.page_no}

@@ -6,12 +6,14 @@ import {
   hidden_columns,
   poam_header,
   poam_header_response_map,
+  poam_header_reverse_map,
   secondary_columns,
 } from "../../assets/data/PoamData";
 import FormDialog from "./FormDialog";
 import JustificationDialog from "./JustificationDialog";
 import {
   addRow,
+  getControlsList,
   getData,
   moveRow,
   updateRow,
@@ -125,6 +127,7 @@ export default function PoamTable({ fileID }) {
   };
 
   // fetch data on mounting component
+  // #region Fetch POAM
   useEffect(() => {
     (async () => {
       startLoading();
@@ -141,6 +144,21 @@ export default function PoamTable({ fileID }) {
       stopLoading();
     })();
   }, []);
+
+  // Fetch controls list
+  // #region Controls
+  const [controls, setControls] = useState([])
+  useEffect(() => {
+    async function fetchControls() {
+      startLoading();
+      // Fetch POA&M data
+      const { data, status } = await getControlsList(fileID);
+      if (!status) return stopLoading();
+      setControls(data)
+      stopLoading();
+    }
+    fetchControls()
+  }, [])
 
   // Reset page state on sheet change or data change
   useEffect(() => resetPageState(), [poamData, isOpenPoam]);
@@ -193,8 +211,69 @@ export default function PoamTable({ fileID }) {
       setSecondaryOpen,
       matchedCell,
       sortingMap,
-      searchTerm
+      controls
     );
+
+  const [columnWidths, setColumnWidths] = useState([]);
+  useEffect(() => {
+
+    const timeout = setTimeout(() => {
+
+      if (!poamData?.open || !poamData?.close || visibleColumns.length === 0) return;
+      const columnWidthsMap = {}
+
+      const openPoams = poamData?.open
+      const closedPoams = poamData?.close
+
+      if (isOpenPoam) {
+        Object.keys(poam_header_reverse_map).forEach((column, colIndex) => {
+          let maxColumnValueSize = 0;
+          Object.values(openPoams[column]).forEach((rowValue, rowIndex) => {
+            const rowValueSize = [0, 1].includes(rowIndex) ? 0 : getElementWidth(`${rowIndex - 2}-${colIndex + 1}`, column);
+            const rowValueSizeReduced = 0.5 * rowValueSize
+            maxColumnValueSize = Math.max(maxColumnValueSize, rowValueSizeReduced)
+          });
+          const largestCellSize = maxColumnValueSize + 38
+          if (largestCellSize > columns_width[colIndex]) {
+            columnWidthsMap[column] = columns_width[colIndex];
+          }
+          else {
+            columnWidthsMap[column] = largestCellSize;
+          }
+          // columnWidthsMap[column] = Math.min(largestCellSize, columns_width[colIndex]);
+        })
+      }
+      else {
+        Object.keys(poam_header_reverse_map).forEach((column, colIndex) => {
+          let maxColumnValueSize = 0;
+          Object.values(closedPoams[column]).forEach((rowValue, rowIndex) => {
+            const rowValueSize = getElementWidth(`${rowIndex}-${colIndex + 1}`, column);
+            const rowValueSizeReduced = 0.5 * rowValueSize
+            maxColumnValueSize = Math.max(maxColumnValueSize, rowValueSizeReduced)
+          });
+          const largestCellSize = maxColumnValueSize + 38
+          if (largestCellSize > columns_width[colIndex]) {
+            columnWidthsMap[column] = columns_width[colIndex];
+          }
+          else {
+            columnWidthsMap[column] = largestCellSize;
+          }
+        })
+      }
+      // console.log(columnWidthsMap)
+      const widths = poam_header.map((h, i) => columnWidthsMap[h])
+      setColumnWidths(widths)
+
+    }, 0)
+
+    return () => clearTimeout(timeout)
+  }, [poamData, visibleColumns, isOpenPoam])
+
+  function getElementWidth(id, column) {
+    const el = document.getElementById(id);
+    if (!el) return 0;
+    return el.scrollWidth;
+  }
 
   // ? ----------> ROW MANUPULATION METHODS
 
@@ -372,49 +451,49 @@ export default function PoamTable({ fileID }) {
         />
       ) : (
         <>
-        <PoamDataTable
-          classes={classes}
-          fullScreen={{ isZoomed, zoomIn, zoomOut }}
-          data={{
-            selectedRow,
-            setSelectedRow,
-            fileID,
-            poamData,
-            getPoam,
-            setSecondaryOpen,
-            getRowIndex,
-            sortingMap,
-            poamDetails,
-            isLoading,
-          }}
-          manageCol={{
-            allColumns,
-            secondaryColumns,
-            hiddenColumns,
-            visibleColumns,
-            moveToPrimary,
-            moveToSecondary,
-          }}
-          manageRow={{ openEditFrom, openCreateForm, openJustify }}
-          manageSheet={{ isOpenPoam, showOpenPoam, showClosePoam }}
-          manageJira={{ containIssue, showCreateIssue, showUpdateIssue }}
-          manageTask={{ isTaskVisible, showTaskTracker, hideTaskTracker }}
-          search={{
-            matchedCell,
-            setMatched,
-            searchSelected,
-            setSelected,
-            setSearchTerm,
-            searchTerm,
-          }}
-          manageTable={{
-            secondaryOpen,
-            mapTableHeader,
-            mapTableBody,
-            columns_width,
-          }}
-        />
-      </>)}
+          <PoamDataTable
+            classes={classes}
+            fullScreen={{ isZoomed, zoomIn, zoomOut }}
+            data={{
+              selectedRow,
+              setSelectedRow,
+              fileID,
+              poamData,
+              getPoam,
+              setSecondaryOpen,
+              getRowIndex,
+              sortingMap,
+              poamDetails,
+              isLoading,
+            }}
+            manageCol={{
+              allColumns,
+              secondaryColumns,
+              hiddenColumns,
+              visibleColumns,
+              moveToPrimary,
+              moveToSecondary,
+            }}
+            manageRow={{ openEditFrom, openCreateForm, openJustify }}
+            manageSheet={{ isOpenPoam, showOpenPoam, showClosePoam }}
+            manageJira={{ containIssue, showCreateIssue, showUpdateIssue }}
+            manageTask={{ isTaskVisible, showTaskTracker, hideTaskTracker }}
+            search={{
+              matchedCell,
+              setMatched,
+              searchSelected,
+              setSelected,
+              setSearchTerm,
+              searchTerm,
+            }}
+            manageTable={{
+              secondaryOpen,
+              mapTableHeader,
+              mapTableBody,
+              columns_width: columnWidths.length > 0 ? columnWidths : columns_width,
+            }}
+          />
+        </>)}
 
       <FormDialog
         poamID_data={getPoamID_data(poamData)}
@@ -423,6 +502,7 @@ export default function PoamTable({ fileID }) {
         open={formOpen}
         onClose={closeFormDialog}
         onSubmit={onFormSubmit}
+        controls={controls}
       />
 
       <JustificationDialog

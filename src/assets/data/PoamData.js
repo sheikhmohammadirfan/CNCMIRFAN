@@ -1,6 +1,6 @@
 export const poam_header = [
   "POAM ID",
-  "Controls",
+  "Control",
   "Weakness Name",
   "Weakness Description",
   "Weakness Detector Source",
@@ -39,7 +39,7 @@ export const secondary_columns = [
 export const hidden_columns = ["justification"];
 
 export const columns_width = [
-  110, 100, 170, 210, 250, 250, 160, 160, 200, 230, 220, 250, 300, 400, 180,
+  110, 100, 170, 500, 250, 250, 160, 160, 200, 230, 220, 250, 300, 400, 180,
   200, 240, 300, 200, 200, 170, 150, 230, 400, 400, 300, 150, 300,
 ];
 
@@ -51,6 +51,7 @@ export const poam_header_response_map = {
   "is_open": "is_open",
   "poam_id": "POAM ID",
   "controls": "Controls",
+  "control": "Control",
   "weakness_name": "Weakness Name",
   "weakness_description": "Weakness Description",
   "weakness_detector_source": "Weakness Detector Source",
@@ -81,3 +82,34 @@ export const poam_header_response_map = {
   "extra_field": "extra_field",
   "poam_file": "poam_file",
 }
+
+export const poam_header_reverse_map = {
+  "POAM ID": "poam_id",
+  "Controls": "controls",
+  "Weakness Name": "weakness_name",
+  "Weakness Description": "weakness_description",
+  "Weakness Detector Source": "weakness_detector_source",
+  "Weakness Source Identifier": "weakness_source_identifier",
+  "Asset Identifier": "asset_identifier",
+  "Point of Contact": "point_of_contact",
+  "Resources Required": "resources_required",
+  "Overall Remediation Plan": "overall_remediation_plan",
+  "Original Detection Date": "original_detection_date",
+  "Scheduled Completion Date": "scheduled_completion_date",
+  "Planned Milestones": "planned_milestones",
+  "Milestone Changes": "milestone_changes",
+  "Status Date": "status_date",
+  "Vendor Dependency": "vendor_dependency",
+  "Last Vendor Check-in Date": "last_vendor_checkin_date",
+  "Vendor Dependent Product Name": "vendor_dependent_product_name",
+  "Original Risk Rating": "original_risk_rating",
+  "Adjusted Risk Rating": "adjusted_risk_rating",
+  "Risk Adjustment": "risk_adjustment",
+  "False Positive": "false_positive",
+  "Operational Requirement": "operational_requirement",
+  "Deviation Rationale": "deviation_rationale",
+  "Supporting Documents": "supporting_documents",
+  "Comments": "comments",
+  "Auto-Approve": "auto_approve",
+  "justification": "justification"
+};

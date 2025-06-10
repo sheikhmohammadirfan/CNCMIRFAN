@@ -47,8 +47,9 @@ const FormInput = ({ ...rest }) => (
   />
 );
 
+
 // MAIN FORM COMPONENT
-function FormDialog({ poamID_data, rows, open, onClose, rowIndex, onSubmit }) {
+function FormDialog({ poamID_data, rows, open, onClose, rowIndex, onSubmit, controls }) {
   const classes = useStyle();
 
   // Method to check if form is of create or update row
@@ -64,6 +65,7 @@ function FormDialog({ poamID_data, rows, open, onClose, rowIndex, onSubmit }) {
 
   // Options list
   // const controlsList = ["RA-5", "SA-9", "PF-07"];
+  // const controlsList = ["RA-5", "SA-9", "PF-07"];
   const sliderInput = [
     { value: 0, label: "Low" },
     { value: 50, label: "Moderate" },
@@ -72,14 +74,22 @@ function FormDialog({ poamID_data, rows, open, onClose, rowIndex, onSubmit }) {
 
   // Set dafault values for Create Form, for Edit Form populate existing details
   const defaultValues = {};
-  for (var name of poam_header) {
+  for (const name of poam_header) {
     if (!name.toLowerCase().includes("date"))
-      defaultValues[name] = isCreateForm() ? "" : rows[name][rowIndex];
+      defaultValues[name] = isCreateForm()
+        ? name === "Control" ? null : ""
+        : name === "Control" ? controls.find(c => c.id === rows[name][rowIndex]) : rows[name][rowIndex];
     else
       defaultValues[name] = stringToMoment(
         isCreateForm() ? "" : rows[name][rowIndex]
       );
   }
+
+
+    // Get useForm Methods
+  const {  getValues } = useForm({
+    defaultValues,
+  });
 
   // Set default POA&M ID, form is of create type
   if (isCreateForm())
@@ -95,7 +105,7 @@ function FormDialog({ poamID_data, rows, open, onClose, rowIndex, onSubmit }) {
   };
 
   // Get useForm Methods
-  const { handleSubmit, getValues, setValue, control } = useForm({
+  const { handleSubmit, setValue, control } = useForm({
     defaultValues,
   });
 
@@ -116,7 +126,7 @@ function FormDialog({ poamID_data, rows, open, onClose, rowIndex, onSubmit }) {
           .replaceAll(" ", "_")
           .replaceAll("-", "_");
       }
-      newFormatData[newColNameFormat] = data[colName] || "";
+      newFormatData[newColNameFormat] = colName === 'Control' ? (data['Control']?.id || null) : data[colName] || "";
     });
 
     // Push jira_issues column in datatable

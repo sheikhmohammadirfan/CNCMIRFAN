@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Box,
   Button,
@@ -7,15 +7,6 @@ import {
   IconButton,
   InputAdornment,
   Typography,
-  Paper,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Popover,
-  makeStyles,
-  InputLabel,
-  TextField,
   Divider,
   Chip,
 } from "@material-ui/core";
@@ -23,8 +14,6 @@ import { useHistory } from "react-router-dom";
 import { TextControl } from "../../Utils/Control";
 import DataTable from "../../Utils/DataTable/DataTable";
 import OptionDropdown from "../../RiskManagement/RiskRegister/OptionDropdown";
-import MenuItem from "@mui/material/MenuItem";
-import { tableMockData } from "../Accounts/AccountsColumns";
 import DoughnutChart from "./DoughnutChart";
 import { getEntities, getReviews, postReview } from "../../../Service/AccessManagement/Reviews";
 import { obj_to_yyyy_mm_dd } from "../../Utils/DateFormatConverter";
@@ -78,14 +67,14 @@ function AccessReviews() {
 
   const classes = useStyle();
   const history = useHistory();
-  const createBtnRef = useRef(null);
-  const [openCreatePopper, setOpenCreatePropper] = useState(false);
-  const [createAccess, setCreateAccess] = useState("");
+  // const createBtnRef = useRef(null);
+  // const [openCreatePopper, setOpenCreatePropper] = useState(false);
+  // const [createAccess, setCreateAccess] = useState("");
   const [statusOpen, setStatusOpen] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState("");
   const [searchValue, setSearchValue] = useState("");
   const [filteredData, setFilteredData] = useState([]);
-  const [showCreateReview, setShowCreateReview] = useState(false);
+  // const [showCreateReview, setShowCreateReview] = useState(false);
   const [open, setOpen] = useState(false);
   const [entities, setEntities] = useState([]);
 
@@ -178,9 +167,9 @@ function AccessReviews() {
   //   handleFilter();
   // }, [selectedStatus, searchValue]);
 
-  const handleCreateAccessChange = (event) => {
-    setCreateAccess(event.target.value);
-  };
+  // const handleCreateAccessChange = (event) => {
+  //   setCreateAccess(event.target.value);
+  // };
 
   const handleDropdownChange = (setter) => (value) => {
     setter(value);
@@ -201,13 +190,13 @@ function AccessReviews() {
     });
   };
 
-  const handleShowCreateReview = () => {
-    setShowCreateReview(true);
-  };
+  // const handleShowCreateReview = () => {
+  //   setShowCreateReview(true);
+  // };
 
-  const handleHideCreateReview = () => {
-    setShowCreateReview(false);
-  };
+  // const handleHideCreateReview = () => {
+  //   setShowCreateReview(false);
+  // };
 
   const handleClickOpen = () => {
     setOpen(true);

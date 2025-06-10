@@ -190,6 +190,7 @@ const RiskRegisterHeader = ({
         display="flex"
         justifyContent="space-between"
         alignItems="center"
+        mb={2}
       >
         {/* Contains Add scenario button, and Edit Button, and Add to Action Button */}
         <Box
@@ -369,12 +370,33 @@ const RiskRegisterHeader = ({
               Share
             </Button>
           </OptionDropdown>
+          {/* Dropdown to show and hide columns */}
+          <Box>
+            <ManageRegisterColumns
+              open={ismanageColsOpen}
+              handleClose={closeManageColsDropdown}
+              cols={{ allColumns, visibleColumns, hideColumn, showColumn }}
+            // addColumns={moveToSecondary}
+            // removeColums={moveToPrimary}
+            >
+              <Button
+                onClick={openManageColsDropdown}
+                endIcon=<Icon>tune</Icon>
+                className={classes.actionButton}
+                style={{
+                  fontSize: "0.8rem"
+                }}
+              >
+                Columns
+              </Button>
+            </ManageRegisterColumns>
+          </Box>
         </Box>
       </Box>
 
       {/* FILTERS */}
       {/* Contains 2 Boxes, 1 for filters, and 2nd for a dropdown to show and hide columns */}
-      <Box
+      {/* <Box
         mt={2}
         display={'flex'}
         justifyContent={'space-between'}
@@ -397,7 +419,6 @@ const RiskRegisterHeader = ({
           overflowX: "auto"
         }}
       >
-        {/* Filters */}
         <Box
           display={"flex"}
           gridColumnGap={8}
@@ -436,28 +457,8 @@ const RiskRegisterHeader = ({
               }
         </Box>
 
-        {/* Dropdown to show and hide columns */}
-        <Box className={classes.columnContainer}>
-          <ManageRegisterColumns
-            open={ismanageColsOpen}
-            handleClose={closeManageColsDropdown}
-            cols={{ allColumns, visibleColumns, hideColumn, showColumn }}
-          // addColumns={moveToSecondary}
-          // removeColums={moveToPrimary}
-          >
-            <Button
-              onClick={openManageColsDropdown}
-              endIcon=<Icon>tune</Icon>
-              className={classes.actionButton}
-              style={{
-                fontSize: "0.8rem"
-              }}
-            >
-              Columns
-            </Button>
-          </ManageRegisterColumns>
-        </Box>
-      </Box>
+
+      </Box> */}
     </>
   )
 }
