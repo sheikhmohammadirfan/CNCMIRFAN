@@ -1,6 +1,6 @@
 import { Box, Button, Grid, makeStyles, Typography } from "@material-ui/core";
 import DialogBox from "../Utils/DialogBox";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { poam_header } from "../../assets/data/PoamData";
 import {
   DateControl,
@@ -16,6 +16,7 @@ import { useForm } from "react-hook-form";
 import { validateID } from "./PoamUtils";
 import { stringToMoment } from "../Utils/Utils";
 import { Autocomplete } from "@material-ui/lab";
+import { get } from "../../Service/CrudFactory";
 
 // Style generator
 const useStyle = makeStyles((theme) => ({
@@ -55,12 +56,14 @@ function FormDialog({ poamID_data, rows, open, onClose, rowIndex, onSubmit }) {
 
   // Get current max POA&M ID & prefix value
   const { prefix, maxValue } = poamID_data;
-
   // Loading status for dialog
   const [isLoading, setisLoading] = useState(false);
+  const [frameworkList, setFrameworkList] = useState([]);
+  const [controlsList, setControlsList] = useState([]);
+  const [selectedFramework, setSelectedFramework] = useState(null);
 
   // Options list
-  const controlsList = ["RA-5", "SA-9", "PF-07"];
+  // const controlsList = ["RA-5", "SA-9", "PF-07"];
   const sliderInput = [
     { value: 0, label: "Low" },
     { value: 50, label: "Moderate" },
@@ -102,23 +105,54 @@ function FormDialog({ poamID_data, rows, open, onClose, rowIndex, onSubmit }) {
 
     // Backend requires column names that are lower-case with underscores. So, formatting that data here from uppercase to lowercase
     // setting columns names to lower cases
-    const newFormatData = {}
+    const newFormatData = {};
     Object.keys(data).map((colName, index) => {
       let newColNameFormat = "";
       if (colName === "Last Vendor Check-in Date") {
         newColNameFormat = "last_vendor_checkin_date";
-      }
-      else {
-        newColNameFormat = colName.toLowerCase().replaceAll(" ", "_").replaceAll("-", "_");
+      } else {
+        newColNameFormat = colName
+          .toLowerCase()
+          .replaceAll(" ", "_")
+          .replaceAll("-", "_");
       }
       newFormatData[newColNameFormat] = data[colName] || "";
     });
 
     // Push jira_issues column in datatable
-    await onSubmit({ ...newFormatData, jira_issues: rows.jira_issues[rowIndex] || {} });
+    await onSubmit({
+      ...newFormatData,
+      jira_issues: rows.jira_issues[rowIndex] || {},
+    });
     setisLoading(false);
   };
 
+  // <-----------------------------FRAMEWORK FETCHER--------------------------------->
+  useEffect(async () => {
+    const response = await get("/control/list-framework/");
+    setFrameworkList(response?.data);
+  }, []);
+
+  // <------------------------------------CONTROLS FETCHER--------------------------->
+  useEffect(() => {
+    const fetchControls = async () => {
+      let url = "/control/list-controls";
+      if (selectedFramework && selectedFramework.id) {
+        const frameworkId = parseInt(selectedFramework.id, 10);
+        url += `?framework_id=${frameworkId}`;
+        // console.log("selected framework", selectedFramework, url);
+      }
+
+      try {
+        const res = await get(url);
+        setControlsList(res?.data || []);
+      } catch (err) {
+        console.error("Error fetching controls", err);
+      }
+    };
+
+    fetchControls();
+  }, [selectedFramework]);
   return (
     <DialogBox
       open={open}
@@ -137,7 +171,7 @@ function FormDialog({ poamID_data, rows, open, onClose, rowIndex, onSubmit }) {
             onSubmit={handleSubmit(submitForm)}
           >
             <Grid container spacing={2}>
-              <Grid item xs={12} sm={6}>
+              <Grid item xs={12} sm={12}>
                 <FormInput
                   name="POAM ID"
                   label="POA&M ID"
@@ -147,11 +181,42 @@ function FormDialog({ poamID_data, rows, open, onClose, rowIndex, onSubmit }) {
 
               <Grid item xs={12} sm={6}>
                 <Autocomplete
+                  value={getValues("Framework") || null}
+                  onChange={(e, v) => {
+                    setValue("Framework", v);
+                    setSelectedFramework(v);
+                  }}
+                  disablePortal
+                  options={frameworkList}
+                  getOptionLabel={(option) =>
+                    typeof option === "string" ? option : option.name
+                  }
+                  freeSolo
+                  renderInput={(props) => (
+                    <TextControl
+                      {...props}
+                      noControls
+                      gutter={false}
+                      variant="outlined"
+                      name="Framework"
+                      value={getValues("Framework")}
+                      onChange={(e) =>
+                        setValue("Framework", e.target.value || "")
+                      }
+                    />
+                  )}
+                />
+              </Grid>
+
+              <Grid item xs={12} sm={6}>
+                <Autocomplete
                   value={getValues("Controls")}
                   onChange={(e, v) => setValue("Controls", v || "")}
-                  freeSolo
                   disablePortal
                   options={controlsList}
+                  getOptionLabel={(option) =>
+                    typeof option === "string" ? option : option.name
+                  }
                   renderInput={(props) => (
                     <TextControl
                       {...props}
@@ -159,10 +224,6 @@ function FormDialog({ poamID_data, rows, open, onClose, rowIndex, onSubmit }) {
                       gutter={false}
                       variant="outlined"
                       name="Controls"
-                      value={getValues("Controls")}
-                      onChange={(e) =>
-                        setValue("Controls", e.target.value || "")
-                      }
                     />
                   )}
                 />
