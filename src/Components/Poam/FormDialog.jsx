@@ -128,9 +128,12 @@ function FormDialog({ poamID_data, rows, open, onClose, rowIndex, onSubmit }) {
   };
 
   // <-----------------------------FRAMEWORK FETCHER--------------------------------->
-  useEffect(async () => {
-    const response = await get("/control/list-framework/");
-    setFrameworkList(response?.data);
+  useEffect(() => {
+    const fetchFramework = async () => {
+      const response = await get("/control/list-framework/");
+      setFrameworkList(response?.data);
+    };
+    fetchFramework();
   }, []);
 
   // <------------------------------------CONTROLS FETCHER--------------------------->
