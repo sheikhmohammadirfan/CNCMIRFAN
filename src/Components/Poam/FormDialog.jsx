@@ -187,6 +187,7 @@ function FormDialog({ poamID_data, rows, open, onClose, rowIndex, onSubmit }) {
                   value={getValues("Framework") || null}
                   onChange={(e, v) => {
                     setValue("Framework", v);
+                    setControlsList([])
                     setSelectedFramework(v);
                   }}
                   disablePortal
