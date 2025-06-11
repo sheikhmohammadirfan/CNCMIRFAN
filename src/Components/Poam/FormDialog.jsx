@@ -4,7 +4,6 @@ import React, { useEffect, useState } from "react";
 import { poam_header } from "../../assets/data/PoamData";
 import {
   DateControl,
-  SelectControl,
   Form,
   RadioControl,
   SliderControl,
@@ -47,9 +46,16 @@ const FormInput = ({ ...rest }) => (
   />
 );
 
-
 // MAIN FORM COMPONENT
-function FormDialog({ poamID_data, rows, open, onClose, rowIndex, onSubmit, controls }) {
+function FormDialog({
+  poamID_data,
+  rows,
+  open,
+  onClose,
+  rowIndex,
+  onSubmit,
+  controls,
+}) {
   const classes = useStyle();
 
   // Method to check if form is of create or update row
@@ -77,17 +83,21 @@ function FormDialog({ poamID_data, rows, open, onClose, rowIndex, onSubmit, cont
   for (const name of poam_header) {
     if (!name.toLowerCase().includes("date"))
       defaultValues[name] = isCreateForm()
-        ? name === "Control" ? null : ""
-        : name === "Control" ? controls.find(c => c.id === rows[name][rowIndex]) : rows[name][rowIndex];
+        ? name === "Control"
+          ? null
+          : ""
+        : name === "Control"
+        ? controls.find((c) => c.id === rows[name][rowIndex])
+        : rows[name][rowIndex];
     else
       defaultValues[name] = stringToMoment(
         isCreateForm() ? "" : rows[name][rowIndex]
       );
   }
 
-
-    // Get useForm Methods
-  const {  getValues } = useForm({
+  console.log("DEFAULT VALUES", defaultValues);
+  // Get useForm Methods
+  const { getValues } = useForm({
     defaultValues,
   });
 
@@ -116,17 +126,19 @@ function FormDialog({ poamID_data, rows, open, onClose, rowIndex, onSubmit, cont
     // Backend requires column names that are lower-case with underscores. So, formatting that data here from uppercase to lowercase
     // setting columns names to lower cases
     const newFormatData = {};
-    Object.keys(data).map((colName, index) => {
-      let newColNameFormat = "";
-      if (colName === "Last Vendor Check-in Date") {
-        newColNameFormat = "last_vendor_checkin_date";
+    Object.keys(data).forEach((colName) => {
+      let newColNameFormat =
+        colName === "Last Vendor Check-in Date"
+          ? "last_vendor_checkin_date"
+          : colName.toLowerCase().replaceAll(" ", "_").replaceAll("-", "_");
+
+      // Map the key to 'controls' and extract the ID
+      if (colName === "Controls") {
+        newColNameFormat = "controls";
+        newFormatData[newColNameFormat] = data["Controls"]?.id || null;
       } else {
-        newColNameFormat = colName
-          .toLowerCase()
-          .replaceAll(" ", "_")
-          .replaceAll("-", "_");
+        newFormatData[newColNameFormat] = data[colName] || "";
       }
-      newFormatData[newColNameFormat] = colName === 'Control' ? (data['Control']?.id || null) : data[colName] || "";
     });
 
     // Push jira_issues column in datatable
@@ -197,7 +209,7 @@ function FormDialog({ poamID_data, rows, open, onClose, rowIndex, onSubmit, cont
                   value={getValues("Framework") || null}
                   onChange={(e, v) => {
                     setValue("Framework", v);
-                    setControlsList([])
+                    setControlsList([]);
                     setSelectedFramework(v);
                   }}
                   disablePortal
