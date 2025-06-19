@@ -1,10 +1,18 @@
-import { TextField } from '@material-ui/core'
-import { Autocomplete } from '@mui/material'
-import React from 'react'
-import { Controller } from 'react-hook-form'
+import { TextField } from "@material-ui/core";
+import { Autocomplete } from "@mui/material";
+import React from "react";
+import { Controller } from "react-hook-form";
 
-const SelectCategories = ({ name, label, control, rules, multiple, optionList, disabled, ...rest }) => {
-
+const SelectCategories = ({
+  name,
+  label,
+  control,
+  rules,
+  multiple,
+  optionList,
+  disabled,
+  ...rest
+}) => {
   return (
     <Controller
       name={name}
@@ -13,7 +21,7 @@ const SelectCategories = ({ name, label, control, rules, multiple, optionList, d
       render={({ field: { value, onChange }, fieldState: { error } }) => {
         return (
           <Autocomplete
-            size='medium'
+            size="medium"
             multiple={multiple}
             value={value || []}
             onChange={(e, newVal) => !disabled && onChange(newVal)}
@@ -21,12 +29,12 @@ const SelectCategories = ({ name, label, control, rules, multiple, optionList, d
             getOptionLabel={(option) => option.category_name}
             filterSelectedOptions
             loading={true}
-            loadingText={disabled ? "Can't be changed" : "Loading..."}
+            loadingText={disabled ? "Can't be changed" : "Not Found"}
             renderInput={(params) => (
               <TextField
                 error={Boolean(error)}
                 helperText={error ? error.message : ""}
-                size='medium'
+                size="medium"
                 variant="outlined"
                 label={label}
                 {...params}
@@ -35,10 +43,10 @@ const SelectCategories = ({ name, label, control, rules, multiple, optionList, d
             disabled={disabled}
             {...rest}
           />
-        )
+        );
       }}
     />
-  )
-}
+  );
+};
 
-export default SelectCategories
+export default SelectCategories;

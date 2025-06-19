@@ -1,10 +1,12 @@
 import { Typography, makeStyles } from "@material-ui/core";
 import columnToCellMap from "../../../assets/data/RiskManagement/TableColCellMap";
-import { HEADER_TABLE_COLS_MAP, HEADER_TABLE_FILTERS_MAP } from "../../../assets/data/RiskManagement/RiskRegister/RiskRegisterColumns";
+import {
+  HEADER_TABLE_COLS_MAP,
+  HEADER_TABLE_FILTERS_MAP,
+} from "../../../assets/data/RiskManagement/RiskRegister/RiskRegisterColumns";
 import colorShader from "../../Utils/ColorShader";
 
-export const useStyle = makeStyles(theme => ({
-
+export const useStyle = makeStyles((theme) => ({
   // Root Register Container
   registerContainer: {
     maxHeight: `calc(100vh - ${theme.headerHeight}px)`,
@@ -52,34 +54,34 @@ export const useStyle = makeStyles(theme => ({
         fontFamily: "Material Icons",
         right: 0,
         fontSize: 18,
-        width: 10
+        width: 10,
       },
       "&::before": {
         content: "'\\2193'",
         color: theme.palette.grey[400],
-        display: 'flex',
+        display: "flex",
         top: 8,
-        right: 3
+        right: 3,
       },
       "&::after": {
         content: "'\\2191'",
         color: theme.palette.grey[400],
         top: 8,
-        right: 10
+        right: 10,
       },
       "&.asc::before": {
         content: "'\\2193'",
-        color: '#4477CE'
+        color: "#4477CE",
       },
       "&.dsc::after": {
         content: "'\\2191'",
-        color: '#4477CE'
+        color: "#4477CE",
       },
     },
 
     // Giving box shadow on left side to First cell on select
     "& tr.Mui-selected td:nth-child(1)": {
-      boxShadow: 'inset 4px 0 0 0 #4477CE',
+      boxShadow: "inset 4px 0 0 0 #4477CE",
     },
 
     // Change background color of selected row CELLS
@@ -92,7 +94,9 @@ export const useStyle = makeStyles(theme => ({
     // "& thead th:nth-child(1)": { background: "#cce6e3" },
     "& thead th:nth-child(2)": { borderRight: `1px solid #d9d9d9` },
     // "& tbody td:nth-child(1)": { borderRight: `1px solid #d9d9d9` },
-    "& tbody td:nth-child(2)": { borderRight: `1px solid ${theme.palette.grey[300]}` },
+    "& tbody td:nth-child(2)": {
+      borderRight: `1px solid ${theme.palette.grey[300]}`,
+    },
 
     // searched data cell style
     "& tbody td[data-searched='true']": { border: "2px solid #4477CE" },
@@ -103,7 +107,7 @@ export const useStyle = makeStyles(theme => ({
     color: "#797979",
     fontSize: 12,
     textTransform: "uppercase",
-    fontWeight: 'bold'
+    fontWeight: "bold",
   },
 
   // Style to make all cell height of 3 line
@@ -123,7 +127,7 @@ export const useStyle = makeStyles(theme => ({
 
   treatmentAction: {
     fontSize: "0.8rem",
-    padding: "0 0 0 5px"
+    padding: "0 0 0 5px",
   },
 
   treatmentStatus: {
@@ -148,7 +152,7 @@ export const useStyle = makeStyles(theme => ({
     // backgroundColor: green["300"],
     // backgroundColor: amber["300"],
     color: "rgba(0, 0, 0, 0.6)",
-    textAlign: "center"
+    textAlign: "center",
   },
 
   statusCell: {
@@ -158,14 +162,14 @@ export const useStyle = makeStyles(theme => ({
     borderRadius: "20px",
     display: "flex",
     alignItems: "center",
-    gap: "5px"
+    gap: "5px",
   },
 
   // Risk Create/Edit form Container
   formContainer: {
     "& .MuiDialogContent-root": {
-      padding: "24px"
-    }
+      padding: "24px",
+    },
   },
 
   // REGISTER FORM STYLES
@@ -175,7 +179,7 @@ export const useStyle = makeStyles(theme => ({
     "& .MuiAutocomplete-input": {
       // to bring autocomplete input's label in center. it was off by some pixels
       paddingTop: "10px !important",
-    }
+    },
   },
 
   // Accordion styles
@@ -191,7 +195,7 @@ export const useStyle = makeStyles(theme => ({
     },
     "& .MuiAccordionSummary-content.Mui-expanded": {
       margin: "16px 0",
-    }
+    },
   },
 
   // Sub inputs container (container which contains 2 or more inputs)
@@ -199,8 +203,8 @@ export const useStyle = makeStyles(theme => ({
     border: "1px solid #c5c5c5",
     borderRadius: "4px",
     "&.error": {
-      borderColor: theme.palette.error.main
-    }
+      borderColor: theme.palette.error.main,
+    },
   },
 
   // subtitle in inputs
@@ -215,7 +219,7 @@ export const useStyle = makeStyles(theme => ({
     "& .MuiFormControlLabel-label": {
       color: "rgba(0, 0, 0, 0.8)",
       fontSize: "0.9rem",
-    }
+    },
   },
 
   // CIA Checkboxes in risk create and edit form
@@ -225,7 +229,7 @@ export const useStyle = makeStyles(theme => ({
       color: theme.palette.primary.main,
     },
     "&.Mui-checked.Mui-disabled": {
-      color: colorShader('000000', 0.4),
+      color: colorShader("000000", 0.4),
     },
   },
 
@@ -244,14 +248,14 @@ export const useStyle = makeStyles(theme => ({
     color: "rgba(0, 0, 0, 0.6)",
     margin: "0 0 10px 5px",
     "&:nth-of-type(2)": {
-      marginTop: "10px"
-    }
+      marginTop: "10px",
+    },
   },
 
   errorText: {
     color: theme.palette.error.main,
     padding: "3px 14px 0 9px",
-    display: "inline-block"
+    display: "inline-block",
   },
 
   // Risk scoring slider container
@@ -272,20 +276,20 @@ export const useStyle = makeStyles(theme => ({
       opacity: 0.15,
     },
     "& .MuiSlider-track": {
-      height: "4px"
+      height: "4px",
     },
     "& .MuiSlider-thumb": {
       marginTop: "-4px",
-      width: '12px',
-      height: '12px'
+      width: "12px",
+      height: "12px",
       // borderRadius: "0",
     },
     "& .MuiSlider-mark": {
-      opacity: 0.15
+      opacity: 0.15,
     },
     "& .MuiSlider-markActive": {
-      backgroundColor: theme.palette.primary.main
-    }
+      backgroundColor: theme.palette.primary.main,
+    },
   },
 
   noValue: {
@@ -293,12 +297,12 @@ export const useStyle = makeStyles(theme => ({
       opacity: 0,
     },
     "& .MuiSlider-markLabelActive": {
-      color: theme.palette.grey[600]
+      color: theme.palette.grey[600],
     },
     "& .description": {
       opacity: 0,
-      pointerEvents: "none"
-    }
+      pointerEvents: "none",
+    },
   },
 
   // Horizontal divider after slider
@@ -323,7 +327,7 @@ export const useStyle = makeStyles(theme => ({
     justifyContent: "center",
     "& .MuiIcon-root": {
       fontSize: "1rem",
-    }
+    },
   },
 
   // Tooltip for slider description
@@ -336,7 +340,7 @@ export const useStyle = makeStyles(theme => ({
   // description of value selected in slider
   sliderValueDesc: {
     marginTop: "10px",
-    color: "#808080"
+    color: "#808080",
   },
 
   // Radio Button title
@@ -363,8 +367,8 @@ export const useStyle = makeStyles(theme => ({
       margin: "15px 10px 15px 10px",
       padding: 0,
       "&.Mui-checked": {
-        color: theme.palette.primary.main
-      }
+        color: theme.palette.primary.main,
+      },
     },
   },
 
@@ -396,11 +400,11 @@ export const useStyle = makeStyles(theme => ({
       width: "100%",
       "&:hover": {
         color: theme.palette.primary.light,
-        textDecoration: "underline"
-      }
-    }
-  }
-}))
+        textDecoration: "underline",
+      },
+    },
+  },
+}));
 
 /* Header cell component */
 export const HeaderCell = ({ text }) => {
@@ -419,21 +423,21 @@ export const RowCell = ({ text }) => {
     <Typography variant="body2" className={classes.tableCell}>
       {text}
     </Typography>
-  )
+  );
 };
 
 const COLUMN_FILTER_MAP = {
-  'Scenario': ['text'],
-  "Source": ['filter'],
-  "Categories": ['text', 'filter'],
-  "Owner": ['text', 'filter'],
-  "Identified Date": ['filter'],
-  "CIA": ['filter'],
-  "Inherent Risk": ['filter'],
-  "Residual Risk": ['filter'],
-  "Treatment": ['filter'],
-  "Approved": ['filter'],
-}
+  Scenario: ["text"],
+  Source: ["filter"],
+  Categories: ["text", "filter"],
+  Owner: ["text", "filter"],
+  "Identified Date": ["filter"],
+  CIA: ["filter"],
+  "Inherent Risk": ["filter"],
+  "Residual Risk": ["filter"],
+  Treatment: ["filter"],
+  Approved: ["filter"],
+};
 
 /* Method to map visible columns to header row */
 export const mapDataToHeader = (visibleColumns, sorting, updateSort) => ({
@@ -442,68 +446,94 @@ export const mapDataToHeader = (visibleColumns, sorting, updateSort) => ({
     params:
       text === "Custom Id" || text === "Scenario"
         ? {
-          "sticky": "",
-          "scenario": text === "Scenario" ? "true" : "false",
-          "header": "",
-          onClick: () => updateSort(text),
-          className: (sorting && sorting.sort_by === HEADER_TABLE_COLS_MAP[text]) ? (sorting.sort_order === 1 ? "asc" : "dsc") : "",
-        }
+            sticky: "",
+            scenario: text === "Scenario" ? "true" : "false",
+            header: "",
+            onClick: () => updateSort(text),
+            className:
+              sorting && sorting.sort_by === HEADER_TABLE_COLS_MAP[text]
+                ? sorting.sort_order === 1
+                  ? "asc"
+                  : "dsc"
+                : "",
+          }
         : {
-          onClick: () => updateSort(text),
-          className: (sorting && sorting.sort_by === HEADER_TABLE_COLS_MAP[text]) ? (sorting.sort_order === 1 ? "asc" : "dsc") : "",
-        },
+            onClick: () => updateSort(text),
+            className:
+              sorting && sorting.sort_by === HEADER_TABLE_COLS_MAP[text]
+                ? sorting.sort_order === 1
+                  ? "asc"
+                  : "dsc"
+                : "",
+          },
     colName: HEADER_TABLE_FILTERS_MAP[text],
     filterType: COLUMN_FILTER_MAP[text] || [],
-    filterCellCss: text === "Custom Id" || text === "Scenario" ? {
-      position: 'sticky',
-      left: text === 'Custom Id' ? '50px' : text === "Scenario" ? '200px' : 0,
-      zIndex: 1
-    } : {}
+    filterCellCss:
+      text === "Custom Id" || text === "Scenario"
+        ? {
+            position: "sticky",
+            left:
+              text === "Custom Id" ? "50px" : text === "Scenario" ? "200px" : 0,
+            zIndex: 1,
+          }
+        : {},
   })),
   cellStyle: {
     fontWeight: "bold",
     cursor: "pointer",
-    display: 'flex',
-    alignItems: 'center',
+    display: "flex",
+    alignItems: "center",
   },
 });
 
 /* Method to map data to row dictionary */
-const mapDataToRow = (row, rowIndex, columns, matchedCell, categories, owners, scores) => (
-  columns.map(colName => {
-    let CellComponent = colName in columnToCellMap && columnToCellMap[colName]
+const mapDataToRow = (
+  row,
+  rowIndex,
+  columns,
+  matchedCell,
+  categories,
+  owners,
+  scores,
+) =>
+  columns.map((colName) => {
+    let CellComponent = colName in columnToCellMap && columnToCellMap[colName];
     let cellValue = getCellValue(row, colName, categories, owners, scores);
     return {
-      text: colName in columnToCellMap ? <CellComponent cellValue={cellValue} /> : <RowCell text={cellValue} />,
+      text:
+        colName in columnToCellMap ? (
+          <CellComponent cellValue={cellValue} />
+        ) : (
+          <RowCell text={cellValue} />
+        ),
       params:
         colName === "Custom Id" || colName === "Scenario"
           ? {
-            "sticky": "",
-            "scenario": colName === "Scenario" ? "true" : "false",
-            "data-searched": Boolean(
-              matchedCell.find(
-                (cell) =>
-                  cell.column === colName &&
-                  cell.row === rowIndex &&
-                  cell.selected === true
-              )
-            ),
-            tabIndex: 0,
-          }
+              sticky: "",
+              scenario: colName === "Scenario" ? "true" : "false",
+              "data-searched": Boolean(
+                matchedCell.find(
+                  (cell) =>
+                    cell.column === colName &&
+                    cell.row === rowIndex &&
+                    cell.selected === true,
+                ),
+              ),
+              tabIndex: 0,
+            }
           : {
-            "data-searched": Boolean(
-              matchedCell.find(
-                (cell) =>
-                  cell.column === colName &&
-                  cell.row === rowIndex &&
-                  cell.selected === true
-              )
-            ),
-            tabIndex: 0,
-          },
-    }
-  })
-)
+              "data-searched": Boolean(
+                matchedCell.find(
+                  (cell) =>
+                    cell.column === colName &&
+                    cell.row === rowIndex &&
+                    cell.selected === true,
+                ),
+              ),
+              tabIndex: 0,
+            },
+    };
+  });
 
 /* Method to convert 2D row data into table body format */
 export const generateRows = (
@@ -547,8 +577,8 @@ export const generateRows = (
     rowData,
     rowStyle: { cursor: "pointer" },
     cellStyle: {
-      display: 'flex',
-      alignItems: 'center',
+      display: "flex",
+      alignItems: "center",
       position: "relative",
     },
   };
@@ -557,41 +587,45 @@ export const generateRows = (
 const getCellValue = (row, colName, categories, owners, scores) => {
   if (colName === "Scenario") {
     return JSON.parse(row["Scenario"]).description;
-  }
-  else if (colName === "Source") {
+  } else if (colName === "Source") {
     let sourceType = JSON.parse(row["Scenario"]).source_type;
     return sourceType === 0 ? "SYSTEM" : "CUSTOM";
-  }
-  else if (colName === "Categories") {
+  } else if (colName === "Categories") {
     let catsId = JSON.parse(row["Scenario"]).categories_id;
-    return categories.filter((cat, id) => catsId.includes(cat.id))
-  }
-  else if (colName === "Owner") {
-    let owner = owners.find(owner => owner.id === row["Owner"]);
-    return `${owner?.first_name} ${owner?.last_name}` || ""
-  }
-  else if (colName === "Inherent Risk") {
+    return categories.filter((cat, id) => catsId.includes(cat.id));
+  } else if (colName === "Owner") {
+    let owner = owners.find((owner) => owner.id === row["Owner"]);
+    return `${owner?.first_name} ${owner?.last_name}` || "";
+  } else if (colName === "Inherent Risk") {
     const val =
-      (scores.likelihoodScores.find(score => score.id === row["Inherent Risk Likelihood Id"]).score)
-      *
-      (scores.impactScores.find(score => score.id === row["Inherent Risk Impact Id"]).score);
-    const group = scores.riskScoreGroups.find(r => r.range_from <= val && val <= r.range_to);
+      scores.likelihoodScores.find(
+        (score) => score.id === row["Inherent Risk Likelihood Id"],
+      ).score *
+      scores.impactScores.find(
+        (score) => score.id === row["Inherent Risk Impact Id"],
+      ).score;
+    const group = scores.riskScoreGroups.find(
+      (r) => r.range_from <= val && val <= r.range_to,
+    );
     return { value: val, colour: group.color };
-  }
-  else if (colName === "Residual Risk") {
+  } else if (colName === "Residual Risk") {
     const val =
-      (scores.likelihoodScores.find(score => score.id === row["Residual Risk Likelihood Id"])?.score || 0)
-      *
-      (scores.impactScores.find(score => score.id === row["Residual Risk Impact Id"])?.score || 0)
+      (scores.likelihoodScores.find(
+        (score) => score.id === row["Residual Risk Likelihood Id"],
+      )?.score || 0) *
+      (scores.impactScores.find(
+        (score) => score.id === row["Residual Risk Impact Id"],
+      )?.score || 0);
 
     const group = Boolean(val)
-      ? scores.riskScoreGroups.find(r => r.range_from <= val && val <= r.range_to)
-      : { color: null }
+      ? scores.riskScoreGroups.find(
+          (r) => r.range_from <= val && val <= r.range_to,
+        )
+      : { color: null };
 
     return { value: val, colour: group.color };
-  }
-  else return row[colName]
-}
+  } else return row[colName];
+};
 
 /* Method to get data row index from table index */
 export const getRowIndex = (data, index, sortingMap) => {

@@ -1,5 +1,14 @@
-import { Box, ClickAwayListener, List, ListItem, Switch, Tooltip, Typography, makeStyles } from '@material-ui/core'
-import React from 'react'
+import {
+  Box,
+  ClickAwayListener,
+  List,
+  ListItem,
+  Switch,
+  Tooltip,
+  Typography,
+  makeStyles,
+} from "@material-ui/core";
+import React from "react";
 
 const useStyle = makeStyles((theme) => ({
   // Tooltip background style
@@ -13,18 +22,17 @@ const useStyle = makeStyles((theme) => ({
     overflowY: "auto",
     overflowX: "hidden",
     marginTop: "8px",
-    padding: '8px',
+    padding: "8px",
   },
-}))
+}));
 
 // Dropdown to hide and show columns in risk register table
 const ManageRegisterColumns = ({
   open,
   handleClose,
   cols: { allColumns, visibleColumns, hideColumn, showColumn },
-  children
+  children,
 }) => {
-
   const classes = useStyle();
 
   return (
@@ -37,12 +45,6 @@ const ManageRegisterColumns = ({
         <Box>
           <ClickAwayListener onClickAway={handleClose}>
             <List disablePadding>
-              <ListItem divider disableGutters dense>
-                <Typography variant="button" style={{ fontWeight: "bold", textTransform: "none", }}>
-                  Default Columns
-                </Typography>
-              </ListItem>
-
               {/* {allColumns
                 .filter(
                   (name) =>
@@ -52,7 +54,7 @@ const ManageRegisterColumns = ({
                 .map((headerName, index) => (
                 ))} */}
               {allColumns
-                .filter(col => (col !== "Custom Id" && col !== "Scenario"))
+                .filter((col) => col !== "Custom Id" && col !== "Scenario")
                 .map((colName, index) => (
                   <ListItem key={index} disableGutters dense>
                     <Box
@@ -69,7 +71,7 @@ const ManageRegisterColumns = ({
                         name={colName}
                         size="small"
                         inputProps={{ "aria-label": "secondary checkbox" }}
-                        color='primary'
+                        color="primary"
                         checked={visibleColumns.includes(colName)}
                         onChange={(e) =>
                           !e.target.checked
@@ -80,12 +82,6 @@ const ManageRegisterColumns = ({
                     </Box>
                   </ListItem>
                 ))}
-
-              <ListItem divider disableGutters dense>
-                <Typography variant="button" style={{ fontWeight: "bold", textTransform: "none", }}>
-                  Hidden columns
-                </Typography>
-              </ListItem>
 
               {/* {hiddenColumns.map((headerName, index) => (
               ))} */}
@@ -103,13 +99,13 @@ const ManageRegisterColumns = ({
                     name={"headerName"}
                     size="small"
                     inputProps={{ "aria-label": "secondary checkbox" }}
-                    color='primary'
-                  // checked={!secondaryColumns.includes(headerName)}
-                  // onChange={(e) =>
-                  //   !e.target.checked
-                  //     ? addColumns(headerName)
-                  //     : removeColums(headerName)
-                  // }
+                    color="primary"
+                    // checked={!secondaryColumns.includes(headerName)}
+                    // onChange={(e) =>
+                    //   !e.target.checked
+                    //     ? addColumns(headerName)
+                    //     : removeColums(headerName)
+                    // }
                   />
                 </Box>
               </ListItem>
@@ -120,7 +116,7 @@ const ManageRegisterColumns = ({
     >
       {children}
     </Tooltip>
-  )
-}
+  );
+};
 
-export default ManageRegisterColumns
+export default ManageRegisterColumns;
