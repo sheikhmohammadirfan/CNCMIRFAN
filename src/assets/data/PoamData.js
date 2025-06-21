@@ -46,6 +46,8 @@ export const columns_width = [
 // Mapping of names that come in response from backend, to names that are required by frontend to populate data
 export const poam_header_response_map = {
   "id": "id",
+  "framework_id":"framework_id",
+  "framework_name":"framework_name",
   "is_open": "is_open",
   "poam_id": "POAM ID",
   "controls": "Controls",
