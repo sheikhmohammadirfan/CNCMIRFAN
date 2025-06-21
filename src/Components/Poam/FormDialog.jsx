@@ -91,7 +91,7 @@ function FormDialog({
         : rows[name][rowIndex];
     else
       defaultValues[name] = stringToMoment(
-        isCreateForm() ? "" : rows[name][rowIndex]
+        isCreateForm() ? "" : rows[name][rowIndex],
       );
   }
 

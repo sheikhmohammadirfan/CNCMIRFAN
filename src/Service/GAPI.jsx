@@ -14,7 +14,7 @@ export let GAPI_SETUP_STATUS = STATUS.INCOMPLETE;
 export let GAPI_SIGNIN_STATUS = false;
 
 // Gapi global variables
-const gapi = window?.gapi;
+const gapi = window.gapi;
 let GAPI_AUTH = null;
 export let GAPI_TOKEN = null;
 export let GAPI_USER = null;
@@ -156,13 +156,13 @@ export function createPicker() {
   // Check if picker api is loaded, & user is logged in
   if (picker_loaded && GAPI_TOKEN) {
     const viewGroup = new PICKER.ViewGroup(
-      new PICKER.DocsView(PICKER.ViewId.SPREADSHEETS).setLabel("PPT & DOC")
+      new PICKER.DocsView(PICKER.ViewId.SPREADSHEETS).setLabel("PPT & DOC"),
     )
       .addView(PICKER.ViewId.DOCUMENTS)
       .addView(PICKER.ViewId.PRESENTATIONS);
 
     const view = new PICKER.DocsView(PICKER.ViewId.SPREADSHEETS).setLabel(
-      "Excel"
+      "Excel",
     );
 
     // Set picker object

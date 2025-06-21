@@ -17,7 +17,7 @@ import { TextControl } from "../Control";
 import DataTableHeader from "./DataTableHeader";
 import { Box, Icon, InputAdornment } from "@mui/material";
 import FilterDropdown from "./FilterDropdown";
-import { debounce } from 'lodash'
+import { debounce } from "lodash";
 
 /** CSS classe generator */
 const useStyles = makeStyles((theme) => ({
@@ -46,6 +46,12 @@ const useStyles = makeStyles((theme) => ({
     "& thead, & tbody, & tr": { display: "contents" },
     // Make cell relative to put dragger inside cell
     "& th, & td": { position: "relative", width: "100%" },
+
+    "& td > div": {
+      display: "flex",
+      flexWrap: "wrap",
+      gap: "5px",
+    },
   },
 
   // Style for dragger handle
@@ -107,30 +113,30 @@ const useStyles = makeStyles((theme) => ({
 
   // Style for highlighting searched word
   searchHighlight: {
-    backgroundColor: 'yellow',
-    display: 'inline-block',
+    backgroundColor: "yellow",
+    display: "inline-block",
   },
 
   // Style for highlighting row that the user is hovering over
   tableRowHover: {
     cursor: "pointer",
-    '&:hover': {
-      '& > *': {  // Apply to all children cells
-        backgroundColor: '#F4F4F4',
+    "&:hover": {
+      "& > *": {
+        // Apply to all children cells
+        backgroundColor: "#F4F4F4",
       },
     },
   },
 
   searchFilter: {
-    width: '100%',
-    '& .MuiInputBase-root': {
-      paddingRight: '0'
+    width: "100%",
+    "& .MuiInputBase-root": {
+      paddingRight: "0",
     },
-    '& input': {
-      padding: '7px'
-    }
+    "& input": {
+      padding: "7px",
+    },
   },
-
 }));
 
 /** Main DataTable Component */
@@ -168,9 +174,9 @@ function DataTable({
   // Filtering
   columnFilters = {},
   activeFilters = {},
-  changeFilters = () => { },
-  clearFilters = () => { },
-  handleColumnSearch = () => { },
+  changeFilters = () => {},
+  clearFilters = () => {},
+  handleColumnSearch = () => {},
   activeColumnsSearched = {},
   ...rest
 }) {
@@ -188,16 +194,22 @@ function DataTable({
     toggleAllRows,
     isSomeChecked,
     isAllChecked,
-  } = useRowSelect(currentPage, rowData, pageSize, selectedRows, setSelectedRows);
+  } = useRowSelect(
+    currentPage,
+    rowData,
+    pageSize,
+    selectedRows,
+    setSelectedRows,
+  );
 
   const handleRowsPerPageChange = (e) => {
     updatePageSize(e.target.value);
-  }
+  };
 
   const handlePageChange = (e, pageNumber) => {
     updatePageNumber(pageNumber + 1);
-    return updatePage(null, pageNumber)
-  }
+    return updatePage(null, pageNumber);
+  };
 
   // Method to append Checkbox & Serial no. to Header data list
   const addColsToHeader = (data) => {
@@ -221,8 +233,8 @@ function DataTable({
               e.stopPropagation();
             }}
             data-test="datatable-header-checkbox"
-          // disableRipple
-          // style={{ padding: 0, margin: "0 9px" }}
+            // disableRipple
+            // style={{ padding: 0, margin: "0 9px" }}
           />
         ),
         params: { checkbox: "", header: "" },
@@ -249,8 +261,8 @@ function DataTable({
             onChange={(e) => toggleRow(startIndex + index, e.target.checked)}
             onClick={(e) => e.stopPropagation()}
             data-test="datatable-row-checkbox"
-          // disableRipple
-          // style={{ padding: 0, margin: "0 9px" }}
+            // disableRipple
+            // style={{ padding: 0, margin: "0 9px" }}
           />
         ),
         params: { checkbox: "", row: "" },
@@ -283,7 +295,7 @@ function DataTable({
     classes.resizeHandle,
     minCellWidth,
     minCheckboxWidth,
-    header
+    header,
   );
 
   const HeightResizer = useHeightResize(
@@ -291,32 +303,43 @@ function DataTable({
     classes.expandHandle,
     50,
     tableRef,
-    rowData
+    rowData,
   );
 
   // Function to highlight search term in text
   const highlightSearchTerm = (text) => {
-    if (!searchTerm || typeof text !== 'string') return text;
-    const parts = text.split(new RegExp(`(${searchTerm})`, 'gi'));
-    return parts.map((part, index) => (
-      part.toLowerCase() === searchTerm.toLowerCase() ? <span className={classes.searchHighlight}>{part}</span> : part
-    ));
+    if (!searchTerm || typeof text !== "string") return text;
+    const parts = text.split(new RegExp(`(${searchTerm})`, "gi"));
+    return parts.map((part, index) =>
+      part.toLowerCase() === searchTerm.toLowerCase() ? (
+        <span className={classes.searchHighlight}>{part}</span>
+      ) : (
+        part
+      ),
+    );
   };
 
   const getfilterRow = () => {
-    const temp = [...header.data]
+    const temp = [...header.data];
     if (checkbox) {
-      temp.unshift({ text: "", params: {}, css: { position: "sticky", left: 0, zIndex: 2 } })
+      temp.unshift({
+        text: "",
+        params: {},
+        css: { position: "sticky", left: 0, zIndex: 2 },
+      });
     }
     return temp;
-  }
+  };
 
-  const hasFilterColumn = Boolean(getfilterRow().find(c => Boolean(c.filterType)))
+  const hasFilterColumn = Boolean(
+    getfilterRow().find((c) => Boolean(c.filterType)),
+  );
 
   return (
     <TableContainer
-      className={`${classes.root} ${verticalBorder && classes.border
-        } ${className}`}
+      className={`${classes.root} ${
+        verticalBorder && classes.border
+      } ${className}`}
       {...rest}
     >
       <DataTableHeader
@@ -330,11 +353,9 @@ function DataTable({
       />
       <Table
         className={classes.table}
-        style={
-          {
-            gridTemplateColumns: generateColumns(),
-          }
-        }
+        style={{
+          gridTemplateColumns: generateColumns(),
+        }}
         ref={tableRef}
         data-test="datatable-table"
       >
@@ -363,40 +384,46 @@ function DataTable({
         </TableHead>
 
         <TableBody>
-
           {/* FILTERS ROW (1st ROW) */}
           {hasFilterColumn && (
-            <TableRow
-              data-test="datatable-row-container"
-            >
+            <TableRow data-test="datatable-row-container">
               {getfilterRow().map((r, i) => (
                 <TableCell
                   key={i}
-                  style={{ ...r.css, display: 'flex', alignItems: 'center', ...r.filterCellCss }}
-                  padding={
-                    checkbox && i === 0 ? "checkbox" : "normal"
-                  }
+                  style={{
+                    ...r.css,
+                    display: "flex",
+                    alignItems: "center",
+                    ...r.filterCellCss,
+                  }}
+                  padding={checkbox && i === 0 ? "checkbox" : "normal"}
                   data-test="datatable-row-cell"
                 >
-                  {r.filterType?.includes('text') ?
-                    (
-                      <TextControl
-                        defaultValue={activeColumnsSearched?.[r.colName]}
-                        type='search'
-                        variant="outlined"
-                        gutter={false}
-                        size="small"
-                        className={classes.searchFilter}
-                        InputProps={{
-                          placeholder: `${r.text}`,
-                          endAdornment: r.filterType.includes('filter') && r.colName in columnFilters && (
+                  {r.filterType?.includes("text") ? (
+                    <TextControl
+                      defaultValue={activeColumnsSearched?.[r.colName]}
+                      type="search"
+                      variant="outlined"
+                      gutter={false}
+                      size="small"
+                      className={classes.searchFilter}
+                      InputProps={{
+                        placeholder: `${r.text}`,
+                        endAdornment: r.filterType.includes("filter") &&
+                          r.colName in columnFilters && (
                             <InputAdornment position="end">
                               <FilterDropdown
                                 key={i}
                                 filterName={columnFilters[r.colName].name}
-                                buttonText={<Icon sx={{ fontSize: '1.2rem' }}>filter_alt</Icon>}
+                                buttonText={
+                                  <Icon sx={{ fontSize: "1.2rem" }}>
+                                    filter_alt
+                                  </Icon>
+                                }
                                 filterOptions={columnFilters[r.colName].options}
-                                activeFilters={activeFilters[columnFilters[r.colName].name]}
+                                activeFilters={
+                                  activeFilters[columnFilters[r.colName].name]
+                                }
                                 changeFilters={changeFilters}
                                 clearFilters={clearFilters}
                                 filterHandlerMap={{}}
@@ -405,34 +432,75 @@ function DataTable({
                                 dropdownPlacement="bottom-end"
                               />
                             </InputAdornment>
-                          )
-                        }}
-                        onChange={debounce((e) => handleColumnSearch(r.colName, e.target.value), 1000)}
+                          ),
+                      }}
+                      onChange={debounce(
+                        (e) => handleColumnSearch(r.colName, e.target.value),
+                        1000,
+                      )}
+                    />
+                  ) : r.filterType?.includes("filter") &&
+                    r.colName in columnFilters ? (
+                    <Box width="100%">
+                      <FilterDropdown
+                        key={i}
+                        filterName={columnFilters[r.colName].name}
+                        buttonText={columnFilters[r.colName].text}
+                        filterOptions={columnFilters[r.colName].options}
+                        activeFilters={
+                          activeFilters[columnFilters[r.colName].name]
+                        }
+                        changeFilters={changeFilters}
+                        clearFilters={clearFilters}
+                        filterHandlerMap={{}}
+                        //   contextLoading={contextLoading}
+                        // filterMetadata={filterMetadata}
+                        dropdownPlacement="bottom-end"
+                        buttonStyles={{ width: "100%" }}
                       />
-                    ) : r.filterType?.includes('filter') && r.colName in columnFilters ? (
-                      <Box width='100%'>
-                        <FilterDropdown
-                          key={i}
-                          filterName={columnFilters[r.colName].name}
-                          buttonText={columnFilters[r.colName].text}
-                          filterOptions={columnFilters[r.colName].options}
-                          activeFilters={activeFilters[columnFilters[r.colName].name]}
-                          changeFilters={changeFilters}
-                          clearFilters={clearFilters}
-                          filterHandlerMap={{}}
-                          //   contextLoading={contextLoading}
-                          // filterMetadata={filterMetadata}
-                          dropdownPlacement="bottom-end"
-                          buttonStyles={{ width: '100%' }}
-                        />
-                      </Box>
-                    ) : <></>
-                  }
+                    </Box>
+                  ) : (
+                    <></>
+                  )}
                 </TableCell>
               ))}
-            </TableRow>)}
+            </TableRow>
+          )}
           {/* <----------------- FILER ROW END -----------------> */}
 
+          {/* NO DATA FOUND ROW */}
+          {rowData.length === 0 && (
+            <TableRow
+              data-test="datatable-no-data-row"
+              style={{
+                display: "contents", // Maintain grid structure
+              }}
+            >
+              {/* First cell with the message */}
+              <TableCell
+                key="no-data-message"
+                style={{
+                  padding: "10px 20px",
+                  fontStyle: "italic",
+                  color: "#888",
+                  backgroundColor: "#fafafa",
+                  textAlign: "center",
+                  fontSize: "14px",
+                  borderBottom: "none",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gridColumn: "1 / -1", // This spans all columns in CSS Grid
+                  minHeight: "70px", // min-height
+                }}
+                data-test="datatable-no-data"
+              >
+                No data found.
+              </TableCell>
+            </TableRow>
+          )}
+
+          {/* TABLE DATA ROWS */}
           {sliceRowLength(startIndex, rowsPerPage).map(
             ({ data = [], props = {}, style = {} }, rowIndex) => (
               <TableRow
@@ -442,7 +510,10 @@ function DataTable({
                 className={classes.tableRowHover}
                 style={{ ...rowStyle, ...style }}
                 data-test="datatable-row-container"
-                onClick={props.onClick || ((e) => toggleRow(rowIndex, !isChecked(rowIndex)))}
+                onClick={
+                  props.onClick ||
+                  ((e) => toggleRow(rowIndex, !isChecked(rowIndex)))
+                }
               >
                 {addColsToRow(data, rowIndex).map(
                   ({ text = "", params = {}, css = {} }, colIndex) => (
@@ -456,18 +527,22 @@ function DataTable({
                       }
                       data-test="datatable-row-cell"
                     >
-                      {rowWrapper(highlightSearchTerm(text), params.colname, rowIndex, colIndex)}
+                      {rowWrapper(
+                        highlightSearchTerm(text),
+                        params.colname,
+                        rowIndex,
+                        colIndex,
+                      )}
                       {resizeTable && colIndex === 0 && (
                         <HeightResizer index={rowIndex + 1} />
                       )}
                     </TableCell>
-                  )
+                  ),
                 )}
               </TableRow>
-            )
+            ),
           )}
         </TableBody>
-
       </Table>
       {/* <DataTableFooter
         component={footerComponent}

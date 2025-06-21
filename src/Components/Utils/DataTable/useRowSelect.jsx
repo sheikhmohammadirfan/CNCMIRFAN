@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import useCheck from "../Hooks/useCheck";
 
 export default function useRowSelect(
@@ -6,7 +6,7 @@ export default function useRowSelect(
   rowData,
   pageSize,
   selectedRows,
-  setSelectedRows
+  setSelectedRows,
 ) {
   // Page index and current Starting index (-1 because it stores index from 0.)
   const [page, setPage] = useState(currentPage - 1);

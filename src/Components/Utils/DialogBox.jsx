@@ -28,7 +28,15 @@ function DialogBox({
   return (
     <Dialog
       open={open}
-      onClose={close}
+      onClose={(event, reason) => {
+        if (
+          loading &&
+          (reason === "backdropClick" || reason === "escapeKeyDown") // check if the dailoque is in loading state
+        ) {
+          return;
+        }
+        close(event, reason); //  original close handler
+      }}
       scroll="paper"
       container={() =>
         document.getElementById(localStorage.getItem("fullScreen"))

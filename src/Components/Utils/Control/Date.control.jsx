@@ -20,30 +20,33 @@ function DateControl(props) {
         gutter = false,
         controls,
         ...other
-      }) => (
-        <DatePicker
-          label={getLabel(label, name)}
-          variant={variant}
-          inputVariant={variant}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position={iconPosition}>
-                <Icon>{icon}</Icon>
-              </InputAdornment>
-            ),
-          }}
-          onChange={(val) => console.log(val)}
-          DialogProps={{
-            container: () =>
-              document.getElementById(localStorage.getItem("fullScreen")),
-          }}
-          error={Boolean(error || controls?.fieldState.error)}
-          helperText={getError(error, controls?.fieldState.error, gutter)}
-          {...controls?.field}
-          {...other}
-          data-test="date-container"
-        />
-      )}
+      }) => {
+        name === "identified_date" && console.log(other);
+        return (
+          <DatePicker
+            label={getLabel(label, name)}
+            variant={variant}
+            inputVariant={variant}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position={iconPosition}>
+                  <Icon>{icon}</Icon>
+                </InputAdornment>
+              ),
+            }}
+            onChange={(val) => console.log(val)}
+            DialogProps={{
+              container: () =>
+                document.getElementById(localStorage.getItem("fullScreen")),
+            }}
+            error={Boolean(error || controls?.fieldState.error)}
+            helperText={getError(error, controls?.fieldState.error, gutter)}
+            {...controls?.field}
+            {...other}
+            data-test="date-container"
+          />
+        );
+      }}
     />
   );
 }

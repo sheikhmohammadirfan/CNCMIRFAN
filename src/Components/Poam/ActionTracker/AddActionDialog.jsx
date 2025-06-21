@@ -1,11 +1,16 @@
-import React, { useEffect, useState } from 'react'
-import DialogBox from '../../Utils/DialogBox'
-import { FormHelperText, TextField, Typography } from '@material-ui/core'
-import { useStyle } from './ActionTrackerUtils';
-import { Autocomplete, Box, Button, Grid } from '@mui/material';
-import { DateControl, Form, SelectControl, TextControl } from '../../Utils/Control';
-import { Controller, useForm } from 'react-hook-form';
-import useLoading from '../../Utils/Hooks/useLoading';
+import React, { useEffect, useState } from "react";
+import DialogBox from "../../Utils/DialogBox";
+import { FormHelperText, TextField, Typography } from "@material-ui/core";
+import { useStyle } from "./ActionTrackerUtils";
+import { Autocomplete, Box, Button, Grid } from "@mui/material";
+import {
+  DateControl,
+  Form,
+  SelectControl,
+  TextControl,
+} from "../../Utils/Control";
+import { Controller, useForm } from "react-hook-form";
+import useLoading from "../../Utils/Hooks/useLoading";
 
 // Custom input compoent
 const FormInput = ({ ...rest }) => (
@@ -28,9 +33,9 @@ const LoadingStatus = (loading) => ({
     <Typography noWrap>
       {loading("risk")
         ? "Loading POA&M IDs..."
-        : loading('owner')
-          ? "Loading Owneres"
-          : ""}
+        : loading("owner")
+        ? "Loading Owneres"
+        : ""}
     </Typography>
   ),
 });
@@ -45,64 +50,60 @@ const AddActionDialog = ({
   owners,
   onFormSubmit,
 }) => {
-
   // Get loading status
   const { isLoading, startLoading, stopLoading } = useLoading({
     risk: false,
-    owner: false
+    owner: false,
   });
   // Set loading state of risk options
   useEffect(() => {
-    if (risks.length === 0) startLoading('risk')
-    else if (risks.length > 0) stopLoading('risk');
-  }, [risks])
+    if (risks.length === 0) startLoading("risk");
+    else if (risks.length > 0) stopLoading("risk");
+  }, [risks]);
   // Set loading state of risk owners
   useEffect(() => {
-    if (owners.length === 0) startLoading('owner')
-    else if (owners.length > 0) stopLoading('owner');
-  }, [owners])
+    if (owners.length === 0) startLoading("owner");
+    else if (owners.length > 0) stopLoading("owner");
+  }, [owners]);
 
   // Loading status for dialog
   const [isFormLoading, setisFormLoading] = useState(false);
 
   const validation = {
-    risk: { required: 'This field is required' },
-    owner: { required: 'This field is required' },
-    due_date: { required: 'This field is required' },
-    action: { required: 'This field is required' },
-    notes: { required: 'This field is required' },
+    risk: { required: "This field is required" },
+    owner: { required: "This field is required" },
+    due_date: { required: "This field is required" },
+    action: { required: "This field is required" },
+    notes: { required: "This field is required" },
   };
 
-  const disabled = Boolean(actionVal) || Boolean(riskVal)
+  const disabled = Boolean(actionVal) || Boolean(riskVal);
 
   let formValues = {
-    risk: (
-      (riskVal && risks.find(risk => risk.val === riskVal["ID"])))
-      ||
-      (actionVal && risks.find(risk => risk.val === actionVal.poam_row)),
-    owner: (riskVal && `${riskVal["Owner"]}`) || (actionVal && actionVal.assignee),
+    risk:
+      (riskVal && risks.find((risk) => risk.val === riskVal["ID"])) ||
+      (actionVal && risks.find((risk) => risk.val === actionVal.poam_row)),
+    owner:
+      (riskVal && `${riskVal["Owner"]}`) || (actionVal && actionVal.assignee),
     due_date: actionVal ? new Date(actionVal.due_date) : null,
     action: actionVal && actionVal.task,
-    notes: actionVal && actionVal.notes
-  }
+    notes: actionVal && actionVal.notes,
+  };
 
   // Get useForm Methods
   const { handleSubmit, getValues, setValue, control, reset } = useForm({
     defaultValues: formValues,
   });
 
-
-
   useEffect(() => {
     reset(formValues);
-  }, [riskVal, actionVal])
+  }, [riskVal, actionVal]);
 
   const onSubmit = async (values) => {
     setisFormLoading(true);
-    await onFormSubmit(values, (isCreateAction && !actionVal));
+    await onFormSubmit(values, isCreateAction && !actionVal);
     setisFormLoading(false);
-  }
-
+  };
 
   const classes = useStyle();
 
@@ -112,7 +113,7 @@ const AddActionDialog = ({
       close={closeHandler}
       title={
         <Typography style={{ fontWeight: "bold" }}>
-          {isCreateAction ? 'Add New Action' : 'Update Action'}
+          {isCreateAction ? "Add New Action" : "Update Action"}
         </Typography>
       }
       loading={isFormLoading}
@@ -132,28 +133,43 @@ const AddActionDialog = ({
                   name="risk"
                   control={control}
                   rules={validation.risk}
-                  render={({ field: { value, onChange }, fieldState: { error } }) => (
+                  render={({
+                    field: { value, onChange },
+                    fieldState: { error },
+                  }) => (
                     <>
                       <Autocomplete
                         value={value}
                         onChange={(e, newVal) => !disabled && onChange(newVal)}
                         options={disabled ? [] : risks}
                         disabled={disabled}
-                        noOptionsText={disabled ? "Already Selected !" : "No Options"}
+                        noOptionsText={
+                          disabled ? "Already Selected !" : "No Options"
+                        }
                         // defaultValue={riskVal && risks.find(risk => risk.val === riskVal["ID"])}
-                        getOptionLabel={(option) => option.text ? option.text : ""}
+                        getOptionLabel={(option) =>
+                          option.text ? option.text : ""
+                        }
                         renderInput={(params) => (
                           // Added error prop here. This results in border becoming red if there's some error
-                          <TextField error={error ? true : false} variant="outlined" label="POA&M ID" {...params} />
+                          <TextField
+                            error={error ? true : false}
+                            variant="outlined"
+                            label="POA&M ID"
+                            {...params}
+                          />
                         )}
                         loading={isLoading("risk")}
                       />
                       {/* If error, show the error message */}
-                      {error &&
-                        <FormHelperText style={{ marginLeft: '14px' }} error={Boolean(error)}>
+                      {error && (
+                        <FormHelperText
+                          style={{ marginLeft: "14px" }}
+                          error={Boolean(error)}
+                        >
                           {error.message}
                         </FormHelperText>
-                      }
+                      )}
                     </>
                   )}
                 />
@@ -165,30 +181,24 @@ const AddActionDialog = ({
                   label="Owner"
                   variant="outlined"
                   options={owners}
-                  loading={isLoading('owner')}
-                  styleProps={{ fullWidth: true, }}
-                  disabled={(riskVal || actionVal) ? true : false}
+                  loading={isLoading("owner")}
+                  styleProps={{ fullWidth: true }}
+                  disabled={riskVal || actionVal ? true : false}
                 />
               </Grid>
               <Grid item xs={6}>
                 <DateControl
                   name="due_date"
                   label="Due Date"
-                  variant='outlined'
+                  variant="outlined"
                   fullWidth
                 />
               </Grid>
               <Grid item xs={12}>
-                <FormInput
-                  name="action"
-                  label="Action"
-                />
+                <FormInput name="action" label="Action" />
               </Grid>
               <Grid item xs={12}>
-                <FormInput
-                  name="notes"
-                  label="Notes"
-                />
+                <FormInput name="notes" label="Notes" />
               </Grid>
             </Grid>
           </Form>
@@ -213,13 +223,11 @@ const AddActionDialog = ({
           type="submit"
           disabled={isFormLoading || isLoading()}
         >
-          {isCreateAction ? 'ADD' : 'UPDATE'}
+          {isCreateAction ? "ADD" : "UPDATE"}
         </Button>,
       ]}
-    >
+    ></DialogBox>
+  );
+};
 
-    </DialogBox>
-  )
-}
-
-export default AddActionDialog
+export default AddActionDialog;
