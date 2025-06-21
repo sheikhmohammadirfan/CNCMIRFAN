@@ -21,7 +21,6 @@ function DateControl(props) {
         controls,
         ...other
       }) => {
-        console.log(name);
         name === "identified_date" && console.log(other);
         return (
           <DatePicker
