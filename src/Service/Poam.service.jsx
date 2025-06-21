@@ -31,9 +31,9 @@ export async function getData(id) {
   const mapped_data = { open_data: {}, closed_data: {} };
 
   Object.values(poam_header_response_map).map((val, index) => {
-    mapped_data.open_data[val] = [];
-    mapped_data.closed_data[val] = [];
-  });
+    mapped_data.open_data[val] = []
+    mapped_data.closed_data[val] = []
+  })
 
   res.data.open_data.map((row, index) => {
     Object.keys(row).map((col, colIndex) => {
