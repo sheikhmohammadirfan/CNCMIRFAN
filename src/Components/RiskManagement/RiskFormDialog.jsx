@@ -472,6 +472,7 @@ const RiskFormDialog = ({
                       variant="outlined"
                       fullWidth
                       disabled={!hasAccess}
+                      disablePast={true}
                     />
                   </Grid>
                   <Grid item xs={6}>
@@ -481,6 +482,7 @@ const RiskFormDialog = ({
                       variant="outlined"
                       fullWidth
                       disabled
+                      disablePast={true}
                     />
                   </Grid>
                 </>

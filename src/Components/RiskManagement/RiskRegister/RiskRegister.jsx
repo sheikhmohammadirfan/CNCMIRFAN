@@ -291,8 +291,21 @@ const RiskRegister = () => {
         source_type: r.scenario.scenario_source,
       }),
       Owner: r.owner,
-      "Identified Date": new Date(r.identification_date).toLocaleDateString(),
-      "Modified Date": new Date(r.created_at).toLocaleDateString(),
+      "Identified Date": r.identification_date
+        ? new Date(r.identification_date).toLocaleDateString("en-GB", {
+            day: "numeric",
+            month: "long",
+            year: "numeric",
+          })
+        : "N/A",
+
+      "Modified Date": r.created_at
+        ? new Date(r.created_at).toLocaleDateString("en-GB", {
+            day: "numeric",
+            month: "long",
+            year: "numeric",
+          })
+        : "N/A",
       CIA: r.cia.map((c) => c.id),
       "Custom Id": r.custom_id,
       "Inherent Risk Likelihood Id": r.inherent_risk_likelihood,

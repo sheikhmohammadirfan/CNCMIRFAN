@@ -271,7 +271,7 @@ const getCellValue = (row, colName, register, owners) => {
     );
 
     // Check if match was found
-    if (!matchedRisk || !matchedRisk.scenario) return "Unknown Scenario";
+    if (!matchedRisk || !matchedRisk.scenario) return "";
 
     return matchedRisk.scenario.scenario;
   } else if (colName === "owner") {
