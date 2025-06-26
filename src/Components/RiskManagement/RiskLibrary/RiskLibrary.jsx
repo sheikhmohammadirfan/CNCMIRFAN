@@ -37,7 +37,7 @@ const RiskLibrary = () => {
   const hasEditRiskAccess = useMemo(() => {
     const user = getUser();
     return Boolean(
-      user.roles[0].permissions.find((p) => p.permission_name === "edit_risk")
+      user.roles[0].permissions.find((p) => p.permission_name === "edit_risk"),
     );
   }, []);
 
@@ -79,6 +79,7 @@ const RiskLibrary = () => {
   // SORTING
   const [sorting, setSorting] = useState(null);
   const updateSort = (colName) => {
+    setSelectedRows([]);
     let currSort = {};
     if (sorting) {
       currSort = { ...sorting };
@@ -205,6 +206,7 @@ const RiskLibrary = () => {
   }, [categories]);
 
   const changeFilters = (filterName, updatedFilterIds) => {
+    setSelectedRows([]);
     setFilters((prev) => {
       return {
         ...prev,
@@ -243,10 +245,10 @@ const RiskLibrary = () => {
     const payload = {
       scenario_id: library[getCurrentIndex()].id,
       likelihood_id: scores.likelihoodScores.find(
-        (score) => score.score === getLikelihoodScore(val.inherent_likelihood)
+        (score) => score.score === getLikelihoodScore(val.inherent_likelihood),
       ).id,
       impact_id: scores.impactScores.find(
-        (score) => score.score === getImpactScore(val.inherent_impact)
+        (score) => score.score === getImpactScore(val.inherent_impact),
       ).id,
       notes: val.notes,
       cia: cia_categories
@@ -260,7 +262,7 @@ const RiskLibrary = () => {
       notification(
         "risk-add-success",
         "Risk Successfully Created !",
-        "success"
+        "success",
       );
     }
   };
@@ -276,7 +278,7 @@ const RiskLibrary = () => {
       libraryColumns,
       selectedRows,
       matchedCell,
-      categories
+      categories,
       // sortingMap
     );
 
@@ -285,6 +287,7 @@ const RiskLibrary = () => {
   const onSearch = (val) => {
     searchedValue.current = val;
     fetchLibrary();
+    setSelectedRows([]);
   };
 
   return (
@@ -339,7 +342,7 @@ const RiskLibrary = () => {
                 borderTopRightRadius: 0,
               }}
               minCellWidth={libraryColumns.map(
-                (name) => librayColumnWidths[libraryColumns.indexOf(name)]
+                (name) => librayColumnWidths[libraryColumns.indexOf(name)],
               )}
               // Pagination props
               currentPage={pagination.page_no}

@@ -1,20 +1,30 @@
-import { Box, Button, Icon, IconButton, InputAdornment, Tooltip, makeStyles, useMediaQuery, useTheme } from '@material-ui/core'
-import React, { useState } from 'react'
-import { TextControl } from '../../Utils/Control';
-import OptionDropdown from './OptionDropdown';
-import FilterDropdown from '../../Utils/DataTable/FilterDropdown';
-import ManageRegisterColumns from './ManageRegisterColumns';
-import colorShader from '../../Utils/ColorShader';
-import FILTER_HANDLERS from './FilterHandlerMap';
+import {
+  Box,
+  Button,
+  Icon,
+  IconButton,
+  InputAdornment,
+  Tooltip,
+  makeStyles,
+  useMediaQuery,
+  useTheme,
+} from "@material-ui/core";
+import React, { useState } from "react";
+import { TextControl } from "../../Utils/Control";
+import OptionDropdown from "./OptionDropdown";
+import FilterDropdown from "../../Utils/DataTable/FilterDropdown";
+import ManageRegisterColumns from "./ManageRegisterColumns";
+import colorShader from "../../Utils/ColorShader";
+import FILTER_HANDLERS from "./FilterHandlerMap";
 
 // Generate Styles
 const useStyle = makeStyles((theme) => ({
   searchInput: {
     width: 300,
-    '@media (max-width: 960px)': {
+    "@media (max-width: 960px)": {
       flexGrow: 1,
     },
-    backgroundColor: 'white',
+    backgroundColor: "white",
     borderRadius: 7,
     borderRight: 0,
     "& .MuiOutlinedInput-adornedStart": {
@@ -25,30 +35,30 @@ const useStyle = makeStyles((theme) => ({
       borderRadius: 7,
       // borderTopRightRadius: 0,
       // borderBottomRightRadius: 0,
-      height: 35
+      height: 35,
     },
     // overflow: "hidden"
   },
   actionButton: {
-    '&.Mui-disabled': {
-      color: `${colorShader('#4477CE', 0.5)} !important`
+    "&.Mui-disabled": {
+      color: `${colorShader("#4477CE", 0.5)} !important`,
     },
-    '&.Mui-disabled img': {
-      opacity: 0.4
+    "&.Mui-disabled img": {
+      opacity: 0.4,
     },
     maxHeight: 34,
-    backgroundColor: 'white',
+    backgroundColor: "white",
     color: theme.palette.primary.main,
-    border: '1px solid rgba(0, 0, 0, 0.2)',
+    border: "1px solid rgba(0, 0, 0, 0.2)",
     paddingInline: 10,
-    textTransform: 'none',
+    textTransform: "none",
     "&.text": {
       border: "none",
-      paddingInline: 6
-    }
+      paddingInline: 6,
+    },
   },
   dropdownButton: {
-    maxHeight: 32
+    maxHeight: 32,
   },
   columnContainer: {
     position: "sticky",
@@ -58,9 +68,9 @@ const useStyle = makeStyles((theme) => ({
                 -10px 0px #FFFFFF77,
                  -8px 0px #FFFFFF77,
                  -6px 0px #FFFFFF77,
-                 -4px 0px #FFFFFF77`
-  }
-}))
+                 -4px 0px #FFFFFF77`,
+  },
+}));
 
 const RiskRegisterHeader = ({
   contextLoading,
@@ -79,9 +89,8 @@ const RiskRegisterHeader = ({
   cols: { allColumns, visibleColumns, hideColumn, showColumn },
   openAddActionForm,
   onSearch,
-  row
+  row,
 }) => {
-
   const classes = useStyle();
 
   // State to control search value
@@ -106,26 +115,26 @@ const RiskRegisterHeader = ({
       text: "View Archived",
       clickHandler: () => {
         setMoreOpen(false);
-        moreOptionsHandlers.viewArchived()
-      }
+        moreOptionsHandlers.viewArchived();
+      },
     },
     {
       startIcon: "visibility_off",
       text: "Hide Getting Started Guide",
       clickHandler: () => {
         setMoreOpen(false);
-        moreOptionsHandlers.hideGuide()
-      }
+        moreOptionsHandlers.hideGuide();
+      },
     },
     {
       startIcon: "arrow_downward",
       text: "Export all risk scenarios",
       clickHandler: () => {
         setMoreOpen(false);
-        moreOptionsHandlers.openExportDialog()
-      }
-    }
-  ]
+        moreOptionsHandlers.openExportDialog();
+      },
+    },
+  ];
 
   // Share Functions
   const shareOptions = [
@@ -134,48 +143,48 @@ const RiskRegisterHeader = ({
       clickHandler: () => {
         setShareOpen(false);
         shareOptionsHandlers.createSnapshot();
-      }
+      },
     },
     {
       text: "Generate Assessment Reoprt",
       clickHandler: () => {
         setShareOpen(false);
         shareOptionsHandlers.generateAssessmentReport();
-      }
+      },
     },
     {
       text: "Configure Auditor View",
       clickHandler: () => {
         setShareOpen(false);
         shareOptionsHandlers.configAuditorView();
-      }
-    }
-  ]
+      },
+    },
+  ];
 
   // Add scenario Options
   const addScenarioOptions = [
     {
       text: "Manually",
       clickHandler: () => {
-        setIsAddScenarioOpen(false)
+        setIsAddScenarioOpen(false);
         addScenarioOptionsHandlers.addManualScenario();
-      }
+      },
     },
     {
       text: "Via Library",
       clickHandler: () => {
-        setIsAddScenarioOpen(false)
+        setIsAddScenarioOpen(false);
         addScenarioOptionsHandlers.addScenarioViaLibrary();
-      }
+      },
     },
     {
       text: "Via Import (.csv, .xlsx)",
       clickHandler: () => {
-        setIsAddScenarioOpen(false)
+        setIsAddScenarioOpen(false);
         addScenarioOptionsHandlers.addScenarioViaImport();
-      }
-    }
-  ]
+      },
+    },
+  ];
 
   // State to toggle Manage Columns dropdown
   const [ismanageColsOpen, setManageColsOpen] = useState(false);
@@ -207,8 +216,10 @@ const RiskRegisterHeader = ({
             options={addScenarioOptions}
           >
             <Button
-              size='small'
-              endIcon={<Icon style={{ rotate: '90deg' }}>arrow_forward_ios</Icon>}
+              size="small"
+              endIcon={
+                <Icon style={{ rotate: "90deg" }}>arrow_forward_ios</Icon>
+              }
               className={classes.dropdownButton}
               style={{
                 backgroundColor: "#4477CE",
@@ -216,7 +227,7 @@ const RiskRegisterHeader = ({
                 textTransform: "none",
                 paddingInline: 10,
               }}
-              onClick={() => setIsAddScenarioOpen(prev => !prev)}
+              onClick={() => setIsAddScenarioOpen((prev) => !prev)}
               disabled={contextLoading}
             >
               Add Scenario
@@ -226,7 +237,7 @@ const RiskRegisterHeader = ({
           {/* Edit Button */}
           <Button
             // size='small'
-            startIcon={<Icon style={{ fontSize: '1rem' }}>edit</Icon>}
+            startIcon={<Icon style={{ fontSize: "1rem" }}>edit</Icon>}
             className={classes.actionButton}
             disabled={contextLoading || selectedRows.length !== 1}
             onClick={editHandler}
@@ -237,9 +248,13 @@ const RiskRegisterHeader = ({
           {/* Edit Button */}
           <Button
             // size='small'
-            startIcon={<Icon style={{ fontSize: '1rem' }}>verified</Icon>}
+            startIcon={<Icon style={{ fontSize: "1rem" }}>verified</Icon>}
             className={classes.actionButton}
-            disabled={contextLoading || selectedRows.length !== 1 || row?.["Approved"] !== false}
+            disabled={
+              contextLoading ||
+              selectedRows.length !== 1 ||
+              row?.["Approved"] !== false
+            }
             onClick={approveHandler}
           >
             Approve
@@ -248,7 +263,7 @@ const RiskRegisterHeader = ({
           {/* Jira Button */}
           <Button
             // size='small'
-            startIcon={<Icon style={{ fontSize: '1rem' }}>add</Icon>}
+            startIcon={<Icon style={{ fontSize: "1rem" }}>add</Icon>}
             className={classes.actionButton}
             disabled={contextLoading || selectedRows.length !== 1}
             onClick={() => openAddActionForm()}
@@ -258,13 +273,9 @@ const RiskRegisterHeader = ({
         </Box>
 
         {/* Contains search text field, and two dropdowns i.e. More and Share */}
-        <Box
-          display="flex"
-          gridColumnGap={15}
-          alignItems="center"
-        >
+        <Box display="flex" gridColumnGap={15} alignItems="center">
           {/* Search field */}
-          <TextControl
+          {/* <TextControl
             disabled={contextLoading}
             variant="outlined"
             placeholder="Search here"
@@ -321,7 +332,7 @@ const RiskRegisterHeader = ({
                 onSearch(e.target.value);
               }
             }}
-          />
+          /> */}
 
           {/* More dropdown */}
           <OptionDropdown
@@ -331,16 +342,18 @@ const RiskRegisterHeader = ({
             options={moreOptions}
           >
             <Button
-              size='small'
-              endIcon={<Icon style={{ rotate: '90deg' }}>arrow_forward_ios</Icon>}
+              size="small"
+              endIcon={
+                <Icon style={{ rotate: "90deg" }}>arrow_forward_ios</Icon>
+              }
               className={classes.dropdownButton}
               style={{
-                border: '1px solid #4477CE',
-                color: '#4477CE',
+                border: "1px solid #4477CE",
+                color: "#4477CE",
                 textTransform: "none",
                 paddingInline: 10,
               }}
-              onClick={() => setMoreOpen(prev => !prev)}
+              onClick={() => setMoreOpen((prev) => !prev)}
               disabled={contextLoading}
             >
               More
@@ -355,16 +368,18 @@ const RiskRegisterHeader = ({
             options={shareOptions}
           >
             <Button
-              size='small'
-              endIcon={<Icon style={{ rotate: '90deg' }}>arrow_forward_ios</Icon>}
+              size="small"
+              endIcon={
+                <Icon style={{ rotate: "90deg" }}>arrow_forward_ios</Icon>
+              }
               className={classes.dropdownButton}
               style={{
-                border: '1px solid #4477CE',
-                color: '#4477CE',
+                border: "1px solid #4477CE",
+                color: "#4477CE",
                 textTransform: "none",
                 paddingInline: 10,
               }}
-              onClick={() => setShareOpen(prev => !prev)}
+              onClick={() => setShareOpen((prev) => !prev)}
               disabled={contextLoading}
             >
               Share
@@ -376,15 +391,15 @@ const RiskRegisterHeader = ({
               open={ismanageColsOpen}
               handleClose={closeManageColsDropdown}
               cols={{ allColumns, visibleColumns, hideColumn, showColumn }}
-            // addColumns={moveToSecondary}
-            // removeColums={moveToPrimary}
+              // addColumns={moveToSecondary}
+              // removeColums={moveToPrimary}
             >
               <Button
                 onClick={openManageColsDropdown}
                 endIcon=<Icon>tune</Icon>
                 className={classes.actionButton}
                 style={{
-                  fontSize: "0.8rem"
+                  fontSize: "0.8rem",
                 }}
               >
                 Columns
@@ -460,7 +475,7 @@ const RiskRegisterHeader = ({
 
       </Box> */}
     </>
-  )
-}
+  );
+};
 
-export default RiskRegisterHeader
+export default RiskRegisterHeader;

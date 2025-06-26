@@ -30,7 +30,7 @@ import colorShader from "./ColorShader";
 
 const useStyles = makeStyles((theme) => ({
   note: {
-    backgroundColor: colorShader(theme.palette.primary.main, 0.15)
+    backgroundColor: colorShader(theme.palette.primary.main, 0.15),
   },
   button: {
     textTransform: "none",
@@ -39,13 +39,13 @@ const useStyles = makeStyles((theme) => ({
   listHead: {
     marginTop: 10,
     marginBottom: 5,
-    fontSize: '0.8rem',
-    fontWeight: 'bold',
-    color: colorShader('#000000', 0.7)
+    fontSize: "0.8rem",
+    fontWeight: "bold",
+    color: colorShader("#000000", 0.7),
   },
   columnNamesList: {
-    maxHeight: '200px',
-    overflow: 'auto',
+    maxHeight: "200px",
+    overflow: "auto",
     "&::-webkit-scrollbar": {
       width: "6px",
     },
@@ -58,11 +58,11 @@ const useStyles = makeStyles((theme) => ({
       borderRadius: "10px",
       backgroundColor: colorShader(theme.palette.primary.main, 0.6),
     },
-    paddingInline: '10px',
+    paddingInline: "10px",
     "& .MuiListItem-root": {
-      padding: '2px 0'
-    }
-  }
+      padding: "2px 0",
+    },
+  },
 }));
 
 const InfoIconWithTooltip = ({ title }) => (
@@ -78,7 +78,7 @@ const UploadFileDialog = ({
   requiredColumns,
   optionalColumns = [],
   col_TooltipDesc_Map,
-  getPlainFile = false
+  getPlainFile = false,
 }) => {
   const classes = useStyles();
 
@@ -91,10 +91,9 @@ const UploadFileDialog = ({
   const [data, setData] = useState([]);
 
   const handleDownloadTemplate = () => {
-
     const allCols = [...requiredColumns, ...optionalColumns];
     const templateData = [{}];
-    allCols.forEach(col => templateData[0][col] = "")
+    allCols.forEach((col) => (templateData[0][col] = ""));
 
     const worksheet = XLSX.utils.json_to_sheet(templateData);
     const workbook = XLSX.utils.book_new();
@@ -109,13 +108,13 @@ const UploadFileDialog = ({
       file &&
       (file.type === "application/vnd.ms-excel" ||
         file.type ===
-        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
         file.name.endsWith(".csv"))
     ) {
       setUploading(true);
       if (getPlainFile) {
         const res = await onImport(file);
-        if (res !== undefined && !res) setError(true)
+        if (res !== undefined && !res) setError(true);
         setUploading(false);
         return;
       }
@@ -145,7 +144,7 @@ const UploadFileDialog = ({
     setShowSheetSelector(false);
     const worksheet = workbook.Sheets[sheetName];
     let jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
-    jsonData = jsonData.filter(row => row.some(cell => cell !== undefined));
+    jsonData = jsonData.filter((row) => row.some((cell) => cell !== undefined));
     setData(jsonData);
     handleImport(jsonData);
   };
@@ -272,27 +271,43 @@ const UploadFileDialog = ({
             <Box display="flex" alignItems="center" p={1}>
               <InfoIcon color="info" />
               <Box ml={1}>
-                <Typography variant="body2" style={{ color: colorShader('#000000', 0.6), fontSize: '0.8rem' }}>
+                <Typography
+                  variant="body2"
+                  style={{
+                    color: colorShader("#000000", 0.6),
+                    fontSize: "0.8rem",
+                  }}
+                >
                   Make sure your file includes the following required columns:
                 </Typography>
               </Box>
             </Box>
           </Paper>
-          <Typography variant="body2" className={classes.listHead} style={{ marginTop: 15 }}>REQUIRED COLUMNS</Typography>
+          <Typography
+            variant="body2"
+            className={classes.listHead}
+            style={{ marginTop: 15 }}
+          >
+            REQUIRED COLUMNS
+          </Typography>
           <Divider />
-          <List className={classes.columnNamesList} dense >
+          <List className={classes.columnNamesList} dense>
             {requiredColumns.map((column, index) => (
               <ListItem key={index} disableGutters>
                 <ListItemText primary={column} />
-                <InfoIconWithTooltip title={col_TooltipDesc_Map[column] || ""} />
+                <InfoIconWithTooltip
+                  title={col_TooltipDesc_Map[column] || ""}
+                />
               </ListItem>
             ))}
           </List>
-          {optionalColumns.length > 0 &&
+          {optionalColumns.length > 0 && (
             <>
-              <Typography variant="body2" className={classes.listHead}>OPTIONAL COLUMNS</Typography>
+              <Typography variant="body2" className={classes.listHead}>
+                OPTIONAL COLUMNS
+              </Typography>
               <Divider />
-              <List className={classes.columnNamesList} dense >
+              <List className={classes.columnNamesList} dense>
                 {optionalColumns.map((column, index) => (
                   <ListItem key={index} disableGutters>
                     <ListItemText primary={column} />
@@ -303,9 +318,9 @@ const UploadFileDialog = ({
                 ))}
               </List>
             </>
-          }
+          )}
           <Divider style={{ marginTop: 10 }} />
-          <DialogActions style={{ justifyContent: 'start', paddingLeft: 0 }}>
+          <DialogActions style={{ justifyContent: "start", paddingLeft: 0 }}>
             <Box>
               <Button
                 size="small"
@@ -337,7 +352,20 @@ const UploadFileDialog = ({
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
+    <Dialog
+      open={open}
+      onClose={(event, reason) => {
+        if (
+          !uploading &&
+          reason !== "backdropClick" &&
+          reason !== "escapeKeyDown"
+        ) {
+          onClose();
+        }
+      }}
+      maxWidth="md"
+      fullWidth
+    >
       <DialogTitle style={{ paddingBlock: 0 }}>
         <Box display="flex" justifyContent="space-between" alignItems="center">
           <Box display="flex" alignItems="center">
@@ -352,7 +380,9 @@ const UploadFileDialog = ({
         </Box>
       </DialogTitle>
       <Divider />
-      <DialogContent style={{ paddingTop: '16px' }}>{renderContent()}</DialogContent>
+      <DialogContent style={{ paddingTop: "16px" }}>
+        {renderContent()}
+      </DialogContent>
     </Dialog>
   );
 };

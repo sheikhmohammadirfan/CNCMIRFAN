@@ -1,11 +1,20 @@
 import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import actionTrackerFilters from "../../../assets/data/RiskManagement/ActionTracker/ActionTrackerFilters";
-import { Backdrop, Box, CircularProgress, Grid, Typography } from "@material-ui/core";
+import {
+  Backdrop,
+  Box,
+  CircularProgress,
+  Grid,
+  Typography,
+} from "@material-ui/core";
 import ActionTrackerHeader from "./ActionTrackerHeader";
 import AddActionDialog from "../AddActionDialog";
 import { getRegister } from "../../../Service/RiskManagement/RiskRegister.service";
 import useLoading from "../../Utils/Hooks/useLoading";
-import { exportAction, getActions } from "../../../Service/RiskManagement/ActionTracker.service";
+import {
+  exportAction,
+  getActions,
+} from "../../../Service/RiskManagement/ActionTracker.service";
 import {
   HeaderCell,
   generateRows,
@@ -31,14 +40,18 @@ const ActionTracker = () => {
   const history = useHistory();
 
   const hasEditActionAccess = useMemo(() => {
-    const user = getUser()
-    return Boolean(user.roles[0].permissions.find(p => p.permission_name === 'edit_action'))
-  }, [])
+    const user = getUser();
+    return Boolean(
+      user.roles[0].permissions.find(
+        (p) => p.permission_name === "edit_action",
+      ),
+    );
+  }, []);
 
   // React state to maintain loading status
   const { isLoading, startLoading, stopLoading } = useLoading({
     table: false,
-    backdrop: false
+    backdrop: false,
   });
 
   // Get owners from RiskManagementContext
@@ -215,7 +228,7 @@ const ActionTracker = () => {
       const { data } = await getRegister({
         filters: {},
         search: "",
-        page_size: 30,
+        page_size: 100,
       });
       setRegister(data.risks);
     })();
@@ -231,9 +244,9 @@ const ActionTracker = () => {
   const getRegisterOptions = () =>
     register.length !== 0
       ? register.map((row) => ({
-        val: row.id,
-        text: row.scenario.scenario,
-      }))
+          val: row.id,
+          text: row.scenario.scenario,
+        }))
       : [];
 
   const handleAddActionFormSubmit = async (values, isCreateAction) => {
@@ -298,24 +311,26 @@ const ActionTracker = () => {
       register,
       owners,
       selectedRows,
-      matchedCell
+      matchedCell,
       // sortingMap
     );
 
   const classes = useStyle();
 
   const mapRiskRows = (row) => {
-    let mappedRow = {}
-    Object.keys(row).forEach(key => {
-      if (key === 'risk')
-        mappedRow['risk'] = register.find(risk => risk.id === row['risk'].id).scenario.scenario
-      if (key === 'assignee')
-        mappedRow['assignee'] = row.assignee.first_name + " " + row.assignee.last_name
+    let mappedRow = {};
+    Object.keys(row).forEach((key) => {
+      if (key === "risk")
+        mappedRow["risk"] = register.find(
+          (risk) => risk.id === row["risk"].id,
+        ).scenario.scenario;
+      if (key === "assignee")
+        mappedRow["assignee"] =
+          row.assignee.first_name + " " + row.assignee.last_name;
       else mappedRow[key] = row[key];
-    })
+    });
     return mappedRow;
-  }
-
+  };
 
   const [exportDialog, setExportDialog] = useState(false);
   const openExportDialog = async () => {
@@ -326,7 +341,7 @@ const ActionTracker = () => {
     if (!status) {
       stopLoading("backdrop");
       return;
-    };
+    }
 
     const finalData = data.map(mapRiskRows);
 
@@ -340,15 +355,14 @@ const ActionTracker = () => {
     XLSX.utils.book_append_sheet(book, sheetOpen, "Actions");
 
     // Save & download file
-    XLSX.write(book, { bookType: 'xlsx', type: "binary" });
+    XLSX.write(book, { bookType: "xlsx", type: "binary" });
     XLSX.writeFile(book, `risks.xlsx`);
 
     stopLoading("backdrop");
 
     // setExportDialog(true);
-  }
+  };
   const closeExportDialog = () => setExportDialog(false);
-
 
   return (
     <Box className={classes.actionTrackerContainer}>
@@ -389,7 +403,7 @@ const ActionTracker = () => {
                 borderTopRightRadius: 0,
               }}
               minCellWidth={columns.map(
-                (name) => ACTION_TABLE_COL_WIDTHS[columns.indexOf(name)]
+                (name) => ACTION_TABLE_COL_WIDTHS[columns.indexOf(name)],
               )}
               // Pagination props
               currentPage={pagination.page_no}

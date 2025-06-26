@@ -3,7 +3,6 @@ import { poam_header_response_map } from "../assets/data/PoamData";
 
 /* Method to create new POA&M */
 export async function createPoam(data) {
-
   // As backend is accepting formData instead of JSON, we're making formData
   const formData = new FormData();
   for (let key of Object.keys(data)) formData.append(key, data[key]);
@@ -26,11 +25,10 @@ export async function getCSP() {
 
 /* Method to get POA&M data from Open or close sheet */
 export async function getData(id) {
-
-  const res = await get(`/poam/fetchexcel/${id}`)
+  const res = await get(`/poam/fetchexcel/${id}`);
 
   // Mapping new response format to old
-  const mapped_data = { "open_data": {}, "closed_data": {} };
+  const mapped_data = { open_data: {}, closed_data: {} };
 
   Object.values(poam_header_response_map).map((val, index) => {
     mapped_data.open_data[val] = []
@@ -40,14 +38,14 @@ export async function getData(id) {
   res.data.open_data.map((row, index) => {
     Object.keys(row).map((col, colIndex) => {
       mapped_data.open_data[poam_header_response_map[col]][index] = row[col];
-    })
-  })
+    });
+  });
 
   res.data.closed_data.map((row, index) => {
     Object.keys(row).map((col, colIndex) => {
       mapped_data.closed_data[poam_header_response_map[col]][index] = row[col];
-    })
-  })
+    });
+  });
 
   mapped_data["file_name"] = res.data.file_name;
   mapped_data["csp"] = res.data.csp;
@@ -65,7 +63,6 @@ export async function getPoamList() {
 
 /* Method to add new row in OPEN sheet, based on row_index */
 export async function addRow(fileID, data, size) {
-
   // Jira issues not required in payload
   delete data.jira_issues;
   // Will always be true
@@ -102,10 +99,9 @@ async function moveToOpen(fileID, data, rowIndex, newIndex) {
 }
 /* Method to move data */
 export async function moveRow(fileID, data, isOpen, rowIndex, newIndex) {
-
   // The endpoint for movetoopen and movetoclose has merged on backend, so sending request from here only as this is common function for both operations
   return await put(`/poam/moveto/${fileID}`, {
-    id: data.id
+    id: data.id,
   });
 
   // return await (isOpen
@@ -114,13 +110,13 @@ export async function moveRow(fileID, data, isOpen, rowIndex, newIndex) {
 }
 
 export async function getActions(options, signal) {
-  return await post('/poam/tasks/', options, signal)
+  return await post("/poam/tasks/", options, signal);
 }
 
 export async function exportAction() {
-  return await get('/risk/tasks/export/')
+  return await get("/risk/tasks/export/");
 }
 
-export async function getControlsList () {
-  return await get('/poam/listcontrol')
+export async function getControlsList() {
+  return await get("/poam/listcontrol");
 }

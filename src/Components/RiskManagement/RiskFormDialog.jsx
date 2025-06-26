@@ -1,17 +1,34 @@
-import React, { useEffect, useMemo, useState } from 'react'
-import DialogBox from '../Utils/DialogBox'
-import { Box, Button, Checkbox, Divider, FormControlLabel, FormGroup, Grid, Slider, TextField, Typography } from '@material-ui/core'
-import { DateControl, Form, RadioControl, SelectControl, TextControl } from '../Utils/Control';
-import { Controller, useForm } from 'react-hook-form';
-import CustomAccordion from '../Utils/CustomAccordion';
-import { useStyle } from './RiskRegister/RiskRegisterUtils';
-import { Autocomplete, Tooltip } from '@mui/material';
-import { source_options } from '../../assets/data/RiskManagement/RiskRegister/RiskRegisterFilters';
-import SelectCategories from './RiskRegister/SelectCategories';
-import { cia_categories } from '../../assets/data/RiskManagement/RiskRegister/RiskRegisterFilters';
-import SliderControl from './RiskRegister/SliderControl';
-import useLoading from '../Utils/Hooks/useLoading';
-import useSlider from '../Utils/Hooks/useSlider';
+import React, { useEffect, useMemo, useState } from "react";
+import DialogBox from "../Utils/DialogBox";
+import {
+  Box,
+  Button,
+  Checkbox,
+  Divider,
+  FormControlLabel,
+  FormGroup,
+  Grid,
+  Slider,
+  TextField,
+  Typography,
+} from "@material-ui/core";
+import {
+  DateControl,
+  Form,
+  RadioControl,
+  SelectControl,
+  TextControl,
+} from "../Utils/Control";
+import { Controller, useForm } from "react-hook-form";
+import CustomAccordion from "../Utils/CustomAccordion";
+import { useStyle } from "./RiskRegister/RiskRegisterUtils";
+import { Autocomplete, Tooltip } from "@mui/material";
+import { source_options } from "../../assets/data/RiskManagement/RiskRegister/RiskRegisterFilters";
+import SelectCategories from "./RiskRegister/SelectCategories";
+import { cia_categories } from "../../assets/data/RiskManagement/RiskRegister/RiskRegisterFilters";
+import SliderControl from "./RiskRegister/SliderControl";
+import useLoading from "../Utils/Hooks/useLoading";
+import useSlider from "../Utils/Hooks/useSlider";
 
 // Custom input compoent
 const FormInput = ({ ...rest }) => (
@@ -31,9 +48,7 @@ const LoadingStatus = (loading) => ({
   },
   element: (
     <Typography noWrap>
-      {loading("library")
-        ? "Loading Library..."
-        : ""}
+      {loading("library") ? "Loading Library..." : ""}
     </Typography>
   ),
 });
@@ -51,9 +66,8 @@ const RiskFormDialog = ({
   autocompleteOptions: { categories, owners },
   getSliderValue: { getLikelihoodSliderValue, getImpactSliderValue },
   scores,
-  onFormSubmit
+  onFormSubmit,
 }) => {
-
   // Get loading status
   const { isLoading, startLoading, stopLoading } = useLoading({
     library: false,
@@ -62,9 +76,9 @@ const RiskFormDialog = ({
   // Set loading state of library
   useEffect(() => {
     if (!viaLibrary) return;
-    else if (library.length === 0) startLoading('library')
-    else if (library.length > 0) stopLoading('library');
-  }, [library, viaLibrary])
+    else if (library.length === 0) startLoading("library");
+    else if (library.length > 0) stopLoading("library");
+  }, [library, viaLibrary]);
 
   const isCreateForm = () => rowIndex === -1 || isLibraryRow;
 
@@ -73,9 +87,9 @@ const RiskFormDialog = ({
 
   // Checking if scenario is a object in string form by trying to parse it, and returning description
   const scenarioDescription = useMemo(() => {
-    if (!row) return ""
+    if (!row) return "";
     return row["Scenario"];
-  }, [row])
+  }, [row]);
 
   const categoriesList_l = useMemo(() => {
     if (!row || !isLibraryRow) return;
@@ -84,117 +98,167 @@ const RiskFormDialog = ({
 
   const categoriesList = useMemo(() => {
     if (!row || isLibraryRow) return;
-    return scenarioDescription ? (JSON.parse(scenarioDescription).categories_id || []) : [];
-  }, [row])
+    return scenarioDescription
+      ? JSON.parse(scenarioDescription).categories_id || []
+      : [];
+  }, [row]);
 
   let formValues = row
-    ? isLibraryRow ? {
-      scenario: scenarioDescription,
-      categories: categoriesList_l,
-      // Get id for a single cia category, and check if it is in the row data that is selected.
-      confidentiality: false,
-      integrity: false,
-      availability: false,
-      uncategorized: true,
-      // getting slider values (0-100) from actual scores. 
-      // Boolean flag is to check if score is of likelihood or impact
-      // If it is library row, set default risk value to 1 (slider value 0)
-      inherent_likelihood: isLibraryRow
-        ? getLikelihoodSliderValue(
-          scores.likelihoodScores.length > 0 && scores.likelihoodScores[0].score
-        )
-        : getLikelihoodSliderValue(
-          scores.likelihoodScores.find(score => score.id === row["Inherent Risk Likelihood Id"]).score
-        ),
-      inherent_impact: isLibraryRow
-        ? getImpactSliderValue(
-          scores.impactScores.length > 0 && scores.impactScores[0].score
-        )
-        : getImpactSliderValue(
-          scores.impactScores.find(score => score.id === row["Inherent Risk Impact Id"]).score,
-        ),
-      // Setting default slider values of residual risk scores to 1 (One) 
-      // Here it is assumed first score object is the lowest score
-      residual_likelihood: getLikelihoodSliderValue(
-        scores.likelihoodScores.length > 0 && scores.likelihoodScores[0].score,
-      ),
-      residual_impact: getImpactSliderValue(
-        scores.impactScores.length > 0 && scores.impactScores[0].score,
-      ),
-      notes: "Notes" in row ? row["Notes"] : "",
-      customId: "Custom Id" in row ? row["Custom Id"] : ""
-    } : {
-      scenario: scenarioDescription ? (JSON.parse(scenarioDescription).description || "") : "",
-      categories: categories.filter(c => categoriesList.includes(c.id)),
-      // Get id for a single cia category, and check if it is in the row data that is selected.
-      confidentiality: row["CIA"]?.includes(cia_categories.find(cat => cat.name === "confidentiality").id),
-      integrity: row["CIA"]?.includes(cia_categories.find(cat => cat.name === "integrity").id),
-      availability: row["CIA"]?.includes(cia_categories.find(cat => cat.name === "availability").id),
-      uncategorized: row["CIA"]?.includes(cia_categories.find(cat => cat.name === "uncategorized").id),
-      // getting slider values (0-100) from actual scores. 
-      // Boolean flag is to check if score is of likelihood or impact
-      // If it is library row, set default risk value to 1 (slider value 0)
-      inherent_likelihood: isLibraryRow
-        ? getLikelihoodSliderValue(
-          scores.likelihoodScores.length > 0 && scores.likelihoodScores[0].score
-        )
-        : getLikelihoodSliderValue(
-          scores.likelihoodScores.find(score => score.id === row["Inherent Risk Likelihood Id"]).score
-        ),
-      inherent_impact: isLibraryRow
-        ? getImpactSliderValue(
-          scores.impactScores.length > 0 && scores.impactScores[0].score
-        )
-        : getImpactSliderValue(
-          scores.impactScores.find(score => score.id === row["Inherent Risk Impact Id"]).score
-        ),
-      // Setting default slider values of residual risk scores to 1 (One) 
-      // Here it is assumed first score object is the lowest score
-      residual_likelihood: row["Residual Risk Likelihood Id"] === null
-        ? null
-        : getLikelihoodSliderValue(
-          scores.likelihoodScores
-            .find(score => score.id === row["Residual Risk Likelihood Id"])
-            ?.score
-          || scores.likelihoodScores[0].score
-        ),
-      residual_impact: row["Residual Risk Impact Id"] === null
-        ? null
-        : getImpactSliderValue(
-          scores.impactScores
-            .find(score => score.id === row["Residual Risk Impact Id"])
-            ?.score
-          || scores.impactScores[0].score
-        ),
-      notes: "Notes" in row ? row["Notes"] : "",
-      customId: "Custom Id" in row ? row["Custom Id"] : "",
-      identified_date: row["Identified Date"] || null,
-      modified_date: row["Modified Date"] || null,
-      treatment_plan: row["Treatment"] ? (JSON.parse(row["Treatment"]).type || -1) : -1,
-      source: scenarioDescription ? (JSON.parse(scenarioDescription).source_type) : null,
-      owner: row["Owner"]
-    }
+    ? isLibraryRow
+      ? {
+          scenario: scenarioDescription,
+          categories: categoriesList_l,
+          // Get id for a single cia category, and check if it is in the row data that is selected.
+          confidentiality: false,
+          integrity: false,
+          availability: false,
+          uncategorized: true,
+          // getting slider values (0-100) from actual scores.
+          // Boolean flag is to check if score is of likelihood or impact
+          // If it is library row, set default risk value to 1 (slider value 0)
+          inherent_likelihood: isLibraryRow
+            ? getLikelihoodSliderValue(
+                scores.likelihoodScores.length > 0 &&
+                  scores.likelihoodScores[0].score,
+              )
+            : getLikelihoodSliderValue(
+                scores.likelihoodScores.find(
+                  (score) => score.id === row["Inherent Risk Likelihood Id"],
+                ).score,
+              ),
+          inherent_impact: isLibraryRow
+            ? getImpactSliderValue(
+                scores.impactScores.length > 0 && scores.impactScores[0].score,
+              )
+            : getImpactSliderValue(
+                scores.impactScores.find(
+                  (score) => score.id === row["Inherent Risk Impact Id"],
+                ).score,
+              ),
+          // Setting default slider values of residual risk scores to 1 (One)
+          // Here it is assumed first score object is the lowest score
+          residual_likelihood: getLikelihoodSliderValue(
+            scores.likelihoodScores.length > 0 &&
+              scores.likelihoodScores[0].score,
+          ),
+          residual_impact: getImpactSliderValue(
+            scores.impactScores.length > 0 && scores.impactScores[0].score,
+          ),
+          notes: "Notes" in row ? row["Notes"] : "",
+          customId: "Custom Id" in row ? row["Custom Id"] : "",
+        }
+      : {
+          scenario: scenarioDescription
+            ? JSON.parse(scenarioDescription).description || ""
+            : "",
+          categories: categories.filter((c) => categoriesList.includes(c.id)),
+          // Get id for a single cia category, and check if it is in the row data that is selected.
+          confidentiality: row["CIA"]?.includes(
+            cia_categories.find((cat) => cat.name === "confidentiality").id,
+          ),
+          integrity: row["CIA"]?.includes(
+            cia_categories.find((cat) => cat.name === "integrity").id,
+          ),
+          availability: row["CIA"]?.includes(
+            cia_categories.find((cat) => cat.name === "availability").id,
+          ),
+          uncategorized: row["CIA"]?.includes(
+            cia_categories.find((cat) => cat.name === "uncategorized").id,
+          ),
+          // getting slider values (0-100) from actual scores.
+          // Boolean flag is to check if score is of likelihood or impact
+          // If it is library row, set default risk value to 1 (slider value 0)
+          inherent_likelihood: isLibraryRow
+            ? getLikelihoodSliderValue(
+                scores.likelihoodScores.length > 0 &&
+                  scores.likelihoodScores[0].score,
+              )
+            : getLikelihoodSliderValue(
+                scores.likelihoodScores.find(
+                  (score) => score.id === row["Inherent Risk Likelihood Id"],
+                ).score,
+              ),
+          inherent_impact: isLibraryRow
+            ? getImpactSliderValue(
+                scores.impactScores.length > 0 && scores.impactScores[0].score,
+              )
+            : getImpactSliderValue(
+                scores.impactScores.find(
+                  (score) => score.id === row["Inherent Risk Impact Id"],
+                ).score,
+              ),
+          // Setting default slider values of residual risk scores to 1 (One)
+          // Here it is assumed first score object is the lowest score
+          residual_likelihood:
+            row["Residual Risk Likelihood Id"] === null
+              ? null
+              : getLikelihoodSliderValue(
+                  scores.likelihoodScores.find(
+                    (score) => score.id === row["Residual Risk Likelihood Id"],
+                  )?.score || scores.likelihoodScores[0].score,
+                ),
+          residual_impact:
+            row["Residual Risk Impact Id"] === null
+              ? null
+              : getImpactSliderValue(
+                  scores.impactScores.find(
+                    (score) => score.id === row["Residual Risk Impact Id"],
+                  )?.score || scores.impactScores[0].score,
+                ),
+          notes: "Notes" in row ? row["Notes"] : "",
+          customId: "Custom Id" in row ? row["Custom Id"] : "",
+          identified_date: row["Identified Date"] || null,
+          modified_date: row["Modified Date"] || null,
+          treatment_plan: row["Treatment"]
+            ? JSON.parse(row["Treatment"]).type || -1
+            : -1,
+          source: scenarioDescription
+            ? JSON.parse(scenarioDescription).source_type
+            : null,
+          owner: row["Owner"],
+        }
     : {
-      // Setting default slider values to 1 (One) 
-      // Here it is assumed first score object is the lowest score
-      inherent_likelihood: getLikelihoodSliderValue(
-        scores.likelihoodScores.length > 0 && scores.likelihoodScores[0].score
-      ),
-      inherent_impact: getImpactSliderValue(
-        scores.impactScores.length > 0 && scores.impactScores[0].score
-      )
-    }
+        // Setting default slider values to 1 (One)
+        // Here it is assumed first score object is the lowest score
+        inherent_likelihood: getLikelihoodSliderValue(
+          scores.likelihoodScores.length > 0 &&
+            scores.likelihoodScores[0].score,
+        ),
+        inherent_impact: getImpactSliderValue(
+          scores.impactScores.length > 0 && scores.impactScores[0].score,
+        ),
+      };
 
   // Get useForm Methods
-  const { handleSubmit, getValues, setValue, control, reset, formState: { errors } } = useForm({
+  const {
+    handleSubmit,
+    getValues,
+    setValue,
+    control,
+    reset,
+    formState: { errors },
+  } = useForm({
     defaultValues: formValues,
   });
 
-  // reset form fields whenever a row changes. 
+  // reset form fields whenever a row changes.
   // reset is required as hook form caches default values. it won't change on its own
   useEffect(() => {
-    reset(formValues)
+    reset(formValues);
   }, [open]);
+
+  useEffect(() => {
+    const values = getValues();
+    const noneSelected =
+      !values.availability &&
+      !values.confidentiality &&
+      !values.integrity &&
+      !values.uncategorized;
+
+    if (noneSelected) {
+      setValue("uncategorized", true);
+    }
+  }, []);
 
   const validation = {
     scenario: { required: "This field is required." },
@@ -205,37 +269,40 @@ const RiskFormDialog = ({
     uncategorized: {
       validate: {
         invalid: () => {
-          return getValues("uncategorized")
-            || getValues("confidentiality")
-            || getValues("integrity")
-            || getValues("availability");
-        }
+          return (
+            getValues("uncategorized") ||
+            getValues("confidentiality") ||
+            getValues("integrity") ||
+            getValues("availability") ||
+            "Select at least one CIA Category"
+          );
+        },
       },
-    }
+    },
   };
 
   const onSubmit = async (values) => {
     setisFormLoading(true);
     await onFormSubmit(values);
     setisFormLoading(false);
-  }
+  };
 
   const classes = useStyle();
 
-  const getSliderMarks = (isLikelihoodRisk) => (
-    isLikelihoodRisk ? scores.likelihoodScores.map(score => ({
-      value: getLikelihoodSliderValue(score.score),
-      label: score.score,
-      name: score.likelihood_name,
-      desc: score.likelihood_description
-    })) :
-      scores.impactScores.map(score => ({
-        value: getImpactSliderValue(score.score),
-        label: score.score,
-        name: score.impact_name,
-        desc: score.impact_description
-      }))
-  )
+  const getSliderMarks = (isLikelihoodRisk) =>
+    isLikelihoodRisk
+      ? scores.likelihoodScores.map((score) => ({
+          value: getLikelihoodSliderValue(score.score),
+          label: score.score,
+          name: score.likelihood_name,
+          desc: score.likelihood_description,
+        }))
+      : scores.impactScores.map((score) => ({
+          value: getImpactSliderValue(score.score),
+          label: score.score,
+          name: score.impact_name,
+          desc: score.impact_description,
+        }));
 
   // Create component to show text & caption
   const OptionText = ({ text, caption }) => (
@@ -282,7 +349,7 @@ const RiskFormDialog = ({
         />
       ),
     },
-  ]
+  ];
 
   return (
     <DialogBox
@@ -306,26 +373,32 @@ const RiskFormDialog = ({
           >
             <Grid container spacing={2}>
               <Grid item xs={12}>
-                {viaLibrary ?
+                {viaLibrary ? (
                   <SelectControl
                     name="scenario"
                     label="Scenario"
                     variant="outlined"
                     loading={isLoading("library")}
-                    options={library.map(row => ({ val: row.id, text: row.scenario })) || []}
-                    styleProps={{ fullWidth: true, }}
+                    options={
+                      library.map((row) => ({
+                        val: row.id,
+                        text: row.scenario,
+                      })) || []
+                    }
+                    styleProps={{ fullWidth: true }}
                     disabled={!hasAccess}
-                  /> :
+                  />
+                ) : (
                   <FormInput
                     name="scenario"
                     label="Scenario"
                     disabled={!hasAccess || isLibraryRow}
                     maxRows={5}
                   />
-                }
+                )}
               </Grid>
               {/* Dont show categories if adding via library */}
-              {!viaLibrary &&
+              {!viaLibrary && (
                 <Grid item xs={12}>
                   <SelectCategories
                     multiple={true}
@@ -337,7 +410,8 @@ const RiskFormDialog = ({
                     className={classes.customAutocomplete}
                     disabled={!hasAccess || isLibraryRow}
                   />
-                </Grid>}
+                </Grid>
+              )}
               {/* Not showing owner, source, identified and modified date fields if it is not a create risk  */}
               {!isCreateForm() && (
                 <>
@@ -361,8 +435,8 @@ const RiskFormDialog = ({
                       name="owner"
                       label="Owner"
                       variant="outlined"
-                      options={owners.map(o => ({ val: o.id, text: o.text }))}
-                      styleProps={{ fullWidth: true, }}
+                      options={owners.map((o) => ({ val: o.id, text: o.text }))}
+                      styleProps={{ fullWidth: true }}
                       disabled={!hasAccess}
                     />
                   </Grid>
@@ -387,7 +461,7 @@ const RiskFormDialog = ({
                       label="Source"
                       variant="outlined"
                       options={source_options}
-                      styleProps={{ fullWidth: true, }}
+                      styleProps={{ fullWidth: true }}
                       disabled
                     />
                   </Grid>
@@ -395,27 +469,40 @@ const RiskFormDialog = ({
                     <DateControl
                       name="identified_date"
                       label="Identified Date"
-                      variant='outlined'
+                      variant="outlined"
                       fullWidth
                       disabled={!hasAccess}
+                      disablePast={true}
                     />
                   </Grid>
                   <Grid item xs={6}>
                     <DateControl
                       name="modified_date"
                       label="Modified Date"
-                      variant='outlined'
+                      variant="outlined"
                       fullWidth
                       disabled
+                      disablePast={true}
                     />
                   </Grid>
                 </>
               )}
               <Grid item xs={12}>
-                <Box className={`${classes.subInputsContainer} ${!!errors.uncategorized ? "error" : ""}`}>
-                  <Typography className={classes.inputSubtitle}>CIA Categories</Typography>
+                <Box
+                  className={`${classes.subInputsContainer} ${
+                    !!errors.uncategorized ? "error" : ""
+                  }`}
+                >
+                  <Typography className={classes.inputSubtitle}>
+                    CIA Categories
+                  </Typography>
                   <Divider />
-                  <Box padding="16px" width="100%" display="flex" justifyContent="space-between">
+                  <Box
+                    padding="16px"
+                    width="100%"
+                    display="flex"
+                    justifyContent="space-between"
+                  >
                     {cia_categories.map((category, index) => (
                       <FormControlLabel
                         key={index}
@@ -430,7 +517,9 @@ const RiskFormDialog = ({
                               const handleChange = (e, value) => {
                                 // CONTROLLING "UNCATEGORIZED" CHECKBOX
                                 // getting id of category who's value was changed
-                                let dataId = parseInt(e.target.getAttribute("data-id"));
+                                let dataId = parseInt(
+                                  e.target.getAttribute("data-id"),
+                                );
                                 // If "Uncategorized" was checked to true, set all other cia categories to unchecked (false)
                                 if (dataId === 1 && value === true) {
                                   setValue("confidentiality", false);
@@ -438,20 +527,23 @@ const RiskFormDialog = ({
                                   setValue("availability", false);
                                 }
                                 // if some other checkbox was checked to true, uncheck "Uncategorized"
-                                else if (dataId !== 1 && value === true) setValue("uncategorized", false)
+                                else if (dataId !== 1 && value === true)
+                                  setValue("uncategorized", false);
                                 onChange(value);
-                              }
+                              };
                               return (
                                 <Checkbox
                                   checked={value || false}
-                                  onChange={(e, newVal) => handleChange(e, newVal)}
+                                  onChange={(e, newVal) =>
+                                    handleChange(e, newVal)
+                                  }
                                   className={classes.ciaCheckbox}
                                   inputProps={{
-                                    'data-id': category.id
+                                    "data-id": category.id,
                                   }}
                                   disabled={!hasAccess}
                                 />
-                              )
+                              );
                             }}
                           />
                         }
@@ -459,19 +551,25 @@ const RiskFormDialog = ({
                     ))}
                   </Box>
                 </Box>
-                {!!errors.uncategorized &&
+                {!!errors.uncategorized && (
                   <Typography
-                    variant='caption'
-                    className={`${classes.subInputSubtitle} ${classes.errorText}`}>
+                    variant="caption"
+                    className={`${classes.subInputSubtitle} ${classes.errorText}`}
+                  >
                     Select atleast one CIA Categories
-                  </Typography>}
+                  </Typography>
+                )}
               </Grid>
               <Grid item xs={12}>
                 <Box className={classes.subInputsContainer}>
-                  <Typography className={classes.inputSubtitle}>Inherent Risk</Typography>
+                  <Typography className={classes.inputSubtitle}>
+                    Inherent Risk
+                  </Typography>
                   <Divider />
                   <Box className={classes.riskSliderContainer}>
-                    <Typography className={classes.subInputSubtitle}>Likelihood Score</Typography>
+                    <Typography className={classes.subInputSubtitle}>
+                      Likelihood Score
+                    </Typography>
                     <Box className={classes.sliderContainer}>
                       <SliderControl
                         name="inherent_likelihood"
@@ -484,7 +582,9 @@ const RiskFormDialog = ({
                         disabled={!hasAccess}
                       />
                     </Box>
-                    <Typography className={classes.subInputSubtitle}>Impact Score</Typography>
+                    <Typography className={classes.subInputSubtitle}>
+                      Impact Score
+                    </Typography>
                     <Box className={classes.sliderContainer}>
                       <SliderControl
                         name="inherent_impact"
@@ -501,13 +601,17 @@ const RiskFormDialog = ({
                 </Box>
               </Grid>
               {/* Not showing residual risk field if it is not create form */}
-              {(!isCreateForm()) &&
+              {!isCreateForm() && (
                 <Grid item xs={12}>
                   <Box className={classes.subInputsContainer}>
-                    <Typography className={classes.inputSubtitle}>Residual Risk</Typography>
+                    <Typography className={classes.inputSubtitle}>
+                      Residual Risk
+                    </Typography>
                     <Divider />
                     <Box className={classes.riskSliderContainer}>
-                      <Typography className={classes.subInputSubtitle}>Likelihood</Typography>
+                      <Typography className={classes.subInputSubtitle}>
+                        Likelihood
+                      </Typography>
                       <Box className={classes.sliderContainer}>
                         <SliderControl
                           name="residual_likelihood"
@@ -518,7 +622,9 @@ const RiskFormDialog = ({
                           disabled={!hasAccess}
                         />
                       </Box>
-                      <Typography className={classes.subInputSubtitle}>Impact</Typography>
+                      <Typography className={classes.subInputSubtitle}>
+                        Impact
+                      </Typography>
                       <Box className={classes.sliderContainer}>
                         <SliderControl
                           name="residual_impact"
@@ -532,18 +638,16 @@ const RiskFormDialog = ({
                     </Box>
                   </Box>
                 </Grid>
-              }
+              )}
               <Grid item xs={12}>
-                <FormInput
-                  name="notes"
-                  rows={3}
-                  disabled={!hasAccess}
-                />
+                <FormInput name="notes" rows={3} disabled={!hasAccess} />
               </Grid>
-              {(!isCreateForm()) &&
+              {!isCreateForm() && (
                 <Grid item xs={12}>
                   <Box className={classes.subInputsContainer} sx={{ pb: 2 }}>
-                    <Typography className={classes.inputSubtitle}>Treatment Plan</Typography>
+                    <Typography className={classes.inputSubtitle}>
+                      Treatment Plan
+                    </Typography>
                     <Box className={classes.treatmentInputContainer}>
                       <RadioControl
                         name="treatment_plan"
@@ -552,23 +656,17 @@ const RiskFormDialog = ({
                         options={treatmentOptions}
                         styleProps={{ className: classes.radioControl }}
                         radioProps={{
-                          disabled: !hasAccess
+                          disabled: !hasAccess,
                         }}
                       />
                     </Box>
                     {/* <Typography className={classes.inputSubtitle}>Controls</Typography> */}
-                    <Box>
-
-                    </Box>
+                    <Box></Box>
                   </Box>
                 </Grid>
-              }
+              )}
               <Grid item xs={12}>
-                <FormInput
-                  name="customId"
-                  rows={1}
-                  disabled={!hasAccess}
-                />
+                <FormInput name="customId" rows={1} disabled={!hasAccess} />
               </Grid>
             </Grid>
           </Form>
@@ -596,16 +694,15 @@ const RiskFormDialog = ({
             size="large"
             form="risk-form"
             type="submit"
-            disabled={(!hasAccess) || (isFormLoading || isLoading())}
+            disabled={!hasAccess || isFormLoading || isLoading()}
           >
-            {(isCreateForm()) ? "ADD" : "UPDATE"}
-          </Button>,
-        </Tooltip>
+            {isCreateForm() ? "ADD" : "UPDATE"}
+          </Button>
+          ,
+        </Tooltip>,
       ]}
-    >
+    ></DialogBox>
+  );
+};
 
-    </DialogBox>
-  )
-}
-
-export default RiskFormDialog
+export default RiskFormDialog;
