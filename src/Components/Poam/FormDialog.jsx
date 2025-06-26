@@ -1,6 +1,14 @@
-import { Box, Button, Grid, makeStyles, Typography } from "@material-ui/core";
+import {
+  Box,
+  Button,
+  CircularProgress,
+  Grid,
+  InputAdornment,
+  makeStyles,
+  Typography,
+} from "@material-ui/core";
 import DialogBox from "../Utils/DialogBox";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { poam_header } from "../../assets/data/PoamData";
 import {
   DateControl,
@@ -11,11 +19,12 @@ import {
 } from "../Utils/Control";
 import CustomAccordion from "../Utils/CustomAccordion";
 import SupportingDocuments from "./SupportingDocuments";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { validateID } from "./PoamUtils";
 import { stringToMoment } from "../Utils/Utils";
 import { Autocomplete } from "@material-ui/lab";
 import { get } from "../../Service/CrudFactory";
+import { values } from "lodash";
 
 // Style generator
 const useStyle = makeStyles((theme) => ({
@@ -58,55 +67,23 @@ function FormDialog({
 }) {
   const classes = useStyle();
 
-  // Method to check if form is of create or update row
   const isCreateForm = () => rowIndex === -1;
-
-  // Get current max POA&M ID & prefix value
   const { prefix, maxValue } = poamID_data;
-  // Loading status for dialog
+
   const [isLoading, setisLoading] = useState(false);
+  const [optionsLoading, setOptionsLoading] = useState(false);
+
   const [frameworkList, setFrameworkList] = useState([]);
   const [controlsList, setControlsList] = useState([]);
   const [selectedFramework, setSelectedFramework] = useState(null);
+  // Validate POA&M ID, on creating new row in table
 
-  // Options list
-  // const controlsList = ["RA-5", "SA-9", "PF-07"];
-  // const controlsList = ["RA-5", "SA-9", "PF-07"];
   const sliderInput = [
     { value: 0, label: "Low" },
     { value: 50, label: "Moderate" },
     { value: 100, label: "High" },
   ];
 
-  // Set dafault values for Create Form, for Edit Form populate existing details
-  const defaultValues = {};
-  for (const name of poam_header) {
-    if (!name.toLowerCase().includes("date"))
-      defaultValues[name] = isCreateForm()
-        ? name === "Control"
-          ? null
-          : ""
-        : name === "Control"
-        ? controls.find((c) => c.id === rows[name][rowIndex])
-        : rows[name][rowIndex];
-    else
-      defaultValues[name] = stringToMoment(
-        isCreateForm() ? "" : rows[name][rowIndex]
-      );
-  }
-
-  console.log("DEFAULT VALUES", defaultValues);
-  // Get useForm Methods
-  const { getValues } = useForm({
-    defaultValues,
-  });
-
-  // Set default POA&M ID, form is of create type
-  if (isCreateForm())
-    defaultValues["POAM ID"] =
-      prefix + "-" + String(maxValue + 1).padStart(3, "0");
-
-  // Validate POA&M ID, on creating new row in table
   const validation = {
     "POAM ID": {
       validate: { valid: (val) => validateID(val, prefix, maxValue) },
@@ -114,17 +91,91 @@ function FormDialog({
     },
   };
 
-  // Get useForm Methods
-  const { handleSubmit, setValue, control } = useForm({
-    defaultValues,
-  });
+  const defaultValues = useMemo(() => {
+    const values = {};
+    for (const name of poam_header) {
+      if (!name.toLowerCase().includes("date")) {
+        if (isCreateForm()) {
+          values[name] = name === "Controls" ? null : "";
+        } else {
+          values[name] =
+            name === "Controls" ? null : rows[name]?.[rowIndex] ?? "";
+        }
+      } else {
+        values[name] = stringToMoment(
+          isCreateForm() ? "" : rows[name]?.[rowIndex]
+        );
+      }
+    }
 
-  // Push data onsubmit
+    if (isCreateForm()) {
+      values["POAM ID"] = prefix + "-" + String(maxValue + 1).padStart(3, "0");
+    }
+
+    return values;
+  }, [rows, rowIndex]);
+
+  const methods = useForm({ defaultValues });
+  const { handleSubmit, setValue, getValues, control } = methods;
+  const controlsValue = useWatch({ name: "Controls", control });
+  useEffect(() => {
+    const fetchFramework = async () => {
+      try {
+        setOptionsLoading(true);
+        const response = await get("/control/list-framework/");
+        setFrameworkList(response?.data || []);
+      } catch (error) {
+      } finally {
+        setOptionsLoading(false);
+      }
+    };
+    fetchFramework();
+  }, []);
+
+  useEffect(() => {
+    if (!isCreateForm() && frameworkList.length) {
+      const matched = frameworkList.find(
+        (f) => f.id === rows?.framework_id?.[rowIndex]
+      );
+      if (matched) {
+        setValue("Framework", matched);
+        setSelectedFramework(matched);
+      }
+    }
+  }, [frameworkList, rowIndex]);
+
+  useEffect(() => {
+    const fetchControls = async () => {
+      let url = "/control/list-controls";
+      if (selectedFramework?.id) {
+        url += `?framework_id=${selectedFramework.id}`;
+      }
+      try {
+        setOptionsLoading(true);
+        const res = await get(url);
+        setControlsList(res?.data || []);
+      } catch (err) {
+        console.error("Error fetching controls", err);
+      } finally {
+        setOptionsLoading(false);
+      }
+    };
+    fetchControls();
+  }, [selectedFramework]);
+
+  useEffect(() => {
+    if (!isCreateForm() && controlsList.length) {
+      const matched = controlsList.find(
+        (c) => c.id === rows?.Controls?.[rowIndex]
+      );
+      if (matched) {
+        setValue("Controls", matched);
+      }
+    }
+  }, [controlsList, rowIndex]);
+
   const submitForm = async (data) => {
     setisLoading(true);
-
-    // Backend requires column names that are lower-case with underscores. So, formatting that data here from uppercase to lowercase
-    // setting columns names to lower cases
     const newFormatData = {};
     Object.keys(data).forEach((colName) => {
       let newColNameFormat =
@@ -132,52 +183,23 @@ function FormDialog({
           ? "last_vendor_checkin_date"
           : colName.toLowerCase().replaceAll(" ", "_").replaceAll("-", "_");
 
-      // Map the key to 'controls' and extract the ID
       if (colName === "Controls") {
         newColNameFormat = "controls";
         newFormatData[newColNameFormat] = data["Controls"]?.id || null;
+      } else if (colName === "Framework") {
+        newFormatData["framework_id"] = data["Framework"]?.id || null;
       } else {
         newFormatData[newColNameFormat] = data[colName] || "";
       }
     });
 
-    // Push jira_issues column in datatable
     await onSubmit({
       ...newFormatData,
-      jira_issues: rows.jira_issues[rowIndex] || {},
+      jira_issues: rows.jira_issues?.[rowIndex] || {},
     });
     setisLoading(false);
   };
 
-  // <-----------------------------FRAMEWORK FETCHER--------------------------------->
-  useEffect(() => {
-    const fetchFramework = async () => {
-      const response = await get("/control/list-framework/");
-      setFrameworkList(response?.data);
-    };
-    fetchFramework();
-  }, []);
-
-  // <------------------------------------CONTROLS FETCHER--------------------------->
-  useEffect(() => {
-    const fetchControls = async () => {
-      let url = "/control/list-controls";
-      if (selectedFramework && selectedFramework.id) {
-        const frameworkId = parseInt(selectedFramework.id, 10);
-        url += `?framework_id=${frameworkId}`;
-        // console.log("selected framework", selectedFramework, url);
-      }
-
-      try {
-        const res = await get(url);
-        setControlsList(res?.data || []);
-      } catch (err) {
-        console.error("Error fetching controls", err);
-      }
-    };
-
-    fetchControls();
-  }, [selectedFramework]);
   return (
     <DialogBox
       open={open}
@@ -207,17 +229,34 @@ function FormDialog({
               <Grid item xs={12} sm={6}>
                 <Autocomplete
                   value={getValues("Framework") || null}
+                  isOptionEqualToValue={(option, value) => {
+                    return option?.id === value?.id;
+                  }}
                   onChange={(e, v) => {
                     setValue("Framework", v);
-                    setControlsList([]);
                     setSelectedFramework(v);
+                    setControlsList([]);
+                    setValue("Controls", null);
                   }}
                   disablePortal
                   options={frameworkList}
                   getOptionLabel={(option) =>
                     typeof option === "string" ? option : option.name
                   }
-                  freeSolo
+                  noOptionsText={
+                    optionsLoading ? (
+                      <Box
+                        display="flex"
+                        justifyContent="center"
+                        alignItems="center"
+                        padding={0}
+                      >
+                        <CircularProgress size={24} />
+                      </Box>
+                    ) : (
+                      "No options"
+                    )
+                  }
                   renderInput={(props) => (
                     <TextControl
                       {...props}
@@ -225,10 +264,19 @@ function FormDialog({
                       gutter={false}
                       variant="outlined"
                       name="Framework"
-                      value={getValues("Framework")}
-                      onChange={(e) =>
-                        setValue("Framework", e.target.value || "")
-                      }
+                      // InputProps={{
+                      //   ...props.InputProps,
+                      //   endAdornment: (
+                      //     <>
+                      //       {isLoading ? (
+                      //         <InputAdornment position="end">
+                      //           <CircularProgress color="inherit" size={20} />
+                      //         </InputAdornment>
+                      //       ) : null}
+                      //       {props.InputProps.endAdornment}
+                      //     </>
+                      //   ),
+                      // }}
                     />
                   )}
                 />
@@ -236,12 +284,32 @@ function FormDialog({
 
               <Grid item xs={12} sm={6}>
                 <Autocomplete
-                  value={getValues("Controls")}
-                  onChange={(e, v) => setValue("Controls", v || "")}
+                  value={controlsValue}
+                  onChange={(e, v) => {
+                    console.log("ONCCHANGE", v, values);
+                    return setValue("Controls", v || "");
+                  }}
                   disablePortal
                   options={controlsList}
                   getOptionLabel={(option) =>
-                    typeof option === "string" ? option : option.name
+                    typeof option === "string" ? option : option.abbreviation
+                  }
+                  isOptionEqualToValue={(option, value) =>
+                    option?.id === value?.id
+                  }
+                  noOptionsText={
+                    optionsLoading ? (
+                      <Box
+                        display="flex"
+                        justifyContent="center"
+                        alignItems="center"
+                        padding={0}
+                      >
+                        <CircularProgress size={24} />
+                      </Box>
+                    ) : (
+                      "No options"
+                    )
                   }
                   renderInput={(props) => (
                     <TextControl

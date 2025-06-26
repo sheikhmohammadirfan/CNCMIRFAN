@@ -1,6 +1,6 @@
 export const poam_header = [
   "POAM ID",
-  "Control",
+  "Controls",
   "Weakness Name",
   "Weakness Description",
   "Weakness Detector Source",
