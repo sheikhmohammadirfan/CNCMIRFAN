@@ -71,7 +71,10 @@ function FormDialog({
   const { prefix, maxValue } = poamID_data;
 
   const [isLoading, setisLoading] = useState(false);
-  const [optionsLoading, setOptionsLoading] = useState(false);
+  const [optionsLoading, setOptionsLoading] = useState({
+    framework: false,
+    controls: false,
+  });
 
   const [frameworkList, setFrameworkList] = useState([]);
   const [controlsList, setControlsList] = useState([]);
@@ -121,12 +124,12 @@ function FormDialog({
   useEffect(() => {
     const fetchFramework = async () => {
       try {
-        setOptionsLoading(true);
+        setOptionsLoading((prev) => ({ ...prev, framework: true }));
         const response = await get("/control/list-framework/");
         setFrameworkList(response?.data || []);
       } catch (error) {
       } finally {
-        setOptionsLoading(false);
+        setOptionsLoading((prev) => ({ ...prev, framework: false }));
       }
     };
     fetchFramework();
@@ -151,13 +154,13 @@ function FormDialog({
         url += `?framework_id=${selectedFramework.id}`;
       }
       try {
-        setOptionsLoading(true);
+        setOptionsLoading((prev) => ({ ...prev, controls: true }));
         const res = await get(url);
         setControlsList(res?.data || []);
       } catch (err) {
         console.error("Error fetching controls", err);
       } finally {
-        setOptionsLoading(false);
+        setOptionsLoading((prev) => ({ ...prev, controls: false }));
       }
     };
     fetchControls();
@@ -264,19 +267,19 @@ function FormDialog({
                       gutter={false}
                       variant="outlined"
                       name="Framework"
-                      // InputProps={{
-                      //   ...props.InputProps,
-                      //   endAdornment: (
-                      //     <>
-                      //       {isLoading ? (
-                      //         <InputAdornment position="end">
-                      //           <CircularProgress color="inherit" size={20} />
-                      //         </InputAdornment>
-                      //       ) : null}
-                      //       {props.InputProps.endAdornment}
-                      //     </>
-                      //   ),
-                      // }}
+                      InputProps={{
+                        ...props.InputProps,
+                        endAdornment: (
+                          <>
+                            {optionsLoading.framework ? (
+                              <InputAdornment position="end">
+                                <CircularProgress color="inherit" size={20} />
+                              </InputAdornment>
+                            ) : null}
+                            {props.InputProps.endAdornment}
+                          </>
+                        ),
+                      }}
                     />
                   )}
                 />
@@ -318,6 +321,19 @@ function FormDialog({
                       gutter={false}
                       variant="outlined"
                       name="Controls"
+                      //                       InputProps={{
+                      //   ...props.InputProps,
+                      //   endAdornment: (
+                      //     <>
+                      //       {optionsLoading.controls ? (
+                      //         <InputAdornment position="end">
+                      //           <CircularProgress color="inherit" size={20} />
+                      //         </InputAdornment>
+                      //       ) : null}
+                      //       {props.InputProps.endAdornment}
+                      //     </>
+                      //   ),
+                      // }}
                     />
                   )}
                 />
