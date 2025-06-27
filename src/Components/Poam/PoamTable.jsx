@@ -150,12 +150,10 @@ export default function PoamTable({ fileID }) {
   const [controls, setControls] = useState([])
   useEffect(() => {
     async function fetchControls() {
-      startLoading();
       // Fetch POA&M data
       const { data, status } = await getControlsList(fileID);
       if (!status) return stopLoading();
       setControls(data)
-      stopLoading();
     }
     fetchControls()
   }, [])
@@ -214,60 +212,58 @@ export default function PoamTable({ fileID }) {
       controls
     );
 
-  const [columnWidths, setColumnWidths] = useState([]);
-  useEffect(() => {
+  // const [columnWidths, setColumnWidths] = useState([]);
+  // useEffect(() => {
 
-    const timeout = setTimeout(() => {
+  //   const timeout = setTimeout(() => {
 
-      if (!poamData?.open || !poamData?.close || visibleColumns.length === 0) return;
-      const columnWidthsMap = {}
+  //     if (!poamData?.open || !poamData?.close || visibleColumns.length === 0) return;
+  //     const columnWidthsMap = {}
 
-      const openPoams = poamData?.open
-      const closedPoams = poamData?.close
+  //     const openPoams = poamData?.open
+  //     const closedPoams = poamData?.close
 
-      if (isOpenPoam) {
-        Object.keys(poam_header_reverse_map).forEach((column, colIndex) => {
-          let maxColumnValueSize = 0;
-          Object.values(openPoams[column]).forEach((rowValue, rowIndex) => {
-            const rowValueSize = [0, 1].includes(rowIndex) ? 0 : getElementWidth(`${rowIndex - 2}-${colIndex + 1}`, column);
-            const rowValueSizeReduced = 0.5 * rowValueSize
-            maxColumnValueSize = Math.max(maxColumnValueSize, rowValueSizeReduced)
-          });
-          const largestCellSize = maxColumnValueSize + 38
-          if (largestCellSize > columns_width[colIndex]) {
-            columnWidthsMap[column] = columns_width[colIndex];
-          }
-          else {
-            columnWidthsMap[column] = largestCellSize;
-          }
-          // columnWidthsMap[column] = Math.min(largestCellSize, columns_width[colIndex]);
-        })
-      }
-      else {
-        Object.keys(poam_header_reverse_map).forEach((column, colIndex) => {
-          let maxColumnValueSize = 0;
-          Object.values(closedPoams[column]).forEach((rowValue, rowIndex) => {
-            const rowValueSize = getElementWidth(`${rowIndex}-${colIndex + 1}`, column);
-            const rowValueSizeReduced = 0.5 * rowValueSize
-            maxColumnValueSize = Math.max(maxColumnValueSize, rowValueSizeReduced)
-          });
-          const largestCellSize = maxColumnValueSize + 38
-          if (largestCellSize > columns_width[colIndex]) {
-            columnWidthsMap[column] = columns_width[colIndex];
-          }
-          else {
-            columnWidthsMap[column] = largestCellSize;
-          }
-        })
-      }
-      // console.log(columnWidthsMap)
-      const widths = poam_header.map((h, i) => columnWidthsMap[h])
-      setColumnWidths(widths)
+  //     if (isOpenPoam) {
+  //       Object.keys(poam_header_reverse_map).forEach((column, colIndex) => {
+  //         let maxColumnValueSize = 0;
+  //         Object.values(openPoams[column]).forEach((rowValue, rowIndex) => {
+  //           const rowValueSize = [0, 1].includes(rowIndex) ? 0 : getElementWidth(`${rowIndex - 2}-${colIndex + 1}`, column);
+  //           const rowValueSizeReduced = 0.5 * rowValueSize
+  //           maxColumnValueSize = Math.max(maxColumnValueSize, rowValueSizeReduced)
+  //         });
+  //         const largestCellSize = maxColumnValueSize + 38
+  //         if (largestCellSize > columns_width[colIndex]) {
+  //           columnWidthsMap[column] = columns_width[colIndex];
+  //         }
+  //         else {
+  //           columnWidthsMap[column] = largestCellSize;
+  //         }
+  //       })
+  //     }
+  //     else {
+  //       Object.keys(poam_header_reverse_map).forEach((column, colIndex) => {
+  //         let maxColumnValueSize = 0;
+  //         Object.values(closedPoams[column]).forEach((rowValue, rowIndex) => {
+  //           const rowValueSize = getElementWidth(`${rowIndex}-${colIndex + 1}`, column);
+  //           const rowValueSizeReduced = 0.5 * rowValueSize
+  //           maxColumnValueSize = Math.max(maxColumnValueSize, rowValueSizeReduced)
+  //         });
+  //         const largestCellSize = maxColumnValueSize + 38
+  //         if (largestCellSize > columns_width[colIndex]) {
+  //           columnWidthsMap[column] = columns_width[colIndex];
+  //         }
+  //         else {
+  //           columnWidthsMap[column] = largestCellSize;
+  //         }
+  //       })
+  //     }
+  //     const widths = poam_header.map((h, i) => columnWidthsMap[h])
+  //     setColumnWidths(widths)
 
-    }, 0)
+  //   }, 0)
 
-    return () => clearTimeout(timeout)
-  }, [poamData, visibleColumns, isOpenPoam])
+  //   return () => clearTimeout(timeout)
+  // }, [poamData, visibleColumns, isOpenPoam, controls])
 
   function getElementWidth(id, column) {
     const el = document.getElementById(id);
@@ -490,7 +486,7 @@ export default function PoamTable({ fileID }) {
               secondaryOpen,
               mapTableHeader,
               mapTableBody,
-              columns_width: columnWidths.length > 0 ? columnWidths : columns_width,
+              columns_width: columns_width,
             }}
           />
         </>)}
