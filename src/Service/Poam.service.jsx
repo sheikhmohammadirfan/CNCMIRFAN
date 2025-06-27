@@ -118,5 +118,5 @@ export async function exportAction() {
 }
 
 export async function getControlsList() {
-  return await get("/poam/listcontrol");
+  return await get("/control/list-controls/");
 }

@@ -169,7 +169,10 @@ const mapDataToRow = (data, columns, rowIndex, matchedCell, controls) =>
         <CellComponent
           cellValue={data[columnName][rowIndex]}
         />
-      ) : columnName === 'Control' ? (controls?.find(c => c.id === data['Control'][rowIndex])?.name || "") : data[columnName][rowIndex],
+      )
+        : columnName === 'Controls'
+          ? (controls?.find(c => c.id === data['Controls'][rowIndex])?.name || "")
+          : data[columnName][rowIndex],
       params:
         columnName === "POAM ID"
           ? {
