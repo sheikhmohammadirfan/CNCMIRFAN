@@ -247,7 +247,7 @@ function FormDialog({
                     typeof option === "string" ? option : option.name
                   }
                   noOptionsText={
-                    optionsLoading ? (
+                    optionsLoading.framework ? (
                       <Box
                         display="flex"
                         justifyContent="center"
@@ -301,7 +301,7 @@ function FormDialog({
                     option?.id === value?.id
                   }
                   noOptionsText={
-                    optionsLoading ? (
+                    optionsLoading.controls ? (
                       <Box
                         display="flex"
                         justifyContent="center"
