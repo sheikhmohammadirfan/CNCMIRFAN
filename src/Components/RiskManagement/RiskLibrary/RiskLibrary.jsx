@@ -243,8 +243,13 @@ const RiskLibrary = () => {
   } = useSlider(scores);
 
   const onAddFormSubmit = async (val) => {
+    // Get the current library row
+    const currentIndex = getCurrentIndex();
+    const currentLibraryRow = library[currentIndex];
+
+    // Add applicable_framework to the payload if available
     const payload = {
-      scenario_id: library[getCurrentIndex()].id,
+      scenario_id: currentLibraryRow.id,
       likelihood_id: scores.likelihoodScores.find(
         (score) => score.score === getLikelihoodScore(val.inherent_likelihood),
       ).id,
@@ -256,6 +261,9 @@ const RiskLibrary = () => {
         .filter((cia) => Boolean(val[cia.name]))
         .map((cia) => cia.id),
       custom_id: val.customId,
+      ...(currentLibraryRow && currentLibraryRow.applicable_framework
+        ? { applicable_framework: currentLibraryRow.applicable_framework }
+        : {}),
     };
     const { status } = await createRisk(payload);
     if (status) {

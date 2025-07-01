@@ -19,7 +19,7 @@ import {
   SelectControl,
   TextControl,
 } from "../Utils/Control";
-import { Controller, useForm } from "react-hook-form";
+import { Controller, useForm, useWatch } from "react-hook-form";
 import CustomAccordion from "../Utils/CustomAccordion";
 import { useStyle } from "./RiskRegister/RiskRegisterUtils";
 import { Autocomplete, Tooltip } from "@mui/material";
@@ -69,7 +69,6 @@ const RiskFormDialog = ({
   scores,
   onFormSubmit,
 }) => {
-  console.log("🚀 ~ row:", row);
   // Get loading status
   const { isLoading, startLoading, stopLoading } = useLoading({
     library: false,
@@ -141,14 +140,10 @@ const RiskFormDialog = ({
       ? {
           scenario: scenarioDescription,
           categories: categoriesList_l,
-          // Get id for a single cia category, and check if it is in the row data that is selected.
           confidentiality: false,
           integrity: false,
           availability: false,
           uncategorized: true,
-          // getting slider values (0-100) from actual scores.
-          // Boolean flag is to check if score is of likelihood or impact
-          // If it is library row, set default risk value to 1 (slider value 0)
           inherent_likelihood: isLibraryRow
             ? getLikelihoodSliderValue(
                 scores.likelihoodScores.length > 0 &&
@@ -168,8 +163,6 @@ const RiskFormDialog = ({
                   (score) => score.id === row["Inherent Risk Impact Id"],
                 ).score,
               ),
-          // Setting default slider values of residual risk scores to 1 (One)
-          // Here it is assumed first score object is the lowest score
           residual_likelihood: getLikelihoodSliderValue(
             scores.likelihoodScores.length > 0 &&
               scores.likelihoodScores[0].score,
@@ -179,13 +172,18 @@ const RiskFormDialog = ({
           ),
           notes: "Notes" in row ? row["Notes"] : "",
           customId: "Custom Id" in row ? row["Custom Id"] : "",
+          // Add applicable_framework to form values for library row
+          applicable_framework:
+            row.applicable_framework ||
+            (typeof row.Framework === "object" && row.Framework?.id)
+              ? row.Framework?.id
+              : null,
         }
       : {
           scenario: scenarioDescription
             ? JSON.parse(scenarioDescription).description || ""
             : "",
           categories: categories.filter((c) => categoriesList.includes(c.id)),
-          // Get id for a single cia category, and check if it is in the row data that is selected.
           confidentiality: row["CIA"]?.includes(
             cia_categories.find((cat) => cat.name === "confidentiality").id,
           ),
@@ -198,9 +196,6 @@ const RiskFormDialog = ({
           uncategorized: row["CIA"]?.includes(
             cia_categories.find((cat) => cat.name === "uncategorized").id,
           ),
-          // getting slider values (0-100) from actual scores.
-          // Boolean flag is to check if score is of likelihood or impact
-          // If it is library row, set default risk value to 1 (slider value 0)
           inherent_likelihood: isLibraryRow
             ? getLikelihoodSliderValue(
                 scores.likelihoodScores.length > 0 &&
@@ -220,8 +215,6 @@ const RiskFormDialog = ({
                   (score) => score.id === row["Inherent Risk Impact Id"],
                 ).score,
               ),
-          // Setting default slider values of residual risk scores to 1 (One)
-          // Here it is assumed first score object is the lowest score
           residual_likelihood:
             row["Residual Risk Likelihood Id"] === null
               ? null
@@ -249,10 +242,14 @@ const RiskFormDialog = ({
             ? JSON.parse(scenarioDescription).source_type
             : null,
           owner: row["Owner"],
+          // Add applicable_framework to form values for non-library row
+          applicable_framework:
+            row.applicable_framework ||
+            (typeof row.Framework === "object" && row.Framework?.id)
+              ? row.Framework?.id
+              : null,
         }
     : {
-        // Setting default slider values to 1 (One)
-        // Here it is assumed first score object is the lowest score
         inherent_likelihood: getLikelihoodSliderValue(
           scores.likelihoodScores.length > 0 &&
             scores.likelihoodScores[0].score,
@@ -260,6 +257,8 @@ const RiskFormDialog = ({
         inherent_impact: getImpactSliderValue(
           scores.impactScores.length > 0 && scores.impactScores[0].score,
         ),
+        // Add applicable_framework to default form values
+        applicable_framework: null,
       };
 
   // Get useForm Methods
@@ -274,8 +273,10 @@ const RiskFormDialog = ({
     defaultValues: formValues,
   });
 
+  const watchedScenarioId = useWatch({ control, name: "scenario" });
+  const watchedFramework = useWatch({ control, name: "Framework" }); // <-- Add this
+
   // reset form fields whenever a row changes.
-  // reset is required as hook form caches default values. it won't change on its own
   useEffect(() => {
     reset(formValues);
   }, [open]);
@@ -292,6 +293,40 @@ const RiskFormDialog = ({
       setValue("uncategorized", true);
     }
   }, []);
+
+  // When scenario changes, update the framework and applicable_framework in the form
+  useEffect(() => {
+    if (!viaLibrary || !watchedScenarioId) return;
+
+    const selected = library.find((item) => item.id === watchedScenarioId);
+    if (!selected) return;
+
+    const frameworkName = selected.applicable_framework_name;
+    const frameworkId = selected.applicable_framework;
+
+    setValue("Framework", frameworkName);
+    setValue("applicable_framework", frameworkId); // Set the framework id in the form
+  }, [watchedScenarioId, viaLibrary, library, setValue]);
+
+  // When framework changes, update the applicable_framework in the form
+  useEffect(() => {
+    if (!watchedFramework) {
+      setValue("applicable_framework", null);
+      return;
+    }
+    if (typeof watchedFramework === "object" && watchedFramework.id) {
+      setValue("applicable_framework", watchedFramework.id);
+    } else if (
+      typeof watchedFramework === "string" &&
+      frameworkList.length > 0
+    ) {
+      const found = frameworkList.find((fw) => fw.name === watchedFramework);
+      setValue("applicable_framework", found ? found.id : null);
+    } else {
+      setValue("applicable_framework", null);
+    }
+    // eslint-disable-next-line
+  }, [watchedFramework, frameworkList]);
 
   const validation = {
     scenario: { required: "This field is required." },
@@ -312,11 +347,17 @@ const RiskFormDialog = ({
         },
       },
     },
+    // Add validation for applicable_framework if needed
+    applicable_framework: { required: "Framework is required." },
   };
 
   const onSubmit = async (values) => {
     setisFormLoading(true);
-    await onFormSubmit(values);
+    const payload = {
+      ...values,
+    };
+
+    await onFormSubmit(payload);
     setisFormLoading(false);
   };
 
@@ -436,6 +477,18 @@ const RiskFormDialog = ({
                   onChange={(e, v) => {
                     setValue("Framework", v);
                     setSelectedFramework(v);
+                    // Set applicable_framework when framework changes
+                    if (v && typeof v === "object" && v.id) {
+                      setValue("applicable_framework", v.id);
+                    } else if (
+                      typeof v === "string" &&
+                      frameworkList.length > 0
+                    ) {
+                      const found = frameworkList.find((fw) => fw.name === v);
+                      setValue("applicable_framework", found ? found.id : null);
+                    } else {
+                      setValue("applicable_framework", null);
+                    }
                   }}
                   disablePortal
                   disabled={!hasAccess || isLibraryRow || viaLibrary}
@@ -452,9 +505,21 @@ const RiskFormDialog = ({
                       variant="outlined"
                       name="Framework"
                       value={getValues("Framework")}
-                      onChange={(e) =>
-                        setValue("Framework", e.target.value || "")
-                      }
+                      onChange={(e) => {
+                        setValue("Framework", e.target.value || "");
+                        // Set applicable_framework when typing
+                        if (frameworkList.length > 0) {
+                          const found = frameworkList.find(
+                            (fw) => fw.name === e.target.value,
+                          );
+                          setValue(
+                            "applicable_framework",
+                            found ? found.id : null,
+                          );
+                        } else {
+                          setValue("applicable_framework", null);
+                        }
+                      }}
                     />
                   )}
                 />
@@ -478,21 +543,6 @@ const RiskFormDialog = ({
               {!isCreateForm() && (
                 <>
                   <Grid item xs={6}>
-                    {/* <Autocomplete
-                          id="tags-outlined"
-                          name="Owner"
-                          options={owners}
-                          value={selectedOwner}
-                          onChange={(e, newVal) => setSelectedOwner(newVal)}
-                          getOptionLabel={(option) => option.text ? option.text : ""}
-                          filterSelectedOptions
-                          renderInput={(params) => (
-                            <FormInput
-                              {...params}
-                              name="Owner"
-                            />
-                          )}
-                        /> */}
                     <SelectControl
                       name="owner"
                       label="Owner"
@@ -503,21 +553,6 @@ const RiskFormDialog = ({
                     />
                   </Grid>
                   <Grid item xs={6}>
-                    {/* <Autocomplete
-                          id="tags-outlined"
-                          name="Source"
-                          options={source_options}
-                          value={selectedSource}
-                          onChange={(e, newVal) => setSelectedSource(newVal)}
-                          getOptionLabel={(option) => option.name ? option.name : ""}
-                          filterSelectedOptions
-                          renderInput={(params) => (
-                            <FormInput
-                              {...params}
-                              name="Source"
-                            />
-                          )}
-                        /> */}
                     <SelectControl
                       name="source"
                       label="Source"
@@ -637,7 +672,6 @@ const RiskFormDialog = ({
                         name="inherent_likelihood"
                         control={control}
                         rules={validation}
-                        // Boolean flag is to check if score is of likelihood or impact
                         marks={getSliderMarks(true)}
                         classes={classes}
                         isCreateForm={isCreateForm()}
@@ -652,7 +686,6 @@ const RiskFormDialog = ({
                         name="inherent_impact"
                         control={control}
                         rules={validation}
-                        // Boolean flag is to check if score is of likelihood or impact
                         marks={getSliderMarks(false)}
                         classes={classes}
                         isCreateForm={isCreateForm()}
@@ -662,7 +695,6 @@ const RiskFormDialog = ({
                   </Box>
                 </Box>
               </Grid>
-              {/* Not showing residual risk field if it is not create form */}
               {!isCreateForm() && (
                 <Grid item xs={12}>
                   <Box className={classes.subInputsContainer}>
@@ -722,7 +754,6 @@ const RiskFormDialog = ({
                         }}
                       />
                     </Box>
-                    {/* <Typography className={classes.inputSubtitle}>Controls</Typography> */}
                     <Box></Box>
                   </Box>
                 </Grid>

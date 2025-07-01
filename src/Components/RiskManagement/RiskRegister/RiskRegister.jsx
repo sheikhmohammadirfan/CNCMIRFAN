@@ -289,7 +289,12 @@ const RiskRegister = () => {
         description: r.scenario.scenario,
         categories_id: r.scenario.categories.map((c) => c.id),
         source_type: r.scenario.scenario_source,
+        // Store both framework id and name for easier access
+        applicable_framework: r.scenario.applicable_framework ?? null,
+        applicable_framework_name: r.scenario.applicable_framework_name ?? null,
       }),
+      "Applicable Framework Id": r.scenario.applicable_framework ?? null,
+      "Applicable Framework Name": r.scenario.applicable_framework_name ?? null,
       Owner: r.owner,
       "Identified Date": r.identification_date
         ? new Date(r.identification_date).toLocaleDateString("en-GB", {
@@ -310,8 +315,8 @@ const RiskRegister = () => {
       "Custom Id": r.custom_id,
       "Inherent Risk Likelihood Id": r.inherent_risk_likelihood,
       "Inherent Risk Impact Id": r.inherent_risk_impact,
-      "Residual Risk Likelihood Id": r.residual_risk_impact,
-      "Residual Risk Impact Id": r.residual_risk_likelihood,
+      "Residual Risk Likelihood Id": r.residual_risk_likelihood,
+      "Residual Risk Impact Id": r.residual_risk_impact,
       Notes: r.notes,
       Treatment: JSON.stringify({
         type: r.treatment,
@@ -590,6 +595,7 @@ const RiskRegister = () => {
   const onRegisterFormSubmit = async (val) => {
     // is new row
     if (getCurrentIndex() === -1 && !scenarioDialog.isViaLibrary) {
+      // Use applicable_framework from form value directly (should be id)
       const payload = {
         scenario_description: val.scenario,
         categories_ids: val.categories.map((category) => category.id),
@@ -605,6 +611,7 @@ const RiskRegister = () => {
           .filter((cia) => Boolean(val[cia.name]))
           .map((cia) => cia.id),
         custom_id: val.customId,
+        applicable_framework: val.applicable_framework ?? null,
       };
       const { status } = await createRisk(payload);
       if (status) {
@@ -618,8 +625,10 @@ const RiskRegister = () => {
         return fetchandSetRegister(true);
       }
     } else if (scenarioDialog.isViaLibrary) {
+      // Use applicable_framework from form value directly (should be id)
       const payload = {
         scenario_id: val.scenario,
+        applicable_framework: val.applicable_framework ?? null,
         likelihood_id: scores.likelihoodScores.find(
           (score) =>
             score.score === getLikelihoodScore(val.inherent_likelihood),
@@ -656,6 +665,9 @@ const RiskRegister = () => {
         : [];
       const curr_scenario = val.scenario;
       const curr_categories = val.categories.map((c) => c.id).sort();
+
+      // Always use applicable_framework from form value (should be id)
+      const applicable_framework = val.applicable_framework ?? null;
 
       if (val.source === 0) {
         if (
@@ -723,7 +735,7 @@ const RiskRegister = () => {
       const il = scores.likelihoodScores.find(
         (score) => score.score === getLikelihoodScore(val.inherent_likelihood),
       ).id;
-      if (il !== row["Inherent Risk Impact Id"]) {
+      if (il !== row["Inherent Risk Likelihood Id"]) {
         payload.inherent_risk_likelihood_id = il;
       }
       const ii = scores.impactScores.find(
@@ -759,6 +771,9 @@ const RiskRegister = () => {
       ) {
         payload.treatment = TREATMENT_NAME_ID_MAP[val.treatment_plan];
       }
+
+      // Always include applicable_framework in edit payload
+      payload.applicable_framework = applicable_framework;
 
       if (Object.keys(payload).length > 0) {
         const { status } = await updateRegister(row["ID"], payload);
@@ -802,6 +817,12 @@ const RiskRegister = () => {
         mappedRow[
           "owner"
         ] = `${row["owner"]["first_name"]} ${row["owner"]["last_name"]}`;
+      // Add applicable framework id and name to export
+      else if (key === "Applicable Framework Id")
+        mappedRow["applicable_framework_id"] = row["Applicable Framework Id"];
+      else if (key === "Applicable Framework Name")
+        mappedRow["applicable_framework_name"] =
+          row["Applicable Framework Name"];
       else mappedRow[key] = row[key];
     });
     return mappedRow;
