@@ -158,6 +158,7 @@ const RiskLibrary = () => {
           Scenario: x.scenario,
           Categories: x.categories,
           Source: x.scenario_source === 0 ? "SYSTEM" : "CUSTOM",
+          Framework: x.applicable_framework_name,
         })),
       });
       setPagination({
@@ -372,7 +373,9 @@ const RiskLibrary = () => {
           rowIndex={getCurrentIndex()}
           row={library[getCurrentIndex()]}
           isLibraryRow={true}
-          autocompleteOptions={{ categories }}
+          autocompleteOptions={{
+            categories,
+          }}
           getSliderValue={{ getLikelihoodSliderValue, getImpactSliderValue }}
           scores={scores}
           onFormSubmit={onAddFormSubmit}

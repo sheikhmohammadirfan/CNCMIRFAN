@@ -29,6 +29,7 @@ import { cia_categories } from "../../assets/data/RiskManagement/RiskRegister/Ri
 import SliderControl from "./RiskRegister/SliderControl";
 import useLoading from "../Utils/Hooks/useLoading";
 import useSlider from "../Utils/Hooks/useSlider";
+import { get } from "../../Service/CrudFactory";
 
 // Custom input compoent
 const FormInput = ({ ...rest }) => (
@@ -68,17 +69,49 @@ const RiskFormDialog = ({
   scores,
   onFormSubmit,
 }) => {
+  console.log("🚀 ~ row:", row);
   // Get loading status
   const { isLoading, startLoading, stopLoading } = useLoading({
     library: false,
     categories: false,
   });
+
+  const [selectedFramework, setSelectedFramework] = useState(null);
+  const [frameworkList, setFrameworkList] = useState([]);
+
   // Set loading state of library
   useEffect(() => {
     if (!viaLibrary) return;
     else if (library.length === 0) startLoading("library");
     else if (library.length > 0) stopLoading("library");
   }, [library, viaLibrary]);
+
+  // <-----------------------------FRAMEWORK FETCHER--------------------------------->
+  useEffect(() => {
+    const fetchFramework = async () => {
+      const response = await get("/control/list-framework/");
+      setFrameworkList(response?.data);
+    };
+    fetchFramework();
+  }, []);
+
+  useEffect(() => {
+    if (!row || frameworkList.length === 0) return;
+
+    const matchingFramework = frameworkList.find(
+      (fw) =>
+        fw.name === row.Framework || fw.name === row.applicable_framework_name,
+    );
+
+    if (matchingFramework) {
+      setSelectedFramework(matchingFramework);
+      setValue("Framework", matchingFramework);
+    } else if (row.Framework) {
+      // If it's a free-form value not in the list
+      setSelectedFramework(row.Framework);
+      setValue("Framework", row.Framework);
+    }
+  }, [frameworkList, row]);
 
   const isCreateForm = () => rowIndex === -1 || isLibraryRow;
 
@@ -396,6 +429,35 @@ const RiskFormDialog = ({
                     maxRows={5}
                   />
                 )}
+              </Grid>
+              <Grid item xs={12}>
+                <Autocomplete
+                  value={getValues("Framework") || selectedFramework}
+                  onChange={(e, v) => {
+                    setValue("Framework", v);
+                    setSelectedFramework(v);
+                  }}
+                  disablePortal
+                  disabled={!hasAccess || isLibraryRow || viaLibrary}
+                  options={frameworkList}
+                  getOptionLabel={(option) =>
+                    typeof option === "string" ? option : option.name
+                  }
+                  freeSolo
+                  renderInput={(props) => (
+                    <TextControl
+                      {...props}
+                      noControls
+                      gutter={false}
+                      variant="outlined"
+                      name="Framework"
+                      value={getValues("Framework")}
+                      onChange={(e) =>
+                        setValue("Framework", e.target.value || "")
+                      }
+                    />
+                  )}
+                />
               </Grid>
               {/* Dont show categories if adding via library */}
               {!viaLibrary && (
