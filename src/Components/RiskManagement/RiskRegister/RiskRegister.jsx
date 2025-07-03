@@ -312,7 +312,7 @@ const RiskRegister = () => {
           })
         : "N/A",
       CIA: r.cia.map((c) => c.id),
-      "Custom Id": r.custom_id,
+      "Risk Id": r.risk_id,
       "Inherent Risk Likelihood Id": r.inherent_risk_likelihood,
       "Inherent Risk Impact Id": r.inherent_risk_impact,
       "Residual Risk Likelihood Id": r.residual_risk_likelihood,
@@ -610,7 +610,6 @@ const RiskRegister = () => {
         cia: cia_categories
           .filter((cia) => Boolean(val[cia.name]))
           .map((cia) => cia.id),
-        custom_id: val.customId,
         applicable_framework: val.applicable_framework ?? null,
       };
       const { status } = await createRisk(payload);
@@ -640,7 +639,6 @@ const RiskRegister = () => {
           .filter((cia) => Boolean(val[cia.name]))
           .map((cia) => cia.id),
         notes: val.notes,
-        custom_id: val.customId,
       };
       const { status } = await createRisk(payload);
       if (status) {
@@ -698,9 +696,6 @@ const RiskRegister = () => {
       }
       if (val.notes !== row.Notes) {
         payload.notes = val.notes;
-      }
-      if (val.customId !== row["Custom Id"]) {
-        payload.custom_id = val.customId;
       }
       if (val.identified_date !== row["Identified Date"]) {
         payload.identified_date =

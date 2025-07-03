@@ -37,6 +37,10 @@ export const useStyle = makeStyles((theme) => ({
       zIndex: 1,
     },
 
+    "& [sticky][riskid=true]": {
+      left: 100,
+    },
+
     "& [sticky][scenario=true]": {
       left: 200,
     },

@@ -1,6 +1,6 @@
 // Column Names
 export const risk_register_columns = [
-  "Custom Id",
+  "Risk Id",
   "Scenario",
   "Source",
   "Categories",
@@ -27,7 +27,7 @@ export const risk_register_columns_width = [
 // Used to map field names from api responses to names that are used in mapping headers of table
 export const HEADER_TABLE_COLS_MAP = {
   ID: "id",
-  "Custom Id": "custom_id",
+  "Risk Id": "risk_id",
   Scenario: "scenario",
   Source: "source",
   Categories: "categories",
@@ -52,7 +52,7 @@ export const HEADER_TABLE_COLS_MAP = {
 
 export const HEADER_TABLE_FILTERS_MAP = {
   ID: "id",
-  "Custom Id": "custom_id",
+  "Risk Id": "risk_id",
   Scenario: "scenario",
   Source: "source",
   Categories: "category",

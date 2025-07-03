@@ -135,6 +135,15 @@ const RiskFormDialog = ({
       : [];
   }, [row]);
 
+  const frameworkId =
+    row?.applicable_framework ??
+    scenarioDescription?.applicable_framework ??
+    row?.["Applicable Framework Id"] ??
+    (typeof row?.Framework === "object" && row.Framework?.id) ??
+    (typeof row?.Framework === "string"
+      ? frameworkList.find((fw) => fw.name === row.Framework)?.id
+      : null);
+
   let formValues = row
     ? isLibraryRow
       ? {
@@ -171,13 +180,15 @@ const RiskFormDialog = ({
             scores.impactScores.length > 0 && scores.impactScores[0].score,
           ),
           notes: "Notes" in row ? row["Notes"] : "",
-          customId: "Custom Id" in row ? row["Custom Id"] : "",
           // Add applicable_framework to form values for library row
-          applicable_framework:
-            row.applicable_framework ||
-            (typeof row.Framework === "object" && row.Framework?.id)
-              ? row.Framework?.id
-              : null,
+          applicable_framework: frameworkId,
+          Framework:
+            frameworkList.find((fw) => fw.id === frameworkId) ??
+            frameworkList.find(
+              (fw) => fw.name === row?.["Applicable Framework Name"],
+            ) ??
+            row?.Framework ??
+            "",
         }
       : {
           scenario: scenarioDescription
@@ -232,7 +243,6 @@ const RiskFormDialog = ({
                   )?.score || scores.impactScores[0].score,
                 ),
           notes: "Notes" in row ? row["Notes"] : "",
-          customId: "Custom Id" in row ? row["Custom Id"] : "",
           identified_date: row["Identified Date"] || null,
           modified_date: row["Modified Date"] || null,
           treatment_plan: row["Treatment"]
@@ -243,11 +253,14 @@ const RiskFormDialog = ({
             : null,
           owner: row["Owner"],
           // Add applicable_framework to form values for non-library row
-          applicable_framework:
-            row.applicable_framework ||
-            (typeof row.Framework === "object" && row.Framework?.id)
-              ? row.Framework?.id
-              : null,
+          applicable_framework: frameworkId,
+          Framework:
+            frameworkList.find((fw) => fw.id === frameworkId) ??
+            frameworkList.find(
+              (fw) => fw.name === row?.["Applicable Framework Name"],
+            ) ??
+            row?.Framework ??
+            "",
         }
     : {
         inherent_likelihood: getLikelihoodSliderValue(
@@ -277,9 +290,15 @@ const RiskFormDialog = ({
   const watchedFramework = useWatch({ control, name: "Framework" }); // <-- Add this
 
   // reset form fields whenever a row changes.
+  // useEffect(() => {
+  //   reset(formValues);
+  // }, [open]);
+
   useEffect(() => {
-    reset(formValues);
-  }, [open]);
+    if (row && frameworkList.length > 0) {
+      reset(formValues);
+    }
+  }, [row, frameworkList, open]);
 
   useEffect(() => {
     const values = getValues();
@@ -326,14 +345,13 @@ const RiskFormDialog = ({
       setValue("applicable_framework", null);
     }
     // eslint-disable-next-line
-  }, [watchedFramework, frameworkList]);
+  }, [watchedFramework, frameworkList, library]);
 
   const validation = {
     scenario: { required: "This field is required." },
     categories: { required: "This field is required." },
     inherent_likelihood: { required: "Select a number" },
     inherent_impact: { required: "Select a number" },
-    customId: { required: "This field is required." },
     uncategorized: {
       validate: {
         invalid: () => {
@@ -347,8 +365,6 @@ const RiskFormDialog = ({
         },
       },
     },
-    // Add validation for applicable_framework if needed
-    applicable_framework: { required: "Framework is required." },
   };
 
   const onSubmit = async (values) => {
@@ -758,9 +774,6 @@ const RiskFormDialog = ({
                   </Box>
                 </Grid>
               )}
-              <Grid item xs={12}>
-                <FormInput name="customId" rows={1} disabled={!hasAccess} />
-              </Grid>
             </Grid>
           </Form>
         </Box>
