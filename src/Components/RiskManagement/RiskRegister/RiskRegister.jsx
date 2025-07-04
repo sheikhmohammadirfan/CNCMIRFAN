@@ -326,6 +326,7 @@ const RiskRegister = () => {
       Tasks: r.actions,
       Approved: r.is_approved,
       Archived: false,
+      "Detected From": r.detected_from,
       Vendors: [],
     }));
     // if signal is not aborted, that means no new reqs were fired. so we can safely stop loading and set the state.
@@ -611,6 +612,10 @@ const RiskRegister = () => {
           .filter((cia) => Boolean(val[cia.name]))
           .map((cia) => cia.id),
         applicable_framework: val.applicable_framework ?? null,
+        // Add detected_from key for new risk
+        detected_from: val.detected_from ?? null,
+        // Always add is_approved to payload for new risk
+        is_approved: val.is_approved,
       };
       const { status } = await createRisk(payload);
       if (status) {
@@ -639,6 +644,8 @@ const RiskRegister = () => {
           .filter((cia) => Boolean(val[cia.name]))
           .map((cia) => cia.id),
         notes: val.notes,
+        detected_from: val.detected_from ?? null,
+        is_approved: val.is_approved,
       };
       const { status } = await createRisk(payload);
       if (status) {
@@ -769,6 +776,12 @@ const RiskRegister = () => {
 
       // Always include applicable_framework in edit payload
       payload.applicable_framework = applicable_framework;
+
+      if (val.detected_from !== row["Detected From"]) {
+        payload.detected_from = val.detected_from ?? null;
+      }
+
+      payload.is_approved = val.is_approved;
 
       if (Object.keys(payload).length > 0) {
         const { status } = await updateRegister(row["ID"], payload);

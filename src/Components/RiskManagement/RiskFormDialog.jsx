@@ -31,6 +31,18 @@ import useLoading from "../Utils/Hooks/useLoading";
 import useSlider from "../Utils/Hooks/useSlider";
 import { get } from "../../Service/CrudFactory";
 
+// Add DETECTED_FROM_CHOICES constant
+const DETECTED_FROM_CHOICES = [
+  { val: 0, text: "Third-Party Risk Assessment" },
+  { val: 1, text: "Internal Audit" },
+  { val: 2, text: "External Audit" },
+  { val: 3, text: "Vulnerability Scan" },
+  { val: 4, text: "Security Assessment" },
+  { val: 5, text: "User Report" },
+  { val: 6, text: "Compliance Review" },
+  { val: 7, text: "Penetration Testing" },
+];
+
 // Custom input compoent
 const FormInput = ({ ...rest }) => (
   <TextControl
@@ -69,6 +81,7 @@ const RiskFormDialog = ({
   scores,
   onFormSubmit,
 }) => {
+  console.log("🚀 ~ row:", row);
   // Get loading status
   const { isLoading, startLoading, stopLoading } = useLoading({
     library: false,
@@ -144,6 +157,20 @@ const RiskFormDialog = ({
       ? frameworkList.find((fw) => fw.name === row.Framework)?.id
       : null);
 
+  // Set up detected_from initial value
+  let detectedFromInitial = null;
+  if (row && row.detected_from !== undefined && row.detected_from !== null) {
+    detectedFromInitial = row.detected_from;
+  } else if (
+    row &&
+    row["Detected From"] !== undefined &&
+    row["Detected From"] !== null
+  ) {
+    detectedFromInitial = row["Detected From"];
+  } else {
+    detectedFromInitial = null;
+  }
+
   let formValues = row
     ? isLibraryRow
       ? {
@@ -189,6 +216,7 @@ const RiskFormDialog = ({
             ) ??
             row?.Framework ??
             "",
+          detected_from: detectedFromInitial,
         }
       : {
           scenario: scenarioDescription
@@ -261,6 +289,7 @@ const RiskFormDialog = ({
             ) ??
             row?.Framework ??
             "",
+          detected_from: detectedFromInitial,
         }
     : {
         inherent_likelihood: getLikelihoodSliderValue(
@@ -272,6 +301,7 @@ const RiskFormDialog = ({
         ),
         // Add applicable_framework to default form values
         applicable_framework: null,
+        detected_from: null,
       };
 
   // Get useForm Methods
@@ -287,7 +317,8 @@ const RiskFormDialog = ({
   });
 
   const watchedScenarioId = useWatch({ control, name: "scenario" });
-  const watchedFramework = useWatch({ control, name: "Framework" }); // <-- Add this
+  const watchedFramework = useWatch({ control, name: "Framework" });
+  const watchedDetectedFrom = useWatch({ control, name: "detected_from" });
 
   // reset form fields whenever a row changes.
   // useEffect(() => {
@@ -347,6 +378,29 @@ const RiskFormDialog = ({
     // eslint-disable-next-line
   }, [watchedFramework, frameworkList, library]);
 
+  // Keep detected_from in sync if row changes (for edit)
+  useEffect(() => {
+    if (!isCreateForm()) {
+      let detectedFromValue = null;
+      if (row.detected_from !== undefined && row.detected_from !== null) {
+        detectedFromValue = row.detected_from;
+      } else if (
+        row["Detected From"] !== undefined &&
+        row["Detected From"] !== null
+      ) {
+        detectedFromValue = row["Detected From"];
+      } else if (
+        row["DetectedFrom"] !== undefined &&
+        row["DetectedFrom"] !== null
+      ) {
+        detectedFromValue = row["DetectedFrom"];
+      }
+      setValue("detected_from", detectedFromValue);
+    }
+    // eslint-disable-next-line
+  }, [row, setValue, open]);
+
+  // Add validation for detected_from if needed
   const validation = {
     scenario: { required: "This field is required." },
     categories: { required: "This field is required." },
@@ -367,12 +421,21 @@ const RiskFormDialog = ({
     },
   };
 
+  // Modified onSubmit to include detected_from in update payload for edit risk
   const onSubmit = async (values) => {
     setisFormLoading(true);
-    const payload = {
+    let payload = {
       ...values,
     };
 
+    // If editing (not create) and row.approved is not true, add is_approved: true to payload
+    if (
+      !isCreateForm() &&
+      !isLibraryRow &&
+      (!row || row["Approved"] === false)
+    ) {
+      payload.is_approved = true;
+    }
     await onFormSubmit(payload);
     setisFormLoading(false);
   };
@@ -540,6 +603,36 @@ const RiskFormDialog = ({
                   )}
                 />
               </Grid>
+
+              {/* Detected From field */}
+              {!isLibraryRow && (
+                <Grid item xs={12}>
+                  <Controller
+                    name="detected_from"
+                    control={control}
+                    render={({ field }) => (
+                      <SelectControl
+                        {...field}
+                        name="detected_from"
+                        label="Detected From"
+                        variant="outlined"
+                        options={DETECTED_FROM_CHOICES}
+                        styleProps={{ fullWidth: true }}
+                        disabled={!hasAccess}
+                        rules={validation.detected_from}
+                        value={field.value ?? null}
+                        onChange={(e) => field.onChange(e.target.value)}
+                      />
+                    )}
+                  />
+                  {!!errors.detected_from && (
+                    <Typography variant="caption" className={classes.errorText}>
+                      {errors.detected_from.message}
+                    </Typography>
+                  )}
+                </Grid>
+              )}
+
               {/* Dont show categories if adding via library */}
               {!viaLibrary && (
                 <Grid item xs={12}>
@@ -802,7 +895,11 @@ const RiskFormDialog = ({
             type="submit"
             disabled={!hasAccess || isFormLoading || isLoading()}
           >
-            {isCreateForm() ? "ADD" : "UPDATE"}
+            {isCreateForm()
+              ? "ADD"
+              : row["Approved"] === false && !isLibraryRow && !isCreateForm()
+              ? "APPROVE & UPDATE"
+              : "UPDATE"}
           </Button>
           ,
         </Tooltip>,
