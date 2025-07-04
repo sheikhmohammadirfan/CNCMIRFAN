@@ -81,7 +81,6 @@ const RiskFormDialog = ({
   scores,
   onFormSubmit,
 }) => {
-  console.log("🚀 ~ row:", row);
   // Get loading status
   const { isLoading, startLoading, stopLoading } = useLoading({
     library: false,
@@ -422,7 +421,7 @@ const RiskFormDialog = ({
   };
 
   // Modified onSubmit to include detected_from in update payload for edit risk
-  const onSubmit = async (values) => {
+  const onSubmit = async (values, isApprove = false) => {
     setisFormLoading(true);
     let payload = {
       ...values,
@@ -434,7 +433,9 @@ const RiskFormDialog = ({
       !isLibraryRow &&
       (!row || row["Approved"] === false)
     ) {
-      payload.is_approved = true;
+      if (isApprove) {
+        payload.is_approved = true;
+      }
     }
     await onFormSubmit(payload);
     setisFormLoading(false);
@@ -503,6 +504,18 @@ const RiskFormDialog = ({
       ),
     },
   ];
+
+  // Handler for Update button
+  const handleUpdate = (e) => {
+    e.preventDefault();
+    handleSubmit((values) => onSubmit(values, false))();
+  };
+
+  // Handler for Approve & Update button
+  const handleApproveAndUpdate = (e) => {
+    e.preventDefault();
+    handleSubmit((values) => onSubmit(values, true))();
+  };
 
   return (
     <DialogBox
@@ -882,27 +895,67 @@ const RiskFormDialog = ({
         >
           CANCEL
         </Button>,
-        <Tooltip
-          placement="top-end"
-          arrow
-          title={!hasAccess && "You don't have write access!"}
-        >
-          <Button
-            variant="contained"
-            color="primary"
-            size="large"
-            form="risk-form"
-            type="submit"
-            disabled={!hasAccess || isFormLoading || isLoading()}
+        !isCreateForm() && (
+          <Tooltip
+            placement="top-end"
+            arrow
+            title={!hasAccess && "You don't have write access!"}
           >
-            {isCreateForm()
-              ? "ADD"
-              : row["Approved"] === false && !isLibraryRow && !isCreateForm()
-              ? "APPROVE & UPDATE"
-              : "UPDATE"}
-          </Button>
-          ,
-        </Tooltip>,
+            <span>
+              <Button
+                variant="contained"
+                color="primary"
+                size="large"
+                onClick={handleUpdate}
+                disabled={!hasAccess || isFormLoading || isLoading()}
+              >
+                UPDATE
+              </Button>
+            </span>
+          </Tooltip>
+        ),
+        !isCreateForm() &&
+          row &&
+          row["Approved"] === false &&
+          !isLibraryRow && (
+            <Tooltip
+              placement="top-end"
+              arrow
+              title={!hasAccess && "You don't have write access!"}
+            >
+              <span>
+                <Button
+                  variant="contained"
+                  color="secondary"
+                  size="large"
+                  onClick={handleApproveAndUpdate}
+                  disabled={!hasAccess || isFormLoading || isLoading()}
+                >
+                  APPROVE & UPDATE
+                </Button>
+              </span>
+            </Tooltip>
+          ),
+        isCreateForm() && (
+          <Tooltip
+            placement="top-end"
+            arrow
+            title={!hasAccess && "You don't have write access!"}
+          >
+            <span>
+              <Button
+                variant="contained"
+                color="primary"
+                size="large"
+                form="risk-form"
+                type="submit"
+                disabled={!hasAccess || isFormLoading || isLoading()}
+              >
+                ADD
+              </Button>
+            </span>
+          </Tooltip>
+        ),
       ]}
     ></DialogBox>
   );
