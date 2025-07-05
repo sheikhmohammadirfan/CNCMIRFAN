@@ -51,6 +51,18 @@ import XLSX from "xlsx";
 import { obj_to_yyyy_mm_dd } from "../../Utils/DateFormatConverter";
 import { getUser } from "../../../Service/UserFactory";
 
+// Add DETECTED_FROM_CHOICES constant
+const DETECTED_FROM_CHOICES = [
+  { val: 0, text: "Third-Party Risk Assessment" },
+  { val: 1, text: "Internal Audit" },
+  { val: 2, text: "External Audit" },
+  { val: 3, text: "Vulnerability Scan" },
+  { val: 4, text: "Security Assessment" },
+  { val: 5, text: "User Report" },
+  { val: 6, text: "Compliance Review" },
+  { val: 7, text: "Penetration Testing" },
+];
+
 const RiskRegister = () => {
   const hasEditRiskAccess = useMemo(() => {
     const user = getUser();
@@ -326,7 +338,12 @@ const RiskRegister = () => {
       Tasks: r.actions,
       Approved: r.is_approved,
       Archived: false,
-      "Detected From": r.detected_from,
+      "Detected From":
+        r.detected_from != null
+          ? DETECTED_FROM_CHOICES.find(
+              (detects) => detects.val === Number(r.detected_from),
+            )?.text
+          : null,
       Vendors: [],
     }));
     // if signal is not aborted, that means no new reqs were fired. so we can safely stop loading and set the state.
