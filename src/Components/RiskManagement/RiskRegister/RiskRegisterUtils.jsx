@@ -37,6 +37,10 @@ export const useStyle = makeStyles((theme) => ({
       zIndex: 1,
     },
 
+    "& [sticky][riskid=true]": {
+      left: 100,
+    },
+
     "& [sticky][scenario=true]": {
       left: 200,
     },
@@ -444,7 +448,7 @@ export const mapDataToHeader = (visibleColumns, sorting, updateSort) => ({
   data: visibleColumns.map((text) => ({
     text,
     params:
-      text === "Custom Id" || text === "Scenario"
+      text === "Risk Id" || text === "Scenario"
         ? {
             sticky: "",
             scenario: text === "Scenario" ? "true" : "false",
@@ -469,11 +473,11 @@ export const mapDataToHeader = (visibleColumns, sorting, updateSort) => ({
     colName: HEADER_TABLE_FILTERS_MAP[text],
     filterType: COLUMN_FILTER_MAP[text] || [],
     filterCellCss:
-      text === "Custom Id" || text === "Scenario"
+      text === "Risk Id" || text === "Scenario"
         ? {
             position: "sticky",
             left:
-              text === "Custom Id" ? "50px" : text === "Scenario" ? "200px" : 0,
+              text === "Risk Id" ? "50px" : text === "Scenario" ? "200px" : 0,
             zIndex: 1,
           }
         : {},
@@ -507,7 +511,7 @@ const mapDataToRow = (
           <RowCell text={cellValue} />
         ),
       params:
-        colName === "Custom Id" || colName === "Scenario"
+        colName === "Risk Id" || colName === "Scenario"
           ? {
               sticky: "",
               scenario: colName === "Scenario" ? "true" : "false",

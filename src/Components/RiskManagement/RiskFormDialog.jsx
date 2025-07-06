@@ -19,7 +19,7 @@ import {
   SelectControl,
   TextControl,
 } from "../Utils/Control";
-import { Controller, useForm } from "react-hook-form";
+import { Controller, useForm, useWatch } from "react-hook-form";
 import CustomAccordion from "../Utils/CustomAccordion";
 import { useStyle } from "./RiskRegister/RiskRegisterUtils";
 import { Autocomplete, Tooltip } from "@mui/material";
@@ -29,6 +29,19 @@ import { cia_categories } from "../../assets/data/RiskManagement/RiskRegister/Ri
 import SliderControl from "./RiskRegister/SliderControl";
 import useLoading from "../Utils/Hooks/useLoading";
 import useSlider from "../Utils/Hooks/useSlider";
+import { get } from "../../Service/CrudFactory";
+
+// Add DETECTED_FROM_CHOICES constant
+const DETECTED_FROM_CHOICES = [
+  { val: 0, text: "Third-Party Risk Assessment" },
+  { val: 1, text: "Internal Audit" },
+  { val: 2, text: "External Audit" },
+  { val: 3, text: "Vulnerability Scan" },
+  { val: 4, text: "Security Assessment" },
+  { val: 5, text: "User Report" },
+  { val: 6, text: "Compliance Review" },
+  { val: 7, text: "Penetration Testing" },
+];
 
 // Custom input compoent
 const FormInput = ({ ...rest }) => (
@@ -73,12 +86,43 @@ const RiskFormDialog = ({
     library: false,
     categories: false,
   });
+
+  const [selectedFramework, setSelectedFramework] = useState(null);
+  const [frameworkList, setFrameworkList] = useState([]);
+
   // Set loading state of library
   useEffect(() => {
     if (!viaLibrary) return;
     else if (library.length === 0) startLoading("library");
     else if (library.length > 0) stopLoading("library");
   }, [library, viaLibrary]);
+
+  // <-----------------------------FRAMEWORK FETCHER--------------------------------->
+  useEffect(() => {
+    const fetchFramework = async () => {
+      const response = await get("/control/list-framework/");
+      setFrameworkList(response?.data);
+    };
+    fetchFramework();
+  }, []);
+
+  useEffect(() => {
+    if (!row || frameworkList.length === 0) return;
+
+    const matchingFramework = frameworkList.find(
+      (fw) =>
+        fw.name === row.Framework || fw.name === row.applicable_framework_name,
+    );
+
+    if (matchingFramework) {
+      setSelectedFramework(matchingFramework);
+      setValue("Framework", matchingFramework);
+    } else if (row.Framework) {
+      // If it's a free-form value not in the list
+      setSelectedFramework(row.Framework);
+      setValue("Framework", row.Framework);
+    }
+  }, [frameworkList, row]);
 
   const isCreateForm = () => rowIndex === -1 || isLibraryRow;
 
@@ -103,19 +147,38 @@ const RiskFormDialog = ({
       : [];
   }, [row]);
 
+  const frameworkId =
+    row?.applicable_framework ??
+    scenarioDescription?.applicable_framework ??
+    row?.["Applicable Framework Id"] ??
+    (typeof row?.Framework === "object" && row.Framework?.id) ??
+    (typeof row?.Framework === "string"
+      ? frameworkList.find((fw) => fw.name === row.Framework)?.id
+      : null);
+
+  // Set up detected_from initial value
+  let detectedFromInitial = null;
+  if (row && row.detected_from !== undefined && row.detected_from !== null) {
+    detectedFromInitial = row.detected_from;
+  } else if (
+    row &&
+    row["Detected From"] !== undefined &&
+    row["Detected From"] !== null
+  ) {
+    detectedFromInitial = row["Detected From"];
+  } else {
+    detectedFromInitial = null;
+  }
+
   let formValues = row
     ? isLibraryRow
       ? {
           scenario: scenarioDescription,
           categories: categoriesList_l,
-          // Get id for a single cia category, and check if it is in the row data that is selected.
           confidentiality: false,
           integrity: false,
           availability: false,
           uncategorized: true,
-          // getting slider values (0-100) from actual scores.
-          // Boolean flag is to check if score is of likelihood or impact
-          // If it is library row, set default risk value to 1 (slider value 0)
           inherent_likelihood: isLibraryRow
             ? getLikelihoodSliderValue(
                 scores.likelihoodScores.length > 0 &&
@@ -135,8 +198,6 @@ const RiskFormDialog = ({
                   (score) => score.id === row["Inherent Risk Impact Id"],
                 ).score,
               ),
-          // Setting default slider values of residual risk scores to 1 (One)
-          // Here it is assumed first score object is the lowest score
           residual_likelihood: getLikelihoodSliderValue(
             scores.likelihoodScores.length > 0 &&
               scores.likelihoodScores[0].score,
@@ -145,14 +206,22 @@ const RiskFormDialog = ({
             scores.impactScores.length > 0 && scores.impactScores[0].score,
           ),
           notes: "Notes" in row ? row["Notes"] : "",
-          customId: "Custom Id" in row ? row["Custom Id"] : "",
+          // Add applicable_framework to form values for library row
+          applicable_framework: frameworkId,
+          Framework:
+            frameworkList.find((fw) => fw.id === frameworkId) ??
+            frameworkList.find(
+              (fw) => fw.name === row?.["Applicable Framework Name"],
+            ) ??
+            row?.Framework ??
+            "",
+          detected_from: detectedFromInitial,
         }
       : {
           scenario: scenarioDescription
             ? JSON.parse(scenarioDescription).description || ""
             : "",
           categories: categories.filter((c) => categoriesList.includes(c.id)),
-          // Get id for a single cia category, and check if it is in the row data that is selected.
           confidentiality: row["CIA"]?.includes(
             cia_categories.find((cat) => cat.name === "confidentiality").id,
           ),
@@ -165,9 +234,6 @@ const RiskFormDialog = ({
           uncategorized: row["CIA"]?.includes(
             cia_categories.find((cat) => cat.name === "uncategorized").id,
           ),
-          // getting slider values (0-100) from actual scores.
-          // Boolean flag is to check if score is of likelihood or impact
-          // If it is library row, set default risk value to 1 (slider value 0)
           inherent_likelihood: isLibraryRow
             ? getLikelihoodSliderValue(
                 scores.likelihoodScores.length > 0 &&
@@ -187,8 +253,6 @@ const RiskFormDialog = ({
                   (score) => score.id === row["Inherent Risk Impact Id"],
                 ).score,
               ),
-          // Setting default slider values of residual risk scores to 1 (One)
-          // Here it is assumed first score object is the lowest score
           residual_likelihood:
             row["Residual Risk Likelihood Id"] === null
               ? null
@@ -206,7 +270,6 @@ const RiskFormDialog = ({
                   )?.score || scores.impactScores[0].score,
                 ),
           notes: "Notes" in row ? row["Notes"] : "",
-          customId: "Custom Id" in row ? row["Custom Id"] : "",
           identified_date: row["Identified Date"] || null,
           modified_date: row["Modified Date"] || null,
           treatment_plan: row["Treatment"]
@@ -216,10 +279,18 @@ const RiskFormDialog = ({
             ? JSON.parse(scenarioDescription).source_type
             : null,
           owner: row["Owner"],
+          // Add applicable_framework to form values for non-library row
+          applicable_framework: frameworkId,
+          Framework:
+            frameworkList.find((fw) => fw.id === frameworkId) ??
+            frameworkList.find(
+              (fw) => fw.name === row?.["Applicable Framework Name"],
+            ) ??
+            row?.Framework ??
+            "",
+          detected_from: detectedFromInitial,
         }
     : {
-        // Setting default slider values to 1 (One)
-        // Here it is assumed first score object is the lowest score
         inherent_likelihood: getLikelihoodSliderValue(
           scores.likelihoodScores.length > 0 &&
             scores.likelihoodScores[0].score,
@@ -227,6 +298,9 @@ const RiskFormDialog = ({
         inherent_impact: getImpactSliderValue(
           scores.impactScores.length > 0 && scores.impactScores[0].score,
         ),
+        // Add applicable_framework to default form values
+        applicable_framework: null,
+        detected_from: null,
       };
 
   // Get useForm Methods
@@ -241,11 +315,20 @@ const RiskFormDialog = ({
     defaultValues: formValues,
   });
 
+  const watchedScenarioId = useWatch({ control, name: "scenario" });
+  const watchedFramework = useWatch({ control, name: "Framework" });
+  const watchedDetectedFrom = useWatch({ control, name: "detected_from" });
+
   // reset form fields whenever a row changes.
-  // reset is required as hook form caches default values. it won't change on its own
+  // useEffect(() => {
+  //   reset(formValues);
+  // }, [open]);
+
   useEffect(() => {
-    reset(formValues);
-  }, [open]);
+    if (row && frameworkList.length > 0) {
+      reset(formValues);
+    }
+  }, [row, frameworkList, open]);
 
   useEffect(() => {
     const values = getValues();
@@ -260,12 +343,68 @@ const RiskFormDialog = ({
     }
   }, []);
 
+  // When scenario changes, update the framework and applicable_framework in the form
+  useEffect(() => {
+    if (!viaLibrary || !watchedScenarioId) return;
+
+    const selected = library.find((item) => item.id === watchedScenarioId);
+    if (!selected) return;
+
+    const frameworkName = selected.applicable_framework_name;
+    const frameworkId = selected.applicable_framework;
+
+    setValue("Framework", frameworkName);
+    setValue("applicable_framework", frameworkId); // Set the framework id in the form
+  }, [watchedScenarioId, viaLibrary, library, setValue]);
+
+  // When framework changes, update the applicable_framework in the form
+  useEffect(() => {
+    if (!watchedFramework) {
+      setValue("applicable_framework", null);
+      return;
+    }
+    if (typeof watchedFramework === "object" && watchedFramework.id) {
+      setValue("applicable_framework", watchedFramework.id);
+    } else if (
+      typeof watchedFramework === "string" &&
+      frameworkList.length > 0
+    ) {
+      const found = frameworkList.find((fw) => fw.name === watchedFramework);
+      setValue("applicable_framework", found ? found.id : null);
+    } else {
+      setValue("applicable_framework", null);
+    }
+    // eslint-disable-next-line
+  }, [watchedFramework, frameworkList, library]);
+
+  // Keep detected_from in sync if row changes (for edit)
+  useEffect(() => {
+    if (!isCreateForm()) {
+      let detectedFromValue = null;
+      if (row.detected_from !== undefined && row.detected_from !== null) {
+        detectedFromValue = row.detected_from;
+      } else if (
+        row["Detected From"] !== undefined &&
+        row["Detected From"] !== null
+      ) {
+        detectedFromValue = row["Detected From"];
+      } else if (
+        row["DetectedFrom"] !== undefined &&
+        row["DetectedFrom"] !== null
+      ) {
+        detectedFromValue = row["DetectedFrom"];
+      }
+      setValue("detected_from", detectedFromValue);
+    }
+    // eslint-disable-next-line
+  }, [row, setValue, open]);
+
+  // Add validation for detected_from if needed
   const validation = {
     scenario: { required: "This field is required." },
     categories: { required: "This field is required." },
     inherent_likelihood: { required: "Select a number" },
     inherent_impact: { required: "Select a number" },
-    customId: { required: "This field is required." },
     uncategorized: {
       validate: {
         invalid: () => {
@@ -281,9 +420,24 @@ const RiskFormDialog = ({
     },
   };
 
-  const onSubmit = async (values) => {
+  // Modified onSubmit to include detected_from in update payload for edit risk
+  const onSubmit = async (values, isApprove = false) => {
     setisFormLoading(true);
-    await onFormSubmit(values);
+    let payload = {
+      ...values,
+    };
+
+    // If editing (not create) and row.approved is not true, add is_approved: true to payload
+    if (
+      !isCreateForm() &&
+      !isLibraryRow &&
+      (!row || row["Approved"] === false)
+    ) {
+      if (isApprove) {
+        payload.is_approved = true;
+      }
+    }
+    await onFormSubmit(payload);
     setisFormLoading(false);
   };
 
@@ -351,6 +505,18 @@ const RiskFormDialog = ({
     },
   ];
 
+  // Handler for Update button
+  const handleUpdate = (e) => {
+    e.preventDefault();
+    handleSubmit((values) => onSubmit(values, false))();
+  };
+
+  // Handler for Approve & Update button
+  const handleApproveAndUpdate = (e) => {
+    e.preventDefault();
+    handleSubmit((values) => onSubmit(values, true))();
+  };
+
   return (
     <DialogBox
       open={open}
@@ -397,6 +563,89 @@ const RiskFormDialog = ({
                   />
                 )}
               </Grid>
+              <Grid item xs={12}>
+                <Autocomplete
+                  value={getValues("Framework") || selectedFramework}
+                  onChange={(e, v) => {
+                    setValue("Framework", v);
+                    setSelectedFramework(v);
+                    // Set applicable_framework when framework changes
+                    if (v && typeof v === "object" && v.id) {
+                      setValue("applicable_framework", v.id);
+                    } else if (
+                      typeof v === "string" &&
+                      frameworkList.length > 0
+                    ) {
+                      const found = frameworkList.find((fw) => fw.name === v);
+                      setValue("applicable_framework", found ? found.id : null);
+                    } else {
+                      setValue("applicable_framework", null);
+                    }
+                  }}
+                  disablePortal
+                  disabled={!hasAccess || isLibraryRow || viaLibrary}
+                  options={frameworkList}
+                  getOptionLabel={(option) =>
+                    typeof option === "string" ? option : option.name
+                  }
+                  freeSolo
+                  renderInput={(props) => (
+                    <TextControl
+                      {...props}
+                      noControls
+                      gutter={false}
+                      variant="outlined"
+                      name="Framework"
+                      value={getValues("Framework")}
+                      onChange={(e) => {
+                        setValue("Framework", e.target.value || "");
+                        // Set applicable_framework when typing
+                        if (frameworkList.length > 0) {
+                          const found = frameworkList.find(
+                            (fw) => fw.name === e.target.value,
+                          );
+                          setValue(
+                            "applicable_framework",
+                            found ? found.id : null,
+                          );
+                        } else {
+                          setValue("applicable_framework", null);
+                        }
+                      }}
+                    />
+                  )}
+                />
+              </Grid>
+
+              {/* Detected From field */}
+              {!isLibraryRow && (
+                <Grid item xs={12}>
+                  <Controller
+                    name="detected_from"
+                    control={control}
+                    render={({ field }) => (
+                      <SelectControl
+                        {...field}
+                        name="detected_from"
+                        label="Detected From"
+                        variant="outlined"
+                        options={DETECTED_FROM_CHOICES}
+                        styleProps={{ fullWidth: true }}
+                        disabled={!hasAccess}
+                        rules={validation.detected_from}
+                        value={field.value ?? null}
+                        onChange={(e) => field.onChange(e.target.value)}
+                      />
+                    )}
+                  />
+                  {!!errors.detected_from && (
+                    <Typography variant="caption" className={classes.errorText}>
+                      {errors.detected_from.message}
+                    </Typography>
+                  )}
+                </Grid>
+              )}
+
               {/* Dont show categories if adding via library */}
               {!viaLibrary && (
                 <Grid item xs={12}>
@@ -416,21 +665,6 @@ const RiskFormDialog = ({
               {!isCreateForm() && (
                 <>
                   <Grid item xs={6}>
-                    {/* <Autocomplete
-                          id="tags-outlined"
-                          name="Owner"
-                          options={owners}
-                          value={selectedOwner}
-                          onChange={(e, newVal) => setSelectedOwner(newVal)}
-                          getOptionLabel={(option) => option.text ? option.text : ""}
-                          filterSelectedOptions
-                          renderInput={(params) => (
-                            <FormInput
-                              {...params}
-                              name="Owner"
-                            />
-                          )}
-                        /> */}
                     <SelectControl
                       name="owner"
                       label="Owner"
@@ -441,21 +675,6 @@ const RiskFormDialog = ({
                     />
                   </Grid>
                   <Grid item xs={6}>
-                    {/* <Autocomplete
-                          id="tags-outlined"
-                          name="Source"
-                          options={source_options}
-                          value={selectedSource}
-                          onChange={(e, newVal) => setSelectedSource(newVal)}
-                          getOptionLabel={(option) => option.name ? option.name : ""}
-                          filterSelectedOptions
-                          renderInput={(params) => (
-                            <FormInput
-                              {...params}
-                              name="Source"
-                            />
-                          )}
-                        /> */}
                     <SelectControl
                       name="source"
                       label="Source"
@@ -575,7 +794,6 @@ const RiskFormDialog = ({
                         name="inherent_likelihood"
                         control={control}
                         rules={validation}
-                        // Boolean flag is to check if score is of likelihood or impact
                         marks={getSliderMarks(true)}
                         classes={classes}
                         isCreateForm={isCreateForm()}
@@ -590,7 +808,6 @@ const RiskFormDialog = ({
                         name="inherent_impact"
                         control={control}
                         rules={validation}
-                        // Boolean flag is to check if score is of likelihood or impact
                         marks={getSliderMarks(false)}
                         classes={classes}
                         isCreateForm={isCreateForm()}
@@ -600,7 +817,6 @@ const RiskFormDialog = ({
                   </Box>
                 </Box>
               </Grid>
-              {/* Not showing residual risk field if it is not create form */}
               {!isCreateForm() && (
                 <Grid item xs={12}>
                   <Box className={classes.subInputsContainer}>
@@ -660,14 +876,10 @@ const RiskFormDialog = ({
                         }}
                       />
                     </Box>
-                    {/* <Typography className={classes.inputSubtitle}>Controls</Typography> */}
                     <Box></Box>
                   </Box>
                 </Grid>
               )}
-              <Grid item xs={12}>
-                <FormInput name="customId" rows={1} disabled={!hasAccess} />
-              </Grid>
             </Grid>
           </Form>
         </Box>
@@ -683,23 +895,67 @@ const RiskFormDialog = ({
         >
           CANCEL
         </Button>,
-        <Tooltip
-          placement="top-end"
-          arrow
-          title={!hasAccess && "You don't have write access!"}
-        >
-          <Button
-            variant="contained"
-            color="primary"
-            size="large"
-            form="risk-form"
-            type="submit"
-            disabled={!hasAccess || isFormLoading || isLoading()}
+        !isCreateForm() && (
+          <Tooltip
+            placement="top-end"
+            arrow
+            title={!hasAccess && "You don't have write access!"}
           >
-            {isCreateForm() ? "ADD" : "UPDATE"}
-          </Button>
-          ,
-        </Tooltip>,
+            <span>
+              <Button
+                variant="contained"
+                color="primary"
+                size="large"
+                onClick={handleUpdate}
+                disabled={!hasAccess || isFormLoading || isLoading()}
+              >
+                UPDATE
+              </Button>
+            </span>
+          </Tooltip>
+        ),
+        !isCreateForm() &&
+          row &&
+          row["Approved"] === false &&
+          !isLibraryRow && (
+            <Tooltip
+              placement="top-end"
+              arrow
+              title={!hasAccess && "You don't have write access!"}
+            >
+              <span>
+                <Button
+                  variant="contained"
+                  color="secondary"
+                  size="large"
+                  onClick={handleApproveAndUpdate}
+                  disabled={!hasAccess || isFormLoading || isLoading()}
+                >
+                  APPROVE & UPDATE
+                </Button>
+              </span>
+            </Tooltip>
+          ),
+        isCreateForm() && (
+          <Tooltip
+            placement="top-end"
+            arrow
+            title={!hasAccess && "You don't have write access!"}
+          >
+            <span>
+              <Button
+                variant="contained"
+                color="primary"
+                size="large"
+                form="risk-form"
+                type="submit"
+                disabled={!hasAccess || isFormLoading || isLoading()}
+              >
+                ADD
+              </Button>
+            </span>
+          </Tooltip>
+        ),
       ]}
     ></DialogBox>
   );

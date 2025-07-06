@@ -51,6 +51,18 @@ import XLSX from "xlsx";
 import { obj_to_yyyy_mm_dd } from "../../Utils/DateFormatConverter";
 import { getUser } from "../../../Service/UserFactory";
 
+// Add DETECTED_FROM_CHOICES constant
+const DETECTED_FROM_CHOICES = [
+  { val: 0, text: "Third-Party Risk Assessment" },
+  { val: 1, text: "Internal Audit" },
+  { val: 2, text: "External Audit" },
+  { val: 3, text: "Vulnerability Scan" },
+  { val: 4, text: "Security Assessment" },
+  { val: 5, text: "User Report" },
+  { val: 6, text: "Compliance Review" },
+  { val: 7, text: "Penetration Testing" },
+];
+
 const RiskRegister = () => {
   const hasEditRiskAccess = useMemo(() => {
     const user = getUser();
@@ -289,7 +301,12 @@ const RiskRegister = () => {
         description: r.scenario.scenario,
         categories_id: r.scenario.categories.map((c) => c.id),
         source_type: r.scenario.scenario_source,
+        // Store both framework id and name for easier access
+        applicable_framework: r.scenario.applicable_framework ?? null,
+        applicable_framework_name: r.scenario.applicable_framework_name ?? null,
       }),
+      "Applicable Framework Id": r.scenario.applicable_framework ?? null,
+      "Applicable Framework Name": r.scenario.applicable_framework_name ?? null,
       Owner: r.owner,
       "Identified Date": r.identification_date
         ? new Date(r.identification_date).toLocaleDateString("en-GB", {
@@ -307,11 +324,11 @@ const RiskRegister = () => {
           })
         : "N/A",
       CIA: r.cia.map((c) => c.id),
-      "Custom Id": r.custom_id,
+      "Risk Id": r.risk_id,
       "Inherent Risk Likelihood Id": r.inherent_risk_likelihood,
       "Inherent Risk Impact Id": r.inherent_risk_impact,
-      "Residual Risk Likelihood Id": r.residual_risk_impact,
-      "Residual Risk Impact Id": r.residual_risk_likelihood,
+      "Residual Risk Likelihood Id": r.residual_risk_likelihood,
+      "Residual Risk Impact Id": r.residual_risk_impact,
       Notes: r.notes,
       Treatment: JSON.stringify({
         type: r.treatment,
@@ -321,6 +338,12 @@ const RiskRegister = () => {
       Tasks: r.actions,
       Approved: r.is_approved,
       Archived: false,
+      "Detected From":
+        r.detected_from != null
+          ? DETECTED_FROM_CHOICES.find(
+              (detects) => detects.val === Number(r.detected_from),
+            )?.text
+          : null,
       Vendors: [],
     }));
     // if signal is not aborted, that means no new reqs were fired. so we can safely stop loading and set the state.
@@ -590,6 +613,7 @@ const RiskRegister = () => {
   const onRegisterFormSubmit = async (val) => {
     // is new row
     if (getCurrentIndex() === -1 && !scenarioDialog.isViaLibrary) {
+      // Use applicable_framework from form value directly (should be id)
       const payload = {
         scenario_description: val.scenario,
         categories_ids: val.categories.map((category) => category.id),
@@ -604,7 +628,11 @@ const RiskRegister = () => {
         cia: cia_categories
           .filter((cia) => Boolean(val[cia.name]))
           .map((cia) => cia.id),
-        custom_id: val.customId,
+        applicable_framework: val.applicable_framework ?? null,
+        // Add detected_from key for new risk
+        detected_from: val.detected_from ?? null,
+        // Always add is_approved to payload for new risk
+        is_approved: val.is_approved,
       };
       const { status } = await createRisk(payload);
       if (status) {
@@ -618,8 +646,10 @@ const RiskRegister = () => {
         return fetchandSetRegister(true);
       }
     } else if (scenarioDialog.isViaLibrary) {
+      // Use applicable_framework from form value directly (should be id)
       const payload = {
         scenario_id: val.scenario,
+        applicable_framework: val.applicable_framework ?? null,
         likelihood_id: scores.likelihoodScores.find(
           (score) =>
             score.score === getLikelihoodScore(val.inherent_likelihood),
@@ -631,7 +661,8 @@ const RiskRegister = () => {
           .filter((cia) => Boolean(val[cia.name]))
           .map((cia) => cia.id),
         notes: val.notes,
-        custom_id: val.customId,
+        detected_from: val.detected_from ?? null,
+        is_approved: val.is_approved,
       };
       const { status } = await createRisk(payload);
       if (status) {
@@ -656,6 +687,9 @@ const RiskRegister = () => {
         : [];
       const curr_scenario = val.scenario;
       const curr_categories = val.categories.map((c) => c.id).sort();
+
+      // Always use applicable_framework from form value (should be id)
+      const applicable_framework = val.applicable_framework ?? null;
 
       if (val.source === 0) {
         if (
@@ -686,9 +720,6 @@ const RiskRegister = () => {
       }
       if (val.notes !== row.Notes) {
         payload.notes = val.notes;
-      }
-      if (val.customId !== row["Custom Id"]) {
-        payload.custom_id = val.customId;
       }
       if (val.identified_date !== row["Identified Date"]) {
         payload.identified_date =
@@ -723,7 +754,7 @@ const RiskRegister = () => {
       const il = scores.likelihoodScores.find(
         (score) => score.score === getLikelihoodScore(val.inherent_likelihood),
       ).id;
-      if (il !== row["Inherent Risk Impact Id"]) {
+      if (il !== row["Inherent Risk Likelihood Id"]) {
         payload.inherent_risk_likelihood_id = il;
       }
       const ii = scores.impactScores.find(
@@ -759,6 +790,15 @@ const RiskRegister = () => {
       ) {
         payload.treatment = TREATMENT_NAME_ID_MAP[val.treatment_plan];
       }
+
+      // Always include applicable_framework in edit payload
+      payload.applicable_framework = applicable_framework;
+
+      if (val.detected_from !== row["Detected From"]) {
+        payload.detected_from = val.detected_from ?? null;
+      }
+
+      payload.is_approved = val.is_approved;
 
       if (Object.keys(payload).length > 0) {
         const { status } = await updateRegister(row["ID"], payload);
@@ -802,6 +842,12 @@ const RiskRegister = () => {
         mappedRow[
           "owner"
         ] = `${row["owner"]["first_name"]} ${row["owner"]["last_name"]}`;
+      // Add applicable framework id and name to export
+      else if (key === "Applicable Framework Id")
+        mappedRow["applicable_framework_id"] = row["Applicable Framework Id"];
+      else if (key === "Applicable Framework Name")
+        mappedRow["applicable_framework_name"] =
+          row["Applicable Framework Name"];
       else mappedRow[key] = row[key];
     });
     return mappedRow;

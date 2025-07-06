@@ -1,6 +1,6 @@
 // Column Names
 export const risk_register_columns = [
-  "Custom Id",
+  "Risk Id",
   "Scenario",
   "Source",
   "Categories",
@@ -13,55 +13,57 @@ export const risk_register_columns = [
   "Notes",
   "Treatment",
   "Tasks",
+  "Detected From",
   "Approved",
   // "Archived",
   // "Vendors",
-]
+];
 
 // Default Column widths
 export const risk_register_columns_width = [
-  150, 200, 150, 250, 200, 150, 150, 250, 150, 150, 150, 150, 150, 150, 150, 250, 150
+  150, 200, 150, 250, 200, 150, 150, 250, 150, 150, 150, 150, 150, 150, 150,
+  250, 150,
 ];
 
 // Used to map field names from api responses to names that are used in mapping headers of table
 export const HEADER_TABLE_COLS_MAP = {
-  "ID": "id",
-  "Custom Id": "custom_id",
-  "Scenario": "scenario",
-  "Source": "source",
-  "Categories": "categories",
-  "Owner": "owner",
+  ID: "id",
+  "Risk Id": "risk_id",
+  Scenario: "scenario",
+  Source: "source",
+  Categories: "categories",
+  Owner: "owner",
   "Identified Date": "identified_date",
   "Modified Date": "modified_date",
-  "CIA": "cia",
+  CIA: "cia",
   "Inherent Risk Likelihood Id": "inherent_risk_likelihood_id",
   "Inherent Risk Impact Id": "inherent_risk_impact_id",
   "Residual Risk Likelihood Id": "residual_risk_likelihood_id",
   "Residual Risk Impact Id": "residual_risk_impact_id",
-  // "inherent_risk_score": "Inherent Risk",
-  // "residual_risk_score": "Residual Risk",
-  "Notes": "notes",
-  "Treatment": "treatment",
-  "Tasks": "task_ids",
-  "Approved": "is_approved",
-  "Archived": "is_archived",
-  "Vendors": "vendors",
+  "Inherent Risk": "inherent_risk",
+  "Residual Risk": "residual_risk",
+  Notes: "notes",
+  Treatment: "treatment",
+  Tasks: "task_ids",
+  "Detected From": "detected_from",
+  Approved: "is_approved",
+  Archived: "is_archived",
+  Vendors: "vendors",
   // For mapping column names that are to be sent for sorting
-
-}
+};
 
 export const HEADER_TABLE_FILTERS_MAP = {
-  "ID": "id",
-  "Custom Id": "custom_id",
-  "Scenario": "scenario",
-  "Source": "source",
-  "Categories": "category",
-  "Owner": "owners",
+  ID: "id",
+  "Risk Id": "risk_id",
+  Scenario: "scenario",
+  Source: "source",
+  Categories: "category",
+  Owner: "owners",
   "Identified Date": "identified_date",
   "Modified Date": "modified_date",
-  "CIA": "ciaCategories",
+  CIA: "ciaCategories",
   "Inherent Risk": "inherentRisk",
   "Residual Risk": "residualRisk",
-  "Treatment": "treatment",
-  "Approved": "status",
-}
+  Treatment: "treatment",
+  Approved: "status",
+};

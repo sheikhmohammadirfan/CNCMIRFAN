@@ -21,7 +21,6 @@ function DateControl(props) {
         controls,
         ...other
       }) => {
-        name === "identified_date" && console.log(other);
         return (
           <DatePicker
             label={getLabel(label, name)}
