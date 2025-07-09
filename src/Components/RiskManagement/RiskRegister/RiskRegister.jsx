@@ -307,6 +307,7 @@ const RiskRegister = () => {
       }),
       "Applicable Framework Id": r.scenario.applicable_framework ?? null,
       "Applicable Framework Name": r.scenario.applicable_framework_name ?? null,
+      "Applicable Framework": r.scenario.applicable_framework_name ?? null,
       Owner: r.owner,
       "Identified Date": r.identification_date
         ? new Date(r.identification_date).toLocaleDateString("en-GB", {
@@ -649,7 +650,7 @@ const RiskRegister = () => {
       // Use applicable_framework from form value directly (should be id)
       const payload = {
         scenario_id: val.scenario,
-        applicable_framework: val.applicable_framework ?? null,
+        // applicable_framework: val.applicable_framework ?? null,
         likelihood_id: scores.likelihoodScores.find(
           (score) =>
             score.score === getLikelihoodScore(val.inherent_likelihood),
@@ -794,8 +795,12 @@ const RiskRegister = () => {
       // Always include applicable_framework in edit payload
       payload.applicable_framework = applicable_framework;
 
-      if (val.detected_from !== row["Detected From"]) {
-        payload.detected_from = val.detected_from ?? null;
+      // Always include detected_from in edit payload
+      payload.detected_from = val.detected_from ?? null;
+
+      // If scenario_id is provided from the dialog payload, and detected_from is set, use it
+      if (val.detected_from != null && val.scenario_id) {
+        payload.scenario_id = val.scenario_id;
       }
 
       payload.is_approved = val.is_approved;

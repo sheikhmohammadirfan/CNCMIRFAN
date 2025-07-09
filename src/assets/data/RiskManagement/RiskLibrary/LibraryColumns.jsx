@@ -6,7 +6,7 @@ export const LibraryColumns = [
   // "Source",
 ];
 
-export const librayColumnWidths = [800, 400, 150, 200];
+export const librayColumnWidths = [600, 400, 150, 200];
 
 export const HEADER_TABLE_NAME_MAP = {
   Id: "id",
