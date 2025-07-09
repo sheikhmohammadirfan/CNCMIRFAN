@@ -6,10 +6,7 @@ import {
   Checkbox,
   Divider,
   FormControlLabel,
-  FormGroup,
   Grid,
-  Slider,
-  TextField,
   Typography,
 } from "@material-ui/core";
 import {
@@ -20,7 +17,6 @@ import {
   TextControl,
 } from "../Utils/Control";
 import { Controller, useForm, useWatch } from "react-hook-form";
-import CustomAccordion from "../Utils/CustomAccordion";
 import { useStyle } from "./RiskRegister/RiskRegisterUtils";
 import { Autocomplete, Tooltip } from "@mui/material";
 import { source_options } from "../../assets/data/RiskManagement/RiskRegister/RiskRegisterFilters";
@@ -28,7 +24,6 @@ import SelectCategories from "./RiskRegister/SelectCategories";
 import { cia_categories } from "../../assets/data/RiskManagement/RiskRegister/RiskRegisterFilters";
 import SliderControl from "./RiskRegister/SliderControl";
 import useLoading from "../Utils/Hooks/useLoading";
-import useSlider from "../Utils/Hooks/useSlider";
 import { get } from "../../Service/CrudFactory";
 
 // Add DETECTED_FROM_CHOICES constant
@@ -42,6 +37,18 @@ const DETECTED_FROM_CHOICES = [
   { val: 6, text: "Compliance Review" },
   { val: 7, text: "Penetration Testing" },
 ];
+
+// Helper to map detected_from string to value
+const getDetectedFromValue = (input) => {
+  if (input === null || input === undefined) return null;
+  // If already a number, return as is
+  if (typeof input === "number") return input;
+  // If string, try to match to DETECTED_FROM_CHOICES
+  const found = DETECTED_FROM_CHOICES.find(
+    (opt) => opt.text === input || String(opt.val) === String(input),
+  );
+  return found ? found.val : null;
+};
 
 // Custom input compoent
 const FormInput = ({ ...rest }) => (
@@ -159,13 +166,13 @@ const RiskFormDialog = ({
   // Set up detected_from initial value
   let detectedFromInitial = null;
   if (row && row.detected_from !== undefined && row.detected_from !== null) {
-    detectedFromInitial = row.detected_from;
+    detectedFromInitial = getDetectedFromValue(row.detected_from);
   } else if (
     row &&
     row["Detected From"] !== undefined &&
     row["Detected From"] !== null
   ) {
-    detectedFromInitial = row["Detected From"];
+    detectedFromInitial = getDetectedFromValue(row["Detected From"]);
   } else {
     detectedFromInitial = null;
   }
@@ -315,19 +322,36 @@ const RiskFormDialog = ({
     defaultValues: formValues,
   });
 
+  // Watch scenario for scenario id
   const watchedScenarioId = useWatch({ control, name: "scenario" });
   const watchedFramework = useWatch({ control, name: "Framework" });
-  const watchedDetectedFrom = useWatch({ control, name: "detected_from" });
 
-  // reset form fields whenever a row changes.
-  // useEffect(() => {
-  //   reset(formValues);
-  // }, [open]);
+  useEffect(() => {
+    if (!isCreateForm()) {
+      let detectedFromValue = null;
+      if (
+        row &&
+        row.detected_from !== undefined &&
+        row.detected_from !== null
+      ) {
+        detectedFromValue = getDetectedFromValue(row.detected_from);
+      } else if (
+        row &&
+        row["Detected From"] !== undefined &&
+        row["Detected From"] !== null
+      ) {
+        detectedFromValue = getDetectedFromValue(row["Detected From"]);
+      }
+      setValue("detected_from", detectedFromValue);
+    }
+    // eslint-disable-next-line
+  }, [row, setValue, open]);
 
   useEffect(() => {
     if (row && frameworkList.length > 0) {
       reset(formValues);
     }
+    // eslint-disable-next-line
   }, [row, frameworkList, open]);
 
   useEffect(() => {
@@ -341,6 +365,7 @@ const RiskFormDialog = ({
     if (noneSelected) {
       setValue("uncategorized", true);
     }
+    // eslint-disable-next-line
   }, []);
 
   // When scenario changes, update the framework and applicable_framework in the form
@@ -377,28 +402,6 @@ const RiskFormDialog = ({
     // eslint-disable-next-line
   }, [watchedFramework, frameworkList, library]);
 
-  // Keep detected_from in sync if row changes (for edit)
-  useEffect(() => {
-    if (!isCreateForm()) {
-      let detectedFromValue = null;
-      if (row.detected_from !== undefined && row.detected_from !== null) {
-        detectedFromValue = row.detected_from;
-      } else if (
-        row["Detected From"] !== undefined &&
-        row["Detected From"] !== null
-      ) {
-        detectedFromValue = row["Detected From"];
-      } else if (
-        row["DetectedFrom"] !== undefined &&
-        row["DetectedFrom"] !== null
-      ) {
-        detectedFromValue = row["DetectedFrom"];
-      }
-      setValue("detected_from", detectedFromValue);
-    }
-    // eslint-disable-next-line
-  }, [row, setValue, open]);
-
   // Add validation for detected_from if needed
   const validation = {
     scenario: { required: "This field is required." },
@@ -418,14 +421,32 @@ const RiskFormDialog = ({
         },
       },
     },
+    detected_from: { required: "This field is required." },
   };
 
-  // Modified onSubmit to include detected_from in update payload for edit risk
   const onSubmit = async (values, isApprove = false) => {
     setisFormLoading(true);
     let payload = {
       ...values,
     };
+
+    // Always include scenario_id if available (for edit/update)
+    if (!isCreateForm()) {
+      // For viaLibrary, scenario is likely the id, for manual edit it's a string, so be careful
+      let scenarioId = null;
+      if (viaLibrary) {
+        scenarioId = values.scenario; // should be id
+      } else if (row && row["Scenario"]) {
+        try {
+          scenarioId = JSON.parse(row["Scenario"]).id;
+        } catch {
+          scenarioId = null;
+        }
+      }
+      if (scenarioId) {
+        payload.scenario_id = scenarioId;
+      }
+    }
 
     // If editing (not create) and row.approved is not true, add is_approved: true to payload
     if (
@@ -633,8 +654,24 @@ const RiskFormDialog = ({
                         styleProps={{ fullWidth: true }}
                         disabled={!hasAccess}
                         rules={validation.detected_from}
-                        value={field.value ?? null}
-                        onChange={(e) => field.onChange(e.target.value)}
+                        value={
+                          field.value !== undefined && field.value !== null
+                            ? field.value
+                            : ""
+                        }
+                        onChange={(e) => {
+                          // e.target.value is a number or string
+                          let val = e.target.value;
+                          // If value is string, try to convert to number if possible
+                          if (
+                            typeof val === "string" &&
+                            !isNaN(Number(val)) &&
+                            val !== ""
+                          ) {
+                            val = Number(val);
+                          }
+                          field.onChange(val);
+                        }}
                       />
                     )}
                   />

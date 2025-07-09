@@ -2,6 +2,7 @@
 export const risk_register_columns = [
   "Risk Id",
   "Scenario",
+  "Applicable Framework",
   "Source",
   "Categories",
   "Owner",
@@ -21,15 +22,16 @@ export const risk_register_columns = [
 
 // Default Column widths
 export const risk_register_columns_width = [
-  150, 200, 150, 250, 200, 150, 150, 250, 150, 150, 150, 150, 150, 150, 150,
-  250, 150,
+  150, 200, 200, 150, 250, 200, 150, 150, 250, 150, 150, 150, 150, 150, 150,
+  150, 250, 150,
 ];
 
 // Used to map field names from api responses to names that are used in mapping headers of table
 export const HEADER_TABLE_COLS_MAP = {
   ID: "id",
-  "Risk Id": "risk_id",
+  // "Risk Id": "risk_id",
   Scenario: "scenario",
+  "Applicable Framework": "applicable_framework",
   Source: "source",
   Categories: "categories",
   Owner: "owner",
@@ -45,7 +47,7 @@ export const HEADER_TABLE_COLS_MAP = {
   Notes: "notes",
   Treatment: "treatment",
   Tasks: "task_ids",
-  "Detected From": "detected_from",
+  // "Detected From": "detected_from",
   Approved: "is_approved",
   Archived: "is_archived",
   Vendors: "vendors",
@@ -56,6 +58,7 @@ export const HEADER_TABLE_FILTERS_MAP = {
   ID: "id",
   "Risk Id": "risk_id",
   Scenario: "scenario",
+  "Applicable Framework": "applicable_framework",
   Source: "source",
   Categories: "category",
   Owner: "owners",
