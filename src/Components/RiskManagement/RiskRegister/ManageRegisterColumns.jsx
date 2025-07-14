@@ -73,11 +73,11 @@ const ManageRegisterColumns = ({
                         inputProps={{ "aria-label": "secondary checkbox" }}
                         color="primary"
                         checked={visibleColumns.includes(colName)}
-                        onChange={(e) =>
+                        onChange={(e) => {
                           !e.target.checked
                             ? hideColumn(colName)
-                            : showColumn(colName)
-                        }
+                            : showColumn(colName);
+                        }}
                       />
                     </Box>
                   </ListItem>

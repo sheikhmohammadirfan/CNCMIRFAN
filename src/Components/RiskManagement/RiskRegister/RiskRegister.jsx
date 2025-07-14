@@ -67,16 +67,14 @@ const RiskRegister = () => {
   const hasEditRiskAccess = useMemo(() => {
     const user = getUser();
     return Boolean(
-      user.roles[0].permissions.find((p) => p.permission_name === "edit_risk"),
+      user.roles[0].permissions.find((p) => p.permission_name === "edit_risk")
     );
   }, []);
 
   const hasEditActionAccess = useMemo(() => {
     const user = getUser();
     return Boolean(
-      user.roles[0].permissions.find(
-        (p) => p.permission_name === "edit_action",
-      ),
+      user.roles[0].permissions.find((p) => p.permission_name === "edit_action")
     );
   }, []);
 
@@ -342,7 +340,7 @@ const RiskRegister = () => {
       "Detected From":
         r.detected_from != null
           ? DETECTED_FROM_CHOICES.find(
-              (detects) => detects.val === Number(r.detected_from),
+              (detects) => detects.val === Number(r.detected_from)
             )?.text
           : null,
       Vendors: [],
@@ -474,7 +472,7 @@ const RiskRegister = () => {
       notification(
         "risk-udpate-success",
         "Risk approved successfully!",
-        "success",
+        "success"
       );
       fetchandSetRegister(true);
     }
@@ -598,7 +596,7 @@ const RiskRegister = () => {
     // Filtering using allColumns state (bcs it is sorted). and removing cols which are not in visibleCols
     // add one more condition to accept new col
     let visibleCols = allColumns.filter(
-      (colName) => visibleColumns.includes(colName) || colName === col,
+      (colName) => visibleColumns.includes(colName) || colName === col
     );
     setVisibleColumns(visibleCols);
   };
@@ -619,11 +617,10 @@ const RiskRegister = () => {
         scenario_description: val.scenario,
         categories_ids: val.categories.map((category) => category.id),
         likelihood_id: scores.likelihoodScores.find(
-          (score) =>
-            score.score === getLikelihoodScore(val.inherent_likelihood),
+          (score) => score.score === getLikelihoodScore(val.inherent_likelihood)
         ).id,
         impact_id: scores.impactScores.find(
-          (score) => score.score === getImpactScore(val.inherent_impact),
+          (score) => score.score === getImpactScore(val.inherent_impact)
         ).id,
         notes: val.notes,
         cia: cia_categories
@@ -641,7 +638,7 @@ const RiskRegister = () => {
         notification(
           "scenario-add-success",
           "Scenario Successfully Created !",
-          "success",
+          "success"
         );
         resetPageState();
         return fetchandSetRegister(true);
@@ -652,11 +649,10 @@ const RiskRegister = () => {
         scenario_id: val.scenario,
         // applicable_framework: val.applicable_framework ?? null,
         likelihood_id: scores.likelihoodScores.find(
-          (score) =>
-            score.score === getLikelihoodScore(val.inherent_likelihood),
+          (score) => score.score === getLikelihoodScore(val.inherent_likelihood)
         ).id,
         impact_id: scores.impactScores.find(
-          (score) => score.score === getImpactScore(val.inherent_impact),
+          (score) => score.score === getImpactScore(val.inherent_impact)
         ).id,
         cia: cia_categories
           .filter((cia) => Boolean(val[cia.name]))
@@ -671,7 +667,7 @@ const RiskRegister = () => {
         notification(
           "risk-add-success",
           "Risk Successfully Created !",
-          "success",
+          "success"
         );
         resetPageState();
         return fetchandSetRegister(true);
@@ -700,7 +696,7 @@ const RiskRegister = () => {
         } else {
           payload.scenario_description = val.scenario;
           payload.categories_ids = val.categories.map(
-            (category) => category.id,
+            (category) => category.id
           );
         }
       } else {
@@ -711,7 +707,7 @@ const RiskRegister = () => {
           JSON.stringify(prev_categories) !== JSON.stringify(curr_categories)
         ) {
           payload.categories_ids = val.categories.map(
-            (category) => category.id,
+            (category) => category.id
           );
         }
       }
@@ -753,13 +749,13 @@ const RiskRegister = () => {
       }
 
       const il = scores.likelihoodScores.find(
-        (score) => score.score === getLikelihoodScore(val.inherent_likelihood),
+        (score) => score.score === getLikelihoodScore(val.inherent_likelihood)
       ).id;
       if (il !== row["Inherent Risk Likelihood Id"]) {
         payload.inherent_risk_likelihood_id = il;
       }
       const ii = scores.impactScores.find(
-        (score) => score.score === getImpactScore(val.inherent_impact),
+        (score) => score.score === getImpactScore(val.inherent_impact)
       ).id;
       if (ii !== row["Inherent Risk Impact Id"]) {
         payload.inherent_risk_impact_id = ii;
@@ -770,7 +766,7 @@ const RiskRegister = () => {
           ? null
           : scores.likelihoodScores.find(
               (score) =>
-                score.score === getLikelihoodScore(val.residual_likelihood),
+                score.score === getLikelihoodScore(val.residual_likelihood)
             ).id;
       if (rl !== row["Residual Risk Likelihood Id"]) {
         payload.residual_risk_likelihood_id = rl;
@@ -779,7 +775,7 @@ const RiskRegister = () => {
         val.residual_impact === null
           ? null
           : scores.impactScores.find(
-              (score) => score.score === getImpactScore(val.residual_impact),
+              (score) => score.score === getImpactScore(val.residual_impact)
             ).id;
       if (ri !== row["Residual Risk Impact Id"]) {
         payload.residual_risk_impact_id = ri;
@@ -812,7 +808,7 @@ const RiskRegister = () => {
           notification(
             "risk-udpate-success",
             "Risk Successfully Updated !",
-            "success",
+            "success"
           );
           resetPageState();
           return fetchandSetRegister(true);
@@ -871,7 +867,7 @@ const RiskRegister = () => {
       matchedCell,
       categories,
       owners,
-      scores,
+      scores
       // sortingMap
     );
 
@@ -942,7 +938,7 @@ const RiskRegister = () => {
                 }}
                 minCellWidth={visibleColumns.map(
                   (name) =>
-                    risk_register_columns_width[allColumns.indexOf(name)],
+                    risk_register_columns_width[allColumns.indexOf(name)]
                 )}
                 // Filters
                 columnFilters={filterDropdowns}
@@ -950,7 +946,7 @@ const RiskRegister = () => {
                 changeFilters={(
                   filterName,
                   updatedFilterIds,
-                  identifiedDates,
+                  identifiedDates
                 ) => {
                   changeFilters(filterName, updatedFilterIds, identifiedDates);
                   setTimeout(() => filterTrigger(), 0);

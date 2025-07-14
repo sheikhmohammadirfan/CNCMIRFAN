@@ -126,6 +126,7 @@ const ActionTrackerHeader = ({
             startIcon={<Icon>add</Icon>}
             className={classes.addActionButton}
             onClick={openAddActionForm}
+            disabled={!hasAccess || selectedRows.length > 0}
           >
             Add
           </Button>
