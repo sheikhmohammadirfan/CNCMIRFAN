@@ -71,9 +71,9 @@ const useStyles = makeStyles((theme) => ({
     height: `calc(100vh - ${headerHeight}px)`,
     minHeight: `calc(100vh - ${headerHeight}px)`,
     overflow: "auto",
-    position: 'relative',
+    position: "relative",
     [theme.breakpoints.down("xs")]: { paddingLeft: sidebarSmall },
-    backgroundColor: '#F4F4F4'
+    backgroundColor: "#F4F4F4",
   },
 }));
 
@@ -99,9 +99,6 @@ function App() {
 
   // State to save scrollbar open/close status
   const [isSidebarOpen, setSidebar] = React.useState(false);
-
-
-
 
   return (
     <ThemeProvider theme={theme}>
@@ -135,12 +132,10 @@ function App() {
                 >
                   <Header scrollTarget={scrollTarget} />
                   <div className={classes.wrapper}>
-
                     <Route exact path="/">
                       <Home title="HOME" />
                     </Route>
                     <RestrictedRoutes>
-
                       <Route exact path="/verify">
                         <Verify title="VERIFY" />
                       </Route>
@@ -168,9 +163,7 @@ function App() {
                       <Route path="/doc-compliance/">
                         <DocCompliance title="Document Compliance" />
                       </Route>
-
                     </RestrictedRoutes>
-
                   </div>
                 </Box>
               </Box>
