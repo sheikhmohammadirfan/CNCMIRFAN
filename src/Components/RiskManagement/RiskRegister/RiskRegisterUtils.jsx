@@ -447,40 +447,18 @@ const COLUMN_FILTER_MAP = {
 export const mapDataToHeader = (visibleColumns, sorting, updateSort) => ({
   data: visibleColumns.map((text) => ({
     text,
-    params:
-      text === "Risk Id" || text === "Scenario"
-        ? {
-            sticky: "",
-            scenario: text === "Scenario" ? "true" : "false",
-            header: "",
-            onClick: () => updateSort(text),
-            className:
-              sorting && sorting.sort_by === HEADER_TABLE_COLS_MAP[text]
-                ? sorting.sort_order === 1
-                  ? "asc"
-                  : "dsc"
-                : "",
-          }
-        : {
-            onClick: () => updateSort(text),
-            className:
-              sorting && sorting.sort_by === HEADER_TABLE_COLS_MAP[text]
-                ? sorting.sort_order === 1
-                  ? "asc"
-                  : "dsc"
-                : "",
-          },
+    params: {
+      onClick: () => updateSort(text),
+      className:
+        sorting && sorting.sort_by === HEADER_TABLE_COLS_MAP[text]
+          ? sorting.sort_order === 1
+            ? "asc"
+            : "dsc"
+          : "",
+    },
     colName: HEADER_TABLE_FILTERS_MAP[text],
     filterType: COLUMN_FILTER_MAP[text] || [],
-    filterCellCss:
-      text === "Risk Id" || text === "Scenario"
-        ? {
-            position: "sticky",
-            left:
-              text === "Risk Id" ? "50px" : text === "Scenario" ? "200px" : 0,
-            zIndex: 1,
-          }
-        : {},
+    filterCellCss: {},
   })),
   cellStyle: {
     fontWeight: "bold",
@@ -498,7 +476,7 @@ const mapDataToRow = (
   matchedCell,
   categories,
   owners,
-  scores,
+  scores
 ) =>
   columns.map((colName) => {
     let CellComponent = colName in columnToCellMap && columnToCellMap[colName];
@@ -510,32 +488,17 @@ const mapDataToRow = (
         ) : (
           <RowCell text={cellValue} />
         ),
-      params:
-        colName === "Risk Id" || colName === "Scenario"
-          ? {
-              sticky: "",
-              scenario: colName === "Scenario" ? "true" : "false",
-              "data-searched": Boolean(
-                matchedCell.find(
-                  (cell) =>
-                    cell.column === colName &&
-                    cell.row === rowIndex &&
-                    cell.selected === true,
-                ),
-              ),
-              tabIndex: 0,
-            }
-          : {
-              "data-searched": Boolean(
-                matchedCell.find(
-                  (cell) =>
-                    cell.column === colName &&
-                    cell.row === rowIndex &&
-                    cell.selected === true,
-                ),
-              ),
-              tabIndex: 0,
-            },
+      params: {
+        "data-searched": Boolean(
+          matchedCell.find(
+            (cell) =>
+              cell.column === colName &&
+              cell.row === rowIndex &&
+              cell.selected === true
+          )
+        ),
+        tabIndex: 0,
+      },
     };
   });
 
@@ -548,7 +511,7 @@ export const generateRows = (
   categories,
   owners,
   scores,
-  sortingMap,
+  sortingMap
 ) => {
   // count of number of rows
   const rowCount = data.length;
@@ -568,7 +531,7 @@ export const generateRows = (
         matchedCell,
         categories,
         owners,
-        scores,
+        scores
       ),
       props: {
         selected: selectedList.indexOf(i) !== -1,
@@ -602,28 +565,28 @@ const getCellValue = (row, colName, categories, owners, scores) => {
     return `${owner?.first_name} ${owner?.last_name}` || "";
   } else if (colName === "Inherent Risk") {
     const val =
-      scores.likelihoodScores.find(
-        (score) => score.id === row["Inherent Risk Likelihood Id"],
+      scores?.likelihoodScores.find(
+        (score) => score?.id === row["Inherent Risk Likelihood Id"]
       ).score *
-      scores.impactScores.find(
-        (score) => score.id === row["Inherent Risk Impact Id"],
-      ).score;
-    const group = scores.riskScoreGroups.find(
-      (r) => r.range_from <= val && val <= r.range_to,
+      scores?.impactScores.find(
+        (score) => score?.id === row["Inherent Risk Impact Id"]
+      )?.score;
+    const group = scores?.riskScoreGroups.find(
+      (r) => r.range_from <= val && val <= r.range_to
     );
     return { value: val, colour: group.color };
   } else if (colName === "Residual Risk") {
     const val =
-      (scores.likelihoodScores.find(
-        (score) => score.id === row["Residual Risk Likelihood Id"],
+      (scores?.likelihoodScores.find(
+        (score) => score?.id === row["Residual Risk Likelihood Id"]
       )?.score || 0) *
       (scores.impactScores.find(
-        (score) => score.id === row["Residual Risk Impact Id"],
+        (score) => score?.id === row["Residual Risk Impact Id"]
       )?.score || 0);
 
     const group = Boolean(val)
       ? scores.riskScoreGroups.find(
-          (r) => r.range_from <= val && val <= r.range_to,
+          (r) => r.range_from <= val && val <= r.range_to
         )
       : { color: null };
 
