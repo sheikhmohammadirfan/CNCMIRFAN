@@ -7,12 +7,13 @@ import {
   Badge,
   Box,
   TextField,
-  FormHelperText
+  FormHelperText,
 } from "@material-ui/core";
 import { Autocomplete } from "@material-ui/lab";
 import { Controller } from "react-hook-form";
 import { TextControl } from "../Utils/Control";
 import CloseButton from "../Utils/CloseButton";
+import zIndex from "@material-ui/core/styles/zIndex";
 
 // Custom badge to show remove button on hover
 const AvatarBadge = withStyles((theme) => ({
@@ -99,6 +100,7 @@ export default function SelectAssignee({
             onChange={(e, newVal) => onChange(newVal)}
             options={options}
             multiple={multiple}
+            sx={{ "& .MuiDialog-root": { zIndex: "13000" } }}
             filterSelectedOptions
             getOptionSelected={(option, test) => option.id === test?.id}
             getOptionLabel={(option) => option.displayName || ""}
@@ -106,16 +108,24 @@ export default function SelectAssignee({
             renderTags={(value, props) => RenderTagList(value, props)}
             renderInput={(params) => (
               // Added error prop here. This results in border becoming red if there's some error
-              <TextField error={error ? true : false} variant="outlined" label={label} {...params} />
+              <TextField
+                error={error ? true : false}
+                variant="outlined"
+                label={label}
+                {...params}
+              />
             )}
             {...rest}
           />
           {/* If error, show the error message */}
-          {error &&
-            <FormHelperText style={{ marginLeft: '14px' }} error={Boolean(error)}>
+          {error && (
+            <FormHelperText
+              style={{ marginLeft: "14px" }}
+              error={Boolean(error)}
+            >
               {error.message}
             </FormHelperText>
-          }
+          )}
         </>
       )}
     />

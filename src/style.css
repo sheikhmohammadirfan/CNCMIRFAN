@@ -52,5 +52,5 @@
 .MuiPopper-root,
 .MuiPopover-root,
 .MuiTooltip-popper {
-  z-index: 2000 !important;
+  z-index: 13000;
 }

@@ -22,6 +22,7 @@ import { notification, replaceIdWithName } from "../Utils/Utils";
 import { getIntegratedPlatform } from "../../Service/UserFactory";
 import SelectLabels from "./SelectLabels";
 import { CreateIssue as defaultValues } from "../../assets/data/DefaultValue";
+import zIndex from "@material-ui/core/styles/zIndex";
 
 // Status text based on loading value
 const LoadingStatus = (loading) => ({
@@ -235,6 +236,9 @@ function CreateIssue({ title, poamID, close, rowIndex, rowId }) {
                 rules={validation}
                 options={assigneeList}
                 loading={isLoading("assignee")}
+                sx={{ "& .MuiDialog-root":{
+                  zIndex:'13000'
+                }}}
               />
             </Grid>
 

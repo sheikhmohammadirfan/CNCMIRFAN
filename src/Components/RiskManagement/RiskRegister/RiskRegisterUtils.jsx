@@ -565,23 +565,23 @@ const getCellValue = (row, colName, categories, owners, scores) => {
     return `${owner?.first_name} ${owner?.last_name}` || "";
   } else if (colName === "Inherent Risk") {
     const val =
-      scores.likelihoodScores.find(
-        (score) => score.id === row["Inherent Risk Likelihood Id"]
+      scores?.likelihoodScores.find(
+        (score) => score?.id === row["Inherent Risk Likelihood Id"]
       ).score *
-      scores.impactScores.find(
-        (score) => score.id === row["Inherent Risk Impact Id"]
-      ).score;
-    const group = scores.riskScoreGroups.find(
+      scores?.impactScores.find(
+        (score) => score?.id === row["Inherent Risk Impact Id"]
+      )?.score;
+    const group = scores?.riskScoreGroups.find(
       (r) => r.range_from <= val && val <= r.range_to
     );
     return { value: val, colour: group.color };
   } else if (colName === "Residual Risk") {
     const val =
-      (scores.likelihoodScores.find(
-        (score) => score.id === row["Residual Risk Likelihood Id"]
+      (scores?.likelihoodScores.find(
+        (score) => score?.id === row["Residual Risk Likelihood Id"]
       )?.score || 0) *
       (scores.impactScores.find(
-        (score) => score.id === row["Residual Risk Impact Id"]
+        (score) => score?.id === row["Residual Risk Impact Id"]
       )?.score || 0);
 
     const group = Boolean(val)

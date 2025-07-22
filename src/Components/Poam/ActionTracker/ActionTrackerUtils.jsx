@@ -275,7 +275,7 @@ const getCellValue = (row, colName, register, owners) => {
   } else if (colName === "owner") {
     if (owners.length === 0) return "load";
     let owner = owners.find((owner) => owner.id === row.assignee);
-    return `${owner.first_name} ${owner.last_name}`;
+    return `${owner?.first_name} ${owner?.last_name}`;
   } else return row[colName];
 };
 
