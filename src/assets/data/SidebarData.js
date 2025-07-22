@@ -212,6 +212,12 @@ export const SidebarData = [
         icon: "timeline",
       },
       {
+        title: "AI Agent",
+        component: Link,
+        to: "/risk-management/agent",
+        icon: "smart_toy",
+      },
+      {
         title: "Settings",
         component: Link,
         to: "/risk-management/settings",
@@ -240,9 +246,9 @@ export const SidebarData = [
         title: "Settings",
         component: Link,
         to: "/access-management/settings",
-        icon: "settings"
-      }
-    ]
+        icon: "settings",
+      },
+    ],
   },
 
   {
@@ -253,20 +259,20 @@ export const SidebarData = [
         title: "Users",
         component: Link,
         to: "/rbac/users",
-        icon: "manage_accounts"
+        icon: "manage_accounts",
       },
       {
         title: "Roles",
         component: Link,
         to: "/rbac/roles",
-        icon: "key"
+        icon: "key",
       },
       {
         title: "Organization",
         component: Link,
         to: "/rbac/organization",
-        icon: "home"
+        icon: "home",
       },
-    ]
-  }
+    ],
+  },
 ];
