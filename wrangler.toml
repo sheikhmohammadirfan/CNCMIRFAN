@@ -1,0 +1,6 @@
+name = "falcon"
+account_id = "da113370be0442ed1e6d25de26a7f68c"
+workers_dev = true
+compatibility_date = "2025-07-26"
+
+main = "src/index.js" 
