@@ -10,17 +10,17 @@ import {
 } from "@material-ui/core";
 import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
-import { SidebarData } from "../../assets/data/SidebarData";
-import { logout } from "../../Service/UserFactory";
+import { getSidebarData } from "../../assets/data/SidebarData"; 
+import { logout, getUser } from "../../Service/UserFactory";
 import SidebarItem from "./SidebarItem";
 import logo from "../../assets/img/logo.png";
 import colorShader from "../Utils/ColorShader";
+
 
 /** CSS Class Generator */
 const useStyles = makeStyles((theme) => {
   const iconPadding = (theme.sidebarSmall - 24) / 2;
   return {
-    // Sidebar root
     sidebar: {
       width: theme.sidebarLarge,
       [theme.breakpoints.down("xs")]: { position: "fixed" },
@@ -35,21 +35,16 @@ const useStyles = makeStyles((theme) => {
       boxShadow: theme.shadows[1],
       paddingTop: theme.spacing(1),
       transition: "width 0.2s linear",
-      // Icon side bar, on minimize btn
       "&.close": {
         width: theme.sidebarSmall,
         "& .MuiList-root": { paddingLeft: "0 !important" },
       },
     },
-
-    // Nav list container
     navContainer: {
       overflowY: "auto",
       overflowX: "hidden",
       flexGrow: 1,
     },
-
-    // Style for logobtn in sidebar
     logoBtn: {
       padding: `${theme.spacing(1)}px ${iconPadding}px`,
       height: 50,
@@ -59,8 +54,6 @@ const useStyles = makeStyles((theme) => {
         alignItems: "center",
       },
     },
-
-    // Style for sidebar width toggler
     toggleBtn: {
       maxWidth: "max-content",
       minWidth: "max-content",
@@ -75,16 +68,15 @@ const useStyles = makeStyles((theme) => {
   };
 });
 
-/**
- * Sidebar Component to show logo btn, profile btn and Navigation
- * */
-export default function Sidebar({ isOpen, toggleSidebar }) {
-  // Get Styles
-  const classes = useStyles();
 
-  // React state to change on theme breakpoint
+/**
+ * Sidebar Component
+ */
+export default function Sidebar({ isOpen, toggleSidebar }) {
+  const classes = useStyles();
   const xs = useMediaQuery((theme) => theme.breakpoints.down("xs"));
-  // Change sidebar status on window width
+
+  // Responsive toggle
   useEffect(() => toggleSidebar(!xs), [xs]);
 
   return (
@@ -96,7 +88,8 @@ export default function Sidebar({ isOpen, toggleSidebar }) {
         className={`${classes.navContainer} ${!isOpen ? "close-sidebar" : ""}`}
         disablePadding
       >
-        {SidebarData.map(({ title, icon, subMenu, collapseMenu, ...rest }, index) => (
+        {/* {changed SidebarData to getSidebarData inorder to match the sidebarData.js export function-irfan}  */}
+        {getSidebarData().map(({ title, icon, subMenu, collapseMenu, ...rest }, index) => (
           <SidebarItem
             key={index}
             sidebarOpen={isOpen}

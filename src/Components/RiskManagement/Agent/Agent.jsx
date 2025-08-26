@@ -1,3 +1,4 @@
+import { post } from "../../../Service/CrudFactory";
 import React, { useState, useRef, useEffect } from "react";
 import {
   Box,
@@ -81,7 +82,7 @@ function mockAgentResponse(userMessage) {
   // Simulate a response from the agent
   if (!userMessage.trim())
     return "How can I help you with risk management today?";
-  return `You said: "${userMessage}". (This is a mock response.)`;
+  return `You said: "${userMessage}". (This is a mock  response.)`;
 }
 
 export default function Agent() {
@@ -102,18 +103,34 @@ export default function Agent() {
     }
   }, [messages]);
 
-  const handleSend = () => {
+  const handleSend = async () => {
     if (!input.trim()) return;
     const userMsg = { sender: "user", text: input };
     setMessages((prev) => [...prev, userMsg]);
+    const currentInput = input;
     setInput("");
-    // Simulate agent response after a short delay
-    setTimeout(() => {
+    
+    try {
+      const response = await post("/agentx/rmagent/", { query: currentInput });
+      console.log("API response:", response);
+      if (response.status) {
+        setMessages((prev) => [
+          ...prev,
+          { sender: "agent", text: response.data || "No reply from agent." },
+        ]); 
+      } else {
+        setMessages((prev) => [
+          ...prev,
+          { sender: "agent", text: response.message || "Error contacting the server." },
+        ]);
+      }
+    } catch (error) {
+      console.error("API call failed:", error);
       setMessages((prev) => [
         ...prev,
-        { sender: "agent", text: mockAgentResponse(input) },
+        { sender: "agent", text: "Error contacting the server." },
       ]);
-    }, 700);
+    }
   };
 
   const handleInputKeyDown = (e) => {

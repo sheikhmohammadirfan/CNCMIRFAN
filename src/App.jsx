@@ -5,6 +5,8 @@ import {
   Box,
   makeStyles,
   responsiveFontSizes,
+  Link,
+  CircularProgress,
 } from "@material-ui/core";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import { Flip, toast } from "react-toastify";
@@ -23,12 +25,15 @@ import Profile from "./Pages/Profile";
 import Integrate from "./Pages/Integrate";
 import ParamsRoutes from "./Components/Utils/Routers/ParamsRoutes";
 import RiskManagement from "./Pages/RiskManagement";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import AccessManagement from "./Pages/AccessManagement";
 import VendorManagement from "./Pages/VendorManagement";
 import Rbac from "./Pages/Rbac";
 import RestrictedRoutes from "./Components/Utils/Routers/RestrictedRoutes";
 import DocCompliance from "./Pages/DocCompliance";
+import { getUser } from "./Service/UserFactory";
+import Organization from "./Components/Rbac/Organization/Organization";
+import NotFound from "./Pages/NotFound";
 
 // Custom values
 const sidebarSmall = 50;
@@ -43,7 +48,6 @@ let theme = createTheme({
   textOnPrimary: "#ffffff",
   palette: {
     primary: {
-      // main: "#008374",
       main: "#4477CE",
       dark: "#4477CE",
       light: "#2a96b5",
@@ -75,6 +79,13 @@ const useStyles = makeStyles((theme) => ({
     [theme.breakpoints.down("xs")]: { paddingLeft: sidebarSmall },
     backgroundColor: "#F4F4F4",
   },
+  // Loading container
+  loadingContainer: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    height: "100vh",
+  },
 }));
 
 /** Configure Toast */
@@ -93,12 +104,39 @@ toast.configure({
 function App() {
   const classes = useStyles();
 
-  // State to get target node, to upate scroll event on header
+  // State to get target node, to update scroll event on header
   const [scrollTarget, setScrollTarget] = React.useState();
   const updateTarget = (target) => target && setScrollTarget(target);
 
   // State to save scrollbar open/close status
   const [isSidebarOpen, setSidebar] = React.useState(false);
+  const [user, setUser] = useState(null);
+  const [isLoading, setIsLoading] = useState(true); // Add loading state
+
+  useEffect(() => {
+    // Initial user load
+    const userData = getUser();
+    console.log('Initial user data:', userData);
+    setUser(userData);
+    setIsLoading(false); // Set loading to false after user data is loaded
+
+  // block added by irfan to listen for user updates
+  const handleUserUpdate = (event) => {
+    console.log('User updated event received:', event.detail); 
+    const updatedUser = getUser();
+    setUser(updatedUser);
+  };
+
+  // event listener for user updates-irfan
+  window.addEventListener('userUpdated', handleUserUpdate);
+
+  // cleanup function-irfan
+  return () => {
+    window.removeEventListener('userUpdated', handleUserUpdate);
+  };
+
+  }, []);
+  
 
   return (
     <ThemeProvider theme={theme}>
@@ -118,62 +156,105 @@ function App() {
             <Route path="/resetpassword">
               <Auth title="RESET PASSWORD" />
             </Route>
-
+          
             <ProtectedRoutes>
-              <Box display="flex">
-                <Box>
-                  <Sidebar isOpen={isSidebarOpen} toggleSidebar={setSidebar} />
+              {isLoading ? (
+                // Show loading spinner while user data is being fetched
+                <Box className={classes.loadingContainer}>
+                  <CircularProgress />
                 </Box>
+              ) : (
+                <Box display="flex">
+                  <Box>
+                    {user?.is_superuser ? (
+                      // Custom sidebar for superadmin with only Organization
+                      <div style={{ width: isSidebarOpen ? 285 : 50, transition: 'width 0.3s' }}>
+                        <Sidebar 
+                          isOpen={isSidebarOpen} 
+                          toggleSidebar={setSidebar} 
+                          customData={[{
+                            icon: "home",
+                            title: "Organization",
+                            component: Link,
+                            to: "/rbac/organization",
+                          }]}
+                        />
+                      </div>
+                    ) : (
+                      // Regular sidebar for normal users
+                      <Sidebar isOpen={isSidebarOpen} toggleSidebar={setSidebar} />
+                    )}
+                  </Box>
 
-                <Box
-                  flexGrow={1}
-                  className={`${classes.body} ${isSidebarOpen ? "open" : ""}`}
-                  data-test="body-wrapper"
-                >
-                  <Header scrollTarget={scrollTarget} />
-                  <div className={classes.wrapper}>
-                    <Route exact path="/">
-                      <Home title="HOME" />
-                    </Route>
-                    <RestrictedRoutes>
-                      <Route exact path="/verify">
-                        <Verify title="VERIFY" />
+                  <Box
+                    flexGrow={1}
+                    className={`${classes.body} ${isSidebarOpen ? "open" : ""}`}
+                    data-test="body-wrapper"
+                  >
+                    <Header scrollTarget={scrollTarget} />
+                    <div className={classes.wrapper}>
+                      <Route exact path="/">
+                        <Home title="HOME" />
                       </Route>
-                      <Route exact path="/poam">
-                        <Poam title="POA&M" />
-                      </Route>
-                      <Route exact path="/profile">
-                        <Profile title="PROFILE" />
-                      </Route>
-                      <Route exact path="/Integrated-Platforms">
-                        <Integrate title="Integrated Platforms" />
-                      </Route>
-                      <Route path="/vendor-management">
-                        <VendorManagement title="Vendor Management" />
-                      </Route>
-                      <Route path="/risk-management">
-                        <RiskManagement title="Risk Management" />
-                      </Route>
-                      <Route path="/access-management/">
-                        <AccessManagement title="Access Management" />
-                      </Route>
-                      <Route path="/rbac/">
-                        <Rbac title="Rbac" />
-                      </Route>
-                      <Route path="/doc-compliance/">
-                        <DocCompliance title="Document Compliance" />
-                      </Route>
-                    </RestrictedRoutes>
-                  </div>
+                      {/* irfan: added user={user} */}
+                      <RestrictedRoutes user={user}>
+                        {user?.is_superuser ? (
+                          <>
+                            <Route exact path="/rbac/organization">
+                              <Organization title="ORGANIZATION" />
+                            </Route>
+                          </>
+                        ) : (
+                          <>
+                          {/* route added by irfan to block normal users from accessing organization page */}
+                          <Route exact path="/rbac/organization">
+                              <NotFound title="403 - Access Denied" />
+                            </Route>
+                            
+                            <Route exact path="/verify">
+                              <Verify title="VERIFY" />
+                            </Route>
+                            <Route exact path="/poam">
+                              <Poam title="POA&M" />
+                            </Route>
+                            <Route exact path="/profile">
+                              <Profile title="PROFILE" />
+                            </Route>
+                            <Route exact path="/Integrated-Platforms">
+                              <Integrate title="Integrated Platforms" />
+                            </Route>
+                            <Route path="/vendor-management">
+                              <VendorManagement title="Vendor Management" />
+                            </Route>
+                            <Route path="/risk-management">
+                              <RiskManagement title="Risk Management" />
+                            </Route>
+                            <Route path="/access-management/">
+                              <AccessManagement title="Access Management" />
+                            </Route>
+                            <Route path="/rbac/">
+                              <Rbac title="Rbac" />
+                            </Route>
+                            <Route path="/doc-compliance/">
+                              <DocCompliance title="Document Compliance" />
+                            </Route>
+                          </>
+                        )}
+                        {/* route added by irfan to show 404 page for undefined routes */}
+                        <Route path="*">
+              <NotFound />
+            </Route>
+                      </RestrictedRoutes>
+                    </div>
+                  </Box>
                 </Box>
-              </Box>
+              )}
 
               <ParamsRoutes params={["email"]}>
                 <Email title="EMAIL" />
               </ParamsRoutes>
 
               <ParamsRoutes
-                // Add rowId in params array, so when it is in the params, the CreateIssue component will mount.
                 params={["createIssue", "rowIndex", "rowId"]}
                 removeParams={["createIssue"]}
               >

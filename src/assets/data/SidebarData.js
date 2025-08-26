@@ -1,8 +1,22 @@
 import { Link } from "react-router-dom";
 import { changeQueryParams } from "../../Components/Utils/Utils";
+import { getUser } from "../../Service/UserFactory";
 
-/** Sidebar data to map */
-export const SidebarData = [
+// Get user data to determine role-based visibility
+const user = getUser();
+
+/** Sidebar data for superadmin - only Organization */
+const SuperAdminSidebarData = [
+  {
+    icon: "home",
+    title: "Organization",
+    component: Link,
+    to: "/rbac/organization",
+  },
+];
+
+/** Sidebar data for normal users - everything except Organization */
+const NormalUserSidebarData = [
   {
     icon: "insert_chart",
     title: "Dashboard",
@@ -225,7 +239,6 @@ export const SidebarData = [
       },
     ],
   },
-
   {
     icon: "accessibility",
     title: "Access Management",
@@ -250,7 +263,6 @@ export const SidebarData = [
       },
     ],
   },
-
   {
     icon: "shield_person",
     title: "Role based access control",
@@ -267,12 +279,12 @@ export const SidebarData = [
         to: "/rbac/roles",
         icon: "key",
       },
-      {
-        title: "Organization",
-        component: Link,
-        to: "/rbac/organization",
-        icon: "home",
-      },
     ],
   },
 ];
+
+// Function to get sidebar data based on user role, dynamically. irfan.
+export const getSidebarData = () => {
+  const user = getUser();
+  return user?.is_superuser ? SuperAdminSidebarData : NormalUserSidebarData;
+};

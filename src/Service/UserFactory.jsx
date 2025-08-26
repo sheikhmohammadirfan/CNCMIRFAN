@@ -21,13 +21,21 @@ function deleteToken() {
 // Get User from storage
 export function getUser() {
   const user = localStorage.getItem("user");
+  console.log(user);
   if (user) return JSON.parse(user);
   return null;
 }
 
 // Set User to Storage
+// export function setUser(userObj) {
+//   localStorage.setItem("user", JSON.stringify(userObj));
+// }
+
+// set User modified to dispatch event on user update by irfan
 export function setUser(userObj) {
   localStorage.setItem("user", JSON.stringify(userObj));
+  // Dispatch custom event to notify components about user change
+  window.dispatchEvent(new CustomEvent('userUpdated', { detail: userObj }));
 }
 
 // Delete User from Storage
@@ -57,6 +65,7 @@ function deleteIntegratedPlatform() {
 // Login user
 export async function login(details) {
   const { data, status } = await post("/user/login", details, {
+    
     isUserAPI: true,
   });
 
@@ -83,6 +92,10 @@ export function logout() {
   deleteToken();
   deleteUser();
   deleteIntegratedPlatform();
+  // window.location.replace("/login");
+
+  // added by irfan to notify all components about user logout
+  window.dispatchEvent(new CustomEvent('userUpdated', { detail: null }));
   window.location.replace("/login");
 }
 

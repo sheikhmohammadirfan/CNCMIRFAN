@@ -10,7 +10,6 @@ import {
   FormHelperText,
 } from "@material-ui/core";
 import { Autocomplete } from "@material-ui/lab";
-import { Controller } from "react-hook-form";
 import CloseButton from "../Utils/CloseButton";
 import { Button } from "@mui/material";
 
@@ -20,7 +19,6 @@ const AvatarBadge = withStyles((theme) => ({
     margin: `${theme.spacing(1 / 2)}px 0`,
     border: `${theme.spacing(1 / 4)}px solid white`,
     borderRadius: "50%",
-    // Show border & badge on hover
     "&.valid:hover": {
       borderColor: theme.palette.primary.dark,
       "& > .MuiBadge-badge": { opacity: 1, pointerEvents: "all" },
@@ -57,7 +55,7 @@ const RenderLabel = (option) => {
         style={{ width: 32, height: 32 }}
       />
       <Typography style={{ paddingLeft: 8, flexGrow: 1 }}>
-        {option.displayName}
+        {option.label}
       </Typography>
       {!isFalcon && (
         <Button
@@ -70,7 +68,7 @@ const RenderLabel = (option) => {
             minWidth: "auto",
           }}
           onClick={(e) => {
-            // e.stopPropagation();
+            e.stopPropagation();
             alert(`Invite sent to ${option.emailAddress}`);
           }}
         >
@@ -98,56 +96,57 @@ const RenderTagList = (value, props) =>
     </Tooltip>
   ));
 
-// Main assignee text field
-export default function SelectAssignee({
-  name,
+export default function FormikSelectAssignee({
+  field,
+  form,
   label,
-  control,
-  multiple,
-  rules,
   options,
+  multiple = false,
   ...rest
 }) {
+  const error = form.touched[field.name] && form.errors[field.name];
   return (
-    <Controller
-      name={name}
-      control={control}
-      rules={rules[name]}
-      render={({ field: { value, onChange }, fieldState: { error } }) => (
-        <>
-          <Autocomplete
-            value={value}
-            onChange={(e, newVal) => onChange(newVal)}
-            options={options}
-            multiple={multiple}
-            groupBy={(option) => (option.is_falcon_user ? "" : "")}
-            sx={{ "& .MuiDialog-root": { zIndex: "13000" } }}
-            filterSelectedOptions
-            getOptionSelected={(option, test) => option.id === test?.id}
-            getOptionLabel={(option) => option.displayName || ""}
-            renderOption={(option) => RenderLabel(option)}
-            renderTags={(value, props) => RenderTagList(value, props)}
-            renderInput={(params) => (
-              // Added error prop here. This results in border becoming red if there's some error
-              <TextField
-                error={error ? true : false}
-                variant="outlined"
-                label={label}
-                {...params}
-              />
-            )}
-            {...rest}
+    <>
+      <Autocomplete
+        value={
+          multiple
+            ? options.filter((opt) => (field.value || []).includes(opt.value))
+            : options.find((opt) => opt.value === field.value) || null
+        }
+        onChange={(e, newVal) => {
+          if (multiple) {
+            form.setFieldValue(
+              field.name,
+              newVal.map((opt) => opt.value)
+            );
+          } else {
+            form.setFieldValue(field.name, newVal ? newVal.value : "");
+          }
+        }}
+        options={options}
+        multiple={multiple}
+        filterSelectedOptions
+        getOptionSelected={(option, test) => {
+          return option.value === test.value;
+        }}
+        getOptionLabel={(option) => option.label || ""}
+        renderOption={(option) => RenderLabel(option)}
+        renderTags={(value, props) => RenderTagList(value, props)}
+        renderInput={(params) => (
+          <TextField
+            {...params}
+            label={label}
+            variant="outlined"
+            error={!!error}
           />
-          {error && (
-            <FormHelperText
-              style={{ marginLeft: "14px" }}
-              error={Boolean(error)}
-            >
-              {error.message}
-            </FormHelperText>
-          )}
-        </>
+        )}
+        {...rest}
+      />
+      {error && (
+        <FormHelperText style={{ marginLeft: "14px" }} error>
+          {error}
+        </FormHelperText>
       )}
-    />
+    </>
   );
 }

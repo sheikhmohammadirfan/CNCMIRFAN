@@ -21,11 +21,11 @@ const Rbac = () => {
             <Roles />
           </CompanyAdminRoutes>
         </Route>
-        <Route exact path="/rbac/organization">
+        {/* <Route exact path="/rbac/organization">
           <FalconAdminRoute>
             <Organization />
           </FalconAdminRoute>
-        </Route>
+        </Route> */}
       </Switch>
     </Box>
   )

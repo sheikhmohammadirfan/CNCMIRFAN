@@ -22,7 +22,6 @@ import { notification, replaceIdWithName } from "../Utils/Utils";
 import { getIntegratedPlatform } from "../../Service/UserFactory";
 import SelectLabels from "./SelectLabels";
 import { CreateIssue as defaultValues } from "../../assets/data/DefaultValue";
-import zIndex from "@material-ui/core/styles/zIndex";
 
 // Status text based on loading value
 const LoadingStatus = (loading) => ({
@@ -34,12 +33,12 @@ const LoadingStatus = (loading) => ({
       {loading("project")
         ? "Loading Project..."
         : loading("issuetype")
-          ? "Loading Issue type..."
-          : loading("assignee")
-            ? "Loading Assignees..."
-            : loading("submit")
-              ? "Submiting data..."
-              : ""}
+        ? "Loading Issue type..."
+        : loading("assignee")
+        ? "Loading Assignees..."
+        : loading("submit")
+        ? "Submiting data..."
+        : ""}
     </Typography>
   ),
 });
@@ -117,8 +116,7 @@ function CreateIssue({ title, poamID, close, rowIndex, rowId }) {
 
   // Method to submit data to create an issue
   const onSubmit = async (formDetails) => {
-
-    const labels = formDetails.labels.join(",")
+    const labels = formDetails.labels.join(",");
     const payload = {
       project: formDetails.project,
       row_id: rowId,
@@ -127,12 +125,12 @@ function CreateIssue({ title, poamID, close, rowIndex, rowId }) {
       issuetype: formDetails.issuetype,
       assignee: formDetails.assignee.id,
       labels: labels,
-      file: formDetails.file
+      file: formDetails.file,
     };
 
     startLoading("submit");
     const { message, status } = await createIssue(
-      payload,
+      payload
       // rowIndex,
       // poamID
     );
@@ -164,7 +162,8 @@ function CreateIssue({ title, poamID, close, rowIndex, rowId }) {
           // preventDefault to prevent form from submitting on any Enter presses
           onSubmit={(e) => e.preventDefault()}
           control={control}
-          rules={validation}>
+          rules={validation}
+        >
           <Grid container spacing={2}>
             <Grid item xs={6}>
               <SelectControl
@@ -236,9 +235,11 @@ function CreateIssue({ title, poamID, close, rowIndex, rowId }) {
                 rules={validation}
                 options={assigneeList}
                 loading={isLoading("assignee")}
-                sx={{ "& .MuiDialog-root":{
-                  zIndex:'13000'
-                }}}
+                sx={{
+                  "& .MuiDialog-root": {
+                    zIndex: "13000",
+                  },
+                }}
               />
             </Grid>
 

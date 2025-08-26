@@ -2,7 +2,6 @@ import {
   Typography,
   Box,
   Button,
-  ButtonGroup,
   Grid,
   List,
   ListItem,
@@ -12,9 +11,8 @@ import {
   Tooltip,
   Backdrop,
   CircularProgress,
-  Chip,
   FormHelperText,
-  InputAdornment
+  InputAdornment,
 } from "@material-ui/core";
 import React from "react";
 import {
@@ -33,6 +31,7 @@ import { Form, TextControl, UploadControl } from "../Utils/Control";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { PoamUpload as defaultValues } from "../../assets/data/DefaultValue";
+import { Menu, MenuItem, Stack } from "@mui/material";
 
 // Generate styles
 const useStyle = makeStyles((theme) => ({
@@ -117,7 +116,7 @@ const AddNewPoamDialog = ({
   loading: { isLoading, startLoading, stopLoading },
   selectFile,
   cspName,
-  cspLoading
+  cspLoading,
 }) => {
   const classes = useStyle();
 
@@ -182,7 +181,7 @@ const AddNewPoamDialog = ({
 
   // set csp input field's value to what we received from backend
   if (cspName) {
-    setValue("csp", cspName)
+    setValue("csp", cspName);
   }
 
   // Make create api call with onsubmitting form
@@ -237,13 +236,15 @@ const AddNewPoamDialog = ({
                   fullWidth
                   disabled={cspLoading || Boolean(cspName)}
                   gutter={false}
-                  InputProps={cspLoading && {
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <CircularProgress size={20} color="inherit" />
-                      </InputAdornment>
-                    )
-                  }}
+                  InputProps={
+                    cspLoading && {
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <CircularProgress size={20} color="inherit" />
+                        </InputAdornment>
+                      ),
+                    }
+                  }
                 />
               </Grid>
 
@@ -373,6 +374,25 @@ export default function PoamUpload({ selectFile }) {
     load: false,
   });
 
+  const [anchorEl, setAnchorEl] = useState(null);
+
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleUpload = () => {
+    handleClose();
+    openUploadDialog();
+  };
+
+  const handleCreate = () => {
+    handleClose();
+    openCreateDialog();
+  };
   // fetch POA&M list on component mount
   useEffect(() => {
     (async () => {
@@ -411,6 +431,15 @@ export default function PoamUpload({ selectFile }) {
     stopLoading("download");
   };
 
+  const handlePoamTemlateClick = () => {
+    const link = document.createElement("a");
+    link.href = "/assets/POA&M_TEMPLATE.xlsx";
+    link.download = "POA&M_Template.xlsx"; // custom file name
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <Box height="80vh" width="100%" paddingX={2} paddingY={3}>
       <Box width="100%">
@@ -424,16 +453,33 @@ export default function PoamUpload({ selectFile }) {
           <Typography noWrap variant="h6" className={classes.titleStyle}>
             List of POA&M Files
           </Typography>
-
-          <ButtonGroup size="small" variant="contained">
-            <Button id="add-file-btn" onClick={openUploadDialog}>
-              Add / Open File
+          <Stack direction={"row"} spacing={1}>
+            <Button
+              variant="outlined"
+              size="small"
+              onClick={handlePoamTemlateClick}
+              color="primary"
+              startIcon={<Icon>download</Icon>}
+            >
+              POA&M Template
             </Button>
-
-            <Button id="create-file-btn" onClick={openCreateDialog}>
-              Create New File
+            <Button
+              variant="contained"
+              size="small"
+              onClick={handleClick}
+              color="primary"
+            >
+              Add POA&M
             </Button>
-          </ButtonGroup>
+          </Stack>
+          <Menu
+            anchorEl={anchorEl}
+            open={Boolean(anchorEl)}
+            onClose={handleClose}
+          >
+            <MenuItem onClick={handleUpload}>Upload POA&M</MenuItem>
+            <MenuItem onClick={handleCreate}>Create POA&M Manually</MenuItem>
+          </Menu>
         </Box>
 
         <List disablePadding className={classes.listContainer}>
@@ -446,7 +492,9 @@ export default function PoamUpload({ selectFile }) {
               <PoamListItem
                 key={index}
                 text={poamFileDetails.file_name}
-                onClick={() => selectFile(poamFileDetails.id, poamFileDetails.file_name)}
+                onClick={() =>
+                  selectFile(poamFileDetails.id, poamFileDetails.file_name)
+                }
                 onDownload={(e) => downloadPoam(e, poamFileDetails.id)}
               />
             ))

@@ -3,12 +3,13 @@ import { useHistory, useLocation } from "react-router-dom/cjs/react-router-dom.m
 import ROUTE_PERMISSIONS_MAP from "../../../assets/data/Rbac/routePermissionMap";
 import RestrictedPage from "../../Rbac/RestrictedPage";
 
-function RestrictedRoutes({ children }) {
+// added user as prop to avoid multiple calls to getUser-irfan
+function RestrictedRoutes({ children, user }) {
 
   const location = useLocation()
   const pathname = location.pathname
 
-  const user = getUser();
+  // const user = getUser();
   const isUserAdmin = user?.roles[0]?.id === 1
   const permissions = user?.roles[0]?.permissions
 

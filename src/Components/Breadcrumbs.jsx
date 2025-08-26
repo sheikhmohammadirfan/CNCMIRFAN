@@ -6,6 +6,7 @@ import {
 } from "@material-ui/core";
 import { Link, withRouter } from "react-router-dom";
 import { BreadcrumbMapper } from "../assets/data/BreadcrumbMapper";
+import { getUser } from "../Service/UserFactory";
 
 /**
  * CSS class generator
@@ -36,10 +37,28 @@ const Text = ({ link, children, path }) => {
   );
 };
 
+
 /**
  * Breadcrumbs Component
  */
 const Breadcrumbs = ({ location: { pathname, search } }) => {
+   
+   const user = getUser();
+  
+  // Define superuser-only routes
+  const SUPERUSER_ONLY_ROUTES = ['/rbac/organization'];
+  
+  // Check if current path is a superuser-only route and user is not superuser
+  const isUnauthorizedSuperUserRoute = SUPERUSER_ONLY_ROUTES.some(route => 
+    pathname.startsWith(route)
+  ) && !user?.is_superuser;
+  
+  // If unauthorized access to superuser route, don't show breadcrumbs
+  if (isUnauthorizedSuperUserRoute) {
+    return null; // No breadcrumbs at all
+  }
+
+
   // Array of object with path details
   const pathObject = pathname
     .split("/")

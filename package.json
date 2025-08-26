@@ -24,6 +24,7 @@
     "axios": "^0.21.1",
     "chart.js": "^3.7.0",
     "country-codes-list": "^1.6.8",
+    "formik": "^2.4.6",
     "lodash": "^4.17.21",
     "moment": "^2.29.1",
     "prop-types": "^15.8.1",
@@ -39,7 +40,8 @@
     "recharts": "^2.0.10",
     "serve": "^13.0.2",
     "web-vitals": "^1.1.2",
-    "xlsx": "^0.17.4"
+    "xlsx": "^0.17.4",
+    "yup": "^1.7.0"
   },
   "scripts": {
     "start": "react-scripts --openssl-legacy-provider start",
