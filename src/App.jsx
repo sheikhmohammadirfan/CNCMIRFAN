@@ -166,26 +166,10 @@ function App() {
               ) : (
                 <Box display="flex">
                   <Box>
-                    {user?.is_superuser ? (
-                      // Custom sidebar for superadmin with only Organization
-                      <div style={{ width: isSidebarOpen ? 285 : 50, transition: 'width 0.3s' }}>
-                        <Sidebar 
-                          isOpen={isSidebarOpen} 
-                          toggleSidebar={setSidebar} 
-                          customData={[{
-                            icon: "home",
-                            title: "Organization",
-                            component: Link,
-                            to: "/rbac/organization",
-                          }]}
-                        />
-                      </div>
-                    ) : (
-                      // Regular sidebar for normal users
-                      <Sidebar isOpen={isSidebarOpen} toggleSidebar={setSidebar} />
-                    )}
-                  </Box>
-
+                  {/* Regular sidebar for all users - no need for custom sidebar logic */}
+                  <Sidebar isOpen={isSidebarOpen} toggleSidebar={setSidebar} />
+                </Box>
+                
                   <Box
                     flexGrow={1}
                     className={`${classes.body} ${isSidebarOpen ? "open" : ""}`}
@@ -198,13 +182,16 @@ function App() {
                       </Route>
                       {/* irfan: added user={user} */}
                       <RestrictedRoutes user={user}>
-                        {user?.is_superuser ? (
-                          <>
-                            <Route exact path="/rbac/organization">
-                              <Organization title="ORGANIZATION" />
-                            </Route>
-                          </>
-                        ) : (
+                       {user?.is_superuser ? (
+                        <>
+                          <Route exact path="/rbac/organization">
+                            <Organization title="ORGANIZATION" />
+                          </Route>
+                          <Route exact path="/profile">
+                            <Profile title="PROFILE" />
+                          </Route>
+                        </>
+                      ) : (
                           <>
                           {/* route added by irfan to block normal users from accessing organization page */}
                           <Route exact path="/rbac/organization">
@@ -240,10 +227,6 @@ function App() {
                             </Route>
                           </>
                         )}
-                        {/* route added by irfan to show 404 page for undefined routes */}
-                        <Route path="*">
-              <NotFound />
-            </Route>
                       </RestrictedRoutes>
                     </div>
                   </Box>
@@ -264,7 +247,11 @@ function App() {
               <ParamsRoutes params={["updateIssue", "issues"]}>
                 <UpdateIssue title="Update Issue" />
               </ParamsRoutes>
+              {/* route added by irfan to show 404 page for undefined routes */}
             </ProtectedRoutes>
+            <Route path="*">
+              <NotFound />
+            </Route>
           </Switch>
         </Router>
       </Box>
