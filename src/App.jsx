@@ -8,7 +8,7 @@ import {
   Link,
   CircularProgress,
 } from "@material-ui/core";
-import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+import { BrowserRouter as Router, Switch, Route, Redirect } from "react-router-dom";
 import { Flip, toast } from "react-toastify";
 import Header from "./Components/Header";
 import Sidebar from "./Components/Sidebar/Sidebar";
@@ -75,6 +75,7 @@ const useStyles = makeStyles((theme) => ({
     height: `calc(100vh - ${headerHeight}px)`,
     minHeight: `calc(100vh - ${headerHeight}px)`,
     overflow: "auto",
+    padding: "16px",
     position: "relative",
     [theme.breakpoints.down("xs")]: { paddingLeft: sidebarSmall },
     backgroundColor: "#F4F4F4",
@@ -178,8 +179,13 @@ function App() {
                     <Header scrollTarget={scrollTarget} />
                     <div className={classes.wrapper}>
                       <Route exact path="/">
+                      {/* Conditional redirect based on user role */}
+                      {user?.is_superuser ? (
+                        <Redirect to="/rbac/organization" />
+                      ) : (
                         <Home title="HOME" />
-                      </Route>
+                      )}
+                    </Route>
                       {/* irfan: added user={user} */}
                       <RestrictedRoutes user={user}>
                        {user?.is_superuser ? (
@@ -195,7 +201,7 @@ function App() {
                           <>
                           {/* route added by irfan to block normal users from accessing organization page */}
                           <Route exact path="/rbac/organization">
-                              <NotFound title="403 - Access Denied" />
+                              <NotFound />
                             </Route>
                             
                             <Route exact path="/verify">

@@ -52,12 +52,16 @@ const Breadcrumbs = ({ location: { pathname, search } }) => {
   const isUnauthorizedSuperUserRoute = SUPERUSER_ONLY_ROUTES.some(route => 
     pathname.startsWith(route)
   ) && !user?.is_superuser;
-  
+    
   // If unauthorized access to superuser route, don't show breadcrumbs
   if (isUnauthorizedSuperUserRoute) {
     return null; // No breadcrumbs at all
   }
 
+  // If user is superadmin, don't show breadcrumbs at all
+  if (user?.is_superuser) {
+    return null;
+  }
 
   // Array of object with path details
   const pathObject = pathname

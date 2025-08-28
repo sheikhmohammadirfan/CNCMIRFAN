@@ -18,7 +18,7 @@ const useStyles = makeStyles((theme) => ({
     paddingLeft: theme.spacing(1.5),
     paddingRight: theme.spacing(2),
     display: "flex",
-    justifyContent: "space-between",
+    justifyContent: "flex-end",
     alignItems: "center",
     position: "sticky",
     top: 0,
