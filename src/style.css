@@ -1,0 +1,56 @@
+/* CUSTOM SCROLLBAR */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 13px;
+}
+
+::-webkit-scrollbar-track {
+  background: #ededed;
+  border: 1px solid #e6e6e6;
+  border-radius: 0 0 5px 5px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbcbcb;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #c5c5c5;
+}
+
+.close-sidebar::-webkit-scrollbar {
+  display: none;
+}
+
+/* FULLSCREEN STYLE */
+.fullscreen-enabled {
+  background: #fff;
+}
+
+/* PULSE ANIMATION */
+.pulse {
+  box-shadow: 0 0 0 0 rgb(var(--color));
+  animation: pulse-animation 1.5s infinite;
+}
+
+@keyframes pulse-animation {
+  0% {
+    box-shadow: 0 0 0 0 rgb(var(--color), 0.7);
+  }
+
+  70% {
+    box-shadow: 0 0 0 5px rgb(var(--color), 0);
+  }
+
+  100% {
+    box-shadow: 0 0 0 0 rgb(var(--color), 0);
+  }
+}
+
+.MuiDialog-root,
+.MuiPopper-root,
+.MuiPopover-root,
+.MuiTooltip-popper {
+  z-index: 13000;
+}
